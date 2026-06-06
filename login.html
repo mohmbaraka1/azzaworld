@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AZZA — تسجيل الدخول</title>
+
+<!-- الخطوط فقط (الأيقونات صارت SVG مدمج، بدون أي مكتبة خارجية) -->
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   AZZA — login.html  (هوية فلسطينية عصرية)
+   كل الأيقونات SVG مدمج → تشتغل دائماً
+   لاحقاً: انقل الـ CSS إلى css/style.css
+   ═══════════════════════════════════════════ */
+:root{
+  --olive:    #1c5b38;
+  --olive-deep:#0e3622;
+  --red:      #ce1126;
+  --red-deep: #9b1220;
+  --green:    #007a3d;
+  --cream:    #f7f1e3;
+  --cream-2:  #ece0c8;
+  --ink:      #1c1a14;
+  --gold:     #c69749;
+  --gold-soft:#e3c98c;
+  --muted:    #6b6555;
+  --line:     rgba(28,26,20,.12);
+  --err:      #c0392b;
+  --ok:       #1c5b38;
+  --r: 14px; --r2: 11px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:22px;position:relative;overflow-x:hidden}
+
+/* أيقونات SVG عامة (خطّية) */
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.card{width:100%;max-width:960px;background:#fff;border:1px solid var(--line);border-radius:26px;overflow:hidden;display:grid;grid-template-columns:1fr 1.1fr;box-shadow:0 30px 80px rgba(14,54,34,.18)}
+.tatreez{display:block;width:100%;height:22px}
+
+.brand{position:relative;color:var(--cream);overflow:hidden;background:radial-gradient(circle at 80% 12%, rgba(198,151,73,.18), transparent 48%),linear-gradient(165deg,var(--olive),var(--olive-deep));display:flex;flex-direction:column}
+.brand::after{content:'';position:absolute;inset:0;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M22 4l6 6-6 6-6-6z' fill='%23ffffff' opacity='0.05'/%3E%3C/svg%3E");background-size:44px 44px}
+.brand-in{position:relative;z-index:1;padding:34px 36px;display:flex;flex-direction:column;flex:1;justify-content:center;text-align:center;align-items:center}
+.flag{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--gold-soft);margin-bottom:14px;letter-spacing:1px}
+.logo{font-family:'Aref Ruqaa',serif;font-size:62px;line-height:1;color:var(--gold);text-shadow:0 2px 14px rgba(0,0,0,.3)}
+.logo-en{font-size:14px;letter-spacing:7px;color:var(--gold-soft);font-weight:700;margin-top:4px;padding-right:7px}
+.olive-svg{margin:18px 0 16px;opacity:.92}
+.brand-tag{font-family:'Aref Ruqaa',serif;font-size:24px;font-weight:700;line-height:1.55;color:#fff;max-width:300px}
+.brand-desc{font-size:13.5px;line-height:1.9;color:rgba(247,241,227,.72);max-width:300px;margin-top:12px}
+
+.panel{padding:38px 40px;display:flex;flex-direction:column;justify-content:center}
+.panel-tatreez{height:14px;max-width:160px;margin:0 auto 18px;display:none}
+
+.lang{position:absolute;top:16px;left:16px;z-index:5;display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.lang button{border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;cursor:pointer;transition:.2s}
+.lang button.on{background:var(--olive);color:#fff}
+
+.tabs{display:flex;gap:6px;background:var(--cream);border-radius:999px;padding:5px;margin-bottom:24px}
+.tab{flex:1;text-align:center;padding:11px;border-radius:999px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.tab.on{background:#fff;color:var(--olive);box-shadow:0 2px 8px rgba(14,54,34,.1)}
+
+.heading{font-family:'Aref Ruqaa',serif;font-size:30px;font-weight:700;color:var(--olive-deep);margin-bottom:4px}
+.subheading{font-size:14px;color:var(--muted);margin-bottom:22px}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--ink)}
+.input{display:flex;align-items:center;gap:11px;background:var(--cream);border:1.5px solid transparent;border-radius:var(--r2);padding:0 15px;transition:.2s}
+.input:focus-within{border-color:var(--olive);background:#fff;box-shadow:0 0 0 4px rgba(28,91,56,.08)}
+.input .ic{color:var(--muted)}
+.input input{flex:1;border:none;background:transparent;outline:none;color:var(--ink);font-family:inherit;font-size:14px;padding:13px 0}
+.input input::placeholder{color:#b3aa92}
+.eye{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex}
+.eye:hover{color:var(--olive)}
+
+.types{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.type{display:flex;align-items:center;gap:10px;background:var(--cream);border:1.5px solid var(--line);border-radius:var(--r2);padding:12px 13px;cursor:pointer;font-family:inherit;color:var(--muted);transition:.2s;text-align:right}
+.type:hover{border-color:var(--olive)}
+.type.on{background:rgba(28,91,56,.07);border-color:var(--olive);color:var(--olive)}
+.type .ic{flex-shrink:0}
+.type .lbl{font-size:13px;font-weight:700}
+
+.submit{width:100%;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--olive);color:#fff;border:none;border-radius:var(--r2);padding:15px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 8px 22px rgba(28,91,56,.25)}
+.submit:hover{background:var(--olive-deep);transform:translateY(-2px)}
+.submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.divider{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12.5px;margin:18px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+.social{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.social button{display:flex;align-items:center;justify-content:center;gap:9px;background:#fff;border:1.5px solid var(--line);border-radius:var(--r2);padding:12px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer;transition:.2s}
+.social button:hover{border-color:var(--gold);background:var(--cream)}
+.social svg{flex-shrink:0;display:block}
+
+.feat{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.feat-ic{width:40px;height:40px;border-radius:11px;flex-shrink:0;background:rgba(198,151,73,.12);border:1px solid rgba(198,151,73,.25);display:flex;align-items:center;justify-content:center;color:var(--gold-soft)}
+.feat-t{font-size:14px;font-weight:700;color:var(--cream)}
+.feat-d{font-size:12px;color:rgba(247,241,227,.7)}
+.feats{text-align:right;margin-top:6px}
+
+.msg{min-height:20px;font-size:12.5px;margin-top:10px}
+.switch{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
+.switch a{color:var(--olive);font-weight:700;cursor:pointer}
+.switch a:hover{text-decoration:underline}
+
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);padding:13px 26px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+
+@media(max-width:800px){
+  .card{grid-template-columns:1fr;max-width:450px}
+  .brand{display:none}
+  .panel{padding:38px 26px}
+  .panel-tatreez{display:block}
+}
+</style>
+</head>
+<body>
+
+<div class="lang">
+  <button id="lng-ar" class="on" onclick="setLang('ar')">ع</button>
+  <button id="lng-en" onclick="setLang('en')">EN</button>
+</div>
+
+<div class="card">
+
+  <!-- ════ لوحة الهوية ════ -->
+  <div class="brand">
+    <svg class="tatreez" viewBox="0 0 240 22" preserveAspectRatio="none">
+      <defs><pattern id="tatA" width="40" height="22" patternUnits="userSpaceOnUse">
+        <path d="M20 2 L26 7 L20 12 L14 7 Z" fill="#ce1126"/>
+        <path d="M20 5 L23 7 L20 9 L17 7 Z" fill="#f7f1e3"/>
+        <path d="M4 12 L8 16 L4 20 L0 16 Z" fill="#9b1220"/>
+        <path d="M36 12 L40 16 L36 20 L32 16 Z" fill="#9b1220"/>
+        <rect x="0" y="0" width="40" height="2" fill="#ce1126"/>
+        <rect x="0" y="20" width="40" height="2" fill="#ce1126"/>
+      </pattern></defs>
+      <rect width="240" height="22" fill="url(#tatA)"/>
+    </svg>
+
+    <div class="brand-in">
+      <div class="flag">
+        <svg class="ic" width="13" height="13" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+        <span>فلسطين</span>
+      </div>
+      <div class="logo">عزّة</div>
+      <div class="logo-en">AZZA</div>
+
+      <svg class="olive-svg" viewBox="0 0 120 40" width="118" height="38">
+        <path d="M10 20 C40 12, 80 12, 110 20" stroke="#e3c98c" stroke-width="1.5" fill="none"/>
+        <g fill="#e3c98c" opacity=".9">
+          <ellipse cx="30" cy="14" rx="6" ry="3" transform="rotate(-30 30 14)"/>
+          <ellipse cx="50" cy="11" rx="6" ry="3" transform="rotate(-20 50 11)"/>
+          <ellipse cx="70" cy="11" rx="6" ry="3" transform="rotate(20 70 11)"/>
+          <ellipse cx="90" cy="14" rx="6" ry="3" transform="rotate(30 90 14)"/>
+          <circle cx="40" cy="22" r="2.4"/><circle cx="60" cy="24" r="2.4"/><circle cx="80" cy="22" r="2.4"/>
+        </g>
+      </svg>
+
+      <div class="brand-tag" data-i18n="brand-tag">حيث تلتقي الأفكار برأس المال والخبرة</div>
+      <div class="brand-desc" data-i18n="brand-desc">منصة فلسطينية تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين — نبدأ بعزٍّ وننمو بشراكة.</div>
+
+      <div class="feats">
+        <div class="feat">
+          <div class="feat-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
+          <div><div class="feat-t" data-i18n="f1t">شارك فكرتك</div><div class="feat-d" data-i18n="f1d">انشرها أمام مجتمع جاهز للدعم</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div><div class="feat-t" data-i18n="f2t">تواصل مع الفريق</div><div class="feat-d" data-i18n="f2d">خبراء ومستثمرون بانتظارك</div></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ic"><svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91 0z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></div>
+          <div><div class="feat-t" data-i18n="f3t">ابنِ مستقبلك</div><div class="feat-d" data-i18n="f3d">من الفكرة إلى الواقع</div></div>
+        </div>
+      </div>
+    </div>
+
+    <svg class="tatreez" viewBox="0 0 240 22" preserveAspectRatio="none"><rect width="240" height="22" fill="url(#tatA)"/></svg>
+  </div>
+
+  <!-- ════ لوحة النموذج ════ -->
+  <div class="panel">
+    <svg class="panel-tatreez tatreez" viewBox="0 0 240 14" preserveAspectRatio="none">
+      <defs><pattern id="tatB" width="40" height="14" patternUnits="userSpaceOnUse">
+        <path d="M20 1 L25 5 L20 9 L15 5 Z" fill="#ce1126"/>
+        <rect x="0" y="12" width="40" height="2" fill="#ce1126"/>
+      </pattern></defs>
+      <rect width="240" height="14" fill="url(#tatB)"/>
+    </svg>
+
+    <div class="tabs">
+      <button class="tab on" id="tab-login" onclick="switchTab('login')" data-i18n="tab-login">دخول</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')" data-i18n="tab-register">إنشاء حساب</button>
+    </div>
+
+    <!-- ── الدخول ── -->
+    <div id="panel-login">
+      <div class="heading" data-i18n="login-h">أهلاً بعودتك</div>
+      <div class="subheading" data-i18n="login-s">سجّل دخولك لحسابك على عزّة</div>
+
+      <div class="field">
+        <label data-i18n="lbl-email">البريد الإلكتروني</label>
+        <div class="input">
+          <svg class="ic" width="17" height="17" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="login-email" placeholder="your@email.com" dir="ltr">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="lbl-pass">كلمة المرور</label>
+        <div class="input">
+          <svg class="ic" width="17" height="17" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="login-pass" placeholder="••••••••" dir="ltr" onkeypress="if(event.key==='Enter')login()">
+          <button class="eye" type="button" id="eye-login-pass" onclick="togglePass('login-pass','eye-login-pass')"></button>
+        </div>
+      </div>
+
+      <button class="submit" id="login-btn" onclick="login()">
+        <span data-i18n="login-btn">دخول</span>
+        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </button>
+      <div class="msg" id="login-msg"></div>
+
+      <div class="divider"><span data-i18n="or">أو</span></div>
+      <div class="social">
+        <button onclick="socialLogin('google')">
+          <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.3-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 5.1 29.5 3 24 3 16 3 9.1 7.6 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.5-5.2l-6.2-5.3C29.2 36 26.7 37 24 37c-5.3 0-9.7-3.6-11.3-8.4l-6.5 5C9.1 40.5 16 45 24 45z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4-4 5.5l6.2 5.3C41.4 36.2 45 30.6 45 24c0-1.2-.1-2.3-.4-3.5z"/>
+          </svg> Google</button>
+        <button onclick="socialLogin('apple')">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="#1c1a14" aria-hidden="true">
+            <path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.78 1.3 10.32.86 1.24 1.88 2.64 3.22 2.59 1.29-.05 1.78-.83 3.34-.83s2 .83 3.37.81c1.39-.03 2.27-1.27 3.12-2.52.98-1.44 1.39-2.83 1.41-2.9-.03-.01-2.71-1.04-2.74-4.13zM14.6 4.42c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44z"/>
+          </svg> iCloud</button>
+      </div>
+
+      <div class="switch"><span data-i18n="login-switch">ليس لديك حساب؟</span>
+        <a onclick="switchTab('register')" data-i18n="go-reg">سجّل الآن</a></div>
+    </div>
+
+    <!-- ── إنشاء حساب ── -->
+    <div id="panel-register" style="display:none">
+      <div class="heading" data-i18n="reg-h">إنشاء حساب</div>
+      <div class="subheading" data-i18n="reg-s">انضم إلى مجتمع عزّة اليوم</div>
+
+      <div class="field">
+        <label data-i18n="lbl-name">الاسم الكامل</label>
+        <div class="input">
+          <svg class="ic" width="17" height="17" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="reg-name" placeholder="الاسم الكامل">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="lbl-email">البريد الإلكتروني</label>
+        <div class="input">
+          <svg class="ic" width="17" height="17" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="reg-email" placeholder="your@email.com" dir="ltr">
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="lbl-type">أنت</label>
+        <div class="types">
+          <button class="type on" id="type-idea" onclick="selectType('idea')">
+            <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            <span class="lbl" data-i18n="t-idea">صاحب فكرة</span></button>
+          <button class="type" id="type-skill" onclick="selectType('skill')">
+            <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            <span class="lbl" data-i18n="t-skill">خبير</span></button>
+          <button class="type" id="type-investor" onclick="selectType('investor')">
+            <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <span class="lbl" data-i18n="t-inv">مستثمر</span></button>
+          <button class="type" id="type-company" onclick="selectType('company')">
+            <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg>
+            <span class="lbl" data-i18n="t-comp">شركة / مؤسسة</span></button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:15px">
+        <label data-i18n="lbl-pass">كلمة المرور</label>
+        <div class="input">
+          <svg class="ic" width="17" height="17" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="reg-pass" placeholder="••••••••" dir="ltr" onkeypress="if(event.key==='Enter')register()">
+          <button class="eye" type="button" id="eye-reg-pass" onclick="togglePass('reg-pass','eye-reg-pass')"></button>
+        </div>
+      </div>
+
+      <button class="submit" id="reg-btn" onclick="register()">
+        <span data-i18n="reg-btn">إنشاء الحساب</span>
+        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </button>
+      <div class="msg" id="reg-msg"></div>
+
+      <div class="divider"><span data-i18n="or">أو</span></div>
+      <div class="social">
+        <button onclick="socialLogin('google')">
+          <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.3-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 5.1 29.5 3 24 3 16 3 9.1 7.6 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.5-5.2l-6.2-5.3C29.2 36 26.7 37 24 37c-5.3 0-9.7-3.6-11.3-8.4l-6.5 5C9.1 40.5 16 45 24 45z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4-4 5.5l6.2 5.3C41.4 36.2 45 30.6 45 24c0-1.2-.1-2.3-.4-3.5z"/>
+          </svg> Google</button>
+        <button onclick="socialLogin('apple')">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="#1c1a14" aria-hidden="true">
+            <path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.78 1.3 10.32.86 1.24 1.88 2.64 3.22 2.59 1.29-.05 1.78-.83 3.34-.83s2 .83 3.37.81c1.39-.03 2.27-1.27 3.12-2.52.98-1.44 1.39-2.83 1.41-2.9-.03-.01-2.71-1.04-2.74-4.13zM14.6 4.42c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44z"/>
+          </svg> iCloud</button>
+      </div>
+
+      <div class="switch"><span data-i18n="reg-switch">لديك حساب؟</span>
+        <a onclick="switchTab('login')" data-i18n="go-login">سجّل دخولك</a></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   AZZA — auth.js  (لاحقاً: js/auth.js)
+   ═══════════════════════════════════════════ */
+let selectedType = 'idea';
+let currentLang  = localStorage.getItem('azza_lang') || 'ar';
+
+/* أيقونات SVG للجافاسكربت (العين والسبينر) */
+const ICON_EYE     = '<svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF = '<svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>';
+const ICON_SPIN    = '<svg class="ic spin" width="18" height="18" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+
+const getUsers  = () => { try { return JSON.parse(localStorage.getItem('azza_users') || '[]'); } catch { return []; } };
+const saveUsers = u => localStorage.setItem('azza_users', JSON.stringify(u));
+const saveUser  = u => localStorage.setItem('azza_user', JSON.stringify(u));
+const saveToken = t => localStorage.setItem('azza_token', t);
+const genId     = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+async function hashPassword(pw){
+  const salted = pw + 'AZZA_SALT_2025';
+  if (window.crypto && crypto.subtle){
+    try{
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(salted));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }catch(e){}
+  }
+  let h = 0; for (let i=0;i<salted.length;i++){ h=(h<<5)-h+salted.charCodeAt(i); h|=0; }
+  return 'fb_' + Math.abs(h).toString(16);
+}
+
+function switchTab(tab){
+  const isLogin = tab === 'login';
+  document.getElementById('panel-login').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('panel-register').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('tab-login').classList.toggle('on', isLogin);
+  document.getElementById('tab-register').classList.toggle('on', !isLogin);
+}
+function selectType(type){
+  selectedType = type;
+  document.querySelectorAll('.type').forEach(b => b.classList.remove('on'));
+  document.getElementById('type-' + type).classList.add('on');
+}
+function togglePass(inputId, btnId){
+  const inp = document.getElementById(inputId), btn = document.getElementById(btnId);
+  const reveal = inp.type === 'password';
+  inp.type = reveal ? 'text' : 'password';
+  btn.innerHTML = reveal ? ICON_EYE_OFF : ICON_EYE;
+}
+function setBtnLoading(btn, on){
+  if (!btn) return;
+  if (on){ btn._orig = btn.innerHTML; btn.innerHTML = ICON_SPIN; btn.disabled = true; }
+  else   { btn.innerHTML = btn._orig || btn.innerHTML; btn.disabled = false; }
+}
+function showToast(msg, type='ok'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = type==='ok' ? 'var(--ok)' : type==='err' ? 'var(--err)' : 'var(--gold)';
+  el.style.color = type==='info' ? '#000' : '#fff';
+  el.style.opacity = '1';
+  clearTimeout(el._t); el._t = setTimeout(() => el.style.opacity = '0', 3200);
+}
+function fieldError(elId, key){
+  document.getElementById(elId).innerHTML = '<span style="color:var(--err)">' + t(key) + '</span>';
+}
+
+function socialLogin(provider){
+  const name = provider === 'google' ? 'Google' : 'Apple / iCloud';
+  showToast(t('social-soon').replace('{p}', name), 'info');
+}
+
+async function login(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('login-btn');
+  document.getElementById('login-msg').innerHTML = '';
+  if (!email || !pass){ fieldError('login-msg','err-fields'); return; }
+  setBtnLoading(btn, true);
+  const hashed = await hashPassword(pass);
+  const user = getUsers().find(u => u.email === email && u.password === hashed);
+  setBtnLoading(btn, false);
+  if (!user){ fieldError('login-msg','err-cred'); return; }
+  saveToken('local_token_' + user.id); saveUser(user);
+  showToast(t('welcome-back') + ' ' + user.name + ' 👋');
+  // window.location.href = 'app.html';
+}
+
+async function register(){
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  document.getElementById('reg-msg').innerHTML = '';
+  if (!name || !email || !pass){ fieldError('reg-msg','err-fields'); return; }
+  if (pass.length < 8)         { fieldError('reg-msg','err-len');    return; }
+  if (!/[0-9]/.test(pass))     { fieldError('reg-msg','err-num');    return; }
+  const users = getUsers();
+  if (users.find(u => u.email === email)){ fieldError('reg-msg','err-exists'); return; }
+  const btn = document.getElementById('reg-btn');
+  setBtnLoading(btn, true);
+  const hashed = await hashPassword(pass);
+  const user = { id: genId(), name, email, password: hashed, type: selectedType, level:1, points:0, createdAt:new Date().toISOString() };
+  users.push(user); saveUsers(users);
+  saveToken('local_token_' + user.id); saveUser(user);
+  setBtnLoading(btn, false);
+  showToast(t('welcome') + ' ' + name + ' 🎉');
+  // window.location.href = 'app.html';
+}
+
+const I18N = {
+  ar:{
+    'brand-tag':'حيث تلتقي الأفكار برأس المال والخبرة',
+    'brand-desc':'منصة فلسطينية تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين — نبدأ بعزٍّ وننمو بشراكة.',
+    'f1t':'شارك فكرتك','f1d':'انشرها أمام مجتمع جاهز للدعم',
+    'f2t':'تواصل مع الفريق','f2d':'خبراء ومستثمرون بانتظارك',
+    'f3t':'ابنِ مستقبلك','f3d':'من الفكرة إلى الواقع',
+    'tab-login':'دخول','tab-register':'إنشاء حساب',
+    'login-h':'أهلاً بعودتك','login-s':'سجّل دخولك لحسابك على عزّة',
+    'lbl-email':'البريد الإلكتروني','lbl-pass':'كلمة المرور','lbl-name':'الاسم الكامل','lbl-type':'أنت',
+    't-idea':'صاحب فكرة','t-skill':'خبير','t-inv':'مستثمر','t-comp':'شركة / مؤسسة',
+    'login-btn':'دخول','login-switch':'ليس لديك حساب؟','go-reg':'سجّل الآن',
+    'reg-h':'إنشاء حساب','reg-s':'انضم إلى مجتمع عزّة اليوم',
+    'reg-btn':'إنشاء الحساب','reg-switch':'لديك حساب؟','go-login':'سجّل دخولك',
+    'or':'أو',
+    'err-fields':'يرجى ملء جميع الحقول','err-cred':'البريد أو كلمة المرور غير صحيحة',
+    'err-len':'كلمة المرور 8 أحرف على الأقل','err-num':'يجب أن تحتوي على رقم','err-exists':'البريد مستخدم مسبقاً',
+    'welcome':'مرحباً بك في عزّة،','welcome-back':'أهلاً بعودتك',
+    'social-soon':'الدخول عبر {p} سيُفعّل بعد إعداد الخادم'
+  },
+  en:{
+    'brand-tag':'Where ideas meet capital and expertise',
+    'brand-desc':'A Palestinian platform connecting idea holders, companies, experts, and investors — we start with pride and grow in partnership.',
+    'f1t':'Share your idea','f1d':'Post it to a community ready to back you',
+    'f2t':'Connect with the team','f2d':'Experts & investors are waiting',
+    'f3t':'Build your future','f3d':'From idea to reality',
+    'tab-login':'Login','tab-register':'Sign Up',
+    'login-h':'Welcome back','login-s':'Sign in to your AZZA account',
+    'lbl-email':'Email','lbl-pass':'Password','lbl-name':'Full name','lbl-type':'You are',
+    't-idea':'Ideator','t-skill':'Expert','t-inv':'Investor','t-comp':'Company / Institution',
+    'login-btn':'Sign In','login-switch':"Don't have an account?",'go-reg':'Register now',
+    'reg-h':'Create account','reg-s':'Join the AZZA community today',
+    'reg-btn':'Create Account','reg-switch':'Have an account?','go-login':'Sign in',
+    'or':'or',
+    'err-fields':'Please fill all fields','err-cred':'Incorrect email or password',
+    'err-len':'Password must be at least 8 characters','err-num':'Must contain at least one number','err-exists':'Email already registered',
+    'welcome':'Welcome to AZZA,','welcome-back':'Welcome back',
+    'social-soon':'Sign in with {p} will be enabled after server setup'
+  }
+};
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('azza_lang', lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('lng-ar').classList.toggle('on', lang === 'ar');
+  document.getElementById('lng-en').classList.toggle('on', lang === 'en');
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
+}
+
+/* تهيئة أيقونات العين */
+document.getElementById('eye-login-pass').innerHTML = ICON_EYE;
+document.getElementById('eye-reg-pass').innerHTML   = ICON_EYE;
+setLang(currentLang);
+
+/* فتح تبويب "إنشاء حساب" تلقائياً عند المجيء من زر حساب جديد (login.html#register) */
+if (location.hash === '#register') switchTab('register');
+</script>
+</body>
+</html>

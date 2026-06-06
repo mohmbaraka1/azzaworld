@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فحص الربط</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,'Segoe UI',Tahoma,sans-serif}
+body{background:#0e3622;color:#f7f1e3;padding:24px;line-height:1.8}
+h1{color:#c69749;font-size:22px;margin-bottom:16px}
+.box{background:#1c5b38;border:1px solid #c69749;border-radius:12px;padding:18px;margin-bottom:16px}
+a.test{display:block;background:#c69749;color:#0e3622;text-align:center;padding:18px;border-radius:12px;font-size:20px;font-weight:800;text-decoration:none;margin-bottom:12px}
+button{display:block;width:100%;background:#fff;color:#0e3622;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;margin-bottom:12px}
+#log{background:#000;color:#0f0;border-radius:10px;padding:14px;font-family:monospace;font-size:13px;min-height:120px;white-space:pre-wrap;direction:ltr;text-align:left}
+.note{font-size:14px;color:#e3c98c;margin-bottom:10px}
+</style>
+</head>
+<body>
+  <h1>🔍 فحص الربط بين الصفحات</h1>
+
+  <div class="box">
+    <div class="note">جرّب الطرق الثلاث بالترتيب. كل طريقة بتكتب نتيجتها بالأسفل:</div>
+
+    <a class="test" href="login.html">الطريقة 1: رابط عادي (اضغط هنا)</a>
+
+    <button onclick="goJS()">الطريقة 2: انتقال بالكود (اضغط هنا)</button>
+
+    <button onclick="goReplace()">الطريقة 3: انتقال إجباري (اضغط هنا)</button>
+  </div>
+
+  <div class="box">
+    <div class="note">📋 سجلّ الفحص:</div>
+    <div id="log">جاهز... اضغط أي زر فوق.</div>
+  </div>
+
+<script>
+const log = document.getElementById('log');
+function w(msg){ log.textContent += '\n> ' + msg; }
+
+// فحص وجود الملف فعلياً على السيرفر
+fetch('login.html')
+  .then(r => w('فحص الملف: login.html موجود على السيرفر ✓ (الحالة ' + r.status + ')'))
+  .catch(e => w('فحص الملف: تعذّر الوصول ✗ — ' + e.message));
+
+function goJS(){
+  w('الطريقة 2: محاولة الانتقال عبر location.href ...');
+  try { window.location.href = 'login.html'; }
+  catch(e){ w('خطأ: ' + e.message); }
+}
+function goReplace(){
+  w('الطريقة 3: محاولة الانتقال الإجباري ...');
+  try { window.location.assign('login.html'); }
+  catch(e){ w('خطأ: ' + e.message); }
+}
+
+// نراقب: هل في كود بيلغي الانتقال؟
+window.addEventListener('beforeunload', () => {
+  // لو وصلنا هون يعني الصفحة فعلاً رايحة تنتقل
+});
+document.querySelector('a.test').addEventListener('click', () => {
+  w('الطريقة 1: ضغطت الرابط العادي — المفروض ينتقل الآن...');
+});
+</script>
+</body>
+</html>

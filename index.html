@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — AZZA | حيث تلتقي الأفكار برأس المال والخبرة</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   AZZA — index.html  (الصفحة الرئيسية)
+   نفس هوية صفحة الدخول: زيتي + أحمر + رملي + ذهبي + تطريز
+   كل الأيقونات SVG مدمج → تشتغل دائماً
+   ═══════════════════════════════════════════ */
+:root{
+  --olive:#1c5b38; --olive-deep:#0e3622;
+  --red:#ce1126; --red-deep:#9b1220;
+  --cream:#f7f1e3; --cream-2:#ece0c8;
+  --ink:#1c1a14; --gold:#c69749; --gold-soft:#e3c98c;
+  --muted:#6b6555; --line:rgba(28,26,20,.12);
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.7}
+a{text-decoration:none;color:inherit}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+.container{max-width:1140px;margin:0 auto;padding:0 22px}
+
+/* شريط تطريز فاصل */
+.tatreez{display:block;width:100%;height:16px}
+
+/* ════ الهيدر ════ */
+.nav{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:24px;flex-shrink:0}
+.logo-text{font-family:'Aref Ruqaa',serif;font-size:26px;color:var(--olive-deep);line-height:1}
+.nav-links{display:flex;gap:26px;font-size:15px;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--olive)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang{display:flex;gap:3px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
+.lang button{border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;transition:.2s}
+.lang button.on{background:var(--olive);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;font-family:inherit;font-weight:700;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--olive);color:#fff;padding:11px 22px;font-size:14px;box-shadow:0 6px 18px rgba(28,91,56,.25)}
+.btn-primary:hover{background:var(--olive-deep);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);font-weight:600;padding:11px 8px;font-size:14px}
+.btn-ghost:hover{color:var(--olive)}
+.btn-lg{padding:15px 30px;font-size:16px}
+.burger{display:none;background:none;border:none;color:var(--ink);cursor:pointer;padding:4px}
+
+/* ════ القسم البطل ════ */
+.hero{position:relative;text-align:center;padding:80px 0 70px;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 22% 25%,rgba(28,91,56,.10),transparent 45%),radial-gradient(circle at 80% 60%,rgba(198,151,73,.12),transparent 50%)}
+.hero-in{position:relative;z-index:1;max-width:780px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(28,91,56,.08);color:var(--olive-deep);border:1px solid rgba(28,91,56,.18);border-radius:999px;padding:7px 16px;font-size:13.5px;font-weight:600;margin-bottom:22px}
+.hero h1{font-family:'Aref Ruqaa',serif;font-size:clamp(34px,6vw,60px);line-height:1.25;color:var(--olive-deep);margin-bottom:18px}
+.hero h1 .accent{color:var(--olive);position:relative}
+.hero h1 .accent::after{content:'';position:absolute;left:0;right:0;bottom:4%;height:26%;background:var(--gold-soft);opacity:.5;z-index:-1;border-radius:4px}
+.hero p{font-size:clamp(16px,2.2vw,20px);color:var(--muted);max-width:620px;margin:0 auto 32px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 6px 18px rgba(198,151,73,.3)}
+.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
+.btn-outline{background:#fff;color:var(--olive);border:1.5px solid var(--line)}
+.btn-outline:hover{border-color:var(--olive)}
+
+.stats{display:inline-flex;align-items:center;gap:26px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 32px;box-shadow:0 14px 40px rgba(14,54,34,.07)}
+.stat strong{display:block;font-family:'Aref Ruqaa',serif;font-size:28px;color:var(--olive-deep)}
+.stat span{font-size:12.5px;color:var(--muted)}
+.stat-sep{width:1px;height:36px;background:var(--line)}
+
+/* ════ عناوين الأقسام ════ */
+.section{padding:78px 0}
+.head{text-align:center;max-width:620px;margin:0 auto 48px}
+.head h2{font-family:'Aref Ruqaa',serif;font-size:clamp(28px,4.5vw,40px);color:var(--olive-deep);margin-bottom:12px}
+.head p{font-size:17px;color:var(--muted)}
+
+/* ════ الأطراف الثلاثة ════ */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px 22px;transition:.25s}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 44px rgba(14,54,34,.1);border-color:rgba(28,91,56,.3)}
+.card-ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(28,91,56,.09);color:var(--olive);margin-bottom:18px}
+.card h3{font-size:19px;font-weight:700;margin-bottom:8px;color:var(--ink)}
+.card p{font-size:14px;color:var(--muted);margin-bottom:14px}
+.card-link{display:inline-flex;align-items:center;gap:6px;color:var(--olive);font-weight:700;font-size:14px}
+.card:hover .card-link{gap:11px}
+
+/* ════ كيف تعمل (قسم داكن) ════ */
+.dark{position:relative;background:linear-gradient(165deg,var(--olive),var(--olive-deep));color:var(--cream);overflow:hidden}
+.dark::after{content:'';position:absolute;inset:0;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M22 4l6 6-6 6-6-6z' fill='%23ffffff' opacity='0.05'/%3E%3C/svg%3E");background-size:44px 44px}
+.dark .head h2{color:#fff}
+.dark .head p{color:rgba(247,241,227,.65)}
+.dark-in{position:relative;z-index:1}
+.grid-4-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.step-num{font-family:'Aref Ruqaa',serif;font-size:42px;color:var(--gold);line-height:1;margin-bottom:12px}
+.step h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:7px}
+.step p{font-size:14px;color:rgba(247,241,227,.62)}
+
+/* ════ لماذا عزّة ════ */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.feat-ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--gold);margin-bottom:16px}
+.feat h3{font-size:18px;font-weight:700;margin-bottom:7px}
+.feat p{font-size:14px;color:var(--muted)}
+
+/* ════ دعوة أخيرة ════ */
+.cta-sec{padding:50px 0 86px}
+.cta-box{position:relative;overflow:hidden;text-align:center;background:var(--ink);color:var(--cream);border-radius:26px;padding:60px 30px}
+.cta-box::after{content:'';position:absolute;inset:auto -10% -55% -10%;height:340px;background:radial-gradient(circle at 50% 100%,rgba(198,151,73,.4),transparent 60%)}
+.cta-box h2{position:relative;font-family:'Aref Ruqaa',serif;font-size:clamp(26px,4.5vw,38px);margin-bottom:14px}
+.cta-box p{position:relative;color:rgba(247,241,227,.7);font-size:17px;max-width:520px;margin:0 auto 28px}
+.cta-box .btn{position:relative}
+
+/* ════ الفوتر ════ */
+.footer{background:var(--cream-2);border-top:1px solid var(--line);padding:52px 0 26px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px;padding-bottom:36px}
+.footer-tag{color:var(--muted);margin-top:10px;max-width:250px;font-size:14px}
+.footer-col h4{font-size:14px;font-weight:700;margin-bottom:13px}
+.footer-col a{display:block;color:var(--muted);font-size:14px;margin-bottom:9px}
+.footer-col a:hover{color:var(--olive)}
+.footer-bottom{padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted);text-align:center}
+
+/* ظهور تدريجي */
+.reveal{opacity:0;transform:translateY(18px);animation:rev .7s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes rev{to{opacity:1;transform:none}}
+
+/* الموبايل */
+.mnav{display:none;flex-direction:column;gap:14px;padding:18px 22px 24px;border-bottom:1px solid var(--line);font-weight:600}
+@media(max-width:860px){
+  .nav-links,.nav-right .btn-ghost{display:none}
+  .burger{display:flex}
+  .mnav.open{display:flex}
+  .grid-4,.grid-4-steps,.grid-3{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .stats{flex-wrap:wrap;gap:16px;justify-content:center}
+}
+@media(max-width:520px){
+  .grid-4,.grid-4-steps,.grid-3,.footer-grid{grid-template-columns:1fr}
+  .stat-sep{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ الهيدر ════ -->
+<header class="nav">
+  <div class="container nav-in">
+    <a href="#" class="logo">
+      <div class="logo-mark">ع</div>
+      <span class="logo-text">عزّة</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#parties" data-i18n="nav-parties">لمن المنصة</a>
+      <a href="#how" data-i18n="nav-how">كيف تعمل</a>
+      <a href="#why" data-i18n="nav-why">لماذا عزّة</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang">
+        <button id="lng-ar" class="on" onclick="setLang('ar')">ع</button>
+        <button id="lng-en" onclick="setLang('en')">EN</button>
+      </div>
+      <a href="login.html" class="btn btn-ghost" data-i18n="nav-login">تسجيل الدخول</a>
+      <a href="login.html" class="btn btn-primary" data-i18n="nav-join">انضم الآن</a>
+      <button class="burger" onclick="toggleMenu()" aria-label="menu">
+        <svg class="ic" width="24" height="24" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mnav" id="mnav">
+    <a href="#parties" data-i18n="nav-parties">لمن المنصة</a>
+    <a href="#how" data-i18n="nav-how">كيف تعمل</a>
+    <a href="#why" data-i18n="nav-why">لماذا عزّة</a>
+    <a href="login.html" data-i18n="nav-login">تسجيل الدخول</a>
+  </div>
+</header>
+
+<!-- ════ القسم البطل ════ -->
+<section class="hero">
+  <div class="container hero-in">
+    <span class="badge reveal" style="animation-delay:.05s">
+      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21l2.3-7.4-6-4.6h7.6z"/></svg>
+      <span data-i18n="badge">منصة فلسطينية للأفكار والاستثمار</span>
+    </span>
+    <h1 class="reveal" style="animation-delay:.15s" data-i18n="hero-h">حيث تلتقي الأفكار <span class="accent" data-i18n="hero-accent">برأس المال والخبرة</span></h1>
+    <p class="reveal" style="animation-delay:.25s" data-i18n="hero-p">منصة واحدة تجمع أصحاب الأفكار، والشركات والمؤسسات، والخبراء، والمستثمرين — لنبدأ بعزٍّ وننمو بشراكة.</p>
+    <div class="hero-cta reveal" style="animation-delay:.35s">
+      <a href="login.html" class="btn btn-gold btn-lg">
+        <span data-i18n="hero-cta1">اعرض فكرتك</span>
+        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </a>
+      <a href="#parties" class="btn btn-outline btn-lg" data-i18n="hero-cta2">استكشف الفرص</a>
+    </div>
+    <div class="stats reveal" style="animation-delay:.45s">
+      <div class="stat"><strong>+1.2K</strong><span data-i18n="stat1">فكرة منشورة</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><strong>+340</strong><span data-i18n="stat2">مستثمر فعّال</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><strong>+180</strong><span data-i18n="stat3">شراكة ناجحة</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ الأطراف الأربعة ════ -->
+<section class="section" id="parties">
+  <div class="container">
+    <div class="head">
+      <h2 data-i18n="parties-h">لمن صُمّمت عزّة؟</h2>
+      <p data-i18n="parties-p">أربعة أطراف، هدف واحد: تحويل الأفكار إلى واقع.</p>
+    </div>
+    <div class="grid-4">
+      <article class="card">
+        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
+        <h3 data-i18n="p1h">أصحاب الأفكار</h3>
+        <p data-i18n="p1p">اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.</p>
+        <a href="login.html" class="card-link"><span data-i18n="p1c">ابدأ بعرض فكرتك</span>
+          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      </article>
+      <article class="card">
+        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+        <h3 data-i18n="p2h">الشركات والمؤسسات</h3>
+        <p data-i18n="p2p">اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.</p>
+        <a href="login.html" class="card-link"><span data-i18n="p2c">ابحث عن شراكات</span>
+          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      </article>
+      <article class="card">
+        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <h3 data-i18n="p3h">الخبراء</h3>
+        <p data-i18n="p3p">شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.</p>
+        <a href="login.html" class="card-link"><span data-i18n="p3c">قدّم خبرتك</span>
+          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      </article>
+      <article class="card">
+        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+        <h3 data-i18n="p4h">المستثمرون</h3>
+        <p data-i18n="p4p">تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.</p>
+        <a href="login.html" class="card-link"><span data-i18n="p4c">تصفّح الفرص</span>
+          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ════ كيف تعمل ════ -->
+<svg class="tatreez" viewBox="0 0 240 16" preserveAspectRatio="none">
+  <defs><pattern id="tat" width="40" height="16" patternUnits="userSpaceOnUse">
+    <path d="M20 1 L26 6 L20 11 L14 6 Z" fill="#ce1126"/>
+    <path d="M4 8 L8 12 L4 15 L0 12 Z" fill="#9b1220"/><path d="M36 8 L40 12 L36 15 L32 12 Z" fill="#9b1220"/>
+  </pattern></defs><rect width="240" height="16" fill="url(#tat)"/>
+</svg>
+<section class="section dark" id="how">
+  <div class="container dark-in">
+    <div class="head">
+      <h2 data-i18n="how-h">كيف تعمل؟</h2>
+      <p data-i18n="how-p">من الفكرة إلى الشراكة في أربع خطوات.</p>
+    </div>
+    <div class="grid-4-steps">
+      <div class="step"><div class="step-num">٠١</div><h3 data-i18n="s1h">أنشئ ملفك</h3><p data-i18n="s1p">سجّل وحدّد دورك: صاحب فكرة، شركة، خبير، أو مستثمر.</p></div>
+      <div class="step"><div class="step-num">٠٢</div><h3 data-i18n="s2h">اعرض أو اكتشف</h3><p data-i18n="s2p">انشر فكرتك أو تصفّح الفرص المتاحة بسهولة.</p></div>
+      <div class="step"><div class="step-num">٠٣</div><h3 data-i18n="s3h">تواصل بثقة</h3><p data-i18n="s3p">راسل الأطراف المهتمة ضمن بيئة آمنة ومحمية.</p></div>
+      <div class="step"><div class="step-num">٠٤</div><h3 data-i18n="s4h">ابنِ شراكة</h3><p data-i18n="s4p">اتفق على التفاصيل وابدأ رحلة مشروعك معاً.</p></div>
+    </div>
+  </div>
+</section>
+<svg class="tatreez" viewBox="0 0 240 16" preserveAspectRatio="none"><rect width="240" height="16" fill="url(#tat)"/></svg>
+
+<!-- ════ لماذا عزّة ════ -->
+<section class="section" id="why">
+  <div class="container">
+    <div class="head"><h2 data-i18n="why-h">لماذا عزّة؟</h2></div>
+    <div class="grid-3">
+      <div class="feat">
+        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <h3 data-i18n="w1h">تطابق ذكي</h3><p data-i18n="w1p">نوصلك بالأطراف الأنسب لفكرتك أو رأس مالك.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3 data-i18n="w2h">شفافية وحماية</h3><p data-i18n="w2p">ملفات موثّقة واتفاقيات حماية للأفكار (NDA).</p>
+      </div>
+      <div class="feat">
+        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3 data-i18n="w3h">خبرة متاحة</h3><p data-i18n="w3p">وصول إلى خبراء ومستشارين في مختلف المجالات.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ دعوة أخيرة ════ -->
+<section class="cta-sec">
+  <div class="container">
+    <div class="cta-box">
+      <h2 data-i18n="cta-h">جاهز لتحويل فكرتك إلى واقع؟</h2>
+      <p data-i18n="cta-p">انضم اليوم إلى منظومة تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين في مكان واحد.</p>
+      <a href="login.html" class="btn btn-gold btn-lg">
+        <span data-i18n="cta-btn">أنشئ حسابك مجاناً</span>
+        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════ الفوتر ════ -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="#" class="logo"><div class="logo-mark">ع</div><span class="logo-text">عزّة</span></a>
+      <p class="footer-tag" data-i18n="foot-tag">حيث تنمو الأفكار الفلسطينية.</p>
+    </div>
+    <div class="footer-col"><h4 data-i18n="fc1">المنصة</h4>
+      <a href="#how" data-i18n="fc1a">كيف تعمل</a><a href="#why" data-i18n="fc1b">لماذا عزّة</a><a href="#parties" data-i18n="fc1c">لمن المنصة</a></div>
+    <div class="footer-col"><h4 data-i18n="fc2">الشركة</h4>
+      <a href="#" data-i18n="fc2a">عن عزّة</a><a href="#" data-i18n="fc2b">تواصل معنا</a><a href="#" data-i18n="fc2c">الوظائف</a></div>
+    <div class="footer-col"><h4 data-i18n="fc3">قانوني</h4>
+      <a href="#" data-i18n="fc3a">الخصوصية</a><a href="#" data-i18n="fc3b">الشروط</a><a href="#" data-i18n="fc3c">حماية الأفكار</a></div>
+  </div>
+  <div class="container footer-bottom">
+    <span id="foot-rights">© 2026 عزّة. جميع الحقوق محفوظة.</span>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   AZZA — home.js  (لاحقاً: js/home.js)
+   ═══════════════════════════════════════════ */
+let currentLang = localStorage.getItem('azza_lang') || 'ar';
+
+function toggleMenu(){ document.getElementById('mnav').classList.toggle('open'); }
+
+const I18N = {
+  ar:{
+    'nav-parties':'لمن المنصة','nav-how':'كيف تعمل','nav-why':'لماذا عزّة','nav-login':'تسجيل الدخول','nav-join':'انضم الآن',
+    'badge':'منصة فلسطينية للأفكار والاستثمار',
+    'hero-h':'حيث تلتقي الأفكار ','hero-accent':'برأس المال والخبرة',
+    'hero-p':'منصة واحدة تجمع أصحاب الأفكار، والشركات والمؤسسات، والخبراء، والمستثمرين — لنبدأ بعزٍّ وننمو بشراكة.',
+    'hero-cta1':'اعرض فكرتك','hero-cta2':'استكشف الفرص',
+    'stat1':'فكرة منشورة','stat2':'مستثمر فعّال','stat3':'شراكة ناجحة',
+    'parties-h':'لمن صُمّمت عزّة؟','parties-p':'أربعة أطراف، هدف واحد: تحويل الأفكار إلى واقع.',
+    'p1h':'أصحاب الأفكار','p1p':'اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.','p1c':'ابدأ بعرض فكرتك',
+    'p2h':'الشركات والمؤسسات','p2p':'اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.','p2c':'ابحث عن شراكات',
+    'p3h':'الخبراء','p3p':'شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.','p3c':'قدّم خبرتك',
+    'p4h':'المستثمرون','p4p':'تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.','p4c':'تصفّح الفرص',
+    'how-h':'كيف تعمل؟','how-p':'من الفكرة إلى الشراكة في أربع خطوات.',
+    's1h':'أنشئ ملفك','s1p':'سجّل وحدّد دورك: صاحب فكرة، شركة، خبير، أو مستثمر.',
+    's2h':'اعرض أو اكتشف','s2p':'انشر فكرتك أو تصفّح الفرص المتاحة بسهولة.',
+    's3h':'تواصل بثقة','s3p':'راسل الأطراف المهتمة ضمن بيئة آمنة ومحمية.',
+    's4h':'ابنِ شراكة','s4p':'اتفق على التفاصيل وابدأ رحلة مشروعك معاً.',
+    'why-h':'لماذا عزّة؟',
+    'w1h':'تطابق ذكي','w1p':'نوصلك بالأطراف الأنسب لفكرتك أو رأس مالك.',
+    'w2h':'شفافية وحماية','w2p':'ملفات موثّقة واتفاقيات حماية للأفكار (NDA).',
+    'w3h':'خبرة متاحة','w3p':'وصول إلى خبراء ومستشارين في مختلف المجالات.',
+    'cta-h':'جاهز لتحويل فكرتك إلى واقع؟','cta-p':'انضم اليوم إلى منظومة تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين في مكان واحد.','cta-btn':'أنشئ حسابك مجاناً',
+    'foot-tag':'حيث تنمو الأفكار الفلسطينية.',
+    'fc1':'المنصة','fc1a':'كيف تعمل','fc1b':'لماذا عزّة','fc1c':'لمن المنصة',
+    'fc2':'الشركة','fc2a':'عن عزّة','fc2b':'تواصل معنا','fc2c':'الوظائف',
+    'fc3':'قانوني','fc3a':'الخصوصية','fc3b':'الشروط','fc3c':'حماية الأفكار',
+    'rights':'© 2026 عزّة. جميع الحقوق محفوظة.'
+  },
+  en:{
+    'nav-parties':'Who it is for','nav-how':'How it works','nav-why':'Why AZZA','nav-login':'Log in','nav-join':'Join now',
+    'badge':'A Palestinian platform for ideas & investment',
+    'hero-h':'Where ideas meet ','hero-accent':'capital and expertise',
+    'hero-p':'One platform connecting idea holders, companies & institutions, experts, and investors — start with pride, grow in partnership.',
+    'hero-cta1':'Pitch your idea','hero-cta2':'Explore opportunities',
+    'stat1':'Ideas posted','stat2':'Active investors','stat3':'Successful deals',
+    'parties-h':'Who is AZZA for?','parties-p':'Four sides, one goal: turning ideas into reality.',
+    'p1h':'Idea holders','p1p':'Present your venture to investors and experts ready to back you, and get funding and guidance.','p1c':'Pitch your idea',
+    'p2h':'Companies & institutions','p2p':'Discover promising ideas, build strategic partnerships, and grow within an innovation ecosystem.','p2c':'Find partnerships',
+    'p3h':'Experts','p3p':'Share your expertise, mentor promising ventures, and build your professional reputation.','p3c':'Offer expertise',
+    'p4h':'Investors','p4p':'Browse vetted opportunities, connect directly with founders, and invest with transparency.','p4c':'Browse opportunities',
+    'how-h':'How it works','how-p':'From idea to partnership in four steps.',
+    's1h':'Create your profile','s1p':'Sign up and pick your role: founder, company, expert, or investor.',
+    's2h':'Post or discover','s2p':'Publish your idea or browse available opportunities easily.',
+    's3h':'Connect with trust','s3p':'Message interested parties in a safe, protected environment.',
+    's4h':'Build a partnership','s4p':'Agree on details and start your venture together.',
+    'why-h':'Why AZZA?',
+    'w1h':'Smart matching','w1p':'We connect you with the best fit for your idea or capital.',
+    'w2h':'Transparency & protection','w2p':'Verified profiles and idea-protection agreements (NDA).',
+    'w3h':'Expertise on tap','w3p':'Access to experts and advisors across every field.',
+    'cta-h':'Ready to turn your idea into reality?','cta-p':'Join an ecosystem that brings founders, companies, experts, and investors together in one place.','cta-btn':'Create your free account',
+    'foot-tag':'Where Palestinian ideas grow.',
+    'fc1':'Platform','fc1a':'How it works','fc1b':'Why AZZA','fc1c':'Who it is for',
+    'fc2':'Company','fc2a':'About AZZA','fc2b':'Contact','fc2c':'Careers',
+    'fc3':'Legal','fc3a':'Privacy','fc3b':'Terms','fc3c':'Idea protection',
+    'rights':'© 2026 AZZA. All rights reserved.'
+  }
+};
+function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('azza_lang', lang);
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('lng-ar').classList.toggle('on', lang === 'ar');
+  document.getElementById('lng-en').classList.toggle('on', lang === 'en');
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
+  document.getElementById('foot-rights').textContent = t('rights');
+}
+setLang(currentLang);
+</script>
+</body>
+</html>
