@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — التوثيق والمصداقية</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+
+/* هيدر */
+.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;height:62px;padding:0 18px;max-width:880px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
+.theme-btn{margin-right:auto}
+[dir="ltr"] .theme-btn{margin-right:0;margin-left:auto}
+.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.back-btn:hover{border-color:var(--olive);color:var(--olive)}
+
+/* صفحة */
+.page{max-width:880px;margin:0 auto;padding:28px 18px 64px;display:flex;flex-direction:column;gap:22px}
+
+/* هيرو */
+.page-hero{background:linear-gradient(135deg,var(--olive-deep),var(--olive));border-radius:var(--rxl);padding:32px 26px;color:var(--cream);position:relative;overflow:hidden}
+.page-hero h1{font-family:'Aref Ruqaa',serif;font-size:1.7rem;margin-bottom:8px}
+.page-hero p{font-size:14px;color:rgba(247,241,227,.8);max-width:540px;line-height:1.8}
+.hero-badge-demo{display:inline-flex;align-items:center;gap:6px;background:rgba(198,151,73,.18);border:1px solid rgba(198,151,73,.4);color:var(--gold-soft);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;margin-top:14px}
+
+/* بطاقة */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.card h2{font-family:'Aref Ruqaa',serif;font-size:1.25rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.card h2 .ic{width:19px;height:19px;color:var(--gold-dark)}
+.card p{font-size:14px;color:var(--muted);line-height:1.85}
+.card p+p{margin-top:10px}
+
+/* جدول النقاط */
+.score-rows{display:flex;flex-direction:column;gap:0;margin-top:16px;border-top:1px solid var(--line)}
+.score-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.score-row-main{display:flex;align-items:center;gap:12px}
+.score-icon{width:38px;height:38px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.score-icon.profile{background:rgba(28,91,56,.1);color:var(--olive)}
+.score-icon.nda{background:rgba(155,116,32,.12);color:var(--gold-dark)}
+.score-icon.activity{background:rgba(206,17,38,.08);color:var(--red)}
+.score-icon svg{width:18px;height:18px}
+.score-title{font-size:14px;font-weight:700}
+.score-desc{font-size:12.5px;color:var(--muted);margin-top:2px}
+.score-points{font-family:'Aref Ruqaa',serif;font-size:1.3rem;color:var(--ink);white-space:nowrap;flex-shrink:0}
+.score-points span{font-size:11px;color:var(--muted);font-family:'Tajawal',sans-serif;font-weight:500}
+
+/* المعادلة */
+.formula-box{background:var(--cream-2);border:1px dashed var(--line);border-radius:var(--r2);padding:16px 18px;margin-top:16px;text-align:center}
+.formula-box strong{font-family:'Aref Ruqaa',serif;font-size:1.05rem;color:var(--olive-deep)}
+
+/* الشارات حسب الدور */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:14px}
+.role-card{border:1px solid var(--line);border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:10px}
+.role-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.role-name{font-size:13.5px;font-weight:700}
+
+/* FAQ */
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;background:none;border:none;cursor:pointer;font-family:inherit;text-align:right;color:var(--ink)}
+.faq-q span{font-size:14.5px;font-weight:700}
+.faq-q .ic{width:16px;height:16px;color:var(--muted);transition:.2s;flex-shrink:0}
+.faq-item.open .faq-q .ic{transform:rotate(180deg)}
+.faq-a{font-size:13.5px;color:var(--muted);line-height:1.85;padding:0 0 16px;display:none}
+.faq-item.open .faq-a{display:block}
+
+/* CTA */
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 22px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;border:2px solid transparent}
+.btn-olive{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+.btn-olive:hover{background:var(--olive-deep)}
+.btn-outline{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-outline:hover{border-color:var(--olive);color:var(--olive)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="app.html" class="brand">
+      <div class="brand-mark">ع</div>
+      <span class="brand-text">عزّة</span>
+    </a>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="back-btn" onclick="history.back()">
+      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      رجوع
+    </button>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-hero">
+    <h1>التوثيق والمصداقية على عزّة</h1>
+    <p>علامة التوثيق (✓) مش شي بتشتريه — هي نتيجة طبيعية لبناء ملف موثوق وتفاعل حقيقي على المنصة. هاي الصفحة بتشرحلك بالتفصيل كيف تحسب، وكيف توصلها.</p>
+    <span class="hero-badge-demo">
+      <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      مثال: درجة المصداقية ≥ 70 = توثيق تلقائي
+    </span>
+  </div>
+
+  <div class="card">
+    <h2>
+      <svg class="ic" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      كيف تُحسب درجة المصداقية؟
+    </h2>
+    <p>درجة المصداقية (من 100) موجودة على ملفك الشخصي، وبتتكوّن من ثلاث محاور. كل محور له سقف أعلى، وما تقدر تتجاوزه حتى لو زدت بمحور واحد بس.</p>
+
+    <div class="score-rows">
+      <div class="score-row">
+        <div class="score-row-main">
+          <div class="score-icon profile">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="score-title">اكتمال الملف الشخصي</div>
+            <div class="score-desc">صورة شخصية، نبذة (أكثر من 10 حروف)، وسيلة تواصل، حساب تواصل اجتماعي أو موقع، مؤسسة منتسب لها</div>
+          </div>
+        </div>
+        <div class="score-points">30 <span>كحد أعلى</span></div>
+      </div>
+
+      <div class="score-row">
+        <div class="score-row-main">
+          <div class="score-icon nda">
+            <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="score-title">اتفاقيات السرية (NDA) الموقّعة على أفكارك</div>
+            <div class="score-desc">كل توقيع NDA حقيقي من مستخدم آخر على إحدى أفكارك أو مشاريعك = 3 نقاط</div>
+          </div>
+        </div>
+        <div class="score-points">35 <span>كحد أعلى</span></div>
+      </div>
+
+      <div class="score-row">
+        <div class="score-row-main">
+          <div class="score-icon activity">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div>
+            <div class="score-title">النشاط الحقيقي على المنصة</div>
+            <div class="score-desc">عدد منشوراتك ومدى تفاعل الآخرين معها (المشاهدات)</div>
+          </div>
+        </div>
+        <div class="score-points">35 <span>كحد أعلى</span></div>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      عندما تصل درجتك الإجمالية إلى <strong>70 من 100</strong> أو أكثر، تحصل على علامة التوثيق (✓) تلقائياً بجانب اسمك بكل المنصة.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      شارة التوثيق تختلف حسب نوع حسابك
+    </h2>
+    <p>التوثيق مش لقب واحد للجميع — الشارة بتعكس دورك على المنصة، حتى يعرف الآخرون مباشرة مين أمامهم.</p>
+    <div class="role-grid">
+      <div class="role-card"><span class="role-dot" style="background:#1c5b38"></span><span class="role-name">صاحب فكرة موثّق</span></div>
+      <div class="role-card"><span class="role-dot" style="background:#0F6E56"></span><span class="role-name">خبير موثّق</span></div>
+      <div class="role-card"><span class="role-dot" style="background:#9b7420"></span><span class="role-name">مستثمر موثّق</span></div>
+      <div class="role-card"><span class="role-dot" style="background:#E07820"></span><span class="role-name">شركة موثّقة</span></div>
+      <div class="role-card"><span class="role-dot" style="background:#185FA5"></span><span class="role-name">مؤسسة موثّقة</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+      أسئلة شائعة
+    </h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>هل أقدر أوثّق حسابي فوراً بدون ما أبني نشاط؟</span>
+          <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">لا — التوثيق التلقائي مرتبط بدرجة المصداقية، وهاي بتُبنى مع الوقت من خلال نشاطك الحقيقي. ما في طريقة "اختصار" لتجاوز هذا، لأنه أصلاً هدفها إثبات إنك فعلاً موجود وفعّال على المنصة.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>أسرع طريقة أرفع درجتي؟</span>
+          <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">أكمل ملفك الشخصي أول شي (صورة، نبذة، وسيلة تواصل) — هاي أسهل 30 نقطة وبتاخذ دقايق بس. بعدين النشاط المستمر (نشر أفكار حقيقية) والتفاعل الصادق مع المنصة بيبنوا باقي الدرجة بشكل طبيعي.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>هل ممكن أخسر علامة التوثيق بعد ما أحصل عليها؟</span>
+          <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">نعم — الدرجة بتُحسب بشكل مستمر، فإذا قل نشاطك بشكل كبير أو حذفت محتوى مهم من ملفك، ممكن تنخفض درجتك تحت 70 وتختفي العلامة تلقائياً.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>شو الفرق بين التوثيق التلقائي والتوثيق الرسمي؟</span>
+          <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="faq-a">التوثيق التلقائي مبني بالكامل على درجة المصداقية كما هو موضّح فوق. التوثيق الرسمي (عبر مراجعة يدوية من فريق عزّة) هو مسار إضافي مخطط له لاحقاً، خصوصاً للشركات والمؤسسات اللي بتحتاج تأكيد هوية رسمي أعمق.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a href="profile.html" class="btn btn-olive">
+      <svg class="ic" width="15" height="15" viewBox="0 0 24 24" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      شوف درجتي الحالية
+    </a>
+    <a href="app.html" class="btn btn-outline">رجوع للفيد</a>
+  </div>
+
+</div>
+
+<script>
+function toggleFaq(btn){
+  const item = btn.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if(!wasOpen) item.classList.add('open');
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  try{ localStorage.setItem('azza_theme', document.body.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
+}
+(function(){
+  try{
+    const saved = localStorage.getItem('azza_theme');
+    if(saved === 'dark') document.body.classList.add('dark');
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>

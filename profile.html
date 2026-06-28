@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — ملفي الشخصي</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.7}
+a{text-decoration:none;color:inherit}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+
+/* الهيدر */
+.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;justify-content:space-between;height:62px;padding:0 18px;gap:14px;max-width:1200px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:21px}
+.brand-text{font-family:'Aref Ruqaa',serif;font-size:23px;color:var(--olive-deep)}
+.top-right{display:flex;align-items:center;gap:12px}
+.user-chip{display:flex;align-items:center;gap:8px}
+.user-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:15px;overflow:hidden}
+.user-name{font-size:14px;font-weight:700}
+.logout{display:flex;align-items:center;gap:7px;background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.2s}
+.logout:hover{border-color:var(--red);color:var(--red)}
+
+/* التخطيط */
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:20px;padding:20px 18px;align-items:start}
+.side{position:sticky;top:82px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px}
+.side-title{font-size:11px;font-weight:700;color:var(--muted);padding:10px 12px 6px}
+.si{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--r2);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer;transition:.18s;width:100%;border:none;background:transparent;font-family:inherit;text-align:right}
+.si:hover{background:var(--cream)}
+.si.on{background:rgba(28,91,56,.09);color:var(--olive)}
+.si .ic{width:18px;height:18px}
+.main{min-width:0;display:flex;flex-direction:column;gap:14px}
+
+/* شارة التوثيق */
+.verify-badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700}
+.verify-badge svg{width:13px;height:13px;stroke-width:3}
+
+/* الغلاف */
+.cover-wrap{border-radius:var(--r) var(--r) 0 0;overflow:hidden}
+.cover{height:160px;background:var(--olive-deep);position:relative;overflow:hidden}
+.cover-pat{position:absolute;inset:0}
+
+/* البطاقة الرئيسية */
+.prof-card{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 var(--rxl) var(--rxl);padding:0 24px 24px}
+.av-row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:-56px;margin-bottom:14px}
+.prof-av{width:108px;height:108px;border-radius:50%;border:4px solid var(--card);background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:2.5rem;overflow:hidden;flex-shrink:0;box-shadow:0 4px 20px rgba(28,26,20,.15)}
+.edit-btn{display:inline-flex;align-items:center;gap:7px;background:var(--olive);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;margin-top:18px}
+.edit-btn:hover{background:var(--olive-deep);transform:translateY(-1px)}
+.prof-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.prof-name{font-family:'Aref Ruqaa',serif;font-size:1.75rem;font-weight:700;color:var(--ink)}
+.bio-text{font-size:14px;color:var(--muted);margin:8px 0 14px;line-height:1.75;max-width:520px}
+.bio-text.empty{color:rgba(107,101,85,.4);font-style:italic}
+
+/* التواصل والسوشيال */
+.contact-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.contact-chip{display:inline-flex;align-items:center;gap:6px;background:var(--cream);border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-size:12.5px;color:var(--muted);transition:.18s;text-decoration:none}
+.contact-chip:hover{border-color:var(--olive);color:var(--olive)}
+.contact-chip .ic{width:14px;height:14px}
+
+/* إحصائيات */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat-box{background:var(--cream);border-radius:13px;padding:15px 10px;text-align:center;transition:.2s;cursor:default}
+.stat-box:hover{background:var(--cream-2)}
+.stat-box strong{display:block;font-family:'Aref Ruqaa',serif;font-size:1.65rem;color:var(--olive);line-height:1;margin-bottom:5px}
+.stat-box span{font-size:11.5px;color:var(--muted)}
+
+/* المستوى */
+.level-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--cream);border-radius:13px;margin-bottom:4px}
+.level-pill{border-radius:999px;padding:5px 14px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.prog-track{flex:1;height:8px;background:rgba(28,26,20,.1);border-radius:999px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));border-radius:999px;transition:width .9s ease}
+.pts-text{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* الشارات */
+.section-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.section-title{font-size:14.5px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.section-title .ic{width:17px;height:17px;color:var(--gold)}
+.badges-list{display:flex;gap:10px;flex-wrap:wrap}
+.badge-chip{display:flex;flex-direction:column;align-items:center;gap:5px;border:1.5px solid var(--line);border-radius:13px;padding:12px 14px;min-width:84px;text-align:center;transition:.2s}
+.badge-chip.earned{border-color:var(--gold);background:rgba(198,151,73,.07)}
+.badge-chip.locked{opacity:.28;filter:grayscale(.9)}
+.badge-chip .b-icon{font-size:22px}
+.badge-chip .b-name{font-size:11.5px;font-weight:700;color:var(--ink)}
+.badge-chip .b-desc{font-size:10px;color:var(--muted);line-height:1.3}
+
+/* التبويبات */
+.tab-row{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px}
+.tab{flex:1;text-align:center;padding:9px 6px;border-radius:999px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.tab.on{background:rgba(28,91,56,.09);color:var(--olive)}
+
+/* نشاط الحساب */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid rgba(28,26,20,.06)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.act-body{flex:1}
+.act-title{font-size:13.5px;font-weight:700;color:var(--ink)}
+.act-time{font-size:11.5px;color:var(--muted)}
+
+/* الشراكات */
+.partner-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.partner-card{background:var(--cream);border-radius:13px;padding:14px;display:flex;gap:12px;align-items:center;transition:.2s}
+.partner-card:hover{background:var(--cream-2)}
+.partner-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:700;font-size:1.1rem;flex-shrink:0}
+.partner-name{font-size:13.5px;font-weight:700}
+.partner-sub{font-size:11.5px;color:var(--muted)}
+.partner-badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:10.5px;font-weight:700;margin-top:4px}
+
+/* المنشورات */
+.post{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden;opacity:0;transform:translateY(14px);transition:opacity .5s cubic-bezier(.2,.7,.3,1),transform .5s cubic-bezier(.2,.7,.3,1)}
+.post.show{opacity:1;transform:none}
+.post-head{display:flex;align-items:center;gap:11px;padding:14px 15px}
+.post-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:900;flex-shrink:0;overflow:hidden}
+.post-name{font-size:14px;font-weight:700}
+.post-meta{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.post-time{margin-right:auto;font-size:11px;color:var(--muted)}
+.post-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:8px;transition:.2s}
+.post-del:hover{background:rgba(206,17,38,.08);color:var(--red)}
+.post-badges{display:flex;gap:6px;flex-wrap:wrap;padding:0 15px 4px}
+.pbadge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 11px;font-size:11px;font-weight:700;border:1px solid}
+.pbadge-type{background:rgba(198,151,73,.12);color:#9b7420;border-color:rgba(198,151,73,.3)}
+.pbadge-cat{background:rgba(28,91,56,.09);color:#0e3622;border-color:rgba(28,91,56,.2)}
+.pbadge-nda{background:rgba(14,54,34,.12);color:#0e3622;border-color:rgba(14,54,34,.3)}
+.pbadge-trend{background:rgba(206,17,38,.1);color:#9b1220;border-color:rgba(206,17,38,.25)}
+.post-body{padding:6px 15px 12px;font-size:14.5px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word}
+.post-media{width:100%!important;height:300px!important;object-fit:contain!important;display:block;background:#0e3622;cursor:zoom-in}
+.post-embed{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.post-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.post-stats{display:flex;justify-content:space-between;padding:8px 15px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+.post-actions{display:flex;gap:7px;padding:8px 10px;border-top:1px solid var(--line)}
+.pact{display:flex;align-items:center;gap:6px;padding:7px 14px;border:none;border-radius:999px;background:var(--cream);color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+.pact:hover{color:var(--olive)}
+.pact.main-act{background:var(--olive);color:#fff}
+.pact.voted{background:rgba(28,91,56,.1);color:var(--olive)}
+.pact.saved{color:var(--gold)}
+.pact.icon-act{padding:7px 11px;margin-right:auto}
+.tag{color:var(--olive);font-weight:700;cursor:pointer}
+.post-comments{display:none;border-top:1px solid var(--line);background:rgba(28,91,56,.025);padding:6px 15px 12px}
+.post-comments.open{display:block}
+.cmt-row{display:flex;gap:9px;padding:8px 0;border-bottom:.5px solid rgba(28,26,20,.06)}
+.cmt-row:last-child{border-bottom:none}
+.cmt-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.cmt-bubble{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:7px 11px}
+.cmt-name{font-size:11.5px;font-weight:700;color:var(--olive)}
+.cmt-txt{font-size:13px;margin-top:2px}
+.cmt-in-row{display:flex;gap:8px;align-items:center;padding-top:10px}
+.cmt-in{flex:1;border:1px solid var(--line);border-radius:999px;background:var(--card);padding:8px 14px;font-family:inherit;font-size:13px;outline:none}
+.cmt-in:focus{border-color:var(--olive)}
+.cmt-send{width:32px;height:32px;border-radius:50%;background:var(--olive);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.empty-state{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:46px 20px;text-align:center;color:var(--muted)}
+.empty-state .ic{width:36px;height:36px;color:var(--gold);margin:0 auto 12px}
+.empty-state b{display:block;color:var(--ink);font-size:15px;margin-bottom:6px}
+
+/* نافذة التعديل */
+.overlay{position:fixed;inset:0;background:rgba(14,54,34,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:80;padding:18px}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:560px;background:var(--card);border-radius:var(--rxl);overflow:hidden;max-height:92vh;display:flex;flex-direction:column;animation:pop .22s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);flex-shrink:0}
+.modal-x{background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;display:flex}
+.modal-title{font-size:15px;font-weight:700}
+.modal-save{background:var(--olive);color:#fff;border:none;border-radius:999px;padding:8px 22px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.modal-save:hover{background:var(--olive-deep)}
+.modal-body{padding:18px 20px;overflow-y:auto}
+.edit-section{margin-bottom:20px}
+.edit-section-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:var(--r2);background:var(--cream);padding:10px 13px;font-family:inherit;font-size:14px;color:var(--ink);outline:none;transition:.2s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--olive);background:var(--card)}
+.field textarea{resize:none;min-height:80px;line-height:1.7}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.social-field{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.social-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.social-field input{flex:1;border:1px solid var(--line);border-radius:var(--r2);background:var(--cream);padding:9px 12px;font-family:inherit;font-size:13px;color:var(--ink);outline:none}
+.social-field input:focus{border-color:var(--olive);background:var(--card)}
+
+/* لايت بوكس */
+.lightbox{position:fixed;inset:0;background:rgba(14,54,34,.92);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
+.lightbox-x{position:absolute;top:18px;left:18px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:13px 24px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+
+@media(max-width:840px){
+  .layout{grid-template-columns:1fr}
+  .side{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .partner-grid{grid-template-columns:1fr}
+  .field-row{grid-template-columns:1fr}
+  body{padding-bottom:64px}
+
+  /* ══ شريط التنقل السفلي الثابت — نفس فلسفة app.html ══ */
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;right:0;left:0;z-index:500;
+    background:var(--card);border-top:1px solid var(--line);
+    padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));
+    box-shadow:0 -2px 12px rgba(28,26,20,.06)
+  }
+  .bn-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;color:var(--muted);padding:6px 2px;
+    font-family:'Tajawal',sans-serif;font-size:10.5px;cursor:pointer;border-radius:10px
+  }
+  .bn-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .bn-item.active{color:var(--olive)}
+  .bn-item.active svg{stroke-width:2.3}
+  .bn-compose{flex:1;display:flex;align-items:center;justify-content:center;margin-top:-22px}
+  .bn-compose-btn{
+    width:46px;height:46px;border-radius:50%;background:var(--olive);color:#fff;
+    border:3px solid var(--card);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 10px rgba(28,91,56,.35);cursor:pointer
+  }
+  .bn-compose-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.3;stroke-linecap:round}
+
+  /* ══ أزرار الهيرو (إحصائيات/مشاركة/تعديل) — أيقونات فقط بدون نص لمنع التجاوز الأفقي ══ */
+  .hero-bar{padding:0 14px}
+  .hero-info{padding:0 14px 16px}
+  .hero-actions{gap:6px}
+  .hact{padding:9px!important;border-radius:50%!important;width:38px!important;height:38px!important;justify-content:center;font-size:0!important}
+  .hact .ic{width:17px;height:17px;flex-shrink:0}
+}
+@media(min-width:841px){
+  .bottom-nav{display:none}
+}
+
+/* ══ درجة المصداقية ══ */
+.trust-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.trust-inner{display:flex;align-items:center;gap:22px}
+.trust-ring-wrap{flex-shrink:0;position:relative;width:96px;height:96px}
+.trust-ring-wrap svg{width:96px;height:96px}
+.trust-score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.trust-score-num strong{font-family:'Aref Ruqaa',serif;font-size:1.6rem;color:var(--ink)}
+.trust-score-num span{font-size:10px;color:var(--muted)}
+.trust-bars{flex:1;display:flex;flex-direction:column;gap:8px}
+.trust-bar-row{display:flex;align-items:center;gap:10px}
+.trust-bar-label{font-size:12px;color:var(--muted);width:120px;flex-shrink:0}
+.trust-bar-track{flex:1;height:6px;background:var(--cream-2);border-radius:999px;overflow:hidden}
+.trust-bar-fill{height:100%;border-radius:999px;transition:width .8s ease}
+.trust-bar-val{font-size:11px;font-weight:700;color:var(--muted);width:28px;text-align:left;flex-shrink:0}
+/* ══ وضع التعاون ══ */
+.collab-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;border:1.5px solid transparent}
+.collab-badge:hover{opacity:.85}
+.collab-opts{display:flex;flex-direction:column;gap:6px}
+.collab-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;transition:.18s;font-size:13.5px;font-weight:600}
+.collab-opt:hover{background:var(--cream)}
+.collab-opt.chosen{border-color:var(--olive);background:rgba(28,91,56,.06)}
+.collab-opt input{accent-color:var(--olive);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+/* ══ تقييمات الشركاء ══ */
+.reviews-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.avg-stars{display:flex;align-items:center;gap:8px}
+.stars-big{font-size:1.5rem;font-family:'Aref Ruqaa',serif;color:var(--ink)}
+.stars-row{color:#c69749;font-size:18px;letter-spacing:1px}
+.stars-count{font-size:12px;color:var(--muted)}
+.leave-review-btn{display:flex;align-items:center;gap:6px;background:var(--olive);color:#fff;border:none;border-radius:999px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.leave-review-btn:hover{background:var(--olive-deep)}
+.review-item{display:flex;gap:12px;padding:12px 0;border-bottom:.5px solid var(--line)}
+.review-item:last-child{border-bottom:none}
+.review-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:700;flex-shrink:0}
+.review-body{flex:1}
+.review-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.review-name{font-size:13.5px;font-weight:700}
+.review-stars{color:#c69749;font-size:14px}
+.review-time{font-size:11px;color:var(--muted);margin-right:auto}
+.review-text{font-size:13.5px;color:var(--muted);line-height:1.7}
+/* نجوم التقييم التفاعلية */
+.star-pick{display:flex;gap:6px;margin:10px 0}
+.star-pick span{font-size:28px;cursor:pointer;transition:.15s;color:#d9cbb0}
+.star-pick span.lit{color:#c69749}
+
+/* ── المهارات والتأييدات ── */
+.skills-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.skills-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.skill-chip{display:flex;align-items:center;gap:8px;background:var(--cream);border:1.5px solid var(--line);border-radius:12px;padding:9px 14px;transition:.2s;position:relative}
+.skill-chip:hover{border-color:var(--olive)}
+.skill-chip.top-skill{border-color:var(--gold);background:rgba(198,151,73,.07)}
+.skill-name{font-size:13.5px;font-weight:700;color:var(--ink)}
+.endorse-count{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--olive);background:rgba(28,91,56,.09);border-radius:999px;padding:2px 9px}
+.endorse-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.18s}
+.endorse-btn:hover{border-color:var(--olive);color:var(--olive)}
+.endorse-btn.endorsed{background:rgba(28,91,56,.08);border-color:var(--olive);color:var(--olive)}
+.skill-remove{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:6px;font-size:14px;line-height:1;transition:.18s;display:flex;align-items:center}
+.skill-remove:hover{color:var(--red);background:rgba(206,17,38,.08)}
+.add-skill-row{display:flex;gap:8px;align-items:center}
+.add-skill-in{flex:1;border:1.5px solid var(--line);border-radius:999px;background:var(--cream);padding:9px 16px;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;transition:.2s}
+.add-skill-in:focus{border-color:var(--olive);background:var(--card)}
+.add-skill-btn{padding:9px 18px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+.add-skill-btn:hover{background:var(--olive-deep)}
+.skill-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.skill-sug{padding:5px 12px;border-radius:999px;border:1.5px dashed var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.18s}
+.skill-sug:hover{border-color:var(--olive);color:var(--olive);background:rgba(28,91,56,.04)}
+.skills-empty{font-size:13.5px;color:var(--muted);padding:10px 0}
+
+/* ══ هيدر الملف الشخصي المُعاد تصميمه ══ */
+.profile-hero{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden}
+.cover-new{height:210px;position:relative;overflow:hidden;background:linear-gradient(145deg,#051e0f,#0e3622 45%,#1c5b38)}
+/* غراديانات حسب الدور */
+body.role-skill       .cover-new{background:linear-gradient(145deg,#02201a,#04342C 45%,#0F6E56)}
+body.role-investor    .cover-new{background:linear-gradient(145deg,#1a0d00,#412402 45%,#854F0B)}
+body.role-company     .cover-new{background:linear-gradient(145deg,#1e0805,#4A1B0C 45%,#D85A30)}
+body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C53 45%,#185FA5)}
+.cover-pat-abs{position:absolute;inset:0}
+.cover-role-pill{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;background:rgba(0,0,0,.28);color:#fff;border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px)}
+/* شريط الأفاتار */
+.hero-bar{display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px;margin-top:-62px;margin-bottom:12px;position:relative;z-index:1}
+.av-wrap-new{position:relative;display:inline-block}
+.prof-av-new{width:122px;height:122px;border-radius:50%;border:5px solid var(--card);background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:2.8rem;overflow:hidden;box-shadow:0 6px 28px rgba(28,26,20,.2)}
+.av-cam-new{position:absolute;bottom:5px;left:5px;width:32px;height:32px;border-radius:50%;background:var(--olive);border:3px solid var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.av-cam-new:hover{background:var(--olive-deep)}
+.hero-actions{display:flex;gap:8px;padding-bottom:6px}
+.hact{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:border-color .22s ease,color .22s ease,transform .18s ease,box-shadow .22s ease}
+.hact:hover{border-color:var(--olive);color:var(--olive);transform:translateY(-1px);box-shadow:0 3px 10px rgba(28,91,56,.12)}
+.hact:active{transform:translateY(0)}
+.hact.primary{background:var(--olive);color:#fff;border-color:var(--olive)}
+.hact.primary:hover{background:var(--olive-deep);border-color:var(--olive-deep);box-shadow:0 4px 14px rgba(14,54,34,.25)}
+.hact .ic{width:15px;height:15px}
+/* معلومات */
+.hero-info{padding:0 22px 16px}
+.hero-name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.hero-username{font-size:13px;color:var(--olive);font-weight:700;margin-bottom:8px;letter-spacing:.2px}
+/* الإحصائيات الأفقية */
+.stats-h{display:flex;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.stat-hbox{flex:1;text-align:center;padding:4px 0;cursor:default}
+.stat-hbox strong{display:block;font-family:'Aref Ruqaa',serif;font-size:1.5rem;color:var(--ink);line-height:1;margin-bottom:4px;transition:.2s}
+.stat-hbox span{font-size:11px;color:var(--muted)}
+.stat-hbox:hover strong{color:var(--olive)}
+.stat-hbox.c-olive strong{color:var(--olive)}
+.stat-hbox.c-gold strong{color:#9b7420}
+.stat-hdiv{width:1px;height:34px;background:var(--line);flex-shrink:0}
+/* المستوى الجديد */
+.level-new{display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--line);background:rgba(28,91,56,.025)}
+
+/* ── حقول خاصة بالدور ── */
+.role-section{margin-bottom:20px;border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.role-section-head{padding:12px 16px;background:var(--cream);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ink)}
+.role-section-body{padding:14px 16px}
+.role-tag-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.role-tag-opt{padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.18s;color:var(--muted)}
+.role-tag-opt:hover{border-color:var(--olive);color:var(--olive)}
+.role-tag-opt.on{background:rgba(28,91,56,.09);border-color:var(--olive);color:var(--olive)}
+/* بطاقة الدور بالملف العام */
+.role-card{background:var(--cream);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:2px}
+.role-card-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.role-detail-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid rgba(28,26,20,.06);font-size:13.5px}
+.role-detail-row:last-child{border-bottom:none}
+.role-detail-icon{font-size:15px;flex-shrink:0}
+.role-detail-label{color:var(--muted);font-size:12px;min-width:100px;flex-shrink:0}
+.role-detail-val{color:var(--ink);font-weight:600}
+.sector-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(28,91,56,.08);border:1px solid rgba(28,91,56,.2);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;color:#0e3622}
+</style>
+<script src="supabase.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="index.html" class="brand"><div class="brand-mark">ع</div><span class="brand-text">عزّة</span></a>
+    <div class="top-right">
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+        <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <div class="user-chip"><div class="user-av" id="top-av">ع</div><span class="user-name" id="top-name">—</span></div>
+      <button class="logout" onclick="logout()">
+        <svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        خروج
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <div class="side-title">القائمة</div>
+    <button class="si" onclick="location.href='app.html'"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> الفيد</button>
+    <button class="si on"><svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ملفي الشخصي</button>
+    <button class="si" onclick="location.href='messages.html'"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> الرسائل</button>
+    <button class="si" onclick="location.href='explore.html'"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> الخريطة</button>
+    <div style="height:1px;background:var(--line);margin:8px 4px"></div>
+    <button class="si" onclick="location.href='success-stories.html'"><svg class="ic" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> قصص نجاح</button>
+    <button class="si" onclick="location.href='verification.html'"><svg class="ic" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> التوثيق والمصداقية</button>
+  </aside>
+
+  <!-- شريط التنقل السفلي — يظهر فقط بالموبايل، نفس فلسفة app.html -->
+  <nav class="bottom-nav">
+    <button class="bn-item" onclick="location.href='app.html'"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>الفيد</button>
+    <button class="bn-item" onclick="location.href='explore.html'"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>استكشف</button>
+    <div class="bn-compose"><button class="bn-compose-btn" onclick="location.href='app.html'"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div>
+    <button class="bn-item active" onclick="location.href='profile.html'"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ملفي</button>
+    <button class="bn-item" onclick="location.href='messages.html'"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>الرسائل</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- الغلاف + البطاقة الرئيسية — تصميم جديد -->
+    <div class="profile-hero">
+
+      <!-- الغلاف بلون الدور -->
+      <div class="cover-new">
+        <svg class="cover-pat-abs" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs><pattern id="cp" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M30 6L44 20L30 34L16 20Z" fill="none" stroke="#c69749" stroke-width="1" opacity="0.18"/>
+            <path d="M30 13L37 20L30 27L23 20Z" fill="#c69749" opacity="0.07"/>
+            <circle cx="30" cy="6" r="2" fill="#ce1126" opacity="0.2"/>
+            <circle cx="44" cy="20" r="2" fill="#ce1126" opacity="0.2"/>
+            <circle cx="30" cy="34" r="2" fill="#ce1126" opacity="0.2"/>
+            <circle cx="16" cy="20" r="2" fill="#ce1126" opacity="0.2"/>
+          </pattern></defs>
+          <rect width="100%" height="100%" fill="url(#cp)"/>
+        </svg>
+        <!-- شارة الدور على الغلاف -->
+        <div class="cover-role-pill" id="cover-role-pill">💡 صاحب فكرة</div>
+      </div>
+
+      <!-- شريط الأفاتار + الأزرار -->
+      <div class="hero-bar">
+        <div class="av-wrap-new">
+          <div class="prof-av-new" id="prof-av">ع</div>
+          <label for="av-upload" class="av-cam-new" title="تغيير الصورة">
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="stroke:#fff"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </label>
+          <input type="file" id="av-upload" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+        </div>
+        <div class="hero-actions">
+          <button class="hact" onclick="location.href='stats.html'">
+            <svg class="ic" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            الإحصائيات
+          </button>
+          <button class="hact" onclick="shareProfile()">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            مشاركة
+          </button>
+          <button class="hact primary" onclick="openEdit()">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            تعديل
+          </button>
+        </div>
+      </div>
+
+      <!-- معلومات الملف -->
+      <div class="hero-info">
+        <div class="hero-name-row">
+          <span class="prof-name" id="prof-name">—</span>
+          <span class="verify-badge" id="verify-badge">
+            <svg class="ic" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="verify-label">—</span>
+          </span>
+        </div>
+        <div class="hero-username" id="prof-username-show"></div>
+        <div id="inst-name" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none"></div>
+        <div id="collab-status-display" style="margin-bottom:8px;display:none"></div>
+        <p class="bio-text empty" id="prof-bio">أضف نبذة عن نفسك...</p>
+        <div class="contact-row" id="contact-row"></div>
+      </div>
+
+      <!-- الإحصائيات الأفقية -->
+      <div class="stats-h">
+        <div class="stat-hbox"><strong id="st-posts">0</strong><span>منشور</span></div>
+        <div class="stat-hdiv"></div>
+        <div class="stat-hbox c-olive"><strong id="st-votes">0</strong><span>▲ تصويت</span></div>
+        <div class="stat-hdiv"></div>
+        <div class="stat-hbox"><strong id="st-followers">0</strong><span>متابع</span></div>
+        <div class="stat-hdiv"></div>
+        <div class="stat-hbox"><strong id="st-following">0</strong><span>يتابع</span></div>
+        <div class="stat-hdiv"></div>
+        <div class="stat-hbox c-gold"><strong id="st-nda">0</strong><span>🔒 NDA</span></div>
+      </div>
+
+      <!-- المستوى -->
+      <div class="level-new">
+        <span class="level-pill" id="level-pill">🌱 مبتدئ</span>
+        <div class="prog-track" style="flex:1"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        <span class="pts-text" id="pts-text">0 نقطة</span>
+      </div>
+
+    </div>
+
+    <!-- درجة المصداقية -->
+    <div class="trust-card section-card" id="trust-card">
+      <div class="section-title">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+        درجة المصداقية
+      </div>
+      <div class="trust-inner">
+        <div class="trust-ring-wrap">
+          <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="48" cy="48" r="40" fill="none" stroke="var(--cream-2)" stroke-width="8"/>
+            <circle id="trust-arc" cx="48" cy="48" r="40" fill="none" stroke="#1c5b38" stroke-width="8"
+              stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"
+              transform="rotate(-90 48 48)" style="transition:stroke-dashoffset .9s ease,stroke .4s"/>
+          </svg>
+          <div class="trust-score-num"><strong id="trust-num">0</strong><span>من 100</span></div>
+        </div>
+        <div class="trust-bars">
+          <div class="trust-bar-row">
+            <span class="trust-bar-label">اكتمال الملف</span>
+            <div class="trust-bar-track"><div class="trust-bar-fill" id="tb-profile" style="width:0%;background:#1c5b38"></div></div>
+            <span class="trust-bar-val" id="tv-profile">0</span>
+          </div>
+          <div class="trust-bar-row">
+            <span class="trust-bar-label">توقيعات NDA</span>
+            <div class="trust-bar-track"><div class="trust-bar-fill" id="tb-nda" style="width:0%;background:#c69749"></div></div>
+            <span class="trust-bar-val" id="tv-nda">0</span>
+          </div>
+          <div class="trust-bar-row">
+            <span class="trust-bar-label">تقييمات الشركاء</span>
+            <div class="trust-bar-track"><div class="trust-bar-fill" id="tb-reviews" style="width:0%;background:#185FA5"></div></div>
+            <span class="trust-bar-val" id="tv-reviews">0</span>
+          </div>
+          <div class="trust-bar-row">
+            <span class="trust-bar-label">نشاط المنصة</span>
+            <div class="trust-bar-track"><div class="trust-bar-fill" id="tb-activity" style="width:0%;background:#0F6E56"></div></div>
+            <span class="trust-bar-val" id="tv-activity">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="role-card-display" style="display:none"></div>
+    <!-- الشارات -->
+    <div class="section-card">
+      <div class="section-title">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        الشارات المكتسبة
+      </div>
+      <div class="badges-list" id="badges-list"></div>
+    </div>
+
+
+    <!-- المهارات والتأييدات -->
+    <div class="skills-card section-card">
+      <div class="section-title">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        المهارات والخبرات
+      </div>
+      <div class="skills-grid" id="skills-grid">
+        <div class="skills-empty">أضف مهاراتك لتظهر للمستثمرين والشركاء</div>
+      </div>
+      <!-- إضافة مهارة -->
+      <div class="add-skill-row">
+        <input class="add-skill-in" id="skill-input" placeholder="أدخل مهارة..." maxlength="40"
+          onkeypress="if(event.key==='Enter')addSkill()">
+        <button class="add-skill-btn" onclick="addSkill()">+ إضافة</button>
+      </div>
+      <!-- اقتراحات سريعة -->
+      <div class="skill-suggestions" id="skill-sugs"></div>
+    </div>
+
+    <!-- التبويبات -->
+    <div class="tab-row">
+      <button class="tab on" onclick="setTab(this,'posts')">📝 منشوراتي</button>
+      <button class="tab" onclick="setTab(this,'saved')">🔖 المحفوظة</button>
+      <button class="tab" onclick="setTab(this,'activity')">📊 النشاط</button>
+      <button class="tab" onclick="setTab(this,'partners')">🤝 الشراكات</button>
+    </div>
+
+    <div id="profile-feed"></div>
+  </main>
+</div>
+
+<!-- مودال التعديل -->
+<div class="overlay" id="edit-overlay" onclick="if(event.target===this)closeEdit()">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-x" onclick="closeEdit()"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <span class="modal-title">تعديل الملف الشخصي</span>
+      <button class="modal-save" onclick="saveEdit()">حفظ</button>
+    </div>
+    <div class="modal-body">
+      <div class="edit-section">
+        <div class="edit-section-title">وضع التعاون</div>
+        <div class="collab-opts" id="collab-opts">
+          <label class="collab-opt"><input type="radio" name="collab" value="seeking_investor"> 💰 أبحث عن مستثمر</label>
+          <label class="collab-opt"><input type="radio" name="collab" value="seeking_expert"> 🏅 أبحث عن خبير</label>
+          <label class="collab-opt"><input type="radio" name="collab" value="seeking_partner"> 🤝 أبحث عن شريك تقني</label>
+          <label class="collab-opt"><input type="radio" name="collab" value="open"> 🟡 منفتح على الشراكات</label>
+          <label class="collab-opt"><input type="radio" name="collab" value="unavailable"> ⚪ غير متاح حالياً</label>
+        </div>
+      </div>
+      <!-- المعلومات الأساسية -->
+      <div class="edit-section">
+        <div class="edit-section-title">المعلومات الأساسية</div>
+        <div class="field"><label>الاسم الكامل *</label><input type="text" id="edit-name" placeholder="اسمك الكامل"></div>
+      <div class="field">
+        <label>اسم المستخدم</label>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--line);border-radius:var(--r2);padding:10px 13px">
+          <span style="color:var(--muted);font-weight:700">@</span>
+          <span id="edit-username-display" style="font-size:14px;color:var(--ink);dir:ltr">—</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:5px">اسم المستخدم لا يمكن تغييره بعد التسجيل</div>
+      </div>
+        <div class="field"><label>النبذة الشخصية</label><textarea id="edit-bio" placeholder="اكتب نبذة مختصرة عن نفسك أو مشاريعك..."></textarea></div>
+        <div class="field" id="inst-field" style="display:none">
+          <label>اسم المؤسسة / الشركة</label>
+          <input type="text" id="edit-institution" placeholder="اسم مؤسستك..." list="inst-list" autocomplete="off">
+          <datalist id="inst-list">
+            <option value="جامعة بيرزيت">
+            <option value="جامعة النجاح الوطنية">
+            <option value="جامعة القدس">
+            <option value="جامعة بوليتكنيك فلسطين">
+            <option value="الجامعة الإسلامية غزة">
+            <option value="جامعة الأزهر غزة">
+            <option value="الجامعة العربية الأمريكية">
+            <option value="جامعة خضوري">
+            <option value="بلدية رام الله">
+            <option value="بلدية نابلس">
+            <option value="بلدية الخليل">
+            <option value="بلدية بيت لحم">
+            <option value="البنك الإسلامي الفلسطيني">
+            <option value="بنك القدس">
+            <option value="البنك الوطني الفلسطيني">
+            <option value="شركة الاتصالات الفلسطينية (بالتل)">
+            <option value="شركة أوريدو فلسطين">
+            <option value="وزارة التربية والتعليم">
+            <option value="وزارة الاقتصاد الوطني">
+            <option value="وزارة الصحة">
+            <option value="المجلس التشريعي الفلسطيني">
+            <option value="مركز الإحصاء الفلسطيني المركزي">
+            <option value="هيئة سوق رأس المال">
+            <option value="اتحاد الصناعات الفلسطينية">
+            <option value="غرفة تجارة وصناعة رام الله والبيرة">
+            <option value="غرفة تجارة وصناعة نابلس">
+            <option value="مؤسسة الضمان الاجتماعي">
+            <option value="مؤسسة التمويل الفلسطينية">
+            <option value="شركة الريادة للتقنية">
+          </datalist>
+        </div>
+        <div class="field" id="subtype-field" style="display:none">
+          <label>نوع الجهة</label>
+          <select id="edit-subtype">
+            <option value="company">شركة خاصة 🟠</option>
+            <option value="institution">مؤسسة / جهة حكومية 🔵</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- حقول خاصة بالدور -->
+      <div id="role-specific-fields"></div>
+      <!-- معلومات التواصل -->
+      <div class="edit-section">
+        <div class="edit-section-title">معلومات التواصل</div>
+        <div class="field-row">
+          <div class="field"><label>رقم الهاتف</label><input type="tel" id="edit-phone" placeholder="+970 5x xxx xxxx" dir="ltr"></div>
+          <div class="field"><label>بريد التواصل العام (اختياري)</label><input type="email" id="edit-email" placeholder="بريد تريد إظهاره للآخرين" dir="ltr"></div>
+        </div>
+      </div>
+      <!-- حسابات التواصل الاجتماعي -->
+      <div class="edit-section">
+        <div class="edit-section-title">حسابات التواصل الاجتماعي</div>
+        <div class="social-field">
+          <div class="social-icon" style="background:#0077b5;color:#fff">in</div>
+          <input type="url" id="edit-linkedin" placeholder="رابط LinkedIn" dir="ltr">
+        </div>
+        <div class="social-field">
+          <div class="social-icon" style="background:#000;color:#fff">𝕏</div>
+          <input type="text" id="edit-twitter" placeholder="@username على X" dir="ltr">
+        </div>
+        <div class="social-field">
+          <div class="social-icon" style="background:#e1306c;color:#fff">📸</div>
+          <input type="text" id="edit-instagram" placeholder="@username على Instagram" dir="ltr">
+        </div>
+        <div class="social-field">
+          <div class="social-icon" style="background:#25d366;color:#fff">✆</div>
+          <input type="tel" id="edit-whatsapp" placeholder="رقم الواتساب" dir="ltr">
+        </div>
+        <div class="social-field">
+          <div class="social-icon" style="background:var(--olive);color:#fff">🌐</div>
+          <input type="url" id="edit-website" placeholder="رابط موقعك الشخصي" dir="ltr">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- لايت بوكس -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-x" onclick="closeLightbox()"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+<!-- مودال التقييم -->
+<div class="overlay" id="review-overlay" onclick="if(event.target===this)closeReview()">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-x" onclick="closeReview()"><svg class="ic" width="20" height="20" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <span class="modal-title">اترك تقييماً</span>
+      <button class="modal-save" onclick="submitReview()">نشر</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>التقييم</label>
+        <div class="star-pick" id="star-pick">
+          <span onclick="setStar(1)">★</span><span onclick="setStar(2)">★</span>
+          <span onclick="setStar(3)">★</span><span onclick="setStar(4)">★</span><span onclick="setStar(5)">★</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>تعليقك (اختياري)</label>
+        <textarea id="review-text" placeholder="شاركنا تجربتك مع هذا المستخدم..." style="min-height:90px"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ── الوضع الليلي ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
+
+/* ═══════════ AZZA — profile.js ═══════════ */
+const getUser  = ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
+/* === Supabase - تهيئة العميل === */
+const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
+let _postsMem=null, _usersMem=null;
+
+function _mapSupabasePost(row){
+  return {
+    id:row.id,author_id:row.author_id,author_name:row.author_name||'',
+    author_username:row.author_username||'',author_type:row.author_type||'idea',
+    author_photo:row.author_photo||null,type:row.type,text:row.text||'',
+    title:row.title||'',category:row.category||null,
+    image:row.image||null,video:row.video||null,pitch:row.pitch||'',
+    nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
+    job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
+    votes:row.votes||[],r_insightful:row.r_insightful||[],r_collab:row.r_collab||[],
+    comments:row.comments||[],views:row.views||0,created_at:row.created_at,
+  };
+}
+
+async function loadInitialDataFromSupabase(){
+  try{
+    const {data,error}=await azzaDB.from('posts').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    _postsMem=(data||[]).map(_mapSupabasePost);
+  }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
+  try{
+    const {data,error}=await azzaDB.from('users').select('*');
+    if(error)throw error;
+    _usersMem=data||[];
+  }catch(e){ console.error('تعذر جلب المستخدمين من Supabase:',e.message); _usersMem=null; }
+}
+
+const getPosts = ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} };
+const getSigs  = ()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}};
+const genId    = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const ini      = n=>(n||'ع').trim()[0].toUpperCase();
+const esc      = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const isSaved  = id=>{try{return JSON.parse(localStorage.getItem('azza_saved_'+user?.id)||'[]').includes(id);}catch{return false;}};
+
+let user=getUser(); if(!user){location.href='login.html';}
+let curTab='posts';
+
+const ROLES={idea:'صاحب فكرة',skill:'خبير',investor:'مستثمر',company:'شركة / مؤسسة'};
+const TYPE_L={post:'💬 منشور',idea:'💡 فكرة',project:'🚀 مشروع',job:'📋 وظيفة'};
+const CAT_L={environment:'🌿 بيئة',tech:'💻 تقنية',education:'📚 تعليم',health:'🩺 صحة',business:'💼 أعمال',design:'🎨 تصميم'};
+
+/* شارات التوثيق حسب الدور */
+const VERIFY={
+  idea:        {label:'صاحب فكرة موثّق', color:'#1c5b38', bg:'rgba(28,91,56,.1)'},
+  skill:       {label:'خبير موثّق',       color:'#0F6E56', bg:'rgba(15,110,86,.1)'},
+  investor:    {label:'مستثمر موثّق',     color:'#9b7420', bg:'rgba(155,116,32,.1)'},
+  company:     {label:'شركة موثّقة',      color:'#E07820', bg:'rgba(224,120,32,.1)'},
+  institution: {label:'مؤسسة موثّقة',     color:'#185FA5', bg:'rgba(24,95,165,.1)'},
+};
+
+/* ✓ علامة التوثيق الرسمي — أيقونة صفراء ملاصقة بالاسم (نمط تويتر) */
+/* تحويلها من قيمة ثابتة لدالة getter بنفس الاسم — تتيح التحديث التلقائي بعد وصول بيانات Supabase
+   بدون الحاجة لتعديل كل الأماكن الأخرى بالملف اللي تستخدم usersCacheProf */
+const usersCacheProf=new Proxy([],{get(_,prop){
+  const real = _usersMem!==null ? _usersMem : (()=>{try{return JSON.parse(localStorage.getItem('azza_users')||'[]');}catch{return[];}})();
+  return real[prop];
+}});
+function calcTrustScoreQuick(u){
+  if(!u)return 0;
+  const posts=getPosts().filter(p=>p.author_id===u.id);
+  let s={profile:0,nda:0,activity:0};
+  if(u.photo)s.profile+=8;if((u.bio||'').length>10)s.profile+=8;
+  if(u.phone||u.email)s.profile+=5;if(u.linkedin||u.twitter||u.website)s.profile+=5;
+  if(u.institution)s.profile+=4;s.profile=Math.min(30,s.profile);
+  const sigs=getSigs();let ndaT=0;
+  posts.filter(p=>p.nda).forEach(p=>{ndaT+=(sigs[p.id]||[]).length;});
+  s.nda=Math.min(35,Math.round(ndaT*3));
+  const views=posts.reduce((a,p)=>a+(p.views||0),0);
+  s.activity=Math.min(35,posts.length*4+Math.floor(views/25));
+  return Math.min(100,s.profile+s.nda+s.activity);
+}
+function isIdVerifiedById(authorId){
+  if(!authorId)return false;
+  if(authorId===user.id)return user.id_verified===true||calcTrustScoreQuick(user)>=70;
+  const u=usersCacheProf.find(x=>x.id===authorId);
+  if(!u)return false;
+  return u.id_verified===true||calcTrustScoreQuick(u)>=70;
+}
+function checkmarkById(authorId,size=14){
+  if(!isIdVerifiedById(authorId))return'';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة"><svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+}
+
+/* المستويات */
+const LEVELS=[
+  {min:0,   label:'مبتدئ', icon:'🌱', bg:'rgba(107,101,85,.1)', color:'#6b6555', next:50},
+  {min:50,  label:'ناشط',  icon:'⭐', bg:'rgba(63,110,17,.1)',  color:'#3b6d11', next:200},
+  {min:200, label:'متميز', icon:'🏅', bg:'rgba(198,151,73,.12)',color:'#9b7420', next:500},
+  {min:500, label:'خبير',  icon:'💎', bg:'rgba(24,95,165,.1)',  color:'#185FA5', next:1000},
+  {min:1000,label:'رائد',  icon:'👑', bg:'rgba(206,17,38,.1)',  color:'#9b1220', next:null},
+];
+
+/* الشارات */
+const BADGES=[
+  {id:'first_post', icon:'📝',name:'أول منشور',  desc:'نشرت أول منشور',          check:(p,u)=>p.filter(x=>x.author_id===u.id).length>=1},
+  {id:'idea_5',     icon:'💡',name:'مبتكر',      desc:'5 أفكار منشورة',           check:(p,u)=>p.filter(x=>x.author_id===u.id&&x.type==='idea').length>=5},
+  {id:'project',    icon:'🚀',name:'ريادي',      desc:'نشرت مشروعاً',             check:(p,u)=>p.filter(x=>x.author_id===u.id&&x.type==='project').length>=1},
+  {id:'nda_owner',  icon:'🔒',name:'حامي الأفكار',desc:'حميت فكرة بـ NDA',       check:(p,u)=>p.filter(x=>x.author_id===u.id&&x.nda).length>=1},
+  {id:'nda_signed', icon:'✍️',name:'موقّع أمين', desc:'وقّعت 3 اتفاقيات',        check:(_,u)=>{const s=getSigs();return Object.values(s).filter(a=>a.some(x=>x.id===u.id)).length>=3;}},
+  {id:'pts_100',    icon:'⭐',name:'نجمة صاعدة', desc:'100 نقطة',                 check:(_,u)=>(u.points||0)>=100},
+  {id:'pts_500',    icon:'💎',name:'خبير نقاط',  desc:'500 نقطة',                 check:(_,u)=>(u.points||0)>=500},
+  {id:'popular',    icon:'🔥',name:'صاحب الترند',desc:'منشور بـ 10+ تصويت',       check:(p,u)=>p.filter(x=>x.author_id===u.id&&(x.votes?.length||0)>=10).length>=1},
+];
+
+function showToast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#c69749';e.style.color=t==='info'?'#000':'#fff';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2800);}
+function soon(){showToast('قريباً 🛠️','info');}
+async function logout(){if(confirm('تسجيل الخروج؟')){try{await azzaDB.auth.signOut();}catch(e){console.error('تعذر إنهاء جلسة Supabase:',e.message);}localStorage.removeItem('azza_token');localStorage.removeItem('azza_user');location.href='index.html';}}
+function openLightbox(src){document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.add('open');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+function timeAgo(iso){const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+' دقيقة';const h=Math.floor(m/60);if(h<24)return h+' ساعة';return Math.floor(h/24)+' يوم';}
+function linkify(s){return s.replace(/#([\p{L}\p{N}_]+)/gu,(m,w)=>`<span class="tag">#${w}</span>`);}
+function ytEmbed(u){const m=(u||'').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);return m?'https://www.youtube.com/embed/'+m[1]:null;}
+
+/* تحديد نوع التوثيق */
+function verifyType(u){
+  if(u.type==='company'){return u.subtype==='institution'?'institution':'company';}
+  return u.type||'idea';
+}
+
+/* التبويبات */
+function setTab(btn,t){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');curTab=t;renderContent();}
+
+/* نافذة التعديل */
+function openEdit(){
+  document.getElementById('edit-name').value=user.name||'';
+  buildRoleFields();
+  initCollabOpts();
+  const ud=document.getElementById('edit-username-display');
+  if(ud)ud.textContent=user.username||'(غير محدد)';
+  document.getElementById('edit-bio').value=user.bio||'';
+  document.getElementById('edit-phone').value=user.phone||'';
+  document.getElementById('edit-email').value=user.contact_email||'';
+  document.getElementById('edit-linkedin').value=user.linkedin||'';
+  document.getElementById('edit-twitter').value=user.twitter||'';
+  document.getElementById('edit-instagram').value=user.instagram||'';
+  document.getElementById('edit-whatsapp').value=user.whatsapp||'';
+  document.getElementById('edit-website').value=user.website||'';
+  const isComp=user.type==='company';
+  document.getElementById('inst-field').style.display=isComp?'':'none';
+  document.getElementById('subtype-field').style.display=isComp?'':'none';
+  if(isComp){
+    document.getElementById('edit-institution').value=user.institution||'';
+    document.getElementById('edit-subtype').value=user.subtype||'company';
+  }
+  document.getElementById('edit-overlay').classList.add('open');
+}
+function closeEdit(){document.getElementById('edit-overlay').classList.remove('open');}
+function saveEdit(){
+  const name=(document.getElementById('edit-name').value||'').trim();
+  if(!name){showToast('الاسم مطلوب','err');return;}
+  const roleMeta=getRoleMetaFromForm();
+  const collabSel=document.querySelector('#collab-opts input:checked');
+  const upd={...user,name,collab_status:collabSel?collabSel.value:user.collab_status||'',
+    role_meta:roleMeta,
+    bio:document.getElementById('edit-bio').value.trim()||'',
+    phone:document.getElementById('edit-phone').value.trim(),
+    contact_email:document.getElementById('edit-email').value.trim(),
+    linkedin:document.getElementById('edit-linkedin').value.trim(),
+    twitter:document.getElementById('edit-twitter').value.trim(),
+    instagram:document.getElementById('edit-instagram').value.trim(),
+    whatsapp:document.getElementById('edit-whatsapp').value.trim(),
+    website:document.getElementById('edit-website').value.trim(),
+  };
+  if(user.type==='company'){
+    upd.institution=document.getElementById('edit-institution').value.trim();
+    upd.subtype=document.getElementById('edit-subtype').value;
+  }
+  localStorage.setItem('azza_user',JSON.stringify(upd));
+  try{const us=JSON.parse(localStorage.getItem('azza_users')||'[]');const i=us.findIndex(u=>u.id===user.id);if(i!==-1){us[i]=upd;localStorage.setItem('azza_users',JSON.stringify(us));}}catch(e){}
+  user=upd;closeEdit();buildProfile();showToast('تم الحفظ ✅');
+}
+
+/* تفاعلات المنشورات */
+function vote(id){const a=getPosts();const p=a.find(x=>x.id===id);if(!p)return;p.votes=p.votes||[];const i=p.votes.indexOf(user.id);i===-1?p.votes.push(user.id):p.votes.splice(i,1);localStorage.setItem('azza_posts',JSON.stringify(a));renderContent();}
+function toggleSave(id){const k='azza_saved_'+user.id;let s;try{s=JSON.parse(localStorage.getItem(k)||'[]');}catch{s=[];}const i=s.indexOf(id);i===-1?s.push(id):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));showToast(i===-1?'تم الحفظ 🔖':'أُزيل','info');renderContent();}
+function toggleComments(id){document.getElementById('cm-'+id)?.classList.toggle('open');}
+function addComment(id){const inp=document.getElementById('ci-'+id);const t=inp.value.trim();if(!t)return;const a=getPosts();const p=a.find(x=>x.id===id);if(!p)return;p.comments.push({id:genId(),author_name:user.name,text:t,created_at:new Date().toISOString()});localStorage.setItem('azza_posts',JSON.stringify(a));renderContent();setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);}
+function delPost(id){if(!confirm('حذف هذا المنشور؟'))return;localStorage.setItem('azza_posts',JSON.stringify(getPosts().filter(p=>p.id!==id)));buildProfile();showToast('تم الحذف','err');}
+
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target);}});},{threshold:.06});
+
+/* بناء الملف */
+function buildProfile(){
+  const posts=getPosts(); const myPosts=posts.filter(p=>p.author_id===user.id); const pts=user.points||0;
+  /* تطبيق لون الدور */
+  const t2=user.subtype==='institution'?'institution':(user.type||'idea');
+  document.body.className=document.body.className.replace(/role-\S+/g,'').trim();
+  document.body.classList.add('role-'+t2);
+  const vType=verifyType(user); const v=VERIFY[vType]||VERIFY.idea;
+
+  /* الرأس */
+  const av=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(user.name);
+  document.getElementById('prof-av').innerHTML=av;
+  document.getElementById('top-av').innerHTML=av;
+  document.getElementById('top-name').textContent=user.name||'—';
+  document.getElementById('prof-name').textContent=user.name||'—';
+  /* ✓ علامة التوثيق الرسمي ملاصقة بالاسم */
+  const existingProfCheck=document.querySelector('.prof-name-row .id-check-inline');
+  if(existingProfCheck)existingProfCheck.remove();
+  if(isIdVerifiedById(user.id)){
+    const checkEl=document.createElement('span');
+    checkEl.className='id-check-inline';
+    checkEl.innerHTML=checkmarkById(user.id,20);
+    document.getElementById('prof-name').after(checkEl);
+  }
+  buildCollabStatus();
+  setTimeout(renderTrustScore, 100);
+  /* اسم المستخدم */
+  let unEl=document.getElementById('prof-username');
+  if(!unEl){unEl=document.createElement('div');unEl.id='prof-username';unEl.style.cssText='font-size:14px;color:var(--muted);margin-bottom:6px;dir:ltr';document.getElementById('prof-name').after(unEl);}
+  unEl.textContent=user.username?'@'+user.username:'';
+
+  /* شارة التوثيق */
+  const vb=document.getElementById('verify-badge');
+  vb.style.background=v.bg; vb.style.color=v.color;
+  document.getElementById('verify-label').textContent=v.label;
+  /* pill الغلاف */
+  const crp=document.getElementById('cover-role-pill');
+  if(crp){crp.textContent=(v.label);}
+  /* @username */
+  const unShow=document.getElementById('prof-username-show');
+  if(unShow)unShow.textContent=user.username?'@'+user.username:'';
+
+  /* اسم المؤسسة */
+  const instEl=document.getElementById('inst-name');
+  if(user.institution){instEl.style.display='block';instEl.textContent='🏢 '+user.institution;}
+  else instEl.style.display='none';
+
+  /* النبذة */
+  const bio=document.getElementById('prof-bio');
+  if(user.bio){bio.textContent=user.bio;bio.classList.remove('empty');}
+  else{bio.textContent='أضف نبذة عن نفسك...';bio.classList.add('empty');}
+
+  /* روابط التواصل */
+  const cr=document.getElementById('contact-row');
+  const chips=[];
+  if(user.phone) chips.push(`<a href="tel:${user.phone}" class="contact-chip"><svg class="ic" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.61 4.38 2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${esc(user.phone)}</a>`);
+  if(user.contact_email) chips.push(`<a href="mailto:${user.contact_email}" class="contact-chip"><svg class="ic" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> بريد إلكتروني</a>`);
+  if(user.linkedin) chips.push(`<a href="${user.linkedin}" target="_blank" class="contact-chip"><svg class="ic" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn</a>`);
+  if(user.twitter) chips.push(`<a href="https://x.com/${user.twitter.replace('@','')}" target="_blank" class="contact-chip">𝕏 ${esc(user.twitter)}</a>`);
+  if(user.instagram) chips.push(`<a href="https://instagram.com/${user.instagram.replace('@','')}" target="_blank" class="contact-chip">📸 ${esc(user.instagram)}</a>`);
+  if(user.whatsapp) chips.push(`<a href="https://wa.me/${user.whatsapp.replace(/\D/g,'')}" target="_blank" class="contact-chip">✆ واتساب</a>`);
+  if(user.website) chips.push(`<a href="${user.website}" target="_blank" class="contact-chip"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> الموقع</a>`);
+  cr.innerHTML=chips.join('');
+
+  /* الإحصائيات */
+  document.getElementById('st-posts').textContent=myPosts.length;
+  /* تصويتات مستلمة من الفيد الجديد */
+  const totalVotes=myPosts.reduce((s,p)=>s+(p.votes?.length||0),0);
+  const vEl=document.getElementById('st-votes');
+  if(vEl)vEl.textContent=totalVotes;
+  document.getElementById('st-following').textContent=(JSON.parse(localStorage.getItem('azza_following_'+user.id)||'[]')).length;
+  document.getElementById('st-followers').textContent=(JSON.parse(localStorage.getItem('azza_followers_'+user.id)||'[]')).length;
+  const sigs=getSigs(); let ndaCount=0;
+  myPosts.filter(p=>p.nda).forEach(p=>{ndaCount+=(sigs[p.id]||[]).length;});
+  document.getElementById('st-nda').textContent=ndaCount;
+
+  /* المستوى */
+  let lvl=LEVELS[0]; for(const l of LEVELS){if(pts>=l.min)lvl=l;}
+  const pill=document.getElementById('level-pill');
+  pill.textContent=lvl.icon+' '+lvl.label; pill.style.background=lvl.bg; pill.style.color=lvl.color;
+  const prog=lvl.next?Math.min(100,Math.round((pts-lvl.min)/(lvl.next-lvl.min)*100)):100;
+  document.getElementById('prog-fill').style.width=prog+'%';
+  document.getElementById('pts-text').textContent=pts+' نقطة'+(lvl.next?' / '+lvl.next+' للمستوى التالي':'');
+
+  /* الشارات */
+  document.getElementById('badges-list').innerHTML=BADGES.map(b=>{
+    const e=b.check(posts,user);
+    return `<div class="badge-chip ${e?'earned':'locked'}">
+      <span class="b-icon">${b.icon}</span>
+      <span class="b-name">${b.name}</span>
+      <span class="b-desc">${b.desc}</span>
+    </div>`;
+  }).join('');
+
+  buildSkills();
+  buildRoleCard();
+  renderContent();
+  renderContent();
+}
+
+/* رسم المحتوى حسب التبويب */
+function renderContent(){
+  const el=document.getElementById('profile-feed');
+  const posts=getPosts();
+
+  if(curTab==='posts'){
+    const uid = user?.id || user?.email || null;
+    const list=posts.filter(p=>uid && (p.author_id===uid || p.author_id===user.id));
+    if(!list.length){el.innerHTML=`<div class="empty-state"><svg class="ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><b>لا منشورات بعد</b><span>اذهب للفيد وانشر أول منشور</span></div>`;return;}
+    el.innerHTML=list.map((p,i)=>postCard(p,i)).join('');
+  } else if(curTab==='saved'){
+    const saved=JSON.parse(localStorage.getItem('azza_saved_'+user.id)||'[]');
+    const list=posts.filter(p=>saved.includes(p.id));
+    if(!list.length){el.innerHTML=`<div class="empty-state"><svg class="ic" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><b>لا محفوظات بعد</b><span>احفظ منشورات من الفيد</span></div>`;return;}
+    el.innerHTML=list.map((p,i)=>postCard(p,i)).join('');
+  } else if(curTab==='activity'){
+    renderActivity(posts);return;
+  } else if(curTab==='partners'){
+    renderPartners(posts);return;
+  }
+  document.querySelectorAll('.post').forEach(e=>io.observe(e));
+}
+
+/* بطاقة منشور */
+function postCard(p,idx){
+  const voted=(p.votes||[]).includes(user.id),sv=isSaved(p.id),mine=p.author_id===user.id;
+  const voteN=(p.votes||[]).length;
+  const av=p.author_photo?`<img src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover">`:ini(p.author_name);
+  const authorVType=p.author_type?verifyType({type:p.author_type}):verifyType(user);
+  const vc=VERIFY[authorVType]||VERIFY.idea;
+  let badges='';
+  if(voteN>=3)badges+=`<span class="pbadge pbadge-trend">🔥 ترند</span>`;
+  if(p.type&&p.type!=='post')badges+=`<span class="pbadge pbadge-type">${TYPE_L[p.type]||''}</span>`;
+  if(p.category&&CAT_L[p.category])badges+=`<span class="pbadge pbadge-cat">${CAT_L[p.category]}</span>`;
+  if(p.nda)badges+=`<span class="pbadge pbadge-nda">🔒 NDA</span>`;
+  let media='';
+  if(p.image)media=`<img src="${p.image}" class="post-media" onclick="openLightbox('${p.image}')">`;
+  else if(p.video)media=`<video class="post-media" controls src="${p.video}"></video>`;
+  else if(p.videoUrl){const yt=ytEmbed(p.videoUrl);media=yt?`<div class="post-embed"><iframe src="${yt}" allowfullscreen></iframe></div>`:`<video class="post-media" controls src="${esc(p.videoUrl)}"></video>`;}
+  const cmts=p.comments.map(c=>`<div class="cmt-row"><div class="cmt-av">${ini(c.author_name)}</div><div class="cmt-bubble"><div class="cmt-name">${esc(c.author_name)} ${checkmarkById(c.author_id,11)}</div><div class="cmt-txt">${esc(c.text)}</div></div></div>`).join('');
+  return `<article class="post" id="post-${p.id}" style="animation-delay:${idx*.05}s">
+    <div class="post-head">
+      <div class="post-av">${av}</div>
+      <div>
+        <div class="post-name">${esc(p.author_name)} ${checkmarkById(p.author_id,14)}</div>
+        <div class="post-meta">
+          <span style="background:${vc.bg};color:${vc.color};border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:700">✓ ${vc.label}</span>
+        </div>
+      </div>
+      <span class="post-time">${timeAgo(p.created_at)}</span>
+      ${mine?`<button class="post-del" onclick="delPost('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`:''}
+    </div>
+    ${badges?`<div class="post-badges">${badges}</div>`:''}
+    ${p.text?`<div class="post-body">${linkify(esc(p.text))}</div>`:''}
+    ${media}
+    <div class="post-stats"><span>▲ ${voteN} · 💬 ${p.comments.length}</span><span>👁️ ${p.views||0} مشاهدة</span></div>
+    <div class="post-actions">
+      <button class="pact ${voted?'voted':'main-act'}" onclick="vote('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${voted?'مصوّت':'تصويت'}</button>
+      <button class="pact" onclick="toggleComments('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> تعليق</button>
+      <button class="pact ${sv?'saved':''}" onclick="toggleSave('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" ${sv?'fill="currentColor"':''}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> ${sv?'محفوظ':'حفظ'}</button>
+    </div>
+    <div class="post-comments" id="cm-${p.id}">${cmts}
+      <div class="cmt-in-row">
+        <div class="cmt-av">${ini(user.name)}</div>
+        <input class="cmt-in" id="ci-${p.id}" placeholder="أضف تعليقاً..." onkeypress="if(event.key==='Enter')addComment('${p.id}')">
+        <button class="cmt-send" onclick="addComment('${p.id}')"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* نشاط الحساب */
+function renderActivity(posts){
+  const myPosts=posts.filter(p=>p.author_id===user.id);
+  const sigs=getSigs();
+  const mySignatures=Object.entries(sigs).filter(([,a])=>a.some(x=>x.id===user.id));
+  const myComments=posts.flatMap(p=>p.comments.filter(c=>c.author_name===user.name).map(c=>({...c,postId:p.id})));
+  const items=[];
+  myPosts.slice(0,5).forEach(p=>items.push({time:p.created_at,icon:'📝',bg:'rgba(28,91,56,.1)',title:`نشرت: ${p.text?p.text.substring(0,50)+'...':TYPE_L[p.type]||'منشور'}`,type:'post'}));
+  mySignatures.slice(0,3).forEach(([id,a])=>{const sig=a.find(x=>x.id===user.id);if(sig)items.push({time:sig.at,icon:'✍️',bg:'rgba(14,54,34,.1)',title:'وقّعت على اتفاقية NDA لحماية فكرة',type:'nda'});});
+  myComments.slice(0,3).forEach(c=>items.push({time:c.created_at,icon:'💬',bg:'rgba(198,151,73,.1)',title:`علّقت: ${c.text.substring(0,50)}`,type:'comment'}));
+  items.sort((a,b)=>new Date(b.time)-new Date(a.time));
+  const el=document.getElementById('profile-feed');
+  if(!items.length){el.innerHTML=`<div class="empty-state"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><b>لا نشاط بعد</b><span>ابدأ بالنشر والتفاعل في الفيد</span></div>`;return;}
+  el.innerHTML=`<div class="section-card"><div class="activity-list">${items.map(i=>`<div class="act-item"><div class="act-dot" style="background:${i.bg}">${i.icon}</div><div class="act-body"><div class="act-title">${esc(i.title)}</div><div class="act-time">${timeAgo(i.time)}</div></div></div>`).join('')}</div></div>`;
+}
+
+/* الشراكات + التقييمات */
+const getReviews = id=>{try{return JSON.parse(localStorage.getItem('azza_reviews_'+id)||'[]');}catch{return[];}};
+const saveReviews= (id,r)=>localStorage.setItem('azza_reviews_'+id,JSON.stringify(r));
+let curStars=0;
+
+function renderReviewsSection(){
+  const revs=getReviews(user.id);
+  const el=document.getElementById('profile-feed');
+  const avg=revs.length?revs.reduce((a,r)=>a+r.rating,0)/revs.length:0;
+  const stars='★'.repeat(Math.round(avg))+'☆'.repeat(5-Math.round(avg));
+  let html=`<div class="section-card">
+    <div class="reviews-head">
+      <div>
+        <div class="section-title" style="margin-bottom:6px">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+          تقييمات الشركاء
+        </div>
+        ${revs.length?`<div class="avg-stars">
+          <span class="stars-big">${avg.toFixed(1)}</span>
+          <span class="stars-row" style="color:#c69749">${stars}</span>
+          <span class="stars-count">(${revs.length} تقييم)</span>
+        </div>`:'<span style="font-size:13px;color:var(--muted)">لا تقييمات بعد</span>'}
+      </div>
+    </div>
+    ${revs.map(r=>{
+      const rs='★'.repeat(r.rating)+'☆'.repeat(5-r.rating);
+      return `<div class="review-item">
+        <div class="review-av">${ini(r.from_name)}</div>
+        <div class="review-body">
+          <div class="review-meta">
+            <span class="review-name">${esc(r.from_name)}</span>
+            <span class="review-stars">${rs}</span>
+            <span class="review-time">${timeAgo(r.at)}</span>
+          </div>
+          ${r.text?`<div class="review-text">${esc(r.text)}</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const posts2=getPosts();
+  const sigs2=getSigs();
+  const myNdaPosts=posts2.filter(p=>p.author_id===user.id&&p.nda);
+  const partners={};
+  myNdaPosts.forEach(p=>{(sigs2[p.id]||[]).forEach(s=>{if(!partners[s.id])partners[s.id]=s;});});
+  const list=Object.values(partners);
+  html+=`<div class="section-card" style="margin-top:14px">
+    <div class="section-title">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      مهتمون بأفكارك
+    </div>
+    ${list.length?`<div class="partner-grid">${list.map(p=>`<div class="partner-card"><div class="partner-av">${ini(p.name)}</div><div><div class="partner-name">${esc(p.name)}</div><div class="partner-sub">وقّع NDA</div></div></div>`).join('')}</div>`
+    :'<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">انشر أفكاراً بحماية NDA لتجذب شركاء</div>'}
+  </div>`;
+  el.innerHTML=html;
+}
+
+function renderPartners(){ renderReviewsSection(); }
+
+function setStar(n){
+  curStars=n;
+  document.querySelectorAll('#star-pick span').forEach((s,i)=>s.classList.toggle('lit',i<n));
+}
+function openReview(){
+  curStars=0;
+  document.querySelectorAll('#star-pick span').forEach(s=>s.classList.remove('lit'));
+  document.getElementById('review-text').value='';
+  document.getElementById('review-overlay').classList.add('open');
+}
+function closeReview(){document.getElementById('review-overlay').classList.remove('open');}
+function submitReview(){
+  if(!curStars){showToast('اختر تقييماً بالنجوم','err');return;}
+  const text=document.getElementById('review-text').value.trim();
+  const revs=getReviews(user.id);
+  if(revs.find(r=>r.from_id===user.id)){showToast('قدّمت تقييماً مسبقاً','err');return;}
+  revs.push({id:genId(),from_id:user.id,from_name:user.name,from_type:user.type,
+    from_photo:user.photo||null,rating:curStars,text,at:new Date().toISOString()});
+  saveReviews(user.id,revs);closeReview();renderContent();renderTrustScore();
+  showToast('تم نشر التقييم ✅');
+}
+
+/* ── وضع التعاون ── */
+const COLLAB={
+  seeking_investor:{emoji:'💰',label:'أبحث عن مستثمر',color:'#854F0B',bg:'rgba(133,79,11,.1)'},
+  seeking_expert:  {emoji:'🏅',label:'أبحث عن خبير',  color:'#0F6E56',bg:'rgba(15,110,86,.1)'},
+  seeking_partner: {emoji:'🤝',label:'أبحث عن شريك',  color:'#185FA5',bg:'rgba(24,95,165,.1)'},
+  open:            {emoji:'🟡',label:'منفتح على الشراكات',color:'#854F0B',bg:'rgba(133,79,11,.08)'},
+  unavailable:     {emoji:'⚪',label:'غير متاح حالياً',color:'#888780',bg:'rgba(136,135,128,.1)'},
+};
+function buildCollabStatus(){
+  const el=document.getElementById('collab-status-display');
+  if(!el)return;
+  const v=user.collab_status;
+  if(!v){el.style.display='none';return;}
+  const cfg=COLLAB[v];if(!cfg){el.style.display='none';return;}
+  el.style.display='block';
+  el.innerHTML=`<span class="collab-badge" onclick="openEdit()"
+    style="background:${cfg.bg};color:${cfg.color};border-color:${cfg.color}30">
+    ${cfg.emoji} ${cfg.label}
+    <svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+  </span>`;
+}
+function initCollabOpts(){
+  const cur=user.collab_status||'';
+  document.querySelectorAll('#collab-opts .collab-opt input').forEach(inp=>{
+    inp.checked=inp.value===cur;
+    inp.closest('.collab-opt').classList.toggle('chosen',inp.value===cur);
+    inp.addEventListener('change',function(){
+      document.querySelectorAll('#collab-opts .collab-opt').forEach(o=>o.classList.remove('chosen'));
+      this.closest('.collab-opt').classList.add('chosen');
+    });
+  });
+}
+
+/* ── درجة المصداقية ── */
+function calcTrustScore(){
+  const posts=getPosts();let s={profile:0,nda:0,reviews:0,activity:0};
+  if(user.photo)s.profile+=5;if(user.bio&&user.bio.length>10)s.profile+=5;
+  if(user.phone||user.email)s.profile+=5;if(user.linkedin||user.twitter||user.website)s.profile+=5;
+  if(user.institution)s.profile+=5;
+  const sigs=getSigs();const myNda=posts.filter(p=>p.author_id===user.id&&p.nda);
+  let ndaTotal=0;myNda.forEach(p=>{ndaTotal+=(sigs[p.id]||[]).length;});
+  s.nda=Math.min(25,Math.round(ndaTotal*2.5));
+  const revs=getReviews(user.id);
+  if(revs.length>0){const avg=revs.reduce((a,r)=>a+r.rating,0)/revs.length;s.reviews=Math.min(25,Math.round(revs.length*3+(avg>=4?5:0)));}
+  const myPosts=posts.filter(p=>p.author_id===user.id);
+  const views=myPosts.reduce((a,p)=>a+(p.views||0),0);
+  s.activity=Math.min(25,Math.round(myPosts.length*3+Math.floor(views/20)));
+  const total=Math.min(100,s.profile+s.nda+s.reviews+s.activity);
+  return{total,breakdown:s};
+}
+function renderTrustScore(){
+  const {total,breakdown}=calcTrustScore();
+  const num=document.getElementById('trust-num');if(num)num.textContent=total;
+  const color=total>=85?'#0F6E56':total>=60?'#1c5b38':total>=35?'#c69749':'#ce1126';
+  const arc=document.getElementById('trust-arc');
+  if(arc){arc.style.stroke=color;arc.style.strokeDashoffset=251-(total/100*251);}
+  [['profile','#1c5b38'],['nda','#c69749'],['reviews','#185FA5'],['activity','#0F6E56']].forEach(([k,col])=>{
+    const fill=document.getElementById('tb-'+k);const val=document.getElementById('tv-'+k);
+    if(fill){fill.style.width=(breakdown[k]/25*100)+'%';fill.style.background=col;}
+    if(val)val.textContent=breakdown[k];
+  });
+}
+
+/* ── المهارات والتأييدات ── */
+const SKILL_SUGGESTIONS=['تطوير ويب','تطوير تطبيقات','تصميم UI/UX','ذكاء اصطناعي',
+  'ريادة أعمال','تسويق رقمي','إدارة مشاريع','تحليل بيانات',
+  'JavaScript','Python','React','Node.js',
+  'تمويل استثماري','محاسبة','قانون','زراعة ذكية','صحة رقمية'];
+
+function getSkills(){return user?.skills||[];}
+function getEndorsements(uid){try{return JSON.parse(localStorage.getItem('azza_end_'+uid)||'{}');}catch{return{};}}
+
+function buildSkills(){
+  const skills=getSkills();
+  const endorsements=getEndorsements(user.id);
+  const grid=document.getElementById('skills-grid');
+  const sugEl=document.getElementById('skill-sugs');
+  if(!grid)return;
+  if(!skills.length){
+    grid.innerHTML='<div class="skills-empty">أضف مهاراتك لتظهر للمستثمرين والشركاء</div>';
+  } else {
+    const sorted=[...skills].sort((a,b)=>((endorsements[b]||[]).length)-((endorsements[a]||[]).length));
+    grid.innerHTML=sorted.map(sk=>{
+      const ends=endorsements[sk]||[];const isTop=ends.length>=3;
+      return `<div class="skill-chip${isTop?' top-skill':''}">
+        <span class="skill-name">${esc(sk)}</span>
+        ${ends.length?`<span class="endorse-count">▲ ${ends.length}</span>`:''}
+        <button class="skill-remove" onclick="removeSkill('${esc(sk)}')" title="حذف">×</button>
+      </div>`;
+    }).join('');
+  }
+  const notAdded=SKILL_SUGGESTIONS.filter(s=>!skills.includes(s)).slice(0,8);
+  if(sugEl)sugEl.innerHTML=notAdded.map(s=>`<button class="skill-sug" onclick="quickAddSkill('${s}')">+ ${s}</button>`).join('');
+}
+function saveUserData(upd){
+  localStorage.setItem('azza_user',JSON.stringify(upd));
+  try{const us=JSON.parse(localStorage.getItem('azza_users')||'[]');const i=us.findIndex(u=>u.id===user.id);if(i!==-1){us[i]=upd;localStorage.setItem('azza_users',JSON.stringify(us));}}catch(e){}
+  user=upd;
+}
+function addSkill(){
+  const inp=document.getElementById('skill-input');const sk=(inp.value||'').trim();
+  if(!sk){showToast('اكتب مهارة أولاً','err');return;}
+  if(sk.length>40){showToast('المهارة طويلة جداً','err');return;}
+  const skills=getSkills();
+  if(skills.includes(sk)){showToast('هذه المهارة موجودة مسبقاً','err');return;}
+  if(skills.length>=20){showToast('الحد الأقصى 20 مهارة','err');return;}
+  saveUserData({...user,skills:[...skills,sk]});inp.value='';buildSkills();
+  showToast('✅ تمت إضافة: '+sk);
+}
+function quickAddSkill(sk){
+  const skills=getSkills();
+  if(skills.includes(sk)){showToast('هذه المهارة موجودة','info');return;}
+  if(skills.length>=20){showToast('الحد الأقصى 20 مهارة','err');return;}
+  saveUserData({...user,skills:[...skills,sk]});buildSkills();
+  showToast('✅ تمت إضافة: '+sk);
+}
+function removeSkill(sk){
+  if(!confirm('حذف مهارة "'+sk+'"؟'))return;
+  saveUserData({...user,skills:getSkills().filter(s=>s!==sk)});buildSkills();
+  showToast('تم الحذف','err');
+}
+
+/* ── مشاركة الملف ── */
+
+/* رفع الصورة الشخصية */
+function uploadAvatar(inp){
+  const file=inp.files[0]; if(!file)return;
+  if(file.size>2*1024*1024){showToast('الصورة أكبر من 2MB','err');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const size=200; canvas.width=size; canvas.height=size;
+      const ctx=canvas.getContext('2d');
+      /* اقتصاص مربع من المنتصف */
+      const min=Math.min(img.width,img.height);
+      const sx=(img.width-min)/2, sy=(img.height-min)/2;
+      ctx.drawImage(img,sx,sy,min,min,0,0,size,size);
+      const dataUrl=canvas.toDataURL('image/jpeg',.85);
+      saveUserData({...user,photo:dataUrl});
+      buildProfile();
+      showToast('تم تحديث الصورة ✅');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function shareProfile(){
+  const url=window.location.href;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>showToast('تم نسخ رابط الملف 📋'));
+  } else {
+    showToast('رابط الملف: '+url,'info');
+  }
+}
+
+
+/* ══ حقول خاصة بكل دور ══ */
+const SECTORS = ['تقنية','صحة','تعليم','زراعة','بيئة','طاقة','مالية','لوجستيات','تجارة إلكترونية','عقارات'];
+
+function buildRoleFields(){
+  const container = document.getElementById('role-specific-fields');
+  if(!container) return;
+  const type = user.subtype==='institution'?'institution':(user.type||'idea');
+  const meta = user.role_meta || {};
+  let html = '';
+
+  if(type === 'investor'){
+    html = `<div class="role-section">
+      <div class="role-section-head">💼 معلومات المستثمر</div>
+      <div class="role-section-body">
+        <div class="field"><label>الحد الأدنى للاستثمار ($)</label>
+          <input type="number" id="inv-min" placeholder="5000" value="${meta.inv_min||''}"></div>
+        <div class="field"><label>الحد الأقصى للاستثمار ($)</label>
+          <input type="number" id="inv-max" placeholder="100000" value="${meta.inv_max||''}"></div>
+        <div class="field"><label>نبذة استثمارية (Investment Thesis)</label>
+          <textarea id="inv-thesis" placeholder="أصف القطاعات التي أستثمر فيها وما أبحث عنه..." style="min-height:70px">${meta.inv_thesis||''}</textarea></div>
+        <div class="field"><label>القطاعات المفضلة</label>
+          <div class="role-tag-grid" id="inv-sectors">
+            ${SECTORS.map(s=>`<button type="button" class="role-tag-opt${(meta.inv_sectors||[]).includes(s)?' on':''}" onclick="toggleSector(this,'inv-sectors')">${s}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  else if(type === 'skill'){
+    html = `<div class="role-section">
+      <div class="role-section-head">🏅 معلومات الخبير</div>
+      <div class="role-section-body">
+        <div class="field-row">
+          <div class="field"><label>سعر الاستشارة ($/ساعة)</label>
+            <input type="number" id="exp-rate" placeholder="50" value="${meta.exp_rate||''}"></div>
+          <div class="field"><label>التوفر الأسبوعي (ساعة)</label>
+            <input type="number" id="exp-hours" placeholder="10" value="${meta.exp_hours||''}"></div>
+        </div>
+        <div class="field"><label>سنوات الخبرة</label>
+          <input type="number" id="exp-years" placeholder="5" value="${meta.exp_years||''}"></div>
+        <div class="field"><label>مجالات التخصص</label>
+          <div class="role-tag-grid" id="exp-sectors">
+            ${SECTORS.map(s=>`<button type="button" class="role-tag-opt${(meta.exp_sectors||[]).includes(s)?' on':''}" onclick="toggleSector(this,'exp-sectors')">${s}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  else if(type === 'company' || type === 'institution'){
+    html = `<div class="role-section">
+      <div class="role-section-head">${type==='institution'?'🏛️':'🏢'} معلومات ${type==='institution'?'المؤسسة':'الشركة'}</div>
+      <div class="role-section-body">
+        <div class="field-row">
+          <div class="field"><label>تأسست عام</label>
+            <input type="number" id="co-year" placeholder="2020" value="${meta.co_year||''}"></div>
+          <div class="field"><label>حجم الفريق</label>
+            <select id="co-size">
+              <option value="">اختر...</option>
+              ${['1-5','6-20','21-50','51-200','200+'].map(s=>`<option${meta.co_size===s?' selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>القطاعات التي تعمل فيها</label>
+          <div class="role-tag-grid" id="co-sectors">
+            ${SECTORS.map(s=>`<button type="button" class="role-tag-opt${(meta.co_sectors||[]).includes(s)?' on':''}" onclick="toggleSector(this,'co-sectors')">${s}</button>`).join('')}
+          </div>
+        </div>
+        <div class="field"><label>ما تبحث عنه</label>
+          <textarea id="co-looking" placeholder="نبحث عن شركاء تقنيين، أفكار في مجال الصحة الرقمية..." style="min-height:70px">${meta.co_looking||''}</textarea></div>
+      </div>
+    </div>`;
+  }
+  else { // idea holder
+    html = `<div class="role-section">
+      <div class="role-section-head">💡 معلومات المشروع</div>
+      <div class="role-section-body">
+        <div class="field"><label>المرحلة الحالية للفكرة</label>
+          <select id="idea-stage">
+            <option value="">اختر...</option>
+            ${['فكرة مبكرة','نموذج أولي','MVP','يولّد إيراداً','يبحث عن تمويل'].map(s=>`<option${meta.idea_stage===s?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>التمويل المطلوب ($)</label>
+          <input type="number" id="idea-funding" placeholder="50000" value="${meta.idea_funding||''}"></div>
+        <div class="field"><label>قطاع الفكرة</label>
+          <div class="role-tag-grid" id="idea-sectors">
+            ${SECTORS.map(s=>`<button type="button" class="role-tag-opt${(meta.idea_sectors||[]).includes(s)?' on':''}" onclick="toggleSector(this,'idea-sectors')">${s}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function toggleSector(btn, groupId){
+  btn.classList.toggle('on');
+}
+
+function getRoleMetaFromForm(){
+  const type = user.subtype==='institution'?'institution':(user.type||'idea');
+  const meta = {};
+  const getSectors = id => [...document.querySelectorAll(`#${id} .role-tag-opt.on`)].map(b=>b.textContent.trim());
+
+  if(type==='investor'){
+    meta.inv_min    = parseInt(document.getElementById('inv-min')?.value)||0;
+    meta.inv_max    = parseInt(document.getElementById('inv-max')?.value)||0;
+    meta.inv_thesis = document.getElementById('inv-thesis')?.value.trim()||'';
+    meta.inv_sectors= getSectors('inv-sectors');
+  } else if(type==='skill'){
+    meta.exp_rate   = parseInt(document.getElementById('exp-rate')?.value)||0;
+    meta.exp_hours  = parseInt(document.getElementById('exp-hours')?.value)||0;
+    meta.exp_years  = parseInt(document.getElementById('exp-years')?.value)||0;
+    meta.exp_sectors= getSectors('exp-sectors');
+  } else if(type==='company'||type==='institution'){
+    meta.co_year    = parseInt(document.getElementById('co-year')?.value)||0;
+    meta.co_size    = document.getElementById('co-size')?.value||'';
+    meta.co_sectors = getSectors('co-sectors');
+    meta.co_looking = document.getElementById('co-looking')?.value.trim()||'';
+  } else {
+    meta.idea_stage   = document.getElementById('idea-stage')?.value||'';
+    meta.idea_funding = parseInt(document.getElementById('idea-funding')?.value)||0;
+    meta.idea_sectors = getSectors('idea-sectors');
+  }
+  return meta;
+}
+
+/* عرض بيانات الدور بالملف */
+function buildRoleCard(){
+  const meta = user.role_meta||{};
+  const type = user.subtype==='institution'?'institution':(user.type||'idea');
+  const el = document.getElementById('role-card-display');
+  if(!el) return;
+  let rows = [];
+
+  if(type==='investor'){
+    if(meta.inv_min||meta.inv_max) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">💰</span><span class="role-detail-label">نطاق الاستثمار</span><span class="role-detail-val">$${(meta.inv_min||0).toLocaleString()} — $${(meta.inv_max||0).toLocaleString()}</span></div>`);
+    if(meta.inv_thesis) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">📋</span><span class="role-detail-label">Thesis</span><span class="role-detail-val" style="font-size:13px;font-weight:400">${esc(meta.inv_thesis)}</span></div>`);
+    if(meta.inv_sectors?.length) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">🏷️</span><span class="role-detail-label">القطاعات</span><div style="display:flex;gap:5px;flex-wrap:wrap">${meta.inv_sectors.map(s=>`<span class="sector-chip">${s}</span>`).join('')}</div></div>`);
+  } else if(type==='skill'){
+    if(meta.exp_rate) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">💵</span><span class="role-detail-label">سعر الاستشارة</span><span class="role-detail-val">$${meta.exp_rate}/ساعة</span></div>`);
+    if(meta.exp_hours) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">⏱️</span><span class="role-detail-label">التوفر</span><span class="role-detail-val">${meta.exp_hours} ساعة/أسبوع</span></div>`);
+    if(meta.exp_years) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">🏆</span><span class="role-detail-label">الخبرة</span><span class="role-detail-val">${meta.exp_years} سنة</span></div>`);
+    if(meta.exp_sectors?.length) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">🏷️</span><span class="role-detail-label">التخصصات</span><div style="display:flex;gap:5px;flex-wrap:wrap">${meta.exp_sectors.map(s=>`<span class="sector-chip">${s}</span>`).join('')}</div></div>`);
+  } else if(type==='company'||type==='institution'){
+    if(meta.co_year) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">📅</span><span class="role-detail-label">التأسيس</span><span class="role-detail-val">${meta.co_year}</span></div>`);
+    if(meta.co_size) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">👥</span><span class="role-detail-label">حجم الفريق</span><span class="role-detail-val">${meta.co_size} موظف</span></div>`);
+    if(meta.co_sectors?.length) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">🏷️</span><span class="role-detail-label">القطاعات</span><div style="display:flex;gap:5px;flex-wrap:wrap">${meta.co_sectors.map(s=>`<span class="sector-chip">${s}</span>`).join('')}</div></div>`);
+  } else {
+    if(meta.idea_stage) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">📍</span><span class="role-detail-label">المرحلة</span><span class="role-detail-val">${meta.idea_stage}</span></div>`);
+    if(meta.idea_funding) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">💰</span><span class="role-detail-label">التمويل المطلوب</span><span class="role-detail-val">$${meta.idea_funding.toLocaleString()}</span></div>`);
+    if(meta.idea_sectors?.length) rows.push(`<div class="role-detail-row"><span class="role-detail-icon">🏷️</span><span class="role-detail-label">القطاع</span><div style="display:flex;gap:5px;flex-wrap:wrap">${meta.idea_sectors.map(s=>`<span class="sector-chip">${s}</span>`).join('')}</div></div>`);
+  }
+
+  if(!rows.length){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML=`<div class="role-card"><div class="role-card-title"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>معلومات ${type==='investor'?'الاستثمار':type==='skill'?'الخبير':type==='company'?'الشركة':type==='institution'?'المؤسسة':'المشروع'}</div>${rows.join('')}</div>`;
+}
+
+if(user){
+  buildProfile();
+  loadInitialDataFromSupabase().then(()=>{ buildProfile(); });
+}
+</script>
+</body>
+</html>

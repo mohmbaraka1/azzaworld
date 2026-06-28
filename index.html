@@ -3,397 +3,970 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عزّة — AZZA | حيث تلتقي الأفكار برأس المال والخبرة</title>
+<title>عزّة — منصة فلسطين للأفكار والاستثمار</title>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-/* ═══════════════════════════════════════════
-   AZZA — index.html  (الصفحة الرئيسية)
-   نفس هوية صفحة الدخول: زيتي + أحمر + رملي + ذهبي + تطريز
-   كل الأيقونات SVG مدمج → تشتغل دائماً
-   ═══════════════════════════════════════════ */
-:root{
-  --olive:#1c5b38; --olive-deep:#0e3622;
-  --red:#ce1126; --red-deep:#9b1220;
-  --cream:#f7f1e3; --cream-2:#ece0c8;
-  --ink:#1c1a14; --gold:#c69749; --gold-soft:#e3c98c;
-  --muted:#6b6555; --line:rgba(28,26,20,.12);
-  --r:16px;
-}
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.7}
 a{text-decoration:none;color:inherit}
-.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
-.container{max-width:1140px;margin:0 auto;padding:0 22px}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle;flex-shrink:0}
+h1,h2,h3{font-family:'Aref Ruqaa',serif;line-height:1.3}
+h1{font-size:clamp(2rem,5vw,3.6rem);font-weight:700}
+h2{font-size:clamp(1.5rem,3vw,2.3rem);font-weight:700}
+h3{font-size:1.2rem;font-weight:700}
+.container{max-width:1140px;margin:0 auto;padding:0 24px}
 
-/* شريط تطريز فاصل */
-.tatreez{display:block;width:100%;height:16px}
+/* أزرار */
+.btn{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:13px 26px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:.22s;border:2px solid transparent}
+.btn-gold{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.btn-gold:hover{background:var(--gold-dark);border-color:var(--gold-dark);transform:translateY(-2px);box-shadow:0 10px 28px rgba(198,151,73,.35)}
+.btn-outline{background:transparent;color:var(--cream);border-color:rgba(247,241,227,.35)}
+.btn-outline:hover{background:rgba(247,241,227,.1);border-color:rgba(247,241,227,.7)}
+.btn-olive{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+.btn-olive:hover{background:var(--olive-deep);transform:translateY(-2px);box-shadow:0 10px 28px rgba(28,91,56,.3)}
+.btn-lg{padding:15px 34px;font-size:16px}
 
-/* ════ الهيدر ════ */
-.nav{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
-.logo{display:flex;align-items:center;gap:9px}
-.logo-mark{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:24px;flex-shrink:0}
-.logo-text{font-family:'Aref Ruqaa',serif;font-size:26px;color:var(--olive-deep);line-height:1}
-.nav-links{display:flex;gap:26px;font-size:15px;font-weight:500;color:var(--muted)}
-.nav-links a:hover{color:var(--olive)}
+/* شريط التنقّل */
+.nav{position:sticky;top:0;z-index:100;background:rgba(14,54,34,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(198,151,73,.22)}
+.nav-in{display:flex;align-items:center;height:68px;gap:18px}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand-mark{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-dark) 100%);display:flex;align-items:center;justify-content:center;font-family:'Aref Ruqaa',serif;font-size:23px;color:var(--olive-deep);font-weight:700;letter-spacing:-1px}
+.brand-name{font-family:'Aref Ruqaa',serif;font-size:26px;color:var(--gold-soft)}
+.nav-links{display:flex;align-items:center;gap:4px;margin-right:auto}
+[dir="ltr"] .nav-links{margin-right:0;margin-left:auto}
+.nav-link{color:rgba(247,241,227,.7);font-size:14px;font-weight:500;padding:7px 12px;border-radius:8px;transition:.18s}
+.nav-link:hover{color:var(--gold-soft);background:rgba(198,151,73,.1)}
 .nav-right{display:flex;align-items:center;gap:10px}
-.lang{display:flex;gap:3px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
-.lang button{border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;cursor:pointer;transition:.2s}
-.lang button.on{background:var(--olive);color:#fff}
-.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;font-family:inherit;font-weight:700;cursor:pointer;transition:.2s}
-.btn-primary{background:var(--olive);color:#fff;padding:11px 22px;font-size:14px;box-shadow:0 6px 18px rgba(28,91,56,.25)}
-.btn-primary:hover{background:var(--olive-deep);transform:translateY(-2px)}
-.btn-ghost{background:transparent;color:var(--ink);font-weight:600;padding:11px 8px;font-size:14px}
-.btn-ghost:hover{color:var(--olive)}
-.btn-lg{padding:15px 30px;font-size:16px}
-.burger{display:none;background:none;border:none;color:var(--ink);cursor:pointer;padding:4px}
+.lang-btn{background:rgba(247,241,227,.08);border:1px solid rgba(247,241,227,.18);color:rgba(247,241,227,.8);border-radius:8px;padding:7px 13px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.18s}
+.lang-btn:hover{background:rgba(247,241,227,.15);color:var(--cream)}
+.nav-cta{padding:8px 18px;font-size:13px}
 
-/* ════ القسم البطل ════ */
-.hero{position:relative;text-align:center;padding:80px 0 70px;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 22% 25%,rgba(28,91,56,.10),transparent 45%),radial-gradient(circle at 80% 60%,rgba(198,151,73,.12),transparent 50%)}
-.hero-in{position:relative;z-index:1;max-width:780px;margin:0 auto}
-.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(28,91,56,.08);color:var(--olive-deep);border:1px solid rgba(28,91,56,.18);border-radius:999px;padding:7px 16px;font-size:13.5px;font-weight:600;margin-bottom:22px}
-.hero h1{font-family:'Aref Ruqaa',serif;font-size:clamp(34px,6vw,60px);line-height:1.25;color:var(--olive-deep);margin-bottom:18px}
-.hero h1 .accent{color:var(--olive);position:relative}
-.hero h1 .accent::after{content:'';position:absolute;left:0;right:0;bottom:4%;height:26%;background:var(--gold-soft);opacity:.5;z-index:-1;border-radius:4px}
-.hero p{font-size:clamp(16px,2.2vw,20px);color:var(--muted);max-width:620px;margin:0 auto 32px}
-.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
-.btn-gold{background:var(--gold);color:var(--ink);box-shadow:0 6px 18px rgba(198,151,73,.3)}
-.btn-gold:hover{background:var(--gold-soft);transform:translateY(-2px)}
-.btn-outline{background:#fff;color:var(--olive);border:1.5px solid var(--line)}
-.btn-outline:hover{border-color:var(--olive)}
+/* الهيرو */
+.hero{background:#060c07;position:relative;overflow:hidden;padding:96px 0 84px}
+.hero-bg{position:absolute;inset:0;opacity:1;pointer-events:none}
+.hero-in{position:relative;z-index:1;display:grid;grid-template-columns:1fr 360px;gap:48px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(198,151,73,.14);border:1px solid rgba(198,151,73,.32);color:var(--gold-soft);border-radius:999px;padding:7px 16px;font-size:13px;font-weight:700;margin-bottom:22px}
+.hero-badge svg{width:14px;height:14px;stroke:var(--gold);fill:var(--gold)}
+.hero h1{color:var(--cream);margin-bottom:18px}
+.hero h1 .accent{color:var(--gold)}
+.hero-p{color:rgba(247,241,227,.78);font-size:16.5px;max-width:540px;margin-bottom:34px;line-height:1.85}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px}
+.stats-row{display:flex;gap:0;background:rgba(247,241,227,.05);border:1px solid rgba(198,151,73,.18);border-radius:16px;overflow:hidden;width:fit-content}
+.stat{padding:16px 28px;text-align:center;position:relative}
+.stat+.stat::before{content:'';position:absolute;top:20%;bottom:20%;right:0;width:1px;background:rgba(198,151,73,.18)}
+[dir="ltr"] .stat+.stat::before{right:auto;left:0}
+.stat strong{display:block;font-family:'Aref Ruqaa',serif;font-size:2rem;color:var(--gold);line-height:1;margin-bottom:5px}
+.stat span{font-size:12px;color:rgba(247,241,227,.55);white-space:nowrap}
+.hero-motif{display:flex;align-items:center;justify-content:center}
 
-.stats{display:inline-flex;align-items:center;gap:26px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 32px;box-shadow:0 14px 40px rgba(14,54,34,.07)}
-.stat strong{display:block;font-family:'Aref Ruqaa',serif;font-size:28px;color:var(--olive-deep)}
-.stat span{font-size:12.5px;color:var(--muted)}
-.stat-sep{width:1px;height:36px;background:var(--line)}
+/* تطريز: شريط الفصل */
+.tat-strip{height:22px;width:100%;display:block;overflow:hidden}
 
-/* ════ عناوين الأقسام ════ */
-.section{padding:78px 0}
-.head{text-align:center;max-width:620px;margin:0 auto 48px}
-.head h2{font-family:'Aref Ruqaa',serif;font-size:clamp(28px,4.5vw,40px);color:var(--olive-deep);margin-bottom:12px}
-.head p{font-size:17px;color:var(--muted)}
+/* قسم الأطراف */
+.parties{background:var(--cream);padding:84px 0}
+.sec-head{text-align:center;margin-bottom:56px}
+.sec-head .sec-tag{display:inline-block;background:rgba(28,91,56,.1);color:var(--olive);font-size:12px;font-weight:700;letter-spacing:1px;border-radius:999px;padding:5px 14px;margin-bottom:14px;text-transform:uppercase}
+.sec-head h2{margin-bottom:12px;color:var(--ink)}
+.sec-head h2 em{font-style:normal;color:var(--olive)}
+.sec-head p{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto}
+.dark .sec-head .sec-tag{background:rgba(198,151,73,.15);color:var(--gold-soft)}
+.dark .sec-head h2{color:var(--cream)}
+.dark .sec-head h2 em{color:var(--gold)}
+.dark .sec-head p{color:rgba(247,241,227,.58)}
+.p-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.p-card{background:var(--card);border-radius:22px;overflow:hidden;transition:.26s;border:1px solid rgba(28,26,20,.08);position:relative}
+.p-card:hover{transform:translateY(-7px);box-shadow:0 24px 60px rgba(28,26,20,.13)}
+.p-top{height:5px}
+.p-top.t1{background:var(--olive)}
+.p-top.t2{background:var(--red)}
+.p-top.t3{background:var(--gold)}
+.p-top.t4{background:var(--olive-mid)}
+.p-body{padding:28px 22px}
+.p-ic{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.p-ic.i1{background:rgba(28,91,56,.08);color:var(--olive)}
+.p-ic.i2{background:rgba(206,17,38,.07);color:var(--red)}
+.p-ic.i3{background:rgba(198,151,73,.1);color:var(--gold-dark)}
+.p-ic.i4{background:rgba(21,82,48,.08);color:var(--olive)}
+.p-ic svg{width:26px;height:26px}
+.p-card h3{margin-bottom:10px;font-size:1.1rem}
+.p-card p{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.p-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;transition:.18s}
+.p-link.l1{color:var(--olive)}
+.p-link.l2{color:var(--red)}
+.p-link.l3{color:var(--gold-dark)}
+.p-link.l4{color:var(--olive)}
+.p-link:hover{gap:10px}
+.p-link svg{width:14px;height:14px}
 
-/* ════ الأطراف الثلاثة ════ */
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px 22px;transition:.25s}
-.card:hover{transform:translateY(-6px);box-shadow:0 18px 44px rgba(14,54,34,.1);border-color:rgba(28,91,56,.3)}
-.card-ic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(28,91,56,.09);color:var(--olive);margin-bottom:18px}
-.card h3{font-size:19px;font-weight:700;margin-bottom:8px;color:var(--ink)}
-.card p{font-size:14px;color:var(--muted);margin-bottom:14px}
-.card-link{display:inline-flex;align-items:center;gap:6px;color:var(--olive);font-weight:700;font-size:14px}
-.card:hover .card-link{gap:11px}
+/* كيف تعمل */
+.how{background:var(--olive-deep);padding:84px 0;position:relative;overflow:hidden}
+.how::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5L45 20L30 35L15 20Z' fill='none' stroke='%23c69749' stroke-width='0.7' opacity='0.07'/%3E%3C/svg%3E");pointer-events:none}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative;z-index:1}
+.steps::before{content:'';position:absolute;top:38px;right:calc(12.5% + 28px);left:calc(12.5% + 28px);height:2px;background:linear-gradient(90deg,transparent,rgba(198,151,73,.4),rgba(198,151,73,.4),transparent);z-index:0}
+.step{text-align:center;padding:8px 18px;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;background:var(--gold);color:var(--olive-deep);font-family:'Aref Ruqaa',serif;font-size:1.5rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;border:3px solid var(--olive-deep);box-shadow:0 0 0 3px rgba(198,151,73,.3)}
+.step h3{color:var(--cream);margin-bottom:8px;font-size:1.05rem}
+.step p{color:rgba(247,241,227,.6);font-size:13px;line-height:1.7}
 
-/* ════ كيف تعمل (قسم داكن) ════ */
-.dark{position:relative;background:linear-gradient(165deg,var(--olive),var(--olive-deep));color:var(--cream);overflow:hidden}
-.dark::after{content:'';position:absolute;inset:0;opacity:.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M22 4l6 6-6 6-6-6z' fill='%23ffffff' opacity='0.05'/%3E%3C/svg%3E");background-size:44px 44px}
-.dark .head h2{color:#fff}
-.dark .head p{color:rgba(247,241,227,.65)}
-.dark-in{position:relative;z-index:1}
-.grid-4-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.step-num{font-family:'Aref Ruqaa',serif;font-size:42px;color:var(--gold);line-height:1;margin-bottom:12px}
-.step h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:7px}
-.step p{font-size:14px;color:rgba(247,241,227,.62)}
+/* لماذا عزّة */
+.why{background:var(--cream-2);padding:84px 0}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.why-card{background:var(--card);border-radius:22px;padding:32px 26px;border:1px solid rgba(28,26,20,.07);transition:.24s;position:relative;overflow:hidden}
+.why-card::before{content:'';position:absolute;top:-30px;left:-30px;width:100px;height:100px;background:url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,10 70,30 50,50 30,30' fill='none' stroke='%23c69749' stroke-width='1.5' opacity='0.15'/%3E%3Cpolygon points='50,25 62,37 50,49 38,37' fill='none' stroke='%23ce1126' stroke-width='1' opacity='0.1'/%3E%3C/svg%3E") no-repeat center}
+.why-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(28,26,20,.1)}
+.why-ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative}
+.why-ic.w1{background:rgba(28,91,56,.09);color:var(--olive)}
+.why-ic.w2{background:rgba(198,151,73,.12);color:var(--gold-dark)}
+.why-ic.w3{background:rgba(206,17,38,.07);color:var(--red)}
+.why-ic svg{width:24px;height:24px}
+.why-card h3{margin-bottom:10px}
+.why-card p{font-size:13.5px;color:var(--muted);line-height:1.75}
 
-/* ════ لماذا عزّة ════ */
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.feat-ic{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--gold);margin-bottom:16px}
-.feat h3{font-size:18px;font-weight:700;margin-bottom:7px}
-.feat p{font-size:14px;color:var(--muted)}
+/* قسم CTA */
+.cta-sec{background:var(--olive);padding:90px 0;position:relative;overflow:hidden}
+.cta-sec::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='40,8 62,30 40,52 18,30' fill='none' stroke='%23f7f1e3' stroke-width='0.8' opacity='0.05'/%3E%3C/svg%3E");pointer-events:none}
+.cta-inner{position:relative;z-index:1;text-align:center}
+.cta-inner h2{color:var(--cream);margin-bottom:16px}
+.cta-inner h2 em{font-style:normal;color:var(--gold)}
+.cta-inner p{color:rgba(247,241,227,.72);font-size:16px;max-width:480px;margin:0 auto 38px;line-height:1.8}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
-/* ════ دعوة أخيرة ════ */
-.cta-sec{padding:50px 0 86px}
-.cta-box{position:relative;overflow:hidden;text-align:center;background:var(--ink);color:var(--cream);border-radius:26px;padding:60px 30px}
-.cta-box::after{content:'';position:absolute;inset:auto -10% -55% -10%;height:340px;background:radial-gradient(circle at 50% 100%,rgba(198,151,73,.4),transparent 60%)}
-.cta-box h2{position:relative;font-family:'Aref Ruqaa',serif;font-size:clamp(26px,4.5vw,38px);margin-bottom:14px}
-.cta-box p{position:relative;color:rgba(247,241,227,.7);font-size:17px;max-width:520px;margin:0 auto 28px}
-.cta-box .btn{position:relative}
+/* الفوتر */
+.footer{background:var(--olive-deep);padding:38px 0;border-top:1px solid rgba(198,151,73,.18)}
+.footer-in{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-logo{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--gold-soft)}
+.footer-copy{font-size:12.5px;color:rgba(247,241,227,.38)}
+.footer-links{display:flex;gap:18px}
+.footer-link{font-size:13px;color:rgba(247,241,227,.45);transition:.18s}
+.footer-link:hover{color:var(--gold-soft)}
 
-/* ════ الفوتر ════ */
-.footer{background:var(--cream-2);border-top:1px solid var(--line);padding:52px 0 26px}
-.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px;padding-bottom:36px}
-.footer-tag{color:var(--muted);margin-top:10px;max-width:250px;font-size:14px}
-.footer-col h4{font-size:14px;font-weight:700;margin-bottom:13px}
-.footer-col a{display:block;color:var(--muted);font-size:14px;margin-bottom:9px}
-.footer-col a:hover{color:var(--olive)}
-.footer-bottom{padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted);text-align:center}
+/* انيميشن */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s cubic-bezier(.2,.7,.3,1),transform .65s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
 
-/* ظهور تدريجي */
-.reveal{opacity:0;transform:translateY(18px);animation:rev .7s cubic-bezier(.2,.7,.3,1) forwards}
-@keyframes rev{to{opacity:1;transform:none}}
-
-/* الموبايل */
-.mnav{display:none;flex-direction:column;gap:14px;padding:18px 22px 24px;border-bottom:1px solid var(--line);font-weight:600}
-@media(max-width:860px){
-  .nav-links,.nav-right .btn-ghost{display:none}
-  .burger{display:flex}
-  .mnav.open{display:flex}
-  .grid-4,.grid-4-steps,.grid-3{grid-template-columns:1fr 1fr}
-  .footer-grid{grid-template-columns:1fr 1fr}
-  .stats{flex-wrap:wrap;gap:16px;justify-content:center}
+/* ريسبونسف */
+@media(max-width:960px){
+  .p-grid,.steps{grid-template-columns:repeat(2,1fr)}
+  .steps::before{display:none}
+  .why-grid{grid-template-columns:1fr 1fr}
+  .hero-in{grid-template-columns:1fr}
+  .hero-motif{display:none}
 }
-@media(max-width:520px){
-  .grid-4,.grid-4-steps,.grid-3,.footer-grid{grid-template-columns:1fr}
-  .stat-sep{display:none}
+@media(max-width:620px){
+  .p-grid,.why-grid{grid-template-columns:1fr}
+  .stats-row{flex-direction:column;width:100%}
+  .stat+.stat::before{display:none}
+  .stat+.stat{border-top:1px solid rgba(198,151,73,.15)}
+  .nav-links{display:none}
+  .footer-links{display:none}
+}
+
+@keyframes spinRing{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes glowPulse{0%,100%{opacity:.07}50%{opacity:.2}}
+@keyframes domeShimmer{0%,100%{opacity:.8}50%{opacity:1}}
+@keyframes floatUp{0%{transform:translateY(0);opacity:.9}100%{transform:translateY(-50px);opacity:0}}
+
+/* ─ Social Proof ─ */
+.proof-sec{padding:80px 0;background:var(--olive-deep)}
+.proof-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.proof-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stat-card{background:rgba(255,255,255,.06);border:1px solid rgba(227,201,140,.15);border-radius:18px;padding:24px;text-align:center;transition:.3s}
+.stat-card:hover{background:rgba(255,255,255,.1);transform:translateY(-3px)}
+.stat-num{font-family:'Aref Ruqaa',serif;font-size:2.6rem;color:var(--gold);line-height:1;margin-bottom:6px;display:block}
+.stat-lbl{font-size:13px;color:rgba(247,241,227,.65);line-height:1.4}
+.proof-quotes{display:flex;flex-direction:column;gap:16px}
+.quote-card{background:rgba(255,255,255,.05);border:1px solid rgba(227,201,140,.12);border-radius:16px;padding:20px 22px}
+.quote-text{font-size:14.5px;color:rgba(247,241,227,.85);line-height:1.8;margin-bottom:12px;font-style:italic}
+.quote-author{display:flex;align-items:center;gap:10px}
+.quote-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),rgba(198,151,73,.5));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--olive-deep);flex-shrink:0}
+.quote-name{font-size:13px;font-weight:700;color:var(--gold-soft)}
+.quote-role{font-size:11.5px;color:rgba(247,241,227,.5)}
+
+/* ─ Preview ─ */
+.preview-sec{padding:80px 0;background:var(--cream)}
+.preview-tag{display:inline-block;background:rgba(28,91,56,.09);color:var(--olive);border-radius:999px;padding:6px 18px;font-size:13px;font-weight:700;margin-bottom:16px}
+.preview-title{font-family:'Aref Ruqaa',serif;font-size:2rem;color:var(--olive-deep);margin-bottom:10px}
+.preview-sub{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:40px;max-width:560px}
+.preview-tabs{display:flex;gap:8px;margin-bottom:24px}
+.ptab{padding:9px 20px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.ptab.on{background:var(--olive);color:#fff;border-color:var(--olive)}
+.preview-frame{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(28,26,20,.12)}
+.pframe-bar{background:rgba(28,91,56,.04);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.pframe-dots{display:flex;gap:5px}
+.pframe-dot{width:10px;height:10px;border-radius:50%}
+.pframe-url{flex:1;background:var(--cream-2);border-radius:999px;padding:5px 14px;font-size:12px;color:var(--muted);text-align:center}
+.pframe-content{padding:16px}
+/* بطاقات معاينة الفيد */
+.prev-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.prev-card:last-child{margin-bottom:0}
+.prev-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prev-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.prev-name{font-size:13px;font-weight:700;color:var(--ink)}
+.prev-badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:10.5px;font-weight:700}
+.prev-body{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.prev-fund{background:rgba(28,91,56,.05);border:1px solid rgba(28,91,56,.12);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.prev-fund-bar{height:5px;background:rgba(28,26,20,.08);border-radius:999px;margin:6px 0}
+.prev-fund-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--olive),var(--gold))}
+.prev-actions{display:flex;gap:6px}
+.prev-act{padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--cream);font-size:11.5px;font-weight:700;color:var(--muted)}
+.prev-act.main{background:var(--olive);color:#fff;border-color:var(--olive)}
+.prev-idea-wrap{display:flex;gap:0}
+.prev-vote{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;border-left:1px solid var(--line);min-width:56px;gap:2px}
+.prev-vote-arr{font-size:14px;color:var(--olive)}
+.prev-vote-n{font-family:'Aref Ruqaa',serif;font-size:1.2rem;color:var(--olive);font-weight:700}
+
+/* ─ FAQ ─ */
+.faq-sec{padding:80px 0;background:var(--cream-2)}
+.faq-inner{max-width:720px;margin:0 auto}
+.faq-item{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden;transition:.2s}
+.faq-item:hover{border-color:var(--olive)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;font-size:15px;font-weight:700;color:var(--ink);gap:12px;border:none;background:transparent;width:100%;text-align:right;font-family:inherit}
+.faq-icon{width:26px;height:26px;border-radius:50%;background:var(--cream);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:.25s;color:var(--muted)}
+.faq-item.open .faq-icon{background:var(--olive);border-color:var(--olive);color:#fff;transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;font-size:14px;color:var(--muted);line-height:1.8;padding:0 22px}
+.faq-item.open .faq-a{max-height:200px;padding:0 22px 18px}
+
+@media(max-width:768px){
+  .proof-inner{grid-template-columns:1fr}
+  .proof-stats{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- ════ الهيدر ════ -->
+<!-- شريط التنقّل -->
 <header class="nav">
   <div class="container nav-in">
-    <a href="#" class="logo">
-      <div class="logo-mark">ع</div>
-      <span class="logo-text">عزّة</span>
+    <a href="index.html" class="brand" id="brand-link">
+      <div class="brand-mark">ع</div>
+      <span class="brand-name">عزّة</span>
     </a>
     <nav class="nav-links">
-      <a href="#parties" data-i18n="nav-parties">لمن المنصة</a>
-      <a href="#how" data-i18n="nav-how">كيف تعمل</a>
-      <a href="#why" data-i18n="nav-why">لماذا عزّة</a>
+      <a href="#parties" class="nav-link" data-i18n="nav-parties">الأطراف</a>
+      <a href="#how" class="nav-link" data-i18n="nav-how">كيف تعمل</a>
+      <a href="#why" class="nav-link" data-i18n="nav-why">لماذا عزّة</a>
     </nav>
-    <div class="nav-right">
-      <div class="lang">
-        <button id="lng-ar" class="on" onclick="setLang('ar')">ع</button>
-        <button id="lng-en" onclick="setLang('en')">EN</button>
-      </div>
-      <a href="login.html" class="btn btn-ghost" data-i18n="nav-login">تسجيل الدخول</a>
-      <a href="login.html" class="btn btn-primary" data-i18n="nav-join">انضم الآن</a>
-      <button class="burger" onclick="toggleMenu()" aria-label="menu">
-        <svg class="ic" width="24" height="24" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <div class="nav-right" id="nav-auth-area">
+      <button class="lang-btn" onclick="toggleLang()" id="lang-toggle">EN</button>
+      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+        <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
+      <a href="login.html" class="btn btn-outline nav-cta" data-i18n="nav-login">تسجيل الدخول</a>
+      <a href="login.html#register" class="btn btn-gold nav-cta" data-i18n="nav-join">انضم الآن</a>
     </div>
-  </div>
-  <div class="mnav" id="mnav">
-    <a href="#parties" data-i18n="nav-parties">لمن المنصة</a>
-    <a href="#how" data-i18n="nav-how">كيف تعمل</a>
-    <a href="#why" data-i18n="nav-why">لماذا عزّة</a>
-    <a href="login.html" data-i18n="nav-login">تسجيل الدخول</a>
   </div>
 </header>
 
-<!-- ════ القسم البطل ════ -->
+<!-- شريط تطريز -->
+<div class="tat-strip">
+  <svg viewBox="0 0 1200 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:22px;display:block">
+    <defs>
+      <pattern id="t0" width="40" height="22" patternUnits="userSpaceOnUse">
+        <polygon points="20,2 28,11 20,20 12,11" fill="#0e3622"/>
+        <polygon points="20,6 24,11 20,16 16,11" fill="#c69749"/>
+        <polygon points="0,11 6,5 12,11 6,17" fill="#ce1126"/>
+        <polygon points="40,11 34,5 28,11 34,17" fill="#ce1126"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="22" fill="url(#t0)"/>
+  </svg>
+</div>
+
+<!-- الهيرو -->
 <section class="hero">
+  <div class="hero-bg">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hero-pat" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M30 6L44 20L30 34L16 20Z" fill="none" stroke="#c69749" stroke-width="0.8" opacity="0.13"/>
+          <path d="M30 13L37 20L30 27L23 20Z" fill="#c69749" opacity="0.06"/>
+          <circle cx="30" cy="6" r="1.5" fill="#ce1126" opacity="0.22"/>
+          <circle cx="44" cy="20" r="1.5" fill="#ce1126" opacity="0.22"/>
+          <circle cx="30" cy="34" r="1.5" fill="#ce1126" opacity="0.22"/>
+          <circle cx="16" cy="20" r="1.5" fill="#ce1126" opacity="0.22"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hero-pat)"/>
+    </svg>
+  </div>
   <div class="container hero-in">
-    <span class="badge reveal" style="animation-delay:.05s">
-      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21l2.3-7.4-6-4.6h7.6z"/></svg>
-      <span data-i18n="badge">منصة فلسطينية للأفكار والاستثمار</span>
-    </span>
-    <h1 class="reveal" style="animation-delay:.15s" data-i18n="hero-h">حيث تلتقي الأفكار <span class="accent" data-i18n="hero-accent">برأس المال والخبرة</span></h1>
-    <p class="reveal" style="animation-delay:.25s" data-i18n="hero-p">منصة واحدة تجمع أصحاب الأفكار، والشركات والمؤسسات، والخبراء، والمستثمرين — لنبدأ بعزٍّ وننمو بشراكة.</p>
-    <div class="hero-cta reveal" style="animation-delay:.35s">
-      <a href="login.html" class="btn btn-gold btn-lg">
-        <span data-i18n="hero-cta1">اعرض فكرتك</span>
-        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-      </a>
-      <a href="#parties" class="btn btn-outline btn-lg" data-i18n="hero-cta2">استكشف الفرص</a>
+    <div>
+      <div class="hero-badge reveal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#c69749" stroke="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.3L12 17l-6.2 4.2 2.4-7.3L2 9.4h7.6z"/></svg>
+        <span data-i18n="badge">منصة فلسطينية للأفكار والاستثمار</span>
+      </div>
+      <h1 class="reveal" style="animation-delay:.1s" data-i18n-split="hero-h">
+        حيث تلتقي الأفكار <em class="accent" data-i18n="hero-accent">برأس المال والخبرة</em>
+      </h1>
+      <p class="hero-p reveal" style="animation-delay:.2s" data-i18n="hero-p">منصة واحدة تجمع أصحاب الأفكار، والشركات والمؤسسات، والخبراء، والمستثمرين — لنبدأ بعزٍّ وننمو بشراكة.</p>
+      <div class="hero-cta reveal" style="animation-delay:.3s">
+        <a href="login.html#register" class="btn btn-gold btn-lg" id="hero-cta-main">
+          <span data-i18n="hero-cta1" id="hero-cta-main-text">اعرض فكرتك</span>
+          <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        </a>
+        <a href="#parties" class="btn btn-outline btn-lg" data-i18n="hero-cta2">استكشف الفرص</a>
+      </div>
+      <div class="stats-row reveal" style="animation-delay:.4s">
+        <div class="stat"><strong>+1.2K</strong><span data-i18n="stat1">فكرة منشورة</span></div>
+        <div class="stat"><strong>+340</strong><span data-i18n="stat2">مستثمر فعّال</span></div>
+        <div class="stat"><strong>+180</strong><span data-i18n="stat3">شراكة ناجحة</span></div>
+      </div>
     </div>
-    <div class="stats reveal" style="animation-delay:.45s">
-      <div class="stat"><strong>+1.2K</strong><span data-i18n="stat1">فكرة منشورة</span></div>
-      <div class="stat-sep"></div>
-      <div class="stat"><strong>+340</strong><span data-i18n="stat2">مستثمر فعّال</span></div>
-      <div class="stat-sep"></div>
-      <div class="stat"><strong>+180</strong><span data-i18n="stat3">شراكة ناجحة</span></div>
+    <div class="hero-motif reveal" style="animation-delay:.25s">
+      <svg viewBox="0 0 300 390" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <!-- توهّج خلف القبة -->
+        <ellipse cx="150" cy="175" rx="95" ry="52" fill="#c69749" style="animation:glowPulse 4s ease-in-out infinite"/>
+        <!-- حلقة دوّارة خارجية (عكس عقارب الساعة) -->
+        <g style="animation:spinRing 20s linear reverse infinite;transform-box:fill-box;transform-origin:center">
+          <polygon points="150,50 178,93 228,82 217,132 260,160 217,188 228,238 178,227 150,270 122,227 72,238 83,188 40,160 83,132 72,82 122,93" fill="none" stroke="#c69749" stroke-width="0.9" opacity="0.42"/>
+        </g>
+        <!-- حلقة دوّارة داخلية (مع عقارب الساعة) -->
+        <g style="animation:spinRing 14s linear infinite;transform-box:fill-box;transform-origin:center">
+          <polygon points="150,88 168,113 200,107 192,138 218,155 192,172 200,203 168,197 150,222 132,197 100,203 108,172 82,155 108,138 100,107 132,113" fill="none" stroke="#c69749" stroke-width="0.7" opacity="0.32"/>
+        </g>
+        <!-- دوائر هندسية -->
+        <circle cx="150" cy="155" r="118" fill="none" stroke="#c69749" stroke-width="0.5" opacity="0.18"/>
+        <circle cx="150" cy="155" r="94" fill="none" stroke="#c69749" stroke-width="0.4" opacity="0.13"/>
+        <circle cx="150" cy="155" r="68" fill="none" stroke="#c69749" stroke-width="0.4" opacity="0.1"/>
+        <!-- جسم القبة (معبأ داكن) -->
+        <path d="M46,172 C46,105 70,44 150,20 C230,44 254,105 254,172 Z" fill="#08100a"/>
+        <!-- خطوط الأضلاع الهندسية -->
+        <line x1="150" y1="20" x2="46" y2="172" stroke="#e3c98c" stroke-width="0.6" opacity="0.28"/>
+        <line x1="150" y1="20" x2="76" y2="160" stroke="#e3c98c" stroke-width="0.5" opacity="0.22"/>
+        <line x1="150" y1="20" x2="108" y2="148" stroke="#e3c98c" stroke-width="0.5" opacity="0.22"/>
+        <line x1="150" y1="20" x2="192" y2="148" stroke="#e3c98c" stroke-width="0.5" opacity="0.22"/>
+        <line x1="150" y1="20" x2="224" y2="160" stroke="#e3c98c" stroke-width="0.5" opacity="0.22"/>
+        <line x1="150" y1="20" x2="254" y2="172" stroke="#e3c98c" stroke-width="0.6" opacity="0.28"/>
+        <!-- حزام أفقي على القبة -->
+        <path d="M74,74 L226,74" stroke="#e3c98c" stroke-width="0.5" opacity="0.2"/>
+        <path d="M60,105 L240,105" stroke="#e3c98c" stroke-width="0.5" opacity="0.2"/>
+        <path d="M50,136 L250,136" stroke="#e3c98c" stroke-width="0.4" opacity="0.18"/>
+        <!-- محيط القبة بالذهب -->
+        <path d="M46,172 C46,105 70,44 150,20 C230,44 254,105 254,172" fill="none" stroke="#c69749" stroke-width="2.5" opacity="0.9"/>
+        <!-- ماسة وسط القبة -->
+        <rect x="143" y="98" width="14" height="14" transform="rotate(45 150 105)" fill="none" stroke="#c69749" stroke-width="1.2" opacity="0.65"/>
+        <!-- الإسطوانة (drum) -->
+        <rect x="94" y="172" width="112" height="22" fill="#07100a"/>
+        <rect x="94" y="172" width="112" height="22" fill="none" stroke="#c69749" stroke-width="1.2" opacity="0.7"/>
+        <line x1="94" y1="183" x2="206" y2="183" stroke="#c69749" stroke-width="0.5" opacity="0.4"/>
+        <line x1="116" y1="172" x2="116" y2="194" stroke="#c69749" stroke-width="0.5" opacity="0.3"/>
+        <line x1="136" y1="172" x2="136" y2="194" stroke="#c69749" stroke-width="0.5" opacity="0.3"/>
+        <line x1="150" y1="172" x2="150" y2="194" stroke="#c69749" stroke-width="0.5" opacity="0.25"/>
+        <line x1="164" y1="172" x2="164" y2="194" stroke="#c69749" stroke-width="0.5" opacity="0.3"/>
+        <line x1="184" y1="172" x2="184" y2="194" stroke="#c69749" stroke-width="0.5" opacity="0.3"/>
+        <!-- جسم المبنى -->
+        <rect x="36" y="194" width="228" height="112" fill="#060e08" rx="2"/>
+        <rect x="36" y="194" width="228" height="112" fill="none" stroke="#c69749" stroke-width="1.2" opacity="0.48" rx="2"/>
+        <rect x="36" y="194" width="228" height="7" fill="#c69749" opacity="0.16"/>
+        <!-- شبكة هندسية على الجسم -->
+        <line x1="36" y1="204" x2="264" y2="204" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="218" x2="264" y2="218" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="232" x2="264" y2="232" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="246" x2="264" y2="246" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="260" x2="264" y2="260" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="274" x2="264" y2="274" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="36" y1="288" x2="264" y2="288" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="68" y1="194" x2="68" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="100" y1="194" x2="100" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="132" y1="194" x2="132" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="150" y1="194" x2="150" y2="306" stroke="#c69749" stroke-width="0.6" opacity="0.18"/>
+        <line x1="168" y1="194" x2="168" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="200" y1="194" x2="200" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <line x1="232" y1="194" x2="232" y2="306" stroke="#c69749" stroke-width="0.4" opacity="0.22"/>
+        <!-- قوس أيسر -->
+        <path d="M50,306 L50,244 C50,234 60,228 72,228 C84,228 94,234 94,244 L94,306" fill="#0e1a0e" opacity="0.9"/>
+        <path d="M53,306 L53,245 C53,238 62,234 72,234 C82,234 91,238 91,245 L91,306" fill="none" stroke="#c69749" stroke-width="0.9" opacity="0.55"/>
+        <!-- قوس أوسط -->
+        <path d="M118,306 L118,236 C118,224 132,218 150,218 C168,218 182,224 182,236 L182,306" fill="#0e1a0e" opacity="0.9"/>
+        <path d="M122,306 L122,237 C122,228 135,222 150,222 C165,222 178,228 178,237 L178,306" fill="none" stroke="#c69749" stroke-width="1.1" opacity="0.65"/>
+        <!-- قوس أيمن -->
+        <path d="M206,306 L206,244 C206,234 216,228 228,228 C240,228 250,234 250,244 L250,306" fill="#0e1a0e" opacity="0.9"/>
+        <path d="M209,306 L209,245 C209,238 218,234 228,234 C238,234 247,238 247,245 L247,306" fill="none" stroke="#c69749" stroke-width="0.9" opacity="0.55"/>
+        <!-- توهّج النوافذ -->
+        <path d="M55,306 L55,247 C55,241 63,238 72,238 C81,238 89,241 89,247 L89,306" fill="#c69749" style="animation:glowPulse 4s 0.5s ease-in-out infinite"/>
+        <path d="M126,306 L126,239 C126,232 136,228 150,228 C164,228 174,232 174,239 L174,306" fill="#c69749" style="animation:glowPulse 4s ease-in-out infinite"/>
+        <path d="M211,306 L211,247 C211,241 219,238 228,238 C237,238 245,241 245,247 L245,306" fill="#c69749" style="animation:glowPulse 4s 1s ease-in-out infinite"/>
+        <!-- درجات المنصة -->
+        <rect x="18" y="306" width="264" height="13" fill="#050d06" rx="1"/>
+        <rect x="18" y="306" width="264" height="13" fill="none" stroke="#c69749" stroke-width="0.8" opacity="0.38" rx="1"/>
+        <rect x="4" y="319" width="292" height="10" fill="#030a04" rx="1"/>
+        <rect x="4" y="319" width="292" height="10" fill="none" stroke="#c69749" stroke-width="0.6" opacity="0.28" rx="1"/>
+        <!-- المئذنة / السنان -->
+        <line x1="150" y1="20" x2="150" y2="4" stroke="#c69749" stroke-width="3"/>
+        <!-- قبة السنان -->
+        <circle cx="150" cy="4" r="9" fill="#060c07"/>
+        <circle cx="150" cy="4" r="9" fill="none" stroke="#c69749" stroke-width="1.5" opacity="0.9"/>
+        <!-- الهلال -->
+        <circle cx="150" cy="4" r="6.5" fill="#c69749" opacity="0.92"/>
+        <circle cx="154" cy="4" r="5" fill="#060c07"/>
+        <circle cx="148" cy="-1" r="1.8" fill="#c69749"/>
+        <!-- جسيمات طائرة -->
+        <circle cx="126" cy="200" r="2.2" fill="#c69749" opacity="0.85" style="animation:floatUp 3.5s ease-in infinite"/>
+        <circle cx="158" cy="215" r="1.6" fill="#c69749" opacity="0.85" style="animation:floatUp 3.5s 1.2s ease-in infinite"/>
+        <circle cx="174" cy="202" r="2.2" fill="#c69749" opacity="0.85" style="animation:floatUp 3.5s 2.4s ease-in infinite"/>
+        <circle cx="140" cy="225" r="1.2" fill="#c69749" opacity="0.7" style="animation:floatUp 3s 0.6s ease-in infinite"/>
+        <circle cx="164" cy="190" r="1.2" fill="#c69749" opacity="0.7" style="animation:floatUp 3s 1.8s ease-in infinite"/>
+      </svg>
     </div>
   </div>
 </section>
 
-<!-- ════ الأطراف الأربعة ════ -->
-<section class="section" id="parties">
+<!-- شريط تطريز -->
+<div class="tat-strip">
+  <svg viewBox="0 0 1200 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:22px;display:block">
+    <defs>
+      <pattern id="t1" width="40" height="22" patternUnits="userSpaceOnUse">
+        <polygon points="20,2 28,11 20,20 12,11" fill="#1c5b38"/>
+        <polygon points="20,6 24,11 20,16 16,11" fill="#e3c98c"/>
+        <polygon points="0,11 6,5 12,11 6,17" fill="#ce1126"/>
+        <polygon points="40,11 34,5 28,11 34,17" fill="#ce1126"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="22" fill="url(#t1)"/>
+  </svg>
+</div>
+
+<!-- الأطراف الأربعة -->
+<section class="parties" id="parties">
   <div class="container">
-    <div class="head">
-      <h2 data-i18n="parties-h">لمن صُمّمت عزّة؟</h2>
-      <p data-i18n="parties-p">أربعة أطراف، هدف واحد: تحويل الأفكار إلى واقع.</p>
+    <div class="sec-head reveal">
+      <span class="sec-tag" data-i18n="parties-tag">لمن صُمّمت عزّة؟</span>
+      <h2><em data-i18n="parties-h1">أربعة أطراف</em> <span data-i18n="parties-h2">— هدف واحد</span></h2>
+      <p data-i18n="parties-p">تحويل الأفكار الفلسطينية إلى مشاريع حقيقية بدعم متكامل</p>
     </div>
-    <div class="grid-4">
-      <article class="card">
-        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
-        <h3 data-i18n="p1h">أصحاب الأفكار</h3>
-        <p data-i18n="p1p">اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.</p>
-        <a href="login.html" class="card-link"><span data-i18n="p1c">ابدأ بعرض فكرتك</span>
-          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+    <div class="p-grid">
+      <article class="p-card reveal" style="animation-delay:.05s">
+        <div class="p-top t1"></div>
+        <div class="p-body">
+          <div class="p-ic i1"><svg class="ic" width="26" height="26" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
+          <h3 data-i18n="p1h">أصحاب الأفكار</h3>
+          <p data-i18n="p1p">اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.</p>
+          <a href="login.html#register" class="p-link l1">
+            <span data-i18n="p1c">ابدأ بعرض فكرتك</span>
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </a>
+        </div>
       </article>
-      <article class="card">
-        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
-        <h3 data-i18n="p2h">الشركات والمؤسسات</h3>
-        <p data-i18n="p2p">اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.</p>
-        <a href="login.html" class="card-link"><span data-i18n="p2c">ابحث عن شراكات</span>
-          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      <article class="p-card reveal" style="animation-delay:.1s">
+        <div class="p-top t2"></div>
+        <div class="p-body">
+          <div class="p-ic i2"><svg class="ic" width="26" height="26" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg></div>
+          <h3 data-i18n="p2h">الشركات والمؤسسات</h3>
+          <p data-i18n="p2p">اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.</p>
+          <a href="login.html#register" class="p-link l2">
+            <span data-i18n="p2c">ابحث عن شراكات</span>
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </a>
+        </div>
       </article>
-      <article class="card">
-        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
-        <h3 data-i18n="p3h">الخبراء</h3>
-        <p data-i18n="p3p">شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.</p>
-        <a href="login.html" class="card-link"><span data-i18n="p3c">قدّم خبرتك</span>
-          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      <article class="p-card reveal" style="animation-delay:.15s">
+        <div class="p-top t3"></div>
+        <div class="p-body">
+          <div class="p-ic i3"><svg class="ic" width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+          <h3 data-i18n="p3h">الخبراء</h3>
+          <p data-i18n="p3p">شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.</p>
+          <a href="login.html#register" class="p-link l3">
+            <span data-i18n="p3c">قدّم خبرتك</span>
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </a>
+        </div>
       </article>
-      <article class="card">
-        <div class="card-ic"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
-        <h3 data-i18n="p4h">المستثمرون</h3>
-        <p data-i18n="p4p">تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.</p>
-        <a href="login.html" class="card-link"><span data-i18n="p4c">تصفّح الفرص</span>
-          <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></a>
+      <article class="p-card reveal" style="animation-delay:.2s">
+        <div class="p-top t4"></div>
+        <div class="p-body">
+          <div class="p-ic i4"><svg class="ic" width="26" height="26" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+          <h3 data-i18n="p4h">المستثمرون</h3>
+          <p data-i18n="p4p">تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.</p>
+          <a href="login.html#register" class="p-link l4">
+            <span data-i18n="p4c">تصفّح الفرص</span>
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          </a>
+        </div>
       </article>
     </div>
   </div>
 </section>
 
-<!-- ════ كيف تعمل ════ -->
-<svg class="tatreez" viewBox="0 0 240 16" preserveAspectRatio="none">
-  <defs><pattern id="tat" width="40" height="16" patternUnits="userSpaceOnUse">
-    <path d="M20 1 L26 6 L20 11 L14 6 Z" fill="#ce1126"/>
-    <path d="M4 8 L8 12 L4 15 L0 12 Z" fill="#9b1220"/><path d="M36 8 L40 12 L36 15 L32 12 Z" fill="#9b1220"/>
-  </pattern></defs><rect width="240" height="16" fill="url(#tat)"/>
-</svg>
-<section class="section dark" id="how">
-  <div class="container dark-in">
-    <div class="head">
-      <h2 data-i18n="how-h">كيف تعمل؟</h2>
-      <p data-i18n="how-p">من الفكرة إلى الشراكة في أربع خطوات.</p>
-    </div>
-    <div class="grid-4-steps">
-      <div class="step"><div class="step-num">٠١</div><h3 data-i18n="s1h">أنشئ ملفك</h3><p data-i18n="s1p">سجّل وحدّد دورك: صاحب فكرة، شركة، خبير، أو مستثمر.</p></div>
-      <div class="step"><div class="step-num">٠٢</div><h3 data-i18n="s2h">اعرض أو اكتشف</h3><p data-i18n="s2p">انشر فكرتك أو تصفّح الفرص المتاحة بسهولة.</p></div>
-      <div class="step"><div class="step-num">٠٣</div><h3 data-i18n="s3h">تواصل بثقة</h3><p data-i18n="s3p">راسل الأطراف المهتمة ضمن بيئة آمنة ومحمية.</p></div>
-      <div class="step"><div class="step-num">٠٤</div><h3 data-i18n="s4h">ابنِ شراكة</h3><p data-i18n="s4p">اتفق على التفاصيل وابدأ رحلة مشروعك معاً.</p></div>
-    </div>
-  </div>
-</section>
-<svg class="tatreez" viewBox="0 0 240 16" preserveAspectRatio="none"><rect width="240" height="16" fill="url(#tat)"/></svg>
+<!-- شريط تطريز -->
+<div class="tat-strip">
+  <svg viewBox="0 0 1200 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:22px;display:block">
+    <defs>
+      <pattern id="t2" width="40" height="22" patternUnits="userSpaceOnUse">
+        <polygon points="20,2 28,11 20,20 12,11" fill="#0e3622"/>
+        <polygon points="20,6 24,11 20,16 16,11" fill="#ce1126"/>
+        <polygon points="0,11 6,5 12,11 6,17" fill="#c69749"/>
+        <polygon points="40,11 34,5 28,11 34,17" fill="#c69749"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="22" fill="url(#t2)"/>
+  </svg>
+</div>
 
-<!-- ════ لماذا عزّة ════ -->
-<section class="section" id="why">
+<!-- كيف تعمل -->
+<section class="how dark" id="how">
   <div class="container">
-    <div class="head"><h2 data-i18n="why-h">لماذا عزّة؟</h2></div>
-    <div class="grid-3">
-      <div class="feat">
-        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-        <h3 data-i18n="w1h">تطابق ذكي</h3><p data-i18n="w1p">نوصلك بالأطراف الأنسب لفكرتك أو رأس مالك.</p>
+    <div class="sec-head reveal">
+      <span class="sec-tag" data-i18n="how-tag">البداية سهلة</span>
+      <h2><em data-i18n="how-h1">كيف تعمل</em> <span data-i18n="how-h2">عزّة؟</span></h2>
+      <p data-i18n="how-p">أربع خطوات فقط تفصلك عن شبكة داعمين حقيقيين</p>
+    </div>
+    <div class="steps reveal" style="animation-delay:.1s">
+      <div class="step">
+        <div class="step-num">١</div>
+        <h3 data-i18n="s1h">أنشئ حسابك</h3>
+        <p data-i18n="s1p">سجّل كصاحب فكرة أو مستثمر أو خبير أو مؤسسة في دقيقة</p>
       </div>
-      <div class="feat">
-        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
-        <h3 data-i18n="w2h">شفافية وحماية</h3><p data-i18n="w2p">ملفات موثّقة واتفاقيات حماية للأفكار (NDA).</p>
+      <div class="step">
+        <div class="step-num">٢</div>
+        <h3 data-i18n="s2h">انشر مشروعك</h3>
+        <p data-i18n="s2p">اعرض فكرتك أو فرصتك الاستثمارية مع حماية NDA اختيارية</p>
       </div>
-      <div class="feat">
-        <div class="feat-ic"><svg class="ic" width="22" height="22" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <h3 data-i18n="w3h">خبرة متاحة</h3><p data-i18n="w3p">وصول إلى خبراء ومستشارين في مختلف المجالات.</p>
+      <div class="step">
+        <div class="step-num">٣</div>
+        <h3 data-i18n="s3h">تواصل مباشرة</h3>
+        <p data-i18n="s3p">راسل المهتمين، وتفاوض، واشرح فكرتك لمن يفهمها</p>
+      </div>
+      <div class="step">
+        <div class="step-num">٤</div>
+        <h3 data-i18n="s4h">ابدأ شراكتك</h3>
+        <p data-i18n="s4p">وقّع الاتفاقيات، ابنِ فريقك، وانطلق بدعم حقيقي</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ════ دعوة أخيرة ════ -->
+<!-- شريط تطريز -->
+<div class="tat-strip">
+  <svg viewBox="0 0 1200 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:22px;display:block">
+    <defs>
+      <pattern id="t3" width="40" height="22" patternUnits="userSpaceOnUse">
+        <polygon points="20,2 28,11 20,20 12,11" fill="#1c5b38"/>
+        <polygon points="20,6 24,11 20,16 16,11" fill="#e3c98c"/>
+        <polygon points="0,11 6,5 12,11 6,17" fill="#ce1126"/>
+        <polygon points="40,11 34,5 28,11 34,17" fill="#ce1126"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="22" fill="url(#t3)"/>
+  </svg>
+</div>
+
+<!-- لماذا عزّة -->
+<section class="why" id="why">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-tag" data-i18n="why-tag">ما يميّزنا</span>
+      <h2><em data-i18n="why-h1">لماذا عزّة</em><span data-i18n="why-h2"> وليس غيرها؟</span></h2>
+      <p data-i18n="why-p">ميزات بُنيت خصيصاً لبيئة ريادة الأعمال الفلسطينية</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal" style="animation-delay:.05s">
+        <div class="why-ic w1"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3 data-i18n="w1h">حماية الأفكار بـ NDA</h3>
+        <p data-i18n="w1p">انشر فكرتك بأمان — لا يرى التفاصيل إلا من وقّع اتفاقية السرية الإلكترونية. فكرتك محمية قانونياً.</p>
+      </div>
+      <div class="why-card reveal" style="animation-delay:.1s">
+        <div class="why-ic w2"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3 data-i18n="w2h">مجتمع متخصص</h3>
+        <p data-i18n="w2p">لا ضجيج ولا إعلانات — فقط أصحاب أفكار ومستثمرين وخبراء جادّين يبحثون عن شراكات حقيقية.</p>
+      </div>
+      <div class="why-card reveal" style="animation-delay:.15s">
+        <div class="why-ic w3"><svg class="ic" width="24" height="24" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <h3 data-i18n="w3h">هوية فلسطينية</h3>
+        <p data-i18n="w3p">منصة مصمّمة لفهم بيئتنا وتحدياتنا ومتطلباتنا — باللغة العربية، وبروح فلسطينية أصيلة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- شريط تطريز -->
+<div class="tat-strip">
+  <svg viewBox="0 0 1200 22" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:22px;display:block">
+    <defs>
+      <pattern id="t4" width="40" height="22" patternUnits="userSpaceOnUse">
+        <polygon points="20,2 28,11 20,20 12,11" fill="#0e3622"/>
+        <polygon points="20,6 24,11 20,16 16,11" fill="#c69749"/>
+        <polygon points="0,11 6,5 12,11 6,17" fill="#ce1126"/>
+        <polygon points="40,11 34,5 28,11 34,17" fill="#ce1126"/>
+      </pattern>
+    </defs>
+    <rect width="1200" height="22" fill="url(#t4)"/>
+  </svg>
+</div>
+
+
+<!-- Social Proof -->
+<section class="proof-sec">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <span style="display:inline-block;background:rgba(227,201,140,.15);color:var(--gold-soft);border-radius:999px;padding:6px 18px;font-size:13px;font-weight:700;margin-bottom:14px">المنصة بأرقام</span>
+      <h2 style="font-family:'Aref Ruqaa',serif;font-size:2rem;color:#fff;margin-bottom:8px">مجتمع عربي <em style="color:var(--gold)">حقيقي</em> ينمو</h2>
+      <p style="font-size:14.5px;color:rgba(247,241,227,.65);max-width:500px;margin:0 auto">انضم لأصحاب الأفكار والمستثمرين والخبراء من أنحاء العالم العربي</p>
+    </div>
+    <div class="proof-inner">
+      <div class="proof-stats reveal">
+        <div class="stat-card"><span class="stat-num counter" data-target="1240">0</span><span class="stat-lbl">فكرة منشورة<br>ومحمية بـ NDA</span></div>
+        <div class="stat-card"><span class="stat-num counter" data-target="380">0</span><span class="stat-lbl">مستثمر نشط<br>من ١٢ دولة</span></div>
+        <div class="stat-card"><span class="stat-num counter" data-target="94">0</span><span class="stat-lbl">شراكة ناجحة<br>أُبرمت عبر عزّة</span></div>
+        <div class="stat-card"><span class="stat-num counter" data-target="4.8">0</span><span class="stat-lbl">متوسط تقييم<br>المستخدمين / ٥</span></div>
+      </div>
+      <div class="proof-quotes reveal" style="animation-delay:.15s">
+        <div class="quote-card">
+          <div class="quote-text">"عزّة غيّرت طريقة تفكيري في إطلاق أفكاري — وجدت مستثمراً جدياً خلال أسبوعين فقط."</div>
+          <div class="quote-author">
+            <div class="quote-av">س</div>
+            <div><div class="quote-name">سارة المصري</div><div class="quote-role">صاحبة فكرة · مصر</div></div>
+          </div>
+        </div>
+        <div class="quote-card">
+          <div class="quote-text">"أفضل منصة لاكتشاف المشاريع الواعدة في المنطقة العربية. الشفافية والـ NDA يبنيان الثقة."</div>
+          <div class="quote-author">
+            <div class="quote-av">خ</div>
+            <div><div class="quote-name">خالد العمري</div><div class="quote-role">مستثمر · الإمارات</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="tatreez-strip" aria-hidden="true"><svg width="100%" height="22" preserveAspectRatio="none"><rect width="100%" height="22" fill="url(#tat)"/></svg></div>
+
+<!-- Preview -->
+<section class="preview-sec">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:60px;align-items:start">
+      <div>
+        <span class="preview-tag">معاينة المنصة</span>
+        <h2 class="preview-title">شاهد <em>عزّة</em> في العمل</h2>
+        <p class="preview-sub">فيد ذكي يجمع بين قوة ProductHunt للأفكار، وAngelList للاستثمار، وLinkedIn للتواصل المهني.</p>
+        <div class="preview-tabs">
+          <button class="ptab on" onclick="showPreview(this,'idea')">💡 أفكار</button>
+          <button class="ptab" onclick="showPreview(this,'project')">🚀 مشاريع</button>
+          <button class="ptab" onclick="showPreview(this,'post')">💬 منشورات</button>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="width:24px;height:24px;border-radius:50%;background:rgba(28,91,56,.1);display:flex;align-items:center;justify-content:center;color:var(--olive);font-size:13px;flex-shrink:0">✓</span>حماية فكرتك بـ NDA بضغطة واحدة</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="width:24px;height:24px;border-radius:50%;background:rgba(28,91,56,.1);display:flex;align-items:center;justify-content:center;color:var(--olive);font-size:13px;flex-shrink:0">✓</span>شريط تمويل حقيقي لمشاريعك</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)"><span style="width:24px;height:24px;border-radius:50%;background:rgba(28,91,56,.1);display:flex;align-items:center;justify-content:center;color:var(--olive);font-size:13px;flex-shrink:0">✓</span>تواصل مباشر مع مستثمرين موثّقين</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="preview-frame">
+          <div class="pframe-bar">
+            <div class="pframe-dots"><div class="pframe-dot" style="background:#ff5f57"></div><div class="pframe-dot" style="background:#febc2e"></div><div class="pframe-dot" style="background:#28c840"></div></div>
+            <div class="pframe-url">azza.ps/app</div>
+          </div>
+          <div class="pframe-content" id="preview-content">
+            <!-- Idea preview (default) -->
+            <div class="prev-card">
+              <div class="prev-idea-wrap">
+                <div class="prev-vote"><span class="prev-vote-arr">▲</span><span class="prev-vote-n">84</span></div>
+                <div style="flex:1;padding:12px 14px">
+                  <div style="display:flex;gap:6px;margin-bottom:6px">
+                    <span class="prev-badge" style="background:rgba(28,91,56,.08);color:#0e3622;border:1px solid rgba(28,91,56,.2)">💡 فكرة</span>
+                    <span class="prev-badge" style="background:var(--cream-2);color:var(--muted);border:1px solid var(--line)">💻 تقنية</span>
+                    <span class="prev-badge" style="background:rgba(14,54,34,.1);color:#0e3622;border:1px solid rgba(14,54,34,.3)">🔒 NDA</span>
+                  </div>
+                  <div style="font-family:'Aref Ruqaa',serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:4px">تطبيق ذكاء اصطناعي للتعليم العربي</div>
+                  <div style="font-size:12px;color:var(--muted);margin-bottom:10px">يُخصّص مسار التعلم لكل طالب بناءً على أسلوبه ومستواه</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted)">
+                    <div class="prev-av" style="width:22px;height:22px;font-size:.65rem;background:linear-gradient(135deg,#1c5b38,#0e3622)">م</div>
+                    <strong style="color:var(--ink)">محمد بركة</strong><span style="color:var(--olive)">@mobaraka</span><span style="margin-right:auto">منذ يومين</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:5px;padding:8px 12px;border-top:1px solid var(--line)">
+                <span class="prev-act">💡 مثير</span>
+                <span class="prev-act">🤝 تعاون</span>
+                <span class="prev-act">💬 12</span>
+                <span class="prev-act main">أبدِ اهتمامك</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="tatreez-strip" aria-hidden="true"><svg width="100%" height="22" preserveAspectRatio="none"><rect width="100%" height="22" fill="url(#tat)"/></svg></div>
+
+<!-- FAQ -->
+<section class="faq-sec">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <span style="display:inline-block;background:rgba(28,91,56,.09);color:var(--olive);border-radius:999px;padding:6px 18px;font-size:13px;font-weight:700;margin-bottom:14px">أسئلة شائعة</span>
+      <h2 style="font-family:'Aref Ruqaa',serif;font-size:2rem;color:var(--olive-deep);margin-bottom:8px">كل ما تريد <em>معرفته</em></h2>
+    </div>
+    <div class="faq-inner">
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">كيف تحمي عزّة فكرتي من السرقة؟<span class="faq-icon">+</span></button><div class="faq-a">نظام NDA المدمج يُلزم كل شخص يريد الاطلاع على تفاصيل فكرتك بالتوقيع أولاً على اتفاقية عدم الإفصاح القانونية — بضغطة واحدة. كل توقيع مُسجّل ومرتبط بهوية المستخدم.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">هل المنصة مجانية للاستخدام؟<span class="faq-icon">+</span></button><div class="faq-a">نعم، التسجيل ونشر الأفكار والتواصل مجاني تماماً. نخطط مستقبلاً لإضافة ميزات متميزة مدفوعة للشركات والمستثمرين الذين يريدون أدوات تحليل أعمق.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">من يستطيع الانضمام لعزّة؟<span class="faq-icon">+</span></button><div class="faq-a">أي شخص من العالم العربي — صاحب فكرة، خبير، مستثمر، أو شركة. المنصة متاحة لجميع الجنسيات العربية، ونتوسع تدريجياً لتشمل الجاليات العربية في الخارج.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">كيف أتواصل مع مستثمر؟<span class="faq-icon">+</span></button><div class="faq-a">انشر فكرتك أو مشروعك، والمستثمرون المهتمون سيتواصلون معك مباشرة عبر نظام الرسائل المدمج. يمكنك أيضاً تصفح ملفات المستثمرين والتواصل معهم ابتداءً.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">هل عزّة منصة فلسطينية فقط؟<span class="faq-icon">+</span></button><div class="faq-a">لا — عزّة منصة عربية بهوية فلسطينية. نضم مستخدمين من فلسطين ومصر والإمارات والأردن والسعودية وسواها. الهوية الفلسطينية جزء من قصتنا، لكن الهدف عربي شامل.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="tatreez-strip" aria-hidden="true"><svg width="100%" height="22" preserveAspectRatio="none"><rect width="100%" height="22" fill="url(#tat)"/></svg></div>
+
+<!-- CTA نهائي -->
 <section class="cta-sec">
   <div class="container">
-    <div class="cta-box">
-      <h2 data-i18n="cta-h">جاهز لتحويل فكرتك إلى واقع؟</h2>
-      <p data-i18n="cta-p">انضم اليوم إلى منظومة تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين في مكان واحد.</p>
-      <a href="login.html" class="btn btn-gold btn-lg">
-        <span data-i18n="cta-btn">أنشئ حسابك مجاناً</span>
-        <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-      </a>
+    <div class="cta-inner">
+      <h2 class="reveal" data-i18n="cta-h">حوّل فكرتك إلى <em>واقع</em></h2>
+      <p class="reveal" style="animation-delay:.1s" data-i18n="cta-p">انضم لمنظومة تجمع أصحاب الأفكار والشركات والخبراء والمستثمرين في مكان واحد.</p>
+      <div class="cta-btns reveal" style="animation-delay:.2s">
+        <a href="login.html#register" class="btn btn-gold btn-lg" id="cta-final-main">
+          <span data-i18n="cta-btn" id="cta-final-main-text">أنشئ حسابك مجاناً</span>
+          <svg class="ic" width="18" height="18" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        </a>
+        <a href="login.html" class="btn btn-outline btn-lg" data-i18n="cta-login" id="cta-final-secondary">تسجيل الدخول</a>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ════ الفوتر ════ -->
+<!-- الفوتر -->
 <footer class="footer">
-  <div class="container footer-grid">
-    <div>
-      <a href="#" class="logo"><div class="logo-mark">ع</div><span class="logo-text">عزّة</span></a>
-      <p class="footer-tag" data-i18n="foot-tag">حيث تنمو الأفكار الفلسطينية.</p>
+  <div class="container footer-in">
+    <div class="footer-brand">
+      <div class="brand-mark" style="width:36px;height:36px;font-size:20px">ع</div>
+      <span class="footer-logo">عزّة</span>
     </div>
-    <div class="footer-col"><h4 data-i18n="fc1">المنصة</h4>
-      <a href="#how" data-i18n="fc1a">كيف تعمل</a><a href="#why" data-i18n="fc1b">لماذا عزّة</a><a href="#parties" data-i18n="fc1c">لمن المنصة</a></div>
-    <div class="footer-col"><h4 data-i18n="fc2">الشركة</h4>
-      <a href="#" data-i18n="fc2a">عن عزّة</a><a href="#" data-i18n="fc2b">تواصل معنا</a><a href="#" data-i18n="fc2c">الوظائف</a></div>
-    <div class="footer-col"><h4 data-i18n="fc3">قانوني</h4>
-      <a href="#" data-i18n="fc3a">الخصوصية</a><a href="#" data-i18n="fc3b">الشروط</a><a href="#" data-i18n="fc3c">حماية الأفكار</a></div>
-  </div>
-  <div class="container footer-bottom">
-    <span id="foot-rights">© 2026 عزّة. جميع الحقوق محفوظة.</span>
+    <span class="footer-copy" data-i18n="footer-copy">© 2025 عزّة. جميع الحقوق محفوظة.</span>
+    <div class="footer-links">
+      <a href="#" class="footer-link" data-i18n="footer-privacy">الخصوصية</a>
+      <a href="#" class="footer-link" data-i18n="footer-terms">الشروط</a>
+      <a href="#" class="footer-link" data-i18n="footer-contact">تواصل معنا</a>
+    </div>
   </div>
 </footer>
 
 <script>
-/* ═══════════════════════════════════════════
-   AZZA — home.js  (لاحقاً: js/home.js)
-   ═══════════════════════════════════════════ */
-let currentLang = localStorage.getItem('azza_lang') || 'ar';
+/* ── الوضع الليلي ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
 
-function toggleMenu(){ document.getElementById('mnav').classList.toggle('open'); }
-
-const I18N = {
+/* ═══════════════ AZZA — index.js ═══════════════ */
+const T = {
   ar:{
-    'nav-parties':'لمن المنصة','nav-how':'كيف تعمل','nav-why':'لماذا عزّة','nav-login':'تسجيل الدخول','nav-join':'انضم الآن',
-    'badge':'منصة فلسطينية للأفكار والاستثمار',
-    'hero-h':'حيث تلتقي الأفكار ','hero-accent':'برأس المال والخبرة',
+    badge:'منصة فلسطينية للأفكار والاستثمار',
+    'hero-h':'حيث تلتقي الأفكار','hero-accent':'برأس المال والخبرة',
     'hero-p':'منصة واحدة تجمع أصحاب الأفكار، والشركات والمؤسسات، والخبراء، والمستثمرين — لنبدأ بعزٍّ وننمو بشراكة.',
     'hero-cta1':'اعرض فكرتك','hero-cta2':'استكشف الفرص',
-    'stat1':'فكرة منشورة','stat2':'مستثمر فعّال','stat3':'شراكة ناجحة',
-    'parties-h':'لمن صُمّمت عزّة؟','parties-p':'أربعة أطراف، هدف واحد: تحويل الأفكار إلى واقع.',
-    'p1h':'أصحاب الأفكار','p1p':'اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.','p1c':'ابدأ بعرض فكرتك',
-    'p2h':'الشركات والمؤسسات','p2p':'اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.','p2c':'ابحث عن شراكات',
-    'p3h':'الخبراء','p3p':'شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.','p3c':'قدّم خبرتك',
-    'p4h':'المستثمرون','p4p':'تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.','p4c':'تصفّح الفرص',
-    'how-h':'كيف تعمل؟','how-p':'من الفكرة إلى الشراكة في أربع خطوات.',
-    's1h':'أنشئ ملفك','s1p':'سجّل وحدّد دورك: صاحب فكرة، شركة، خبير، أو مستثمر.',
-    's2h':'اعرض أو اكتشف','s2p':'انشر فكرتك أو تصفّح الفرص المتاحة بسهولة.',
-    's3h':'تواصل بثقة','s3p':'راسل الأطراف المهتمة ضمن بيئة آمنة ومحمية.',
-    's4h':'ابنِ شراكة','s4p':'اتفق على التفاصيل وابدأ رحلة مشروعك معاً.',
-    'why-h':'لماذا عزّة؟',
-    'w1h':'تطابق ذكي','w1p':'نوصلك بالأطراف الأنسب لفكرتك أو رأس مالك.',
-    'w2h':'شفافية وحماية','w2p':'ملفات موثّقة واتفاقيات حماية للأفكار (NDA).',
-    'w3h':'خبرة متاحة','w3p':'وصول إلى خبراء ومستشارين في مختلف المجالات.',
-    'cta-h':'جاهز لتحويل فكرتك إلى واقع؟','cta-p':'انضم اليوم إلى منظومة تجمع أصحاب الأفكار، والشركات، والخبراء، والمستثمرين في مكان واحد.','cta-btn':'أنشئ حسابك مجاناً',
-    'foot-tag':'حيث تنمو الأفكار الفلسطينية.',
-    'fc1':'المنصة','fc1a':'كيف تعمل','fc1b':'لماذا عزّة','fc1c':'لمن المنصة',
-    'fc2':'الشركة','fc2a':'عن عزّة','fc2b':'تواصل معنا','fc2c':'الوظائف',
-    'fc3':'قانوني','fc3a':'الخصوصية','fc3b':'الشروط','fc3c':'حماية الأفكار',
-    'rights':'© 2026 عزّة. جميع الحقوق محفوظة.'
+    stat1:'فكرة منشورة',stat2:'مستثمر فعّال',stat3:'شراكة ناجحة',
+    'nav-parties':'الأطراف','nav-how':'كيف تعمل','nav-why':'لماذا عزّة',
+    'nav-login':'تسجيل الدخول','nav-join':'انضم الآن',
+    'parties-tag':'لمن صُمّمت عزّة؟','parties-h1':'أربعة أطراف','parties-h2':'— هدف واحد',
+    'parties-p':'تحويل الأفكار الفلسطينية إلى مشاريع حقيقية بدعم متكامل',
+    p1h:'أصحاب الأفكار',p1p:'اعرض مشروعك أمام مستثمرين وخبراء جاهزين للدعم، واحصل على التمويل والإرشاد.',p1c:'ابدأ بعرض فكرتك',
+    p2h:'الشركات والمؤسسات',p2p:'اكتشف أفكاراً واعدة، وابنِ شراكات استراتيجية، ووسّع شبكتك ضمن منظومة ابتكار.',p2c:'ابحث عن شراكات',
+    p3h:'الخبراء',p3p:'شارك خبرتك، أرشد المشاريع الواعدة، وابنِ سمعتك المهنية ضمن مجتمع متخصص.',p3c:'قدّم خبرتك',
+    p4h:'المستثمرون',p4p:'تصفّح فرصاً مدروسة، وتواصل مباشرة مع أصحاب الأفكار، واستثمر بشفافية ووضوح.',p4c:'تصفّح الفرص',
+    'how-tag':'البداية سهلة','how-h1':'كيف تعمل','how-h2':'عزّة؟',
+    'how-p':'أربع خطوات فقط تفصلك عن شبكة داعمين حقيقيين',
+    s1h:'أنشئ حسابك',s1p:'سجّل كصاحب فكرة أو مستثمر أو خبير أو مؤسسة في دقيقة',
+    s2h:'انشر مشروعك',s2p:'اعرض فكرتك أو فرصتك الاستثمارية مع حماية NDA اختيارية',
+    s3h:'تواصل مباشرة',s3p:'راسل المهتمين، وتفاوض، واشرح فكرتك لمن يفهمها',
+    s4h:'ابدأ شراكتك',s4p:'وقّع الاتفاقيات، ابنِ فريقك، وانطلق بدعم حقيقي',
+    'why-tag':'ما يميّزنا','why-h1':'لماذا عزّة','why-h2':' وليس غيرها؟',
+    'why-p':'ميزات بُنيت خصيصاً لبيئة ريادة الأعمال الفلسطينية',
+    w1h:'حماية الأفكار بـ NDA',w1p:'انشر فكرتك بأمان — لا يرى التفاصيل إلا من وقّع اتفاقية السرية الإلكترونية. فكرتك محمية قانونياً.',
+    w2h:'مجتمع متخصص',w2p:'لا ضجيج ولا إعلانات — فقط أصحاب أفكار ومستثمرين وخبراء جادّين يبحثون عن شراكات حقيقية.',
+    w3h:'هوية فلسطينية',w3p:'منصة مصمّمة لفهم بيئتنا وتحدياتنا ومتطلباتنا — باللغة العربية، وبروح فلسطينية أصيلة.',
+    'cta-h':'حوّل فكرتك إلى واقع','cta-p':'انضم لمنظومة تجمع أصحاب الأفكار والشركات والخبراء والمستثمرين في مكان واحد.',
+    'cta-btn':'أنشئ حسابك مجاناً','cta-login':'تسجيل الدخول',
+    'footer-copy':'© 2025 عزّة. جميع الحقوق محفوظة.','footer-privacy':'الخصوصية','footer-terms':'الشروط','footer-contact':'تواصل معنا'
   },
   en:{
-    'nav-parties':'Who it is for','nav-how':'How it works','nav-why':'Why AZZA','nav-login':'Log in','nav-join':'Join now',
-    'badge':'A Palestinian platform for ideas & investment',
-    'hero-h':'Where ideas meet ','hero-accent':'capital and expertise',
-    'hero-p':'One platform connecting idea holders, companies & institutions, experts, and investors — start with pride, grow in partnership.',
-    'hero-cta1':'Pitch your idea','hero-cta2':'Explore opportunities',
-    'stat1':'Ideas posted','stat2':'Active investors','stat3':'Successful deals',
-    'parties-h':'Who is AZZA for?','parties-p':'Four sides, one goal: turning ideas into reality.',
-    'p1h':'Idea holders','p1p':'Present your venture to investors and experts ready to back you, and get funding and guidance.','p1c':'Pitch your idea',
-    'p2h':'Companies & institutions','p2p':'Discover promising ideas, build strategic partnerships, and grow within an innovation ecosystem.','p2c':'Find partnerships',
-    'p3h':'Experts','p3p':'Share your expertise, mentor promising ventures, and build your professional reputation.','p3c':'Offer expertise',
-    'p4h':'Investors','p4p':'Browse vetted opportunities, connect directly with founders, and invest with transparency.','p4c':'Browse opportunities',
-    'how-h':'How it works','how-p':'From idea to partnership in four steps.',
-    's1h':'Create your profile','s1p':'Sign up and pick your role: founder, company, expert, or investor.',
-    's2h':'Post or discover','s2p':'Publish your idea or browse available opportunities easily.',
-    's3h':'Connect with trust','s3p':'Message interested parties in a safe, protected environment.',
-    's4h':'Build a partnership','s4p':'Agree on details and start your venture together.',
-    'why-h':'Why AZZA?',
-    'w1h':'Smart matching','w1p':'We connect you with the best fit for your idea or capital.',
-    'w2h':'Transparency & protection','w2p':'Verified profiles and idea-protection agreements (NDA).',
-    'w3h':'Expertise on tap','w3p':'Access to experts and advisors across every field.',
-    'cta-h':'Ready to turn your idea into reality?','cta-p':'Join an ecosystem that brings founders, companies, experts, and investors together in one place.','cta-btn':'Create your free account',
-    'foot-tag':'Where Palestinian ideas grow.',
-    'fc1':'Platform','fc1a':'How it works','fc1b':'Why AZZA','fc1c':'Who it is for',
-    'fc2':'Company','fc2a':'About AZZA','fc2b':'Contact','fc2c':'Careers',
-    'fc3':'Legal','fc3a':'Privacy','fc3b':'Terms','fc3c':'Idea protection',
-    'rights':'© 2026 AZZA. All rights reserved.'
+    badge:'Palestinian Platform for Ideas & Investment',
+    'hero-h':'Where Ideas Meet','hero-accent':'Capital & Expertise',
+    'hero-p':'One platform connecting idea holders, companies, experts, and investors — to start boldly and grow through partnership.',
+    'hero-cta1':'Pitch Your Idea','hero-cta2':'Explore Opportunities',
+    stat1:'Ideas Published',stat2:'Active Investors',stat3:'Successful Partnerships',
+    'nav-parties':'Parties','nav-how':'How It Works','nav-why':'Why AZZA',
+    'nav-login':'Sign In','nav-join':'Join Now',
+    'parties-tag':'Who Is AZZA For?','parties-h1':'Four Parties','parties-h2':'— One Goal',
+    'parties-p':'Transforming Palestinian ideas into real projects with full support',
+    p1h:'Idea Holders',p1p:'Present your project to ready investors and experts, and get the funding and mentorship you need.',p1c:'Start Pitching',
+    p2h:'Companies & Institutions',p2p:'Discover promising ideas, build strategic partnerships, and expand your network within an innovation ecosystem.',p2c:'Find Partnerships',
+    p3h:'Experts',p3p:'Share your expertise, mentor promising projects, and build your professional reputation in a specialized community.',p3c:'Offer Expertise',
+    p4h:'Investors',p4p:'Browse vetted opportunities, connect directly with idea holders, and invest with transparency and clarity.',p4c:'Browse Opportunities',
+    'how-tag':'Getting Started Is Easy','how-h1':'How Does','how-h2':'AZZA Work?',
+    'how-p':'Just four steps separate you from a network of real supporters',
+    s1h:'Create Your Account',s1p:'Register as an idea holder, investor, expert, or institution in one minute',
+    s2h:'Publish Your Project',s2p:'Present your idea or investment opportunity with optional NDA protection',
+    s3h:'Connect Directly',s3p:'Message interested parties, negotiate, and explain your vision to those who understand it',
+    s4h:'Start Your Partnership',s4p:'Sign agreements, build your team, and launch with real support',
+    'why-tag':'What Sets Us Apart','why-h1':'Why AZZA','why-h2':', Not Others?',
+    'why-p':'Features built specifically for the Palestinian entrepreneurship environment',
+    w1h:'Idea Protection with NDA',w1p:'Publish your idea safely — only those who sign the electronic confidentiality agreement can see the details. Your idea is legally protected.',
+    w2h:'Specialized Community',w2p:'No noise, no ads — just serious idea holders, investors, and experts looking for real partnerships.',
+    w3h:'Palestinian Identity',w3p:'A platform designed to understand our environment, challenges, and needs — in Arabic, with an authentic Palestinian spirit.',
+    'cta-h':'Turn Your Idea Into Reality','cta-p':'Join an ecosystem that brings founders, companies, experts, and investors together in one place.',
+    'cta-btn':'Create Your Free Account','cta-login':'Sign In',
+    'footer-copy':'© 2025 AZZA. All rights reserved.','footer-privacy':'Privacy','footer-terms':'Terms','footer-contact':'Contact Us'
   }
 };
-function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || key; }
-function setLang(lang){
-  currentLang = lang;
-  localStorage.setItem('azza_lang', lang);
-  document.documentElement.lang = lang;
-  document.documentElement.dir  = lang === 'ar' ? 'rtl' : 'ltr';
-  document.getElementById('lng-ar').classList.toggle('on', lang === 'ar');
-  document.getElementById('lng-en').classList.toggle('on', lang === 'en');
-  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
-  document.getElementById('foot-rights').textContent = t('rights');
+
+/* ── الوعي بحالة تسجيل الدخول ── */
+function getMe(){try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}}
+const me = getMe();
+
+function applyAuthState(){
+  if(!me)return;
+  /* الشعار يوديك للتطبيق مباشرة بدل الصفحة التسويقية */
+  document.getElementById('brand-link').href = 'app.html';
+
+  /* استبدال أزرار الدخول/التسجيل بزر واحد لدخول المنصة */
+  document.getElementById('nav-auth-area').innerHTML = `
+    <button class="lang-btn" onclick="toggleLang()" id="lang-toggle">${lang==='ar'?'EN':'ع'}</button>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"></svg>
+    </button>
+    <a href="app.html" class="btn btn-gold nav-cta">دخول للمنصة ←</a>`;
+  applyTheme();
+
+  /* زر الهيرو الرئيسي يصير "اذهب لمنصتي" بدل "اعرض فكرتك" — نزيل data-i18n حتى ما يكتب applyLang فوقه لاحقاً */
+  const heroBtn=document.getElementById('hero-cta-main');
+  const heroText=document.getElementById('hero-cta-main-text');
+  if(heroBtn&&heroText){heroBtn.href='app.html';heroText.removeAttribute('data-i18n');heroText.textContent=lang==='ar'?'اذهب إلى منصتي':'Go to my platform';}
+
+  /* زر CTA النهائي يصير رابط مباشر للتطبيق، والثانوي يختفي (ما في حاجة لتسجيل دخول وهو مسجّل أصلاً) */
+  const ctaBtn=document.getElementById('cta-final-main');
+  const ctaText=document.getElementById('cta-final-main-text');
+  if(ctaBtn&&ctaText){ctaBtn.href='app.html';ctaText.removeAttribute('data-i18n');ctaText.textContent=lang==='ar'?'اذهب إلى منصتي':'Go to my platform';}
+  const ctaSecondary=document.getElementById('cta-final-secondary');
+  if(ctaSecondary)ctaSecondary.style.display='none';
 }
-setLang(currentLang);
+
+let lang = localStorage.getItem('azza_lang') || 'ar';
+function applyLang(){
+  const isAr = lang==='ar';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+  document.getElementById('lang-toggle').textContent = isAr ? 'EN' : 'ع';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n; if(T[lang][k]!==undefined) el.textContent=T[lang][k];
+  });
+}
+function toggleLang(){ lang = lang==='ar'?'en':'ar'; localStorage.setItem('azza_lang',lang); applyLang(); applyAuthState(); }
+applyLang();
+applyAuthState();
+
+/* كشف التمرير للانيميشن */
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.09});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ── عداد الأرقام ── */
+function animateCounters(){
+  document.querySelectorAll('.counter').forEach(el=>{
+    const target=parseFloat(el.dataset.target);const isDecimal=target%1!==0;
+    const duration=1800;const start=performance.now();
+    function update(now){
+      const p=Math.min((now-start)/duration,1);const ease=1-Math.pow(1-p,3);
+      const val=target*ease;
+      el.textContent=isDecimal?val.toFixed(1):Math.round(val).toLocaleString('ar-EG');
+      if(p<1)requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  });
+}
+const counterObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){animateCounters();counterObs.disconnect();}});},{threshold:.3});
+const proofSec=document.querySelector('.proof-sec');if(proofSec)counterObs.observe(proofSec);
+
+/* ── تبويبات المعاينة ── */
+const PREVIEWS={
+  idea:`<div class="prev-card">
+    <div class="prev-idea-wrap">
+      <div class="prev-vote"><span class="prev-vote-arr">▲</span><span class="prev-vote-n">84</span></div>
+      <div style="flex:1;padding:12px 14px">
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <span class="prev-badge" style="background:rgba(28,91,56,.08);color:#0e3622;border:1px solid rgba(28,91,56,.2)">💡 فكرة</span>
+          <span class="prev-badge" style="background:rgba(14,54,34,.1);color:#0e3622;border:1px solid rgba(14,54,34,.3)">🔒 NDA</span>
+        </div>
+        <div style="font-family:'Aref Ruqaa',serif;font-size:1.1rem;font-weight:700;color:#1c1a14;margin-bottom:4px">تطبيق ذكاء اصطناعي للتعليم العربي</div>
+        <div style="font-size:12px;color:#6b6555;margin-bottom:10px">يُخصّص مسار التعلم لكل طالب بناءً على أسلوبه ومستواه</div>
+        <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#6b6555">
+          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#1c5b38,#0e3622);display:flex;align-items:center;justify-content:center;color:#e3c98c;font-size:.65rem;font-weight:700">م</div>
+          <strong style="color:#1c1a14">محمد بركة</strong><span style="color:#1c5b38">@mobaraka</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;padding:8px 12px;border-top:1px solid rgba(28,26,20,.12)">
+      <span class="prev-act">💡 مثير</span><span class="prev-act">🤝 تعاون</span><span class="prev-act">💬 12</span>
+      <span class="prev-act main">أبدِ اهتمامك</span>
+    </div>
+  </div>`,
+  project:`<div class="prev-card">
+    <div style="padding:2px 0 10px">
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <span class="prev-badge" style="background:rgba(198,151,73,.1);color:#9b7420;border:1px solid rgba(198,151,73,.3)">🚀 مشروع</span>
+        <span class="prev-badge" style="background:rgba(15,110,86,.1);color:#085041;border:1px solid rgba(15,110,86,.25)">✨ جديد</span>
+      </div>
+      <div style="font-family:'Aref Ruqaa',serif;font-size:1.1rem;font-weight:700;color:#1c1a14;margin-bottom:4px">منصة توصيل ذكية للمناطق النائية</div>
+      <div style="font-size:12px;color:#6b6555;margin-bottom:10px">تربط المزارعين بالمستهلكين في مناطق لا تصلها خدمات التوصيل التقليدية</div>
+      <div class="prev-fund">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:700;color:#1c5b38">$18,000</span><span style="color:#6b6555">من $50,000</span></div>
+        <div class="prev-fund-bar"><div class="prev-fund-fill" style="width:36%"></div></div>
+        <div style="display:flex;gap:12px;font-size:11px;color:#6b6555"><span><strong style="color:#1c1a14">36%</strong> مكتمل</span><span><strong style="color:#1c1a14">12</strong> مهتم</span><span><strong style="color:#1c1a14">Seed</strong></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:5px;padding:8px 12px;border-top:1px solid rgba(28,26,20,.12)">
+      <span class="prev-act">▲ 23</span><span class="prev-act">💡</span><span class="prev-act">💬 8</span>
+      <span class="prev-act main">💰 اهتمام</span>
+    </div>
+  </div>`,
+  post:`<div class="prev-card">
+    <div class="prev-head">
+      <div class="prev-av" style="background:linear-gradient(135deg,#185FA5,#042C53)">خ</div>
+      <div><div class="prev-name">خالد العمري <span style="font-size:10px;color:#1c5b38;font-weight:400">@khalid_inv</span></div>
+      <div style="font-size:11px;color:#6b6555">مستثمر موثّق · منذ ٣ ساعات</div></div>
+    </div>
+    <div class="prev-body">نبحث عن أفكار مبتكرة في قطاع التقنية الزراعية والصحة الرقمية — لمن لديه مشروع جاد يتواصل معنا مباشرة. #استثمار #تقنية_زراعية</div>
+    <div style="display:flex;gap:5px;padding:8px 12px;border-top:1px solid rgba(28,26,20,.12)">
+      <span class="prev-act">▲ 15</span><span class="prev-act">💡 مثير</span><span class="prev-act">🤝 تعاون</span><span class="prev-act">💬 5</span>
+    </div>
+  </div>`
+};
+function showPreview(btn,type){
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  const content=document.getElementById('preview-content');
+  if(content){content.style.opacity='0';setTimeout(()=>{content.innerHTML=PREVIEWS[type];content.style.opacity='1';},150);}
+}
+document.getElementById('preview-content').style.transition='opacity .15s';
+
+/* ── FAQ ── */
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+
 </script>
 </body>
 </html>

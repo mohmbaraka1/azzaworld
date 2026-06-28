@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — الإعدادات</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+
+/* هيدر */
+.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;justify-content:space-between;height:62px;padding:0 18px;max-width:860px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.back-btn:hover{border-color:var(--olive);color:var(--olive)}
+
+/* تخطيط */
+.layout{max-width:860px;margin:0 auto;padding:24px 18px 60px;display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
+.side-nav{position:sticky;top:82px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px}
+.snav-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:var(--r2);font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.18s;border:none;background:transparent;font-family:inherit;width:100%;text-align:right}
+.snav-item:hover{background:var(--cream);color:var(--ink)}
+.snav-item.on{background:rgba(28,91,56,.09);color:var(--olive)}
+.snav-item .ic{width:16px;height:16px}
+.snav-item.danger:hover{background:rgba(206,17,38,.06);color:var(--red)}
+.snav-item.danger.on{background:rgba(206,17,38,.08);color:var(--red)}
+.snav-sep{height:1px;background:var(--line);margin:6px 0}
+
+/* المحتوى */
+.main{display:flex;flex-direction:column;gap:16px}
+.settings-section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:none}
+.settings-section.active{display:block;animation:secFadeIn .32s ease both}
+@keyframes secFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.settings-section.active{display:block}
+.ss-head{padding:18px 22px;border-bottom:1px solid var(--line);background:rgba(28,91,56,.02)}
+.ss-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.ss-title .ic{width:17px;height:17px;color:var(--olive)}
+.ss-sub{font-size:13px;color:var(--muted)}
+.ss-body{padding:20px 22px}
+
+/* حقول */
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:7px}
+.field input,.field textarea,.field select{width:100%;border:1.5px solid var(--line);border-radius:var(--r2);background:var(--cream);padding:11px 14px;font-family:inherit;font-size:14px;color:var(--ink);outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--olive);background:var(--card)}
+.field input[readonly]{background:var(--cream-2);color:var(--muted);cursor:not-allowed}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+.field-hint.ok{color:var(--olive)}
+.field-hint.err{color:var(--red)}
+
+/* أفاتار */
+.avatar-section{display:flex;align-items:center;gap:20px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.av-big{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:2rem;overflow:hidden;flex-shrink:0;position:relative}
+.av-actions{display:flex;flex-direction:column;gap:8px}
+.av-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;border:1.5px solid var(--line);background:transparent;color:var(--ink)}
+.av-btn:hover{border-color:var(--olive);color:var(--olive)}
+.av-btn.danger{color:var(--red);border-color:rgba(206,17,38,.3)}
+.av-btn.danger:hover{background:rgba(206,17,38,.06)}
+
+/* أزرار الحفظ */
+.save-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--line);background:rgba(28,91,56,.02)}
+
+/* ── بطاقات التوثيق ── */
+.verify-card{display:flex;align-items:flex-start;gap:13px;padding:15px;background:var(--cream);border:1px solid var(--line);border-radius:14px}
+.vc-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vc-icon .ic{width:19px;height:19px;stroke-width:2}
+.vc-body{flex:1;min-width:0}
+.vc-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.vc-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
+.id-upload-btn{display:inline-flex;align-items:center;gap:6px;margin-top:9px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--olive);background:transparent;color:var(--olive);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.id-upload-btn:hover{background:var(--olive);color:#fff}
+.vc-status{flex-shrink:0;font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.vc-status.ok{background:rgba(28,91,56,.1);color:#0e3622}
+.vc-status.pending{background:var(--cream-2);color:var(--muted)}
+.vc-status.gold{background:rgba(198,151,73,.15);color:#9b7420}
+.vc-status.submitted{background:rgba(24,95,165,.1);color:#185FA5}
+
+/* ── شريط درجة المصداقية ── */
+.trust-progress-box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.trust-progress-track{position:relative;height:9px;background:var(--cream-2);border-radius:999px;overflow:visible}
+.trust-progress-fill{height:100%;background:linear-gradient(90deg,#1c5b38,#c69749);border-radius:999px;transition:width .6s ease}
+.trust-progress-threshold{position:absolute;right:30%;top:-4px;width:2px;height:17px;background:#9b7420;border-radius:2px}
+.btn-save{padding:10px 24px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-save:hover{background:var(--olive-deep)}
+.btn-cancel{padding:10px 18px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-cancel:hover{border-color:var(--red);color:var(--red)}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:.5px solid rgba(28,26,20,.06)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1}
+.toggle-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.toggle-desc{font-size:12px;color:var(--muted)}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--cream-2);border-radius:999px;cursor:pointer;transition:.3s;border:1.5px solid var(--line)}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;right:1px;top:1px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle input:checked+.toggle-slider{background:var(--olive);border-color:var(--olive)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(-20px)}
+
+/* خطر */
+.danger-zone{border:1.5px solid rgba(206,17,38,.25);border-radius:var(--r);overflow:hidden}
+.danger-head{padding:14px 18px;background:rgba(206,17,38,.04);border-bottom:1px solid rgba(206,17,38,.15);display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--red)}
+.danger-item{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:.5px solid rgba(206,17,38,.08);gap:16px}
+.danger-item:last-child{border-bottom:none}
+.danger-info{flex:1}
+.danger-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.danger-desc{font-size:12.5px;color:var(--muted)}
+.danger-btn{padding:8px 18px;border-radius:999px;border:1.5px solid rgba(206,17,38,.4);background:transparent;color:var(--red);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0}
+.danger-btn:hover{background:var(--red);color:#fff}
+
+/* مقياس قوة كلمة المرور */
+.pw-strength{margin-top:8px}
+.pw-bars{display:flex;gap:4px;margin-bottom:5px}
+.pw-bar{flex:1;height:4px;border-radius:999px;background:var(--cream-2);transition:.3s}
+.pw-bar.weak{background:#e74c3c}
+.pw-bar.fair{background:#f39c12}
+.pw-bar.good{background:#2ecc71}
+.pw-bar.strong{background:var(--olive)}
+.pw-label{font-size:11.5px;color:var(--muted)}
+
+/* بطاقة الجلسات */
+.session-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid var(--line)}
+.session-item:last-child{border-bottom:none}
+.session-icon{width:38px;height:38px;border-radius:10px;background:var(--cream);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.session-info{flex:1}
+.session-device{font-size:13.5px;font-weight:700}
+.session-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.session-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.sb-current{background:rgba(28,91,56,.1);color:var(--olive)}
+.end-session{padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:.2s}
+.end-session:hover{border-color:var(--red);color:var(--red)}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+
+@media(max-width:680px){
+  .layout{grid-template-columns:1fr}
+  .side-nav-wrap{position:relative;min-width:0}
+  .side-nav{position:static;display:flex;overflow-x:auto;gap:4px;padding:6px}
+  .snav-item{white-space:nowrap;flex-shrink:0;width:auto}
+  .field-row{grid-template-columns:1fr}
+  .snav-fade{position:absolute;top:0;bottom:0;width:28px;pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:2}
+  .snav-fade.right{right:0;background:linear-gradient(to left,var(--card),transparent)}
+  .snav-fade.left{left:0;background:linear-gradient(to right,var(--card),transparent)}
+  .snav-fade.show{opacity:1}
+}
+</style>
+<script src="supabase.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="app.html" class="brand"><div class="brand-mark">ع</div><span class="brand-text">عزّة</span></a>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="back-btn" onclick="history.back()">
+      <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      رجوع
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- التنقل الجانبي -->
+  <div class="side-nav-wrap">
+  <nav class="side-nav" id="side-nav">
+    <button class="snav-item on" onclick="showSection('account',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      الحساب
+    </button>
+    <button class="snav-item" onclick="showSection('verify',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+      التوثيق والمصداقية
+    </button>
+    <button class="snav-item" onclick="showSection('agent',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 14h.01M15 14h.01"/></svg>
+      المساعد الذكي
+    </button>
+    <button class="snav-item" onclick="showSection('role',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      بيانات دوري
+    </button>
+    <button class="snav-item" onclick="showSection('password',this)">
+      <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      كلمة المرور
+    </button>
+    <button class="snav-item" onclick="showSection('privacy',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+      الخصوصية
+    </button>
+    <button class="snav-item" onclick="showSection('notifications',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      الإشعارات
+    </button>
+    <button class="snav-item" onclick="showSection('appearance',this)">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      المظهر
+    </button>
+    <button class="snav-item" onclick="showSection('sessions',this)">
+      <svg class="ic" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      الجلسات
+    </button>
+    <div class="snav-sep"></div>
+    <button class="snav-item danger" onclick="showSection('danger',this)">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      منطقة الخطر
+    </button>
+  </nav>
+  <div class="snav-fade right"></div>
+  <div class="snav-fade left"></div>
+  </div>
+
+  <main class="main">
+
+    <!-- ── الحساب ── -->
+    <div class="settings-section active" id="sec-account">
+      <!-- الصورة الشخصية -->
+      <div class="avatar-section">
+        <div class="av-big" id="settings-av">م</div>
+        <div class="av-actions">
+          <label class="av-btn">
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            رفع صورة جديدة
+            <input type="file" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+          </label>
+          <button class="av-btn danger" onclick="removeAvatar()">
+            <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            حذف الصورة
+          </button>
+        </div>
+      </div>
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>معلومات الحساب</div>
+        <div class="ss-sub">تعديل معلوماتك الأساسية</div>
+      </div>
+      <div class="ss-body">
+        <div class="field-row">
+          <div class="field">
+            <label>الاسم الكامل</label>
+            <input type="text" id="s-name" placeholder="اسمك الكامل">
+          </div>
+          <div class="field">
+            <label>اسم المستخدم</label>
+            <input type="text" id="s-username" readonly>
+            <div class="field-hint">لا يمكن تغيير اسم المستخدم</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="s-email" placeholder="your@email.com" dir="ltr">
+        </div>
+        <div class="field">
+          <label>النبذة الشخصية</label>
+          <textarea id="s-bio" rows="3" placeholder="اكتب نبذة مختصرة عن نفسك..."></textarea>
+          <div class="field-hint"><span id="bio-count">0</span> / 200 حرف</div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>رقم الهاتف</label>
+            <input type="tel" id="s-phone" placeholder="+970 5x xxx xxxx" dir="ltr" readonly style="background:var(--cream-2);cursor:not-allowed">
+            <div class="field-hint">رقم موثّق عند التسجيل — راجع تبويب "التوثيق والمصداقية"</div>
+          </div>
+          <div class="field">
+            <label>المؤسسة / الشركة</label>
+            <input type="text" id="s-institution" placeholder="اسم مؤسستك">
+          </div>
+        </div>
+      </div>
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="loadAccount()">إلغاء</button>
+        <button class="btn-save" onclick="saveAccount()">حفظ التغييرات</button>
+      </div>
+    </div>
+
+    <!-- ── التوثيق والمصداقية ── -->
+    <div class="settings-section" id="sec-verify">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>التوثيق والمصداقية</div>
+        <div class="ss-sub">رقم جوالك موثّق إلزامياً. توثيق الهوية والعلامة الرسمية اختياريان</div>
+      </div>
+      <div class="ss-body" style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- بطاقة رقم الجوال -->
+        <div class="verify-card" id="vc-phone">
+          <div class="vc-icon" style="background:rgba(28,91,56,.1);color:#1c5b38">
+            <svg class="ic" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="vc-body">
+            <div class="vc-title">رقم الجوال</div>
+            <div class="vc-desc" id="vc-phone-desc">—</div>
+          </div>
+          <span class="vc-status ok" id="vc-phone-status">✓ موثّق</span>
+        </div>
+
+        <!-- بطاقة توثيق الهوية -->
+        <div class="verify-card" id="vc-id">
+          <div class="vc-icon" style="background:rgba(198,151,73,.12);color:#9b7420">
+            <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M7 16h10"/></svg>
+          </div>
+          <div class="vc-body">
+            <div class="vc-title">توثيق الهوية الشخصية</div>
+            <div class="vc-desc">رفع صورة هويتك أو جوازك يسرّع حصولك على العلامة الرسمية الذهبية</div>
+            <label class="id-upload-btn" id="id-upload-label">
+              <svg class="ic" width="13" height="13" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              رفع صورة الهوية
+              <input type="file" accept="image/*" style="display:none" id="id-upload-input" onchange="uploadIdDoc(this)">
+            </label>
+          </div>
+          <span class="vc-status pending" id="vc-id-status">اختياري</span>
+        </div>
+
+        <!-- بطاقة العلامة الرسمية -->
+        <div class="verify-card" id="vc-badge">
+          <div class="vc-icon" style="background:rgba(198,151,73,.12)">
+            <svg viewBox="0 0 22 22" width="22" height="22"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="vc-body">
+            <div class="vc-title">العلامة الرسمية الذهبية</div>
+            <div class="vc-desc">تُمنح تلقائياً عندما تصل درجة مصداقيتك إلى 70 من 100، أو عند توثيق هويتك يدوياً من قِبل فريق عزّة</div>
+          </div>
+          <span class="vc-status" id="vc-badge-status">—</span>
+        </div>
+
+        <!-- شريط درجة المصداقية -->
+        <div class="trust-progress-box">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:700;color:var(--ink)">درجة مصداقيتك الحالية</span>
+            <span style="font-family:'Aref Ruqaa',serif;font-size:1.3rem;font-weight:700;color:var(--olive)" id="trust-score-num">0</span>
+          </div>
+          <div class="trust-progress-track">
+            <div class="trust-progress-fill" id="trust-progress-fill" style="width:0%"></div>
+            <div class="trust-progress-threshold"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px">
+            <span>0</span>
+            <span style="color:#9b7420;font-weight:700">70 ← حد التوثيق التلقائي</span>
+            <span>100</span>
+          </div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.7" id="trust-tip">انشر أفكاراً، اجمع تصويتات، ووقّع اتفاقيات NDA لرفع درجتك.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── المساعد الذكي ── -->
+    <div class="settings-section" id="sec-agent">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 14h.01M15 14h.01"/></svg>المساعد الذكي</div>
+        <div class="ss-sub">إيجنت يساعدك حسب دورك على المنصة — مجاني دائماً للمستخدم، بوضعين للتشغيل</div>
+      </div>
+      <div class="ss-body" style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- حالة الوضع الحالي -->
+        <div class="verify-card" id="ac-mode-card">
+          <div class="vc-icon" id="ac-mode-icon" style="background:var(--cream-2)">
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="vc-body">
+            <div class="vc-title">الوضع الحالي</div>
+            <div class="vc-desc" id="ac-mode-desc">—</div>
+          </div>
+          <span class="vc-status" id="ac-mode-status">—</span>
+        </div>
+
+        <!-- شرح المساعد -->
+        <div style="background:var(--cream);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:12.5px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--ink)">⚡ مساعد عزّة:</strong> ردود مولّدة فعلياً ومخصّصة لسؤالك، بمفتاح Gemini API مجاني خاص بك من Google — مجاني بالكامل بحدود استخدام معقولة، المنصة لا تتوسّط ولا تتحمّل أي رسوم.
+        </div>
+
+        <!-- إدخال المفتاح -->
+        <div class="verify-card" style="flex-direction:column;align-items:stretch">
+          <div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:12px">
+            <div class="vc-icon" style="background:rgba(28,91,56,.1);color:#1c5b38">
+              <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="vc-body">
+              <div class="vc-title">مفتاح Gemini API</div>
+              <div class="vc-desc">احصل على مفتاحك مجاناً من aistudio.google.com — يُخزَّن محلياً بمتصفحك فقط ولا يُرسل لأي خادم تابع لعزّة</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="password" id="ac-key-input" placeholder="AIza..." dir="ltr" style="flex:1;min-width:180px;height:42px;border:1.5px solid var(--line);border-radius:var(--r2);background:var(--cream);padding:0 14px;font-family:inherit;font-size:13px;color:var(--ink);outline:none">
+            <button class="id-upload-btn" id="ac-test-btn" onclick="testAndSaveKey()" style="white-space:nowrap">اختبار وحفظ</button>
+          </div>
+          <div id="ac-key-msg" style="font-size:12px;margin-top:8px"></div>
+          <button id="ac-clear-btn" onclick="clearAgentKey()" style="display:none;background:none;border:none;color:var(--err);font-family:inherit;font-size:12px;cursor:pointer;margin-top:6px;padding:0;text-align:right;width:fit-content">حذف المفتاح</button>
+        </div>
+
+        <!-- رابط لصفحة الإيجنت -->
+        <button class="btn-save" style="width:100%" onclick="location.href='agent.html'">
+          <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/></svg>
+          فتح صفحة المساعد الذكي
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── بيانات الدور ── -->
+    <div class="settings-section" id="sec-role">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg><span id="role-section-title">بيانات دوري</span></div>
+        <div class="ss-sub">معلومات تساعد الآخرين على فهم اهتماماتك</div>
+      </div>
+      <div class="ss-body" id="role-section-body"></div>
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="loadRoleData()">إلغاء</button>
+        <button class="btn-save" onclick="saveRoleData()">حفظ</button>
+      </div>
+    </div>
+
+
+    <!-- ── كلمة المرور ── -->
+    <div class="settings-section" id="sec-password">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>تغيير كلمة المرور</div>
+        <div class="ss-sub">تأكد من اختيار كلمة مرور قوية</div>
+      </div>
+      <div class="ss-body">
+        <div class="field">
+          <label>كلمة المرور الحالية</label>
+          <input type="password" id="s-pw-current" placeholder="••••••••" dir="ltr">
+        </div>
+        <div class="field">
+          <label>كلمة المرور الجديدة</label>
+          <input type="password" id="s-pw-new" placeholder="••••••••" dir="ltr" oninput="checkPwStrength()">
+          <div class="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="pw-b1"></div>
+              <div class="pw-bar" id="pw-b2"></div>
+              <div class="pw-bar" id="pw-b3"></div>
+              <div class="pw-bar" id="pw-b4"></div>
+            </div>
+            <div class="pw-label" id="pw-label">أدخل كلمة مرور</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>تأكيد كلمة المرور الجديدة</label>
+          <input type="password" id="s-pw-confirm" placeholder="••••••••" dir="ltr" oninput="checkPwMatch()">
+          <div class="field-hint" id="pw-match-hint"></div>
+        </div>
+        <div style="background:rgba(28,91,56,.05);border:1px solid rgba(28,91,56,.15);border-radius:var(--r2);padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.7">
+          ✓ ٨ أحرف على الأقل &nbsp;&nbsp; ✓ حرف كبير وصغير &nbsp;&nbsp; ✓ رقم &nbsp;&nbsp; ✓ رمز خاص
+        </div>
+      </div>
+      <div class="save-bar">
+        <button class="btn-cancel" onclick="clearPwFields()">إلغاء</button>
+        <button class="btn-save" onclick="changePassword()">تغيير كلمة المرور</button>
+      </div>
+    </div>
+
+    <!-- ── الخصوصية ── -->
+    <div class="settings-section" id="sec-privacy">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>إعدادات الخصوصية</div>
+        <div class="ss-sub">تحكم في من يرى معلوماتك</div>
+      </div>
+      <div class="ss-body">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إظهار رقم الهاتف</div>
+            <div class="toggle-desc">يسمح للمستخدمين برؤية رقم هاتفك في ملفك العام</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-phone" onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إظهار البريد الإلكتروني</div>
+            <div class="toggle-desc">يسمح للمستخدمين برؤية بريدك في ملفك العام</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-email" onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">ملف شخصي عام</div>
+            <div class="toggle-desc">يسمح لأي مستخدم بمشاهدة ملفك الشخصي</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-public" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إظهار وضع التعاون</div>
+            <div class="toggle-desc">يظهر وضعك (يبحث عن مستثمر...) على منشوراتك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-collab" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">السماح بالرسائل المباشرة</div>
+            <div class="toggle-desc">يسمح للمستخدمين الآخرين بمراسلتك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-msg" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إظهار درجة المصداقية</div>
+            <div class="toggle-desc">يظهر الـ Trust Score لزوار ملفك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="prv-trust" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── الإشعارات ── -->
+    <div class="settings-section" id="sec-notifications">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>إعدادات الإشعارات</div>
+        <div class="ss-sub">اختر ما تريد أن يصلك إشعار عنه</div>
+      </div>
+      <div class="ss-body">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات الإعجاب</div>
+            <div class="toggle-desc">عند إعجاب أحدهم بمنشور أو فكرة لك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-like" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات التعليقات</div>
+            <div class="toggle-desc">عند تعليق أحدهم على منشور لك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-comment" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات المتابعة</div>
+            <div class="toggle-desc">عند متابعة شخص لك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-follow" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات الاهتمام بمشاريعك</div>
+            <div class="toggle-desc">عند إبداء مستثمر اهتمامه بمشروعك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-interest" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات توقيع NDA</div>
+            <div class="toggle-desc">عند توقيع أحدهم على اتفاقية NDA لفكرتك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-nda" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إشعارات الرسائل</div>
+            <div class="toggle-desc">عند وصول رسالة جديدة</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-msg" checked onchange="saveNotifSettings()"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── المظهر ── -->
+    <div class="settings-section" id="sec-appearance">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>المظهر واللغة</div>
+        <div class="ss-sub">تخصيص تجربتك على المنصة</div>
+      </div>
+      <div class="ss-body">
+        <div class="field">
+          <label>اللغة</label>
+          <select id="s-lang" onchange="changeLang()">
+            <option value="ar">العربية 🇸🇦</option>
+            <option value="en">English 🇬🇧</option>
+          </select>
+        </div>
+        <div class="toggle-row" style="margin-top:8px">
+          <div class="toggle-info">
+            <div class="toggle-label">تمييز المنشورات الجديدة</div>
+            <div class="toggle-desc">إظهار شارة "جديد" على المنشورات خلال أول 48 ساعة</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="app-new-badge" checked onchange="saveAppSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">الفلتر التلقائي حسب دوري</div>
+            <div class="toggle-desc">عند فتح الفيد يعرض المحتوى المناسب لدورك أولاً</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="app-smart-filter" checked onchange="saveAppSettings()"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── الجلسات ── -->
+    <div class="settings-section" id="sec-sessions">
+      <div class="ss-head">
+        <div class="ss-title"><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>الجلسات النشطة</div>
+        <div class="ss-sub">الأجهزة المتصلة بحسابك حالياً</div>
+      </div>
+      <div class="ss-body" id="sessions-list"></div>
+      <div class="save-bar">
+        <button class="btn-save" style="background:var(--red)" onclick="endAllSessions()">تسجيل الخروج من كل الأجهزة</button>
+      </div>
+    </div>
+
+    <!-- ── منطقة الخطر ── -->
+    <div class="settings-section" id="sec-danger">
+      <div class="ss-head">
+        <div class="ss-title" style="color:var(--red)"><svg class="ic" viewBox="0 0 24 24" style="color:var(--red)"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>منطقة الخطر</div>
+        <div class="ss-sub">هذه الإجراءات لا يمكن التراجع عنها</div>
+      </div>
+      <div class="ss-body">
+        <div class="danger-zone">
+          <div class="danger-head">
+            <svg class="ic" width="16" height="16" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            إجراءات لا يمكن التراجع عنها
+          </div>
+          <div class="danger-item">
+            <div class="danger-info">
+              <div class="danger-label">حذف جميع منشوراتي</div>
+              <div class="danger-desc">يحذف كل منشوراتك وأفكارك ومشاريعك بشكل نهائي</div>
+            </div>
+            <button class="danger-btn" onclick="deleteAllPosts()">حذف المنشورات</button>
+          </div>
+          <div class="danger-item">
+            <div class="danger-info">
+              <div class="danger-label">تصدير بياناتي</div>
+              <div class="danger-desc">تنزيل نسخة من جميع بياناتك على المنصة</div>
+            </div>
+            <button class="danger-btn" style="border-color:rgba(28,91,56,.4);color:var(--olive)" onclick="exportData()">تصدير البيانات</button>
+          </div>
+          <div class="danger-item">
+            <div class="danger-info">
+              <div class="danger-label">حذف الحساب نهائياً</div>
+              <div class="danger-desc">يحذف حسابك وجميع بياناتك بشكل لا يمكن التراجع عنه</div>
+            </div>
+            <button class="danger-btn" onclick="deleteAccount()">حذف الحساب</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ── الوضع الليلي ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
+
+/* ══ AZZA — settings.html ══ */
+const getUser  = ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
+const saveUser = u=>{localStorage.setItem('azza_user',JSON.stringify(u));try{const us=JSON.parse(localStorage.getItem('azza_users')||'[]');const i=us.findIndex(x=>x.id===u.id);if(i!==-1){us[i]=u;localStorage.setItem('azza_users',JSON.stringify(us));}}catch(e){}};
+const genId    = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const ini      = n=>(n||'م').trim()[0].toUpperCase();
+const sha256   = async s=>{const b=new TextEncoder().encode(s+('AZZA_SALT_2025'));const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join('');};
+
+/* === Supabase - تهيئة العميل === */
+const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
+let _postsMem=null;
+
+async function loadPostsFromSupabase(){
+  try{
+    const {data,error}=await azzaDB.from('posts').select('*');
+    if(error)throw error;
+    _postsMem=data||[];
+  }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
+}
+const getPostsPage=()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} };
+
+let user = getUser();
+if(!user){ location.href='login.html'; }
+
+/* ══ نواة الإيجنت — إدارة المفتاح فقط (settings.html لا تحتاج كامل القوالب) ══ */
+const AC_KEY_API = 'azza_agent_api_key';
+const acGetKey   = ()=>localStorage.getItem(AC_KEY_API)||'';
+const acSetKey   = k=>localStorage.setItem(AC_KEY_API, k||'');
+const acClearKey = ()=>localStorage.removeItem(AC_KEY_API);
+const acHasKey   = ()=>acGetKey().trim().length>10;
+async function acTestKey(key){
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:'قل "تم" فقط'}]}],generationConfig:{maxOutputTokens:10}}),
+    });
+    if(res.ok)return{ok:true};
+    const body=await res.json().catch(()=>({}));
+    return{ok:false,status:res.status,message:body?.error?.message||'مفتاح غير صالح'};
+  }catch(e){
+    return{ok:false,status:0,message:'تعذّر الاتصال — تحقق من الشبكة'};
+  }
+}
+
+function loadAgentSection(){
+  const modeIcon=document.getElementById('ac-mode-icon');
+  const modeDesc=document.getElementById('ac-mode-desc');
+  const modeStatus=document.getElementById('ac-mode-status');
+  const clearBtn=document.getElementById('ac-clear-btn');
+  if(acHasKey()){
+    modeIcon.style.background='rgba(28,91,56,.1)';modeIcon.style.color='#1c5b38';
+    modeDesc.textContent='مفتاح API محفوظ — الردود الآن مولّدة فعلياً ومخصّصة';
+    modeStatus.textContent='⚡ متصل';
+    modeStatus.className='vc-status gold';
+    clearBtn.style.display='block';
+    document.getElementById('ac-key-input').placeholder='•••••••••••••••••••• (محفوظ)';
+  } else {
+    modeIcon.style.background='var(--cream-2)';modeIcon.style.color='var(--muted)';
+    modeDesc.textContent='لا يوجد مفتاح محفوظ — المساعد معطّل حتى تُدخل مفتاحك';
+    modeStatus.textContent='🔑 بانتظار المفتاح';
+    modeStatus.className='vc-status pending';
+    clearBtn.style.display='none';
+  }
+}
+
+async function testAndSaveKey(){
+  const input=document.getElementById('ac-key-input');
+  const msgEl=document.getElementById('ac-key-msg');
+  const btn=document.getElementById('ac-test-btn');
+  const key=input.value.trim();
+  if(!key){ msgEl.innerHTML='<span style="color:var(--err)">أدخل مفتاحاً أولاً</span>'; return; }
+  btn.disabled=true; btn.textContent='جاري الاختبار...';
+  msgEl.innerHTML='<span style="color:var(--muted)">⏳ نتحقق من صلاحية المفتاح...</span>';
+  const result=await acTestKey(key);
+  btn.disabled=false; btn.textContent='اختبار وحفظ';
+  if(result.ok){
+    acSetKey(key);
+    input.value='';
+    msgEl.innerHTML='<span style="color:var(--olive)">✅ تم التحقق وحفظ المفتاح — المساعد مفعّل الآن</span>';
+    showToast('تم تفعيل المساعد الذكي ⚡');
+    loadAgentSection();
+  } else {
+    msgEl.innerHTML=`<span style="color:var(--err)">❌ ${result.message} — تأكد من صحة المفتاح</span>`;
+  }
+}
+
+function clearAgentKey(){
+  if(!confirm('حذف المفتاح؟ سيتعطّل المساعد حتى تُدخل مفتاحاً جديداً.')) return;
+  acClearKey();
+  loadAgentSection();
+  showToast('تم حذف المفتاح — المساعد معطّل الآن','info');
+}
+
+/* ── init ── */
+function init(){
+  const av=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
+  document.getElementById('settings-av').innerHTML=av;
+  loadAccount();
+  loadVerifyData();
+  loadAgentSection();
+  loadRoleData();
+  loadPrivacy();
+  loadNotifSettings();
+  loadAppSettings();
+  buildSessions();
+}
+
+/* ── تنقل الأقسام ── */
+function showSection(id, btn){
+  document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.snav-item').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('on');
+  scrollActiveSnavIntoView(btn);
+}
+
+/* تمرير شريط التنقل برمجياً عشان القسم النشط يبان كاملاً دائماً بالموبايل */
+function scrollActiveSnavIntoView(btn){
+  const wrap=document.getElementById('side-nav');
+  if(!wrap||!btn||window.innerWidth>680)return;
+  const wrapRect=wrap.getBoundingClientRect();
+  const btnRect=btn.getBoundingClientRect();
+  if(btnRect.right>wrapRect.right){
+    wrap.scrollLeft+= (btnRect.right-wrapRect.right) + 16;
+  }else if(btnRect.left<wrapRect.left){
+    wrap.scrollLeft-= (wrapRect.left-btnRect.left) + 16;
+  }
+  updateSnavFade();
+}
+
+function updateSnavFade(){
+  const wrap=document.getElementById('side-nav');
+  const fadeRight=document.querySelector('.snav-fade.right');
+  const fadeLeft=document.querySelector('.snav-fade.left');
+  if(!wrap||!fadeRight||!fadeLeft)return;
+  const maxScroll=wrap.scrollWidth-wrap.clientWidth;
+  const atStart=wrap.scrollLeft>=-2;
+  const atEnd=wrap.scrollLeft<=-(maxScroll-2);
+  fadeRight.classList.toggle('show',!atStart);
+  fadeLeft.classList.toggle('show',!atEnd&&maxScroll>2);
+}
+document.getElementById('side-nav')?.addEventListener('scroll',updateSnavFade);
+setTimeout(updateSnavFade,100);
+
+/* ── الحساب ── */
+function loadAccount(){
+  document.getElementById('s-name').value        = user.name||'';
+  document.getElementById('s-username').value    = user.username||'';
+  document.getElementById('s-email').value       = user.email||'';
+  document.getElementById('s-bio').value         = user.bio||'';
+  document.getElementById('s-phone').value       = user.phone||'';
+  document.getElementById('s-institution').value = user.institution||'';
+  updateBioCount();
+}
+
+document.getElementById('s-bio').addEventListener('input', updateBioCount);
+function updateBioCount(){
+  const len = document.getElementById('s-bio').value.length;
+  const el  = document.getElementById('bio-count');
+  el.textContent = len;
+  el.style.color = len>200?'var(--red)':len>160?'var(--gold)':'';
+}
+
+async function saveAccount(){
+  const name = document.getElementById('s-name').value.trim();
+  if(!name){ showToast('الاسم مطلوب','err'); return; }
+  const bio = document.getElementById('s-bio').value.trim();
+  if(bio.length>200){ showToast('النبذة أطول من 200 حرف','err'); return; }
+  const upd = {
+    ...user,
+    name,
+    email:       document.getElementById('s-email').value.trim(),
+    bio,
+    phone:       document.getElementById('s-phone').value.trim(),
+    institution: document.getElementById('s-institution').value.trim(),
+  };
+  saveUser(upd); user=upd;
+  const av=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
+  document.getElementById('settings-av').innerHTML=av;
+  showToast('تم حفظ التغييرات ✅');
+}
+
+/* ── الصورة ── */
+function uploadAvatar(inp){
+  const f=inp.files[0]; if(!f)return;
+  if(f.size>3*1024*1024){ showToast('الصورة أكبر من 3MB','err'); return; }
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image(); img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=200; canvas.height=200;
+      const ctx=canvas.getContext('2d');
+      const min=Math.min(img.width,img.height);
+      ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);
+      const dataUrl=canvas.toDataURL('image/jpeg',.85);
+      const upd={...user,photo:dataUrl};
+      saveUser(upd); user=upd;
+      document.getElementById('settings-av').innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      showToast('تم تحديث الصورة ✅');
+    }; img.src=e.target.result;
+  }; r.readAsDataURL(f);
+}
+function removeAvatar(){
+  if(!confirm('حذف الصورة الشخصية؟')) return;
+  const upd={...user,photo:null}; saveUser(upd); user=upd;
+  document.getElementById('settings-av').innerHTML=ini(user.name);
+  showToast('تم حذف الصورة','err');
+}
+
+/* ── التوثيق والمصداقية ── */
+function calcTrustScoreSettings(u){
+  const getSigs=()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}};
+  const posts=getPostsPage().filter(p=>p.author_id===u.id);
+  let s={profile:0,nda:0,activity:0};
+  if(u.photo)s.profile+=8;if((u.bio||'').length>10)s.profile+=8;
+  if(u.phone||u.email)s.profile+=5;if(u.linkedin||u.twitter||u.website)s.profile+=5;
+  if(u.institution)s.profile+=4;s.profile=Math.min(30,s.profile);
+  const sigs=getSigs();let ndaT=0;
+  posts.filter(p=>p.nda).forEach(p=>{ndaT+=(sigs[p.id]||[]).length;});
+  s.nda=Math.min(35,Math.round(ndaT*3));
+  const views=posts.reduce((a,p)=>a+(p.views||0),0);
+  s.activity=Math.min(35,posts.length*4+Math.floor(views/25));
+  return Math.min(100,s.profile+s.nda+s.activity);
+}
+
+function loadVerifyData(){
+  /* رقم الجوال — إلزامي، يُعرض كحالة فقط */
+  const phoneDesc=document.getElementById('vc-phone-desc');
+  const phoneStatus=document.getElementById('vc-phone-status');
+  if(user.phone_verified&&user.phone){
+    phoneDesc.textContent=user.phone+' — تم التوثيق عبر رمز OTP عند التسجيل';
+    phoneStatus.textContent='✓ موثّق';
+    phoneStatus.className='vc-status ok';
+  } else {
+    phoneDesc.textContent='لم يتم توثيق رقم الجوال — هذا غير معتاد لحساب مسجَّل بعد التحديث';
+    phoneStatus.textContent='غير موثّق';
+    phoneStatus.className='vc-status pending';
+  }
+
+  /* توثيق الهوية اليدوي */
+  const idStatusEl=document.getElementById('vc-id-status');
+  const idLabel=document.getElementById('id-upload-label');
+  if(user.id_verified===true){
+    idStatusEl.textContent='✓ موثّق';
+    idStatusEl.className='vc-status ok';
+    idLabel.innerHTML='✓ تم توثيق هويتك';
+    idLabel.style.pointerEvents='none';
+    idLabel.style.opacity='.7';
+  } else if(user.id_doc_pending){
+    idStatusEl.textContent='قيد المراجعة';
+    idStatusEl.className='vc-status submitted';
+    idLabel.innerHTML='<svg class="ic" width="13" height="13" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> رفع صورة جديدة'+'<input type="file" accept="image/*" style="display:none" id="id-upload-input" onchange="uploadIdDoc(this)">';
+  } else {
+    idStatusEl.textContent='اختياري';
+    idStatusEl.className='vc-status pending';
+  }
+
+  /* درجة المصداقية */
+  const score=calcTrustScoreSettings(user);
+  document.getElementById('trust-score-num').textContent=score;
+  document.getElementById('trust-progress-fill').style.width=score+'%';
+
+  /* العلامة الرسمية */
+  const badgeStatus=document.getElementById('vc-badge-status');
+  const isVerified=user.id_verified===true||score>=70;
+  if(isVerified){
+    badgeStatus.textContent='✓ مفعّلة';
+    badgeStatus.className='vc-status gold';
+  } else {
+    badgeStatus.textContent='غير مفعّلة';
+    badgeStatus.className='vc-status pending';
+  }
+
+  /* نص توجيهي */
+  const tip=document.getElementById('trust-tip');
+  if(isVerified){
+    tip.innerHTML='🎉 تهانينا! حسابك يحمل العلامة الرسمية الذهبية وتظهر بجانب اسمك في كل مكان.';
+    tip.style.color='var(--olive)';
+  } else {
+    const remaining=70-score;
+    tip.textContent=`تحتاج ${remaining} نقطة إضافية للوصول للتوثيق التلقائي. انشر أفكاراً، اجمع تصويتات ومشاهدات، أو وقّع اتفاقيات NDA لرفع درجتك — أو وثّق هويتك يدوياً أعلاه للحصول على العلامة فوراً بعد مراجعة فريق عزّة.`;
+    tip.style.color='var(--muted)';
+  }
+}
+
+function uploadIdDoc(inp){
+  const f=inp.files[0]; if(!f)return;
+  if(f.size>5*1024*1024){ showToast('حجم الملف أكبر من 5MB','err'); return; }
+  const r=new FileReader();
+  r.onload=e=>{
+    /* بيئة تجريبية محلية: نخزّن أن الوثيقة "قيد المراجعة" بدون نقلها لسيرفر حقيقي */
+    const upd={...user,id_doc_pending:true,id_doc_uploaded_at:new Date().toISOString()};
+    saveUser(upd); user=upd;
+    loadVerifyData();
+    showToast('تم استلام وثيقتك، ستُراجع من فريق عزّة قريباً ✅');
+  };
+  r.readAsDataURL(f);
+}
+
+/* ── كلمة المرور ── */
+function checkPwStrength(){
+  const pw = document.getElementById('s-pw-new').value;
+  const bars = [document.getElementById('pw-b1'),document.getElementById('pw-b2'),document.getElementById('pw-b3'),document.getElementById('pw-b4')];
+  const label = document.getElementById('pw-label');
+  bars.forEach(b=>{b.className='pw-bar';});
+  if(!pw){ label.textContent='أدخل كلمة مرور'; return; }
+  let score=0;
+  if(pw.length>=8)score++;
+  if(/[A-Z]/.test(pw)&&/[a-z]/.test(pw))score++;
+  if(/\d/.test(pw))score++;
+  if(/[^A-Za-z0-9]/.test(pw))score++;
+  const classes=['weak','fair','good','strong'];
+  const labels=['ضعيفة','مقبولة','جيدة','قوية جداً'];
+  for(let i=0;i<score;i++) bars[i].classList.add(classes[score-1]);
+  label.textContent='قوة كلمة المرور: '+labels[score-1];
+  label.style.color=score===1?'#e74c3c':score===2?'#f39c12':score===3?'#2ecc71':score===4?'var(--olive)':'';
+}
+function checkPwMatch(){
+  const pw1=document.getElementById('s-pw-new').value;
+  const pw2=document.getElementById('s-pw-confirm').value;
+  const hint=document.getElementById('pw-match-hint');
+  if(!pw2){ hint.textContent=''; return; }
+  if(pw1===pw2){ hint.textContent='✓ كلمتا المرور متطابقتان'; hint.className='field-hint ok'; }
+  else{ hint.textContent='✗ كلمتا المرور غير متطابقتين'; hint.className='field-hint err'; }
+}
+function clearPwFields(){
+  ['s-pw-current','s-pw-new','s-pw-confirm'].forEach(id=>document.getElementById(id).value='');
+  checkPwStrength(); checkPwMatch();
+}
+async function changePassword(){
+  const cur  = document.getElementById('s-pw-current').value;
+  const newPw = document.getElementById('s-pw-new').value;
+  const conf = document.getElementById('s-pw-confirm').value;
+  if(!cur||!newPw||!conf){ showToast('أكمل جميع الحقول','err'); return; }
+  if(newPw!==conf){ showToast('كلمتا المرور غير متطابقتين','err'); return; }
+  if(newPw.length<8){ showToast('كلمة المرور يجب أن تكون 8 أحرف على الأقل','err'); return; }
+  const curHash = await sha256(cur);
+  if(curHash !== user.password){ showToast('كلمة المرور الحالية غير صحيحة','err'); return; }
+  const newHash = await sha256(newPw);
+  const upd = {...user, password:newHash};
+  saveUser(upd); user=upd;
+  clearPwFields();
+  showToast('تم تغيير كلمة المرور ✅');
+}
+
+/* ── بيانات الدور ── */
+const ROLE_SECTORS=['💻 تقنية','🩺 صحة','📚 تعليم','🌿 بيئة','💼 أعمال','🌾 زراعة','⚡ طاقة','🏗️ بنية تحتية'];
+const COLLAB_OPTS=[
+  {v:'seeking_investor',l:'🔍 أبحث عن مستثمر'},
+  {v:'seeking_expert',l:'🔍 أبحث عن خبير'},
+  {v:'seeking_partner',l:'🔍 أبحث عن شريك'},
+  {v:'open',l:'🟡 منفتح للتعاون'},
+  {v:'closed',l:'🔴 غير متاح الآن'},
+];
+function loadRoleData(){
+  const t=user.subtype==='institution'?'institution':(user.type||'idea');
+  const meta=user.role_meta||{};
+  let html='';
+  if(t==='investor'){
+    document.getElementById('role-section-title').textContent='بيانات المستثمر';
+    html=`
+      <div class="field"><label>نبذتك الاستثمارية (Investment Thesis)</label>
+        <textarea id="r-thesis" rows="3" placeholder="صف استراتيجيتك وما تبحث عنه...">${esc(meta.inv_thesis||'')}</textarea></div>
+      <div class="field-row">
+        <div class="field"><label>الحد الأدنى للاستثمار ($)</label>
+          <input type="number" id="r-inv-min" value="${meta.inv_min||''}" placeholder="5000"></div>
+        <div class="field"><label>الحد الأقصى ($)</label>
+          <input type="number" id="r-inv-max" value="${meta.inv_max||''}" placeholder="500000"></div>
+      </div>
+      <div class="field"><label>القطاعات المفضلة</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px" id="r-sectors">
+          ${ROLE_SECTORS.map(s=>`<button type="button" class="av-btn${(meta.inv_sectors||[]).includes(s)?' on':''}" style="${(meta.inv_sectors||[]).includes(s)?'background:rgba(28,91,56,.1);border-color:var(--olive);color:var(--olive)':''}" onclick="toggleSectorBtn(this,'${s}')">${s}</button>`).join('')}
+        </div>
+      </div>`;
+  } else if(t==='skill'){
+    document.getElementById('role-section-title').textContent='بيانات الخبير';
+    html=`
+      <div class="field-row">
+        <div class="field"><label>السعر بالساعة ($)</label>
+          <input type="number" id="r-exp-rate" value="${meta.exp_rate||''}" placeholder="50"></div>
+        <div class="field"><label>سنوات الخبرة</label>
+          <input type="number" id="r-exp-years" value="${meta.exp_years||''}" placeholder="5"></div>
+      </div>
+      <div class="field"><label>القطاعات التي تعمل فيها</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px" id="r-sectors">
+          ${ROLE_SECTORS.map(s=>`<button type="button" class="av-btn${(meta.exp_sectors||[]).includes(s)?' on':''}" style="${(meta.exp_sectors||[]).includes(s)?'background:rgba(28,91,56,.1);border-color:var(--olive);color:var(--olive)':''}" onclick="toggleSectorBtn(this,'${s}')">${s}</button>`).join('')}
+        </div>
+      </div>`;
+  } else if(t==='company'||t==='institution'){
+    document.getElementById('role-section-title').textContent='بيانات '+(t==='institution'?'المؤسسة':'الشركة');
+    html=`
+      <div class="field-row">
+        <div class="field"><label>سنة التأسيس</label>
+          <input type="number" id="r-co-year" value="${meta.co_year||''}" placeholder="2020"></div>
+        <div class="field"><label>حجم الشركة</label>
+          <select id="r-co-size">
+            ${['1-10','11-50','51-200','201-500','500+'].map(s=>`<option${meta.co_size===s?' selected':''}>${s}</option>`).join('')}
+          </select></div>
+      </div>
+      <div class="field"><label>ما الذي تبحث عنه؟</label>
+        <textarea id="r-co-looking" rows="2" placeholder="صف نوع الشراكات أو المواهب التي تبحث عنها...">${esc(meta.co_looking||'')}</textarea></div>
+      <div class="field"><label>القطاعات التي تعمل فيها</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px" id="r-sectors">
+          ${ROLE_SECTORS.map(s=>`<button type="button" class="av-btn${(meta.co_sectors||[]).includes(s)?' on':''}" style="${(meta.co_sectors||[]).includes(s)?'background:rgba(28,91,56,.1);border-color:var(--olive);color:var(--olive)':''}" onclick="toggleSectorBtn(this,'${s}')">${s}</button>`).join('')}
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('role-section-title').textContent='بيانات صاحب الفكرة';
+    html=`
+      <div class="field"><label>مرحلة مشروعك</label>
+        <select id="r-idea-stage">
+          ${[['','اختر المرحلة'],['idea','فكرة مبدئية'],['mvp','MVP جاهز'],['seed','مرحلة Seed'],['series-a','Series A']].map(([v,l])=>`<option value="${v}"${meta.idea_stage===v?' selected':''}>${l}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>التمويل المطلوب ($)</label>
+        <input type="number" id="r-idea-funding" value="${meta.idea_funding||''}" placeholder="50000"></div>
+      <div class="field"><label>قطاع مشروعك</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px" id="r-sectors">
+          ${ROLE_SECTORS.map(s=>`<button type="button" class="av-btn${(meta.idea_sectors||[]).includes(s)?' on':''}" style="${(meta.idea_sectors||[]).includes(s)?'background:rgba(28,91,56,.1);border-color:var(--olive);color:var(--olive)':''}" onclick="toggleSectorBtn(this,'${s}')">${s}</button>`).join('')}
+        </div>
+      </div>`;
+  }
+  /* وضع التعاون — مشترك */
+  html+=`<div class="field" style="margin-top:16px"><label>وضع التعاون</label>
+    <select id="r-collab">
+      ${COLLAB_OPTS.map(o=>`<option value="${o.v}"${user.collab_status===o.v?' selected':''}>${o.l}</option>`).join('')}
+    </select></div>`;
+  document.getElementById('role-section-body').innerHTML=html;
+}
+function toggleSectorBtn(btn,s){
+  const on=btn.classList.toggle('on');
+  btn.style.background=on?'rgba(28,91,56,.1)':'';
+  btn.style.borderColor=on?'var(--olive)':'';
+  btn.style.color=on?'var(--olive)':'';
+}
+function getSelectedSectors(){
+  return [...document.querySelectorAll('#r-sectors .av-btn.on')].map(b=>b.textContent.trim());
+}
+function saveRoleData(){
+  const t=user.subtype==='institution'?'institution':(user.type||'idea');
+  let meta={...user.role_meta||{}};
+  if(t==='investor'){
+    meta.inv_thesis=document.getElementById('r-thesis')?.value.trim()||'';
+    meta.inv_min=parseInt(document.getElementById('r-inv-min')?.value)||0;
+    meta.inv_max=parseInt(document.getElementById('r-inv-max')?.value)||0;
+    meta.inv_sectors=getSelectedSectors();
+  } else if(t==='skill'){
+    meta.exp_rate=parseInt(document.getElementById('r-exp-rate')?.value)||0;
+    meta.exp_years=parseInt(document.getElementById('r-exp-years')?.value)||0;
+    meta.exp_sectors=getSelectedSectors();
+  } else if(t==='company'||t==='institution'){
+    meta.co_year=parseInt(document.getElementById('r-co-year')?.value)||0;
+    meta.co_size=document.getElementById('r-co-size')?.value||'';
+    meta.co_looking=document.getElementById('r-co-looking')?.value.trim()||'';
+    meta.co_sectors=getSelectedSectors();
+  } else {
+    meta.idea_stage=document.getElementById('r-idea-stage')?.value||'';
+    meta.idea_funding=parseInt(document.getElementById('r-idea-funding')?.value)||0;
+    meta.idea_sectors=getSelectedSectors();
+  }
+  const collab=document.getElementById('r-collab')?.value||'';
+  const upd={...user,role_meta:meta,collab_status:collab};
+  saveUser(upd);user=upd;
+  showToast('تم حفظ بيانات دورك ✅');
+}
+
+/* ── الخصوصية ── */
+function loadPrivacy(){
+  const p = user.privacy||{};
+  document.getElementById('prv-phone').checked  = p.show_phone!==false;
+  document.getElementById('prv-email').checked  = p.show_email!==false;
+  document.getElementById('prv-public').checked = p.public_profile!==false;
+  document.getElementById('prv-collab').checked = p.show_collab!==false;
+  document.getElementById('prv-msg').checked    = p.allow_msg!==false;
+  document.getElementById('prv-trust').checked  = p.show_trust!==false;
+}
+function savePrivacy(){
+  const upd = {...user, privacy:{
+    show_phone:   document.getElementById('prv-phone').checked,
+    show_email:   document.getElementById('prv-email').checked,
+    public_profile:document.getElementById('prv-public').checked,
+    show_collab:  document.getElementById('prv-collab').checked,
+    allow_msg:    document.getElementById('prv-msg').checked,
+    show_trust:   document.getElementById('prv-trust').checked,
+  }};
+  saveUser(upd); user=upd;
+  showToast('تم حفظ إعدادات الخصوصية ✅');
+}
+
+/* ── الإشعارات ── */
+function loadNotifSettings(){
+  const n = user.notif_settings||{};
+  document.getElementById('notif-like').checked    = n.like!==false;
+  document.getElementById('notif-comment').checked = n.comment!==false;
+  document.getElementById('notif-follow').checked  = n.follow!==false;
+  document.getElementById('notif-interest').checked= n.interest!==false;
+  document.getElementById('notif-nda').checked     = n.nda!==false;
+  document.getElementById('notif-msg').checked     = n.msg!==false;
+}
+function saveNotifSettings(){
+  const upd = {...user, notif_settings:{
+    like:    document.getElementById('notif-like').checked,
+    comment: document.getElementById('notif-comment').checked,
+    follow:  document.getElementById('notif-follow').checked,
+    interest:document.getElementById('notif-interest').checked,
+    nda:     document.getElementById('notif-nda').checked,
+    msg:     document.getElementById('notif-msg').checked,
+  }};
+  saveUser(upd); user=upd;
+  showToast('تم حفظ إعدادات الإشعارات ✅');
+}
+
+/* ── المظهر ── */
+function loadAppSettings(){
+  const a = user.app_settings||{};
+  document.getElementById('s-lang').value             = localStorage.getItem('azza_lang')||'ar';
+  document.getElementById('app-new-badge').checked    = a.new_badge!==false;
+  document.getElementById('app-smart-filter').checked = a.smart_filter!==false;
+}
+function changeLang(){
+  const lang = document.getElementById('s-lang').value;
+  localStorage.setItem('azza_lang', lang);
+  showToast('تم تغيير اللغة ✅ — ستطبّق عند فتح الفيد');
+}
+function saveAppSettings(){
+  const upd = {...user, app_settings:{
+    new_badge:    document.getElementById('app-new-badge').checked,
+    smart_filter: document.getElementById('app-smart-filter').checked,
+  }};
+  saveUser(upd); user=upd;
+  showToast('تم حفظ الإعدادات ✅');
+}
+
+/* ── الجلسات ── */
+function buildSessions(){
+  const el = document.getElementById('sessions-list');
+  el.innerHTML = `
+    <div class="session-item">
+      <div class="session-icon"><svg style="width:18px;height:18px;stroke:var(--olive);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div class="session-info">
+        <div class="session-device">متصفح الويب — ${navigator.userAgent.includes('Chrome')?'Chrome':navigator.userAgent.includes('Firefox')?'Firefox':'Safari'}</div>
+        <div class="session-meta">هذا الجهاز · نشط الآن</div>
+      </div>
+      <span class="session-badge sb-current">الجلسة الحالية</span>
+    </div>`;
+}
+async function endAllSessions(){
+  if(!confirm('تسجيل الخروج من جميع الأجهزة؟')) return;
+  /* إنهاء الجلسة الحقيقية بـSupabase Auth أولاً — بدون هذا، تبقى الجلسة فعّالة بصمت
+     رغم مسح بيانات localStorage المحلية، وهذا كان سبب عدم تسجيل الخروج فعلياً */
+  try{ await azzaDB.auth.signOut(); }catch(e){ console.error('تعذر إنهاء جلسة Supabase:',e.message); }
+  localStorage.removeItem('azza_token');
+  localStorage.removeItem('azza_user');
+  location.href='login.html';
+}
+
+/* ── منطقة الخطر ── */
+async function deleteAllPosts(){
+  if(!confirm('هل أنت متأكد؟ سيتم حذف جميع منشوراتك نهائياً.')) return;
+  try{
+    /* الحذف الفعلي من قاعدة البيانات المركزية أولاً */
+    const {error}=await azzaDB.from('posts').delete().eq('author_id',user.id);
+    if(error)throw error;
+    /* تحديث النسخة المحلية لتطابق الواقع الجديد فوراً */
+    const posts = JSON.parse(localStorage.getItem('azza_posts')||'[]');
+    const filtered = posts.filter(p=>p.author_id!==user.id);
+    localStorage.setItem('azza_posts',JSON.stringify(filtered));
+    showToast('تم حذف جميع منشوراتك','err');
+  }catch(e){ showToast('حدث خطأ: '+e.message,'err'); }
+}
+async function exportData(){
+  let realPosts=[];
+  try{
+    const {data,error}=await azzaDB.from('posts').select('*').eq('author_id',user.id);
+    if(error)throw error;
+    realPosts=data||[];
+  }catch(e){
+    console.error('تعذر جلب المنشورات الحقيقية، سيتم التصدير من النسخة المحلية كخطة احتياطية:',e.message);
+    realPosts=JSON.parse(localStorage.getItem('azza_posts')||'[]').filter(p=>p.author_id===user.id);
+  }
+  const data = {
+    user: user,
+    posts: realPosts,
+    following: JSON.parse(localStorage.getItem('azza_following_'+user.id)||'[]'),
+    saved: JSON.parse(localStorage.getItem('azza_saved_'+user.id)||'[]'),
+    exportedAt: new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`azza-data-${user.username||user.id}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast('تم تصدير بياناتك 📥');
+}
+async function deleteAccount(){
+  const confirmed = prompt('اكتب "حذف حسابي" للتأكيد:');
+  if(confirmed !== 'حذف حسابي'){ showToast('تم الإلغاء','info'); return; }
+  try{
+    /* حذف صف المستخدم الفعلي بقاعدة البيانات — كل منشوراته تُحذف تلقائياً معه
+       (cascade مُفعَّل بتعريف الجدول)، بدون الحاجة لحذف المنشورات بشكل منفصل */
+    const {error}=await azzaDB.from('users').delete().eq('id',user.id);
+    if(error)throw error;
+    /* تسجيل خروج حقيقي من جلسة Supabase Auth */
+    await azzaDB.auth.signOut();
+
+    const us = JSON.parse(localStorage.getItem('azza_users')||'[]');
+    localStorage.setItem('azza_users',JSON.stringify(us.filter(u=>u.id!==user.id)));
+    const posts = JSON.parse(localStorage.getItem('azza_posts')||'[]');
+    localStorage.setItem('azza_posts',JSON.stringify(posts.filter(p=>p.author_id!==user.id)));
+    localStorage.removeItem('azza_user');
+    localStorage.removeItem('azza_token');
+    localStorage.removeItem('azza_following_'+user.id);
+    localStorage.removeItem('azza_saved_'+user.id);
+    localStorage.removeItem('azza_notifs_'+user.id);
+    alert('تم حذف حسابك. سنفتقدك!');
+    location.href='index.html';
+  }catch(e){ showToast('حدث خطأ: '+e.message,'err'); }
+}
+
+function showToast(m,t='ok'){
+  const e=document.getElementById('toast');
+  e.textContent=m;
+  e.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#c69749';
+  e.style.opacity='1';
+  clearTimeout(e._t);
+  e._t=setTimeout(()=>e.style.opacity='0',2800);
+}
+
+init();
+</script>
+</body>
+</html>

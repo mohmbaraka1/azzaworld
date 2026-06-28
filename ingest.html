@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تعبئة قاعدة المعرفة — عزّة</title>
+<style>
+body{font-family:'Tajawal',sans-serif,Arial;background:#f7f1e3;color:#1c1a14;padding:24px;max-width:800px;margin:0 auto;line-height:1.8}
+h1{font-size:20px;color:#0e3622}
+input{width:100%;padding:10px 14px;border:1.5px solid #d9cbb0;border-radius:10px;font-size:14px;margin-bottom:10px;box-sizing:border-box;direction:ltr;text-align:left}
+button{background:#1c5b38;color:#fff;border:none;padding:10px 20px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer}
+button:hover{background:#0e3622}
+button:disabled{background:#999;cursor:not-allowed}
+#log{margin-top:20px;background:#fff;border:1px solid #d9cbb0;border-radius:12px;padding:16px;white-space:pre-wrap;font-size:13px;direction:ltr;text-align:left;max-height:500px;overflow-y:auto}
+.warn{color:#9b1220;font-size:13px;margin-top:10px}
+.ok{color:#1c5b38}
+.err{color:#9b1220}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:4px;color:#3d3424}
+</style>
+</head>
+<body>
+
+<h1>📚 تعبئة قاعدة معرفة الإيجنت — أداة لمرّة واحدة</h1>
+<p>هذي الصفحة تحوّل محتوى المنصة لقطع نصية، تحسب embedding حقيقي لكل قطعة عبر Gemini، وترفعها لقاعدة بيانات Supabase. شغّلها مرة واحدة فقط (أو بعد إضافة محتوى جديد).</p>
+
+<label>مفتاح Gemini API</label>
+<input type="password" id="gemini-key" placeholder="AIza...">
+
+<label>Supabase Project URL</label>
+<input type="text" id="sb-url" placeholder="https://xxxxx.supabase.co" value="https://iecniydswotsilaueogq.supabase.co">
+
+<label>Supabase anon key</label>
+<input type="password" id="sb-key" placeholder="eyJ...">
+
+<button onclick="runIngest()" id="run-btn">بدء التعبئة</button>
+<button onclick="checkDimension()" id="dim-btn" style="background:#854F0B">فحص عدد الأبعاد أولاً</button>
+
+<div class="warn">⚠️ بعد الانتهاء، أغلق هذا الملف ولا تشارك أي مفتاح بأي مكان آخر.</div>
+
+<div id="log">السجل سيظهر هنا...</div>
+
+<script>
+/* ── قطع المعرفة — مقسّمة منطقياً، كل قطعة موضوع واحد محدد ── */
+const KB_CHUNKS = [
+  { title:'صفحة الفيد الرئيسي (app.html)', content:'صفحة app.html هي الفيد الرئيسي بمنصة عزّة، تعرض منشورات الأفكار والمشاريع والوظائف. فيها زر "+" أسفل يسار الشاشة لنشر منشور جديد، وفلاتر بأعلى الصفحة لتصفية المحتوى حسب النوع.' },
+  { title:'صفحة الاستكشاف (explore.html)', content:'صفحة explore.html هي صفحة الاستكشاف، فيها 4 تبويبات: الأشخاص، أفكار ومشاريع، وظائف، والخريطة التفاعلية. الخريطة تعرض المسجّلين الحقيقيين على خريطة الوطن العربي، ويمكن الضغط على أي دولة لرؤية مدنها والمسجّلين بها.' },
+  { title:'الملف الشخصي (profile.html)', content:'صفحة profile.html هي الملف الشخصي للمستخدم، تعرض منشوراته الخاصة، درجة المصداقية (Trust Score)، ونشاطه على المنصة.' },
+  { title:'لوحة المستثمر (investor.html)', content:'صفحة investor.html هي لوحة خاصة بالمستثمرين فقط، تعرض الفرص الاستثمارية التي أبدوا اهتماماً بها، والمشاريع التي وقّعوا عليها اتفاقية سرية (NDA).' },
+  { title:'الرسائل والإشعارات', content:'صفحة messages.html للرسائل الخاصة بين المستخدمين على المنصة. صفحة notifications.html تعرض كل الإشعارات (تفاعل، رسائل، توثيق).' },
+  { title:'صفحة الإعدادات (settings.html)', content:'صفحة settings.html فيها كل إعدادات الحساب: تعديل المعلومات الشخصية، التوثيق، إدارة مفتاح Gemini API الخاص بالمساعد الذكي، الخصوصية، الإشعارات، المظهر، الجلسات، وتسجيل الخروج.' },
+  { title:'الملف الشخصي العلني وعرض المنشور', content:'صفحة user.html تعرض الملف الشخصي العلني لأي مستخدم آخر غيرك. صفحة post.html تعرض منشوراً واحداً بكل تفاصيله.' },
+  { title:'صفحة التوثيق وقصص النجاح', content:'صفحة verification.html تشرح بالتفصيل نظام التوثيق ودرجة المصداقية وكيف تُحسب. صفحة success-stories.html تعرض قصص نجاح حقيقية لمستخدمين استفادوا من المنصة.' },
+  { title:'تسجيل الدخول وإنشاء حساب', content:'صفحة login.html لتسجيل الدخول أو إنشاء حساب جديد، وتتطلب اختيار الدولة والمدينة عند التسجيل.' },
+  { title:'أنواع المستخدمين على المنصة', content:'يوجد على منصة عزّة خمسة أنواع حسابات: صاحب فكرة (idea)، خبير (skill)، مستثمر (investor)، شركة (company)، ومؤسسة (institution). كل نوع له واجهة وميزات مخصّصة.' },
+  { title:'نظام التوثيق ودرجة المصداقية (Trust Score)', content:'كل مستخدم على عزّة له درجة مصداقية من 100 نقطة، تُحسب من 3 محاور: اكتمال الملف الشخصي (حتى 30 نقطة: صورة، نبذة، وسيلة تواصل، حساب تواصل اجتماعي، مؤسسة)، عدد اتفاقيات NDA الموقّعة على منشوراته (حتى 35 نقطة، كل توقيع = 3 نقاط)، والنشاط الحقيقي على المنصة (حتى 35 نقطة: عدد المنشورات والمشاهدات). عند الوصول لدرجة 70 أو أكثر، يحصل المستخدم تلقائياً على علامة توثيق (✓) جنب اسمه، وتختلف تسمية الشارة حسب الدور: "صاحب فكرة موثّق"، "خبير موثّق"، "مستثمر موثّق"، وغيرها.' },
+  { title:'أنواع المنشورات على المنصة', content:'يوجد 3 أنواع منشورات على عزّة: فكرة (idea، عرض أولي لمشروع أو فكرة)، مشروع (project، له هدف تمويل محدد)، ووظيفة (job، لها موقع جغرافي وراتب ونوع توظيف).' },
+  { title:'اتفاقية السرية (NDA)', content:'يمكن لصاحب الفكرة على منصة عزّة طلب توقيع اتفاقية سرية (NDA) من المهتمين قبل أن يروا التفاصيل الكاملة لفكرته أو مشروعه، وذلك لحماية خصوصية الفكرة من السرقة أو النشر قبل الجهوزية.' },
+  { title:'كيفية تخزين البيانات حالياً', content:'منصة عزّة حالياً تخزّن كل بيانات المستخدمين بمتصفح كل مستخدم على حدة (localStorage)، وليس على سيرفر مركزي موحّد بعد. هذا يعني أن بيانات الحساب لا تتزامن تلقائياً بين الأجهزة المختلفة حالياً، وهذا مخطط له بمرحلة لاحقة من تطوير المنصة.' },
+];
+
+function log(msg, cls){
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  line.textContent = msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function getEmbedding(text, geminiKey){
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'models/gemini-embedding-001',
+      content: { parts: [{ text }] }
+    })
+  });
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error(`Embedding API error ${res.status}: ${err.slice(0,200)}`);
+  }
+  const data = await res.json();
+  return data.embedding.values;
+}
+
+async function insertChunk(chunk, embedding, sbUrl, sbKey){
+  const res = await fetch(`${sbUrl}/rest/v1/kb_chunks`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': sbKey,
+      'Authorization': `Bearer ${sbKey}`,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      source_type: 'page_help',
+      source_title: chunk.title,
+      content: chunk.content,
+      embedding: embedding
+    })
+  });
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error(`Supabase insert error ${res.status}: ${err.slice(0,300)}`);
+  }
+}
+
+async function checkDimension(){
+  const geminiKey = document.getElementById('gemini-key').value.trim();
+  if(!geminiKey){ log('❌ أدخل مفتاح Gemini أولاً.', 'err'); return; }
+  document.getElementById('log').innerHTML = '';
+  log('⏳ جاري حساب embedding تجريبي لمعرفة عدد الأبعاد الفعلي...');
+  try{
+    const embedding = await getEmbedding('نص تجريبي للفحص', geminiKey);
+    log(`✅ عدد الأبعاد الفعلي: ${embedding.length}`, 'ok');
+    if(embedding.length !== 768){
+      log(`⚠️ تنبيه: هذا العدد (${embedding.length}) لا يطابق تعريف الجدول الحالي بـSupabase (vector(768)). لازم نعدّل جدول kb_chunks بـSupabase ليطابق ${embedding.length} بُعد قبل أي تعبئة، وإلا سيفشل الإدراج.`, 'warn');
+    } else {
+      log('✅ العدد يطابق تعريف الجدول الحالي (768) — جاهز للتعبئة مباشرة.', 'ok');
+    }
+  }catch(e){
+    log(`❌ فشل الفحص: ${e.message}`, 'err');
+  }
+}
+
+async function runIngest(){
+  const geminiKey = document.getElementById('gemini-key').value.trim();
+  const sbUrl = document.getElementById('sb-url').value.trim().replace(/\/$/, '');
+  const sbKey = document.getElementById('sb-key').value.trim();
+  const btn = document.getElementById('run-btn');
+
+  if(!geminiKey || !sbUrl || !sbKey){
+    log('❌ أدخل كل الحقول الثلاثة أولاً.', 'err');
+    return;
+  }
+
+  btn.disabled = true;
+  document.getElementById('log').innerHTML = '';
+  log(`بدء تعبئة ${KB_CHUNKS.length} قطعة معرفة...`);
+
+  let success = 0, failed = 0;
+  for(const chunk of KB_CHUNKS){
+    try{
+      log(`⏳ ${chunk.title} — جاري حساب embedding...`);
+      const embedding = await getEmbedding(chunk.content, geminiKey);
+      await insertChunk(chunk, embedding, sbUrl, sbKey);
+      log(`✅ ${chunk.title} — تم بنجاح`, 'ok');
+      success++;
+    }catch(e){
+      log(`❌ ${chunk.title} — فشل: ${e.message}`, 'err');
+      failed++;
+    }
+    await new Promise(r => setTimeout(r, 300)); // فاصل صغير لتفادي حدود معدّل الطلبات
+  }
+
+  log(`\n🏁 انتهى. نجح: ${success} | فشل: ${failed}`, success===KB_CHUNKS.length ? 'ok' : 'warn');
+  btn.disabled = false;
+}
+</script>
+
+</body>
+</html>

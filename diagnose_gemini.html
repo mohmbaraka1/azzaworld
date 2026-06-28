@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تشخيص Gemini API — عزّة</title>
+<style>
+body{font-family:'Tajawal',sans-serif,Arial;background:#f7f1e3;color:#1c1a14;padding:24px;max-width:700px;margin:0 auto;line-height:1.8}
+h1{font-size:20px;color:#0e3622}
+input{width:100%;padding:10px 14px;border:1.5px solid #d9cbb0;border-radius:10px;font-size:14px;margin-bottom:10px;box-sizing:border-box;direction:ltr;text-align:left}
+button{background:#1c5b38;color:#fff;border:none;padding:10px 20px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer}
+button:hover{background:#0e3622}
+#result{margin-top:20px;background:#fff;border:1px solid #d9cbb0;border-radius:12px;padding:16px;white-space:pre-wrap;font-size:13px;direction:ltr;text-align:left;max-height:500px;overflow-y:auto}
+.model-name{color:#1c5b38;font-weight:700}
+.warn{color:#9b1220;font-size:13px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<h1>🔍 تشخيص مفتاح Gemini API</h1>
+<p>هذي صفحة مستقلة، تستدعي Google مباشرة من متصفحك فقط — لا علاقة لها بعزّة، ولا يُرسل مفتاحك لأي مكان آخر غير Google.</p>
+
+<input type="password" id="key-input" placeholder="الصق مفتاحك هنا (AIza...)">
+<button onclick="checkModels()">فحص النماذج المتاحة</button>
+
+<div class="warn">⚠️ بعد الانتهاء من الفحص، أغلق هذا الملف ولا تشارك المفتاح بأي مكان آخر.</div>
+
+<div id="result">النتيجة ستظهر هنا...</div>
+
+<script>
+async function checkModels(){
+  const key = document.getElementById('key-input').value.trim();
+  const resultEl = document.getElementById('result');
+  if(!key){ resultEl.textContent = 'أدخل المفتاح أولاً.'; return; }
+
+  resultEl.textContent = '⏳ جاري الفحص...';
+  try{
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    const data = await res.json();
+
+    if(!res.ok){
+      resultEl.textContent = '❌ خطأ من Google:\n' + JSON.stringify(data, null, 2);
+      return;
+    }
+
+    const models = (data.models || []).map(m => ({
+      name: m.name.replace('models/',''),
+      methods: m.supportedGenerationMethods || []
+    }));
+
+    const chatModels = models.filter(m => m.methods.includes('generateContent')).map(m => m.name);
+    const embedModels = models.filter(m => m.methods.includes('embedContent')).map(m => m.name);
+
+    let html = '✅ نماذج المحادثة (generateContent):\n';
+    html += chatModels.length ? chatModels.map(m => `<span class="model-name">${m}</span>`).join('\n') : '(لا يوجد)';
+    html += '\n\n✅ نماذج الـ Embeddings (embedContent):\n';
+    html += embedModels.length ? embedModels.map(m => `<span class="model-name">${m}</span>`).join('\n') : '(لا يوجد)';
+
+    resultEl.innerHTML = html;
+
+  }catch(e){
+    resultEl.textContent = '❌ خطأ بالاتصال: ' + e.message;
+  }
+}
+</script>
+
+</body>
+</html>

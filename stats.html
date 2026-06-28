@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — إحصائياتي</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* هيدر */
+.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;height:62px;padding:0 18px;max-width:960px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
+.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;margin-right:auto}
+.back-btn:hover{border-color:var(--olive);color:var(--olive)}
+
+/* صفحة */
+.page{max-width:960px;margin:0 auto;padding:24px 18px 60px;display:flex;flex-direction:column;gap:20px}
+
+/* عنوان */
+.page-hero{background:linear-gradient(135deg,var(--olive-deep),var(--olive));border-radius:var(--rxl);padding:28px 24px;color:#fff;display:flex;align-items:center;gap:18px}
+.hero-av{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-soft));display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:900;font-size:1.6rem;overflow:hidden;flex-shrink:0;border:3px solid rgba(255,255,255,.3)}
+.hero-name{font-family:'Aref Ruqaa',serif;font-size:1.5rem;margin-bottom:3px}
+.hero-sub{font-size:13px;color:rgba(247,241,227,.7)}
+
+/* بطاقات الأرقام الكبيرة */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.metric-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);padding:18px 16px;text-align:center;position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;top:0;right:0;left:0;height:3px}
+.metric-card.c-olive::before{background:var(--olive)}
+.metric-card.c-gold::before{background:var(--gold)}
+.metric-card.c-blue::before{background:#185FA5}
+.metric-card.c-red::before{background:var(--red)}
+.metric-card.c-teal::before{background:#0F6E56}
+.metric-val{font-family:'Aref Ruqaa',serif;font-size:2.2rem;font-weight:700;color:var(--ink);line-height:1;margin-bottom:5px}
+.metric-label{font-size:12px;color:var(--muted);font-weight:600}
+.metric-trend{font-size:11px;margin-top:4px}
+.metric-trend.up{color:#0F6E56}
+.metric-trend.down{color:var(--red)}
+
+/* بطاقة chart */
+.chart-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden}
+.chart-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.chart-title{font-size:14.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px}
+.chart-sub{font-size:12px;color:var(--muted)}
+.chart-body{padding:20px}
+
+/* grid للشارتس */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.charts-grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* قسم المهتمين والـ NDA */
+.people-section{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.people-section{grid-template-columns:1fr}}
+.person-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:.5px solid rgba(28,26,20,.06);cursor:pointer;transition:.13s;border-radius:8px;padding:8px}
+.person-row:hover{background:var(--cream)}
+.person-row:last-child{border-bottom:none}
+.p-av-sm{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:700;font-size:.85rem;overflow:hidden;flex-shrink:0}
+.p-info{flex:1;min-width:0}
+.p-name-sm{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-time-sm{font-size:11px;color:var(--muted)}
+.empty-list{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px}
+
+/* تحسين legend */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+</style>
+<script src="supabase.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="app.html" class="brand">
+      <div class="brand-mark">ع</div>
+      <span class="brand-text">عزّة</span>
+    </a>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="back-btn" onclick="history.back()">
+      <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      رجوع
+    </button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- hero -->
+  <div class="page-hero">
+    <div class="hero-av" id="hero-av">م</div>
+    <div>
+      <div class="hero-name" id="hero-name">إحصائياتي</div>
+      <div class="hero-sub" id="hero-sub">نظرة شاملة على أداؤك على منصة عزّة</div>
+    </div>
+  </div>
+
+  <!-- أرقام كبيرة -->
+  <div class="metrics-grid">
+    <div class="metric-card c-olive">
+      <div class="metric-val" id="m-posts">0</div>
+      <div class="metric-label">إجمالي المنشورات</div>
+    </div>
+    <div class="metric-card c-olive">
+      <div class="metric-val" id="m-votes">0</div>
+      <div class="metric-label">▲ إجمالي التصويتات</div>
+    </div>
+    <div class="metric-card c-gold">
+      <div class="metric-val" id="m-interest">0</div>
+      <div class="metric-label">🤝 إجمالي الاهتمامات</div>
+    </div>
+    <div class="metric-card c-blue">
+      <div class="metric-val" id="m-views">0</div>
+      <div class="metric-label">👁 إجمالي المشاهدات</div>
+    </div>
+    <div class="metric-card c-teal">
+      <div class="metric-val" id="m-nda">0</div>
+      <div class="metric-label">🔒 توقيعات NDA</div>
+    </div>
+    <div class="metric-card c-red">
+      <div class="metric-val" id="m-comments">0</div>
+      <div class="metric-label">💬 إجمالي التعليقات</div>
+    </div>
+  </div>
+
+  <!-- الشارتس الرئيسية -->
+  <div class="charts-grid">
+
+    <!-- نشاط النشر عبر الوقت -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">📅 نشاط النشر</div>
+          <div class="chart-sub">آخر 8 أسابيع</div>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div style="position:relative;height:200px">
+          <canvas id="chart-activity" role="img" aria-label="نشاط النشر عبر الأسابيع">بيانات نشاط النشر</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- توزيع أنواع المنشورات -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">📊 أنواع المنشورات</div>
+          <div class="chart-sub">توزيع المحتوى</div>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div class="legend" id="types-legend"></div>
+        <div style="position:relative;height:170px;display:flex;justify-content:center">
+          <canvas id="chart-types" role="img" aria-label="توزيع أنواع المنشورات">بيانات أنواع المنشورات</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- التصويتات لكل منشور -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">▲ التصويتات لكل منشور</div>
+          <div class="chart-sub">أعلى 6 منشورات</div>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div style="position:relative;height:200px">
+          <canvas id="chart-votes" role="img" aria-label="التصويتات لكل منشور">بيانات التصويتات</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- الاهتمامات لكل مشروع -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">🤝 الاهتمامات بأفكارك</div>
+          <div class="chart-sub">أعلى 5 أفكار ومشاريع</div>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div style="position:relative;height:200px">
+          <canvas id="chart-interest" role="img" aria-label="الاهتمامات بالأفكار والمشاريع">بيانات الاهتمامات</canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- المهتمون وموقعو NDA -->
+  <div class="people-section">
+
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">🤝 آخر المهتمين بأفكارك</div>
+      </div>
+      <div style="padding:8px 12px" id="interest-list">
+        <div class="empty-list">لا اهتمامات بعد</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">🔒 آخر موقعي NDA</div>
+      </div>
+      <div style="padding:8px 12px" id="nda-list">
+        <div class="empty-list">لا توقيعات بعد</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- المتابعون والمتابَعون -->
+  <div class="people-section">
+
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">👥 آخر المتابعين</div>
+      </div>
+      <div style="padding:8px 12px" id="followers-list">
+        <div class="empty-list">لا متابعين بعد</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">📝 أعلى منشوراتك مشاهدةً</div>
+      </div>
+      <div style="padding:8px 12px" id="top-posts-list">
+        <div class="empty-list">لا منشورات بعد</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* ── الوضع الليلي ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
+
+/* ══ AZZA — stats.html ══ */
+const getMe   = ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
+/* === Supabase - تهيئة العميل === */
+const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
+let _postsMem=null, _usersMem=null;
+
+function _mapSupabasePost(row){
+  return {
+    id:row.id,author_id:row.author_id,author_name:row.author_name||'',
+    author_username:row.author_username||'',author_type:row.author_type||'idea',
+    author_photo:row.author_photo||null,type:row.type,text:row.text||'',
+    title:row.title||'',category:row.category||null,
+    image:row.image||null,video:row.video||null,pitch:row.pitch||'',
+    nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
+    job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
+    votes:row.votes||[],r_insightful:row.r_insightful||[],r_collab:row.r_collab||[],
+    comments:row.comments||[],views:row.views||0,created_at:row.created_at,
+  };
+}
+
+async function loadInitialDataFromSupabase(){
+  try{
+    const {data,error}=await azzaDB.from('posts').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    _postsMem=(data||[]).map(_mapSupabasePost);
+  }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
+  try{
+    const {data,error}=await azzaDB.from('users').select('*');
+    if(error)throw error;
+    _usersMem=data||[];
+  }catch(e){ console.error('تعذر جلب المستخدمين من Supabase:',e.message); _usersMem=null; }
+}
+
+const getUsers= ()=>{ if(_usersMem!==null)return _usersMem; try{return JSON.parse(localStorage.getItem('azza_users')||'[]');}catch{return[];} };
+const getPosts= ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} };
+const getSigs = ()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}};
+const getInts = ()=>{try{return JSON.parse(localStorage.getItem('azza_interests')||'{}');}catch{return{};}};
+const ini=n=>(n||'م').trim()[0].toUpperCase();
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const timeAgo=iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+'د';const h=Math.floor(m/60);if(h<24)return h+'س';return Math.floor(h/24)+' يوم';};
+
+const user=getMe();
+if(!user){location.href='login.html';}
+
+/* ── بناء ── */
+function build(){
+  /* hero */
+  const av=document.getElementById('hero-av');
+  if(user.photo)av.innerHTML=`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  else av.textContent=ini(user.name);
+  document.getElementById('hero-name').textContent=user.name||'—';
+  document.getElementById('hero-sub').textContent=`نظرة على أداؤك — ${new Date().toLocaleDateString('ar',{month:'long',year:'numeric'})}`;
+
+  const myPosts=getPosts().filter(p=>p.author_id===user.id);
+  const ints=getInts();
+  const sigs=getSigs();
+  const allUsers=getUsers();
+
+  /* ── أرقام ── */
+  const totalVotes=myPosts.reduce((s,p)=>s+(p.votes?.length||0),0);
+  const totalInterest=myPosts.reduce((s,p)=>s+(ints[p.id]?.length||0),0);
+  const totalViews=myPosts.reduce((s,p)=>s+(p.views||0),0);
+  const totalNda=myPosts.filter(p=>p.nda).reduce((s,p)=>s+(sigs[p.id]?.length||0),0);
+  const totalComments=myPosts.reduce((s,p)=>s+(p.comments?.length||0),0);
+
+  document.getElementById('m-posts').textContent=myPosts.length;
+  document.getElementById('m-votes').textContent=totalVotes;
+  document.getElementById('m-interest').textContent=totalInterest;
+  document.getElementById('m-views').textContent=totalViews.toLocaleString();
+  document.getElementById('m-nda').textContent=totalNda;
+  document.getElementById('m-comments').textContent=totalComments;
+
+  /* ── chart: نشاط الأسابيع ── */
+  const weeks=[];const labels=[];
+  for(let w=7;w>=0;w--){
+    const start=new Date();start.setDate(start.getDate()-w*7-6);
+    const end=new Date();end.setDate(end.getDate()-w*7);
+    const count=myPosts.filter(p=>{const d=new Date(p.created_at);return d>=start&&d<=end;}).length;
+    weeks.push(count);
+    labels.push(w===0?'هذا الأسبوع':`أسبوع -${w}`);
+  }
+  new Chart(document.getElementById('chart-activity'),{
+    type:'line',
+    data:{labels,datasets:[{
+      label:'منشورات',data:weeks,
+      borderColor:'#1c5b38',backgroundColor:'rgba(28,91,56,.08)',
+      fill:true,tension:.4,pointBackgroundColor:'#1c5b38',pointRadius:4,pointHoverRadius:6,
+      borderDash:[]
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{stepSize:1,color:'#6b6555',font:{family:'Tajawal'}},grid:{color:'rgba(28,26,20,.06)'}},
+        x:{ticks:{color:'#6b6555',font:{family:'Tajawal'},maxRotation:30},grid:{display:false}}}}
+  });
+
+  /* ── chart: أنواع المنشورات ── */
+  const typeData=[
+    myPosts.filter(p=>p.type==='idea').length,
+    myPosts.filter(p=>p.type==='project').length,
+    myPosts.filter(p=>p.type==='job').length,
+    myPosts.filter(p=>!p.type||p.type==='post').length,
+  ];
+  const typeLabels=['أفكار','مشاريع','وظائف','منشورات'];
+  const typeColors=['#1c5b38','#c69749','#185FA5','#854F0B'];
+  document.getElementById('types-legend').innerHTML=typeLabels.map((l,i)=>
+    `<span class="leg-item"><span class="leg-dot" style="background:${typeColors[i]}"></span>${l}: ${typeData[i]}</span>`
+  ).join('');
+  new Chart(document.getElementById('chart-types'),{
+    type:'doughnut',
+    data:{labels:typeLabels,datasets:[{data:typeData,backgroundColor:typeColors,borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed}`}}}}
+  });
+
+  /* ── chart: تصويتات لكل منشور ── */
+  const topVoted=[...myPosts].sort((a,b)=>(b.votes?.length||0)-(a.votes?.length||0)).slice(0,6);
+  new Chart(document.getElementById('chart-votes'),{
+    type:'bar',
+    data:{
+      labels:topVoted.map(p=>(p.title||p.text||'منشور').substring(0,18)+'…'),
+      datasets:[{data:topVoted.map(p=>p.votes?.length||0),backgroundColor:'rgba(28,91,56,.75)',borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true,ticks:{stepSize:1,color:'#6b6555',font:{family:'Tajawal'}},grid:{color:'rgba(28,26,20,.06)'}},
+        y:{ticks:{color:'#6b6555',font:{family:'Tajawal',size:11}},grid:{display:false}}}}
+  });
+
+  /* ── chart: اهتمامات ── */
+  const topInt=[...myPosts.filter(p=>p.type==='idea'||p.type==='project')]
+    .sort((a,b)=>(ints[b.id]?.length||0)-(ints[a.id]?.length||0)).slice(0,5);
+  new Chart(document.getElementById('chart-interest'),{
+    type:'bar',
+    data:{
+      labels:topInt.map(p=>(p.title||'فكرة').substring(0,18)+'…'),
+      datasets:[{data:topInt.map(p=>ints[p.id]?.length||0),backgroundColor:'rgba(198,151,73,.75)',borderRadius:6,borderSkipped:false}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{x:{beginAtZero:true,ticks:{stepSize:1,color:'#6b6555',font:{family:'Tajawal'}},grid:{color:'rgba(28,26,20,.06)'}},
+        y:{ticks:{color:'#6b6555',font:{family:'Tajawal',size:11}},grid:{display:false}}}}
+  });
+
+  /* ── قوائم الأشخاص ── */
+  /* آخر المهتمين */
+  const intPeople=[];
+  myPosts.forEach(p=>{(ints[p.id]||[]).forEach(x=>{intPeople.push({...x,postTitle:p.title||p.text?.substring(0,30)||'منشور'});});});
+  intPeople.sort((a,b)=>new Date(b.at)-new Date(a.at));
+  renderPeopleList('interest-list',intPeople.slice(0,6),(x)=>x.postTitle);
+
+  /* آخر موقعي NDA */
+  const ndaPeople=[];
+  myPosts.filter(p=>p.nda).forEach(p=>{(sigs[p.id]||[]).forEach(x=>{ndaPeople.push({...x,postTitle:p.title||'فكرة'});});});
+  ndaPeople.sort((a,b)=>new Date(b.at)-new Date(a.at));
+  renderPeopleList('nda-list',ndaPeople.slice(0,6),(x)=>x.postTitle);
+
+  /* آخر المتابعين */
+  const followerIds=JSON.parse(localStorage.getItem('azza_followers_'+user.id)||'[]');
+  const followerUsers=followerIds.map(id=>allUsers.find(u=>u.id===id)).filter(Boolean).slice(0,6);
+  const el=document.getElementById('followers-list');
+  el.innerHTML=followerUsers.length?followerUsers.map(u=>`
+    <div class="person-row" onclick="location.href='user.html?id=${u.id}'">
+      <div class="p-av-sm">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(u.name)}</div>
+      <div class="p-info"><div class="p-name-sm">${esc(u.name)}</div>${u.username?`<div class="p-time-sm">@${esc(u.username)}</div>`:''}</div>
+    </div>`).join(''):'<div class="empty-list">لا متابعين بعد</div>';
+
+  /* أعلى المنشورات مشاهدة */
+  const topPosts=[...myPosts].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,6);
+  const tpIconBg={idea:'rgba(28,91,56,.1)',project:'rgba(198,151,73,.1)',job:'rgba(24,95,165,.1)'};
+  const tpIcon={idea:'💡',project:'🚀',job:'📋'};
+  const tpEl=document.getElementById('top-posts-list');
+  tpEl.innerHTML=topPosts.length?topPosts.map(p=>`
+    <div class="person-row" onclick="location.href='post.html?id=${p.id}'">
+      <div style="width:34px;height:34px;border-radius:8px;background:${tpIconBg[p.type]||'rgba(133,79,11,.1)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${tpIcon[p.type]||'💬'}</div>
+      <div class="p-info">
+        <div class="p-name-sm">${esc((p.title||p.text||'منشور').substring(0,35))}</div>
+        <div class="p-time-sm">👁 ${p.views||0} · ▲ ${p.votes?.length||0} · 💬 ${p.comments?.length||0}</div>
+      </div>
+    </div>`).join(''):'<div class="empty-list">لا منشورات بعد</div>';
+}
+
+function renderPeopleList(elId,people,subFn){
+  const allUsers=getUsers();
+  const el=document.getElementById(elId);
+  if(!people.length){el.innerHTML='<div class="empty-list">لا بيانات بعد</div>';return;}
+  el.innerHTML=people.map(x=>{
+    const u=allUsers.find(u=>u.id===x.id)||{name:x.name||'مستخدم',photo:x.photo};
+    return `<div class="person-row" onclick="location.href='user.html?id=${x.id}'">
+      <div class="p-av-sm">${u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(u.name||x.name||'م')}</div>
+      <div class="p-info">
+        <div class="p-name-sm">${esc(u.name||x.name||'مستخدم')}</div>
+        <div class="p-time-sm">${subFn?esc(subFn(x)):''} · ${timeAgo(x.at)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+build();
+loadInitialDataFromSupabase().then(build);
+</script>
+</body>
+</html>

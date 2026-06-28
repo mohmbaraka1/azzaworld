@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المساعد الذكي — عزّة</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ══════════════════════════════════════
+   AZZA — Design System (موحّد الآن بملف tokens.css)
+══════════════════════════════════════ */
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;color:var(--ink);background:var(--cream)}
+html,body{height:100%;overflow:hidden}
+
+/* ── هيدر ── */
+.header{position:fixed;top:0;right:0;left:0;z-index:200;height:var(--hh);background:rgba(247,241,227,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;flex-shrink:0;text-decoration:none}
+.brand-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-name{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-2)}
+.back-link{display:flex;align-items:center;gap:6px;margin-right:auto;padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
+.back-link:hover{border-color:var(--olive);color:var(--olive)}
+.mode-pill{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:700;flex-shrink:0;cursor:pointer;transition:.2s}
+.mode-pill.demo{background:var(--cream-2);color:var(--muted)}
+.mode-pill.real{background:rgba(198,151,73,.15);color:#9b7420}
+.mode-pill:hover{filter:brightness(.96)}
+
+/* ── تخطيط الصفحة ── */
+.wrap{padding-top:var(--hh);height:100%;display:flex;flex-direction:column;max-width:780px;margin:0 auto}
+.chat-scroll{flex:1;overflow-y:auto;padding:20px 16px 12px;display:flex;flex-direction:column;gap:14px}
+
+/* ── شاشة الترحيب الأولية ── */
+.welcome{display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px 10px;gap:10px}
+.welcome-icon{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold);margin-bottom:6px}
+.welcome-icon svg{width:30px;height:30px}
+.welcome-title{font-family:'Aref Ruqaa',serif;font-size:1.5rem;color:var(--ink)}
+.welcome-sub{font-size:13.5px;color:var(--muted);max-width:420px;line-height:1.7}
+.role-tag{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;margin-top:4px}
+
+/* ── شبكة الاقتراحات السريعة ── */
+.caps-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:6px 16px 18px;width:100%}
+@media (max-width:540px){.caps-grid{grid-template-columns:1fr}}
+.cap-card{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;cursor:pointer;transition:.15s;text-align:right;font-family:inherit}
+.cap-card:hover{border-color:var(--olive);background:rgba(28,91,56,.04);transform:translateY(-1px)}
+.cap-emoji{font-size:19px;flex-shrink:0}
+.cap-label{font-size:13px;font-weight:700;color:var(--ink);line-height:1.4}
+
+/* ── فقاعات المحادثة ── */
+.msg-row{display:flex;gap:10px;max-width:100%}
+.msg-row.user{flex-direction:row-reverse}
+.msg-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;overflow:hidden}
+.msg-av.agent{background:linear-gradient(135deg,var(--olive),var(--olive-2));color:var(--gold)}
+.msg-av.user{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--olive-2)}
+.msg-bubble{max-width:78%;padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.7;white-space:pre-wrap}
+.msg-row.agent .msg-bubble{background:var(--card);border:1px solid var(--border);border-top-right-radius:4px}
+.msg-row.user .msg-bubble{background:var(--olive);color:#fff;border-top-left-radius:4px}
+.msg-tag{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+.msg-tag.real{color:#9b7420}
+
+/* ── مؤشر الكتابة ── */
+.typing-dots{display:flex;gap:4px;padding:13px 16px}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+/* ── شريط الاقتراحات المصغّر (يظهر بعد بدء المحادثة) ── */
+.mini-caps{display:flex;gap:7px;overflow-x:auto;padding:2px 16px 4px;scrollbar-width:none}
+.mini-caps::-webkit-scrollbar{display:none}
+.mini-chip{flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer;white-space:nowrap;transition:.15s;font-family:inherit}
+.mini-chip:hover{border-color:var(--olive);color:var(--olive)}
+
+/* ── شريط الإدخال ── */
+.input-bar{border-top:1px solid var(--border);background:rgba(247,241,227,.97);padding:12px 16px;display:flex;gap:9px;align-items:flex-end}
+.input-box{flex:1;display:flex;align-items:flex-end;background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:5px 6px 5px 14px;transition:.2s}
+.input-box:focus-within{border-color:var(--olive)}
+.input-box textarea{flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--ink);resize:none;max-height:120px;padding:9px 0;line-height:1.5}
+.send-btn{width:38px;height:38px;border-radius:50%;background:var(--olive);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s}
+.send-btn:hover{background:var(--olive-2)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.clear-btn{width:38px;height:38px;border-radius:50%;background:var(--cream-2);color:var(--muted);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s}
+.clear-btn:hover{background:var(--err);color:#fff}
+
+/* ── بانر تنبيه طلب المفتاح ── */
+.demo-banner{display:flex;align-items:center;gap:9px;background:rgba(198,151,73,.1);border:1px solid rgba(198,151,73,.3);border-radius:12px;padding:10px 14px;margin:0 16px 10px;font-size:12.5px;color:#7a5a18;line-height:1.6}
+.demo-banner a{color:var(--olive);font-weight:700;text-decoration:underline;cursor:pointer}
+.demo-banner svg{flex-shrink:0;width:16px;height:16px}
+
+.ic{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a class="brand" href="app.html">
+    <div class="brand-logo">ع</div>
+    <span class="brand-name">عزّة</span>
+  </a>
+  <a class="back-link" href="app.html">
+    <svg class="ic" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    رجوع للمنصة
+  </a>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+    <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+  <span class="mode-pill" id="mode-pill" onclick="location.href='settings.html'"></span>
+</div>
+
+<div class="wrap">
+  <div class="chat-scroll" id="chat-scroll">
+    <!-- شاشة الترحيب — تُستبدل بأول رسالة -->
+    <div id="welcome-screen">
+      <div class="welcome">
+        <div class="welcome-icon">
+          <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 14h.01M15 14h.01"/></svg>
+        </div>
+        <div class="welcome-title">مساعد عزّة</div>
+        <div class="welcome-sub" id="welcome-sub">هلا فيك! كيف أقدر أساعدك اليوم؟</div>
+        <span class="role-tag" id="role-tag"></span>
+      </div>
+      <div class="caps-grid" id="caps-grid"></div>
+      <div style="text-align:center;margin-top:18px;font-size:11.5px;color:var(--muted);opacity:.75">
+        🎨 توليد الصور قادم بمرحلة لاحقة — حالياً المساعد يدعم توليد النصوص والخطط فقط
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-caps" id="mini-caps" style="display:none"></div>
+  <div class="demo-banner" id="demo-banner" style="display:none">
+    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <span>هذا المساعد يحتاج مفتاح Gemini API مجاني للعمل. احصل عليه من <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a> (مجاني، دقيقتين)، ثم أدخله من <a onclick="location.href='settings.html'">الإعدادات</a>.</span>
+  </div>
+
+  <div class="input-bar">
+    <button class="clear-btn" onclick="clearChat()" title="محادثة جديدة">
+      <svg class="ic" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </button>
+    <div class="input-box">
+      <textarea id="msg-input" placeholder="اكتب سؤالك هنا..." rows="1" onkeydown="handleKey(event)" oninput="autoGrow(this)"></textarea>
+    </div>
+    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+      <svg class="ic" viewBox="0 0 24 24" style="width:17px;height:17px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ── الوضع الليلي ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
+
+/* ══════════════════════════════════════════════════
+   AZZA — agent.html
+   ══════════════════════════════════════════════════ */
+const getUser = ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
+const ini = n=>(n||'م').trim()[0].toUpperCase();
+const esc = s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let user = getUser();
+if(!user){ location.href='login.html'; }
+
+/* ═══ نواة الإيجنت (كاملة) ═══ */
+const KEY_API  = 'azza_agent_api_key';
+const KEY_HIST = 'azza_agent_chat_'; /* + user.id */
+
+const getApiKey   = ()=>localStorage.getItem(KEY_API)||'';
+const hasRealKey  = ()=>getApiKey().trim().length>10;
+
+const ROLE_META = {
+  idea:     { label:'صاحب فكرة', emoji:'💡' },
+  skill:    { label:'خبير',       emoji:'🏅' },
+  investor: { label:'مستثمر',     emoji:'💼' },
+  company:  { label:'شركة',       emoji:'🏢' },
+};
+const roleMeta = t=>ROLE_META[t]||ROLE_META.idea;
+
+const ROLE_CAPS = {
+  idea: [
+    { id:'pitch',    icon:'📝', label:'جهّز لي Pitch مختصر',     prompt:'جهّز لي نص Pitch مختصر واحترافي لفكرتي، يشمل المشكلة والحل والفرصة السوقية.' },
+    { id:'plan',     icon:'📋', label:'اكتب خطة عمل أولية',       prompt:'اكتب لي خطة عمل (Business Plan) أولية ومنظمة لفكرتي، بأقسام واضحة.' },
+    { id:'improve',  icon:'✨', label:'حسّن وصف فكرتي',           prompt:'راجع وصف فكرتي وأعطني نسخة محسّنة أكثر جاذبية واحترافية للمستثمرين.' },
+    { id:'audience', icon:'🎯', label:'من المستثمر المناسب لي؟', prompt:'بناءً على فكرتي، صف لي نوع المستثمر أو الخبير الأنسب للتواصل معه على المنصة.' },
+  ],
+  investor: [
+    { id:'analyze',  icon:'🔍', label:'حلّل فرصة استثمارية',      prompt:'حلّل لي هذه الفرصة الاستثمارية من ناحية الجدوى والمخاطر والفرص.' },
+    { id:'compare',  icon:'⚖️', label:'قارن بين فرصتين',          prompt:'ساعدني أقارن بين فرصتين استثماريتين من حيث القوة والمخاطر.' },
+    { id:'filter',   icon:'🧭', label:'ساعدني أحدد معايير بحثي', prompt:'ساعدني أحدد معايير واضحة (قطاع، مرحلة، حجم تمويل) للبحث عن فرص تناسب thesis الاستثماري.' },
+    { id:'questions',icon:'❓', label:'أسئلة أسألها لصاحب الفكرة',prompt:'اقترح لي قائمة أسئلة ذكية أسألها لصاحب فكرة قبل اتخاذ قرار استثماري.' },
+  ],
+  skill: [
+    { id:'match',    icon:'🧩', label:'أي طلبات تناسب خبرتي؟',   prompt:'بناءً على خبرتي، ساعدني أحدد أي نوع طلبات أو مشاريع على المنصة قد تناسبني.' },
+    { id:'profile',  icon:'✨', label:'حسّن وصف ملفي كخبير',      prompt:'راجع وحسّن وصف ملفي الشخصي كخبير لجعله أكثر جاذبية لأصحاب الأفكار.' },
+    { id:'pitch',    icon:'📝', label:'اكتب عرض تقديم خدماتي',   prompt:'اكتب لي نص قصير أقدّم فيه خدماتي ومهاراتي بشكل جاذب لأصحاب المشاريع.' },
+  ],
+  company: [
+    { id:'scout',    icon:'🔭', label:'كيف أبحث عن أفكار للشراكة؟',prompt:'ساعدني أحدد استراتيجية للبحث عن أفكار أو مشاريع مناسبة للشراكة مع شركتي.' },
+    { id:'profile',  icon:'✨', label:'حسّن ملف شركتي',           prompt:'راجع وحسّن وصف شركتي على المنصة ليكون أكثر وضوحاً واحترافية.' },
+    { id:'rfp',      icon:'📋', label:'اكتب طلب تعاون رسمي',      prompt:'اكتب لي نص طلب تعاون أو شراكة رسمي يمكنني نشره على المنصة.' },
+  ],
+};
+const roleCaps = t=>ROLE_CAPS[t]||ROLE_CAPS.idea;
+const SHARED_CAPS = [
+  { id:'navigate', icon:'🧭', label:'وين ألاقي كذا بالمنصة؟', prompt:'كيف أستخدم المنصة؟ دلّني كيف أنفّذ ما أحتاجه.' },
+  { id:'cv',       icon:'📄', label:'جهّز لي سيرة ذاتية (CV)', prompt:'بدي أسوي سيرة ذاتية (CV). اسألني الأسئلة اللازمة واحداً تلو الآخر (الاسم، نبذة عني، خبراتي، مهاراتي، تعليمي)، وبعد ما أجاوبك على كلهم، جهّز لي السيرة الذاتية كاملة ومنظّمة.' },
+  { id:'launch',   icon:'🚀', label:'خطة إطلاق لمشروعي',      prompt:'بدي خطة إطلاق لمشروعي. اسألني الأسئلة اللازمة واحداً تلو الآخر (اسم المشروع، الفئة المستهدفة، الفئة/القطاع، تاريخ الإطلاق المخطط له)، وبعد ما أجاوبك على كلهم، جهّز لي خطة إطلاق كاملة ومرحلية.' },
+];
+
+/* قاعدة معرفة شاملة بكل صفحات وميزات المنصة الفعلية — مصدر واحد للحقيقة، يُحدَّث هنا فقط عند إضافة ميزة جديدة */
+const PLATFORM_KNOWLEDGE = `
+معلومات شاملة عن منصة عزّة (لاستخدامها بالإجابة عن أي سؤال يخص المنصة نفسها):
+
+الصفحات الموجودة فعلياً:
+- app.html: الفيد الرئيسي، يعرض منشورات الأفكار/المشاريع/الوظائف، فيه زر "+" أسفل يسار الشاشة للنشر، وفلاتر بالأعلى.
+- explore.html: صفحة الاستكشاف، فيها 4 تبويبات: الأشخاص، أفكار ومشاريع، وظائف، والخريطة التفاعلية (تعرض المسجّلين على خريطة الوطن العربي، يمكن الضغط على دولة فتظهر مدنها).
+- profile.html: الملف الشخصي، يعرض منشوراتي ودرجة المصداقية (Trust Score) ونشاطي.
+- investor.html: لوحة خاصة بالمستثمرين فقط، تعرض الفرص الاستثمارية المهتم بها والمشاريع الموقّع عليها NDA.
+- messages.html: الرسائل الخاصة بين المستخدمين.
+- notifications.html: الإشعارات.
+- settings.html: الإعدادات، فيها إدارة مفتاح API الخاص بهذا المساعد، والخصوصية، وتسجيل الخروج.
+- post.html: صفحة عرض منشور واحد بالتفصيل.
+- user.html: الملف الشخصي العلني لأي مستخدم آخر غيرك.
+- verification.html: صفحة تشرح نظام التوثيق ودرجة المصداقية بالتفصيل.
+- success-stories.html: قصص نجاح حقيقية لمستخدمين استفادوا من المنصة.
+- agent.html: هذه الصفحة، محادثة كاملة مع هذا المساعد.
+- login.html: تسجيل الدخول/إنشاء حساب جديد (يتطلب اختيار الدولة والمدينة).
+
+أنواع المستخدمين على المنصة: صاحب فكرة (idea)، خبير (skill)، مستثمر (investor)، شركة (company)، مؤسسة (institution).
+
+نظام التوثيق والمصداقية (Trust Score):
+- كل مستخدم له درجة مصداقية من 100، تُحسب من 3 محاور: اكتمال الملف الشخصي (حتى 30 نقطة: صورة، نبذة، وسيلة تواصل، حساب تواصل اجتماعي، مؤسسة)، عدد اتفاقيات NDA الموقّعة على منشوراته (حتى 35 نقطة، كل توقيع = 3 نقاط)، والنشاط الحقيقي (حتى 35 نقطة: عدد المنشورات والمشاهدات).
+- عند الوصول لدرجة 70 أو أكثر، يحصل المستخدم تلقائياً على علامة التوثيق (✓) جنب اسمه.
+- الشارة تختلف تسميتها حسب الدور: "صاحب فكرة موثّق"، "خبير موثّق"، "مستثمر موثّق"، إلخ.
+
+أنواع المنشورات: فكرة (idea)، مشروع (project، له هدف تمويل)، وظيفة (job، له موقع وراتب ونوع توظيف).
+
+اتفاقية السرية (NDA): يمكن لصاحب الفكرة طلب توقيع NDA قبل أن يرى المهتمون التفاصيل الكاملة لفكرته، لحماية الخصوصية.
+
+نظام البيانات: المنصة حالياً تخزّن كل البيانات بمتصفح المستخدم (localStorage) وليس على سيرفر مركزي بعد — هذا يعني البيانات لا تُزامن بين الأجهزة المختلفة بعد، وهذا مخطط له بمرحلة لاحقة.
+
+الخريطة التفاعلية بصفحة الاستكشاف: تعرض الدول العربية فقط بحدود حقيقية، يمكن الضغط على دولة لرؤية مدنها والمسجّلين الحقيقيين بها (لا بيانات وهمية)، مع فلاتر لكل نوع مستخدم.
+`;
+
+function systemPromptFor(u){
+  const meta=roleMeta(u?.type);
+  const AZA_IDENTITY=`أنت "مساعد أزا" الرسمي لمنصة AZA، منصة عربية متكاملة تجمع أصحاب الأفكار ورواد الأعمال والمستثمرين والشركات والمؤسسات والطلاب والباحثين عن عمل والخبراء والمستشارين في مكان واحد. مهمتك الأساسية هي مساعدة المستخدمين على استخدام المنصة وتحقيق أهدافهم داخلها. يجب أن تكون إجاباتك احترافية وواضحة وسريعة ومفيدة، وأن تركز دائمًا على ريادة الأعمال والاستثمار والتوظيف والتدريب والمنح والمسابقات والشراكات والمشاريع الناشئة والخدمات المتوفرة داخل المنصة.
+يجب أن تساعد المستخدمين في إنشاء المشاريع وتحسينها وتجهيزها للاستثمار، وشرح كيفية البحث عن المستثمرين والتواصل معهم، ومساعدة الشركات على نشر الوظائف والتدريبات والفرص، ومساعدة الطلاب في العثور على التدريب ومشاريع التخرج والمنح والمسابقات، ومساعدة الباحثين عن عمل في بناء ملفاتهم الشخصية وتحسين فرصهم المهنية، ومساعدة المؤسسات في نشر برامجها وفرصها ومنحها. كما يجب أن تشرح للمستخدمين كيفية استخدام الرسائل والإشعارات والإعدادات والتوثيق والملفات الشخصية والخريطة التفاعلية وجميع أقسام المنصة.
+إذا كان لديك وصول إلى بيانات المنصة، فابحث داخلها واقترح مشاريع أو مستثمرين أو شركات أو وظائف أو فرص مناسبة حسب طلب المستخدم. عند الإجابة استخدم خطوات عملية واضحة واقتراحات قابلة للتنفيذ، وقدم نصائح احترافية تساعد المستخدم على تحقيق نتائج أفضل.
+إذا سأل المستخدم سؤالًا لا يتعلق بمنصة أزا أو ريادة الأعمال أو الاستثمار أو الوظائف أو التدريب أو الشركات أو المؤسسات أو الخدمات الموجودة داخل المنصة، فقم بتوجيهه بلطف للمواضيع التي يتخصص بها مساعد أزا، واذكر أنك متخصص في خدمات المنصة وريادة الأعمال والاستثمار والفرص المهنية.
+حافظ دائمًا على أسلوب عربي احترافي وودود، وقدم إجابات قصيرة عندما يكون السؤال بسيطًا، وإجابات مفصلة عندما يطلب المستخدم شرحًا أو خطة أو تحليلًا. عند عدم توفر معلومات كافية، اطلب تفاصيل إضافية قبل الإجابة. عند عدم معرفة الإجابة أو عدم توفر البيانات، أخبر المستخدم بذلك بوضوح واقترح عليه مراجعة مركز المساعدة أو التواصل مع الدعم. هدفك النهائي هو أن تكون المساعد الذكي الأول للمستخدمين داخل منصة أزا وأن تساعدهم على العثور على الفرص المناسبة، بناء المشاريع، جذب المستثمرين، تطوير أعمالهم، وتوسيع شبكاتهم المهنية داخل العالم العربي.`;
+
+  return `${AZA_IDENTITY}
+
+── سياق المستخدم الحالي ──
+دوره على المنصة: ${meta.label} (${u?.type||'idea'}). اسمه: ${u?.name||'مستخدم'}.
+يمكنك استخدام لهجة عربية شامية خفيفة إذا كتب المستخدم بها.
+
+${PLATFORM_KNOWLEDGE}
+
+إذا سألك المستخدم عن أي شيء يخص المنصة نفسها (كيف أنشر، وين ألاقي كذا، شو نظام التوثيق، إلخ) استخدم المعلومات أعلاه للإجابة بدقة ومباشرة، ووجّهه للصفحة الصحيحة بالاسم.
+
+من ضمن قدراتك المتاحة لكل الأدوار: تجهيز سيرة ذاتية (CV) منظّمة بصيغة نص جاهز للنسخ (ملخص، خبرات، مهارات، تعليم)، وتجهيز خطة إطلاق مشروع (Launch Plan) مرحلية (قبل الإطلاق، يوم الإطلاق، أول 30 يوماً). لو طلب المستخدم أي منهما، لا تكتب القالب فوراً — اسأله أولاً الأسئلة اللازمة بالترتيب (واحد بكل مرة) لجمع التفاصيل الحقيقية (مثل: الاسم، النبذة، الخبرات، المهارات، التعليم لـCV؛ أو اسم المشروع، الفئة المستهدفة، تاريخ الإطلاق المخطط لخطة الإطلاق)، وبعد جمع كل المعلومات اكتب المخرج النهائي كاملاً ومنظّماً.
+
+لا تخترع بيانات وهمية عن مستخدمين حقيقيين أو أرقام مالية محددة لم يزوّدك المستخدم بها — اطلب التفاصيل إن احتجتها.
+أجب بشكل مباشر ومفيد، بدون مقدمات طويلة.`;
+}
+
+async function callRealAPI(messages, u){
+  const key=getApiKey();
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      systemInstruction:{parts:[{text:systemPromptFor(u)}]},
+      contents:messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
+      generationConfig:{maxOutputTokens:1024}
+    }),
+  });
+  if(!res.ok){
+    const errBody=await res.text().catch(()=> '');
+    throw new Error(`API_ERROR_${res.status}: ${errBody.slice(0,200)}`);
+  }
+  const data=await res.json();
+  const text=data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join('\n').trim();
+  return text||'لم يصلني رد واضح، حاول مرة أخرى.';
+}
+
+/* ═══ RAG — البحث بقاعدة معرفة المنصة الحقيقية (Supabase + pgvector) ═══ */
+const SUPABASE_URL='https://iecniydswotsilaueogq.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+
+async function getQueryEmbedding(text,geminiKey){
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'models/gemini-embedding-001',content:{parts:[{text}]}}),
+  });
+  if(!res.ok)throw new Error(`Embedding error ${res.status}`);
+  const data=await res.json();
+  return data.embedding.values;
+}
+
+async function searchKnowledgeBase(queryEmbedding){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_kb_chunks`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SUPABASE_ANON_KEY,
+      'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body:JSON.stringify({query_embedding:queryEmbedding,match_count:4,similarity_threshold:0.4}),
+  });
+  if(!res.ok){
+    console.error('RAG search failed:',res.status,await res.text().catch(()=>''));
+    return []; /* فشل البحث لا يوقف الإيجنت — يستمر بدون سياق إضافي */
+  }
+  return await res.json();
+}
+
+async function buildRagContext(userQuestion,geminiKey){
+  try{
+    const embedding=await getQueryEmbedding(userQuestion,geminiKey);
+    const chunks=await searchKnowledgeBase(embedding);
+    if(!chunks||chunks.length===0)return '';
+    return '\n\nمعلومات ذات صلة من قاعدة معرفة المنصة (استخدمها إن كانت مفيدة لسؤال المستخدم):\n'+
+      chunks.map(c=>`- ${c.source_title}: ${c.content}`).join('\n');
+  }catch(e){
+    console.error('RAG context build failed:',e.message);
+    return ''; /* أي فشل بـRAG لا يكسر المحادثة، فقط يفقد السياق الإضافي */
+  }
+}
+
+
+async function askAgent({capId, freeText, history}){
+  if(!hasRealKey()){
+    return {text:'⚠️ هذا المساعد يحتاج مفتاح Gemini API مجاني للعمل. احصل على مفتاحك من aistudio.google.com (دقيقتين، مجاني بالكامل)، ثم أدخله من صفحة الإعدادات.',mode:'no_key'};
+  }
+  try{
+    const key=getApiKey();
+    const userMsg=freeText||(roleCaps(user.type).concat(SHARED_CAPS).find(c=>c.id===capId)?.prompt)||freeText;
+    /* RAG: نبحث بقاعدة معرفة المنصة عن سياق ذي صلة بسؤال المستخدم فقط (لا بطلبات القدرات الجاهزة لتفادي استدعاءات زائدة) */
+    const ragContext=freeText?await buildRagContext(userMsg,key):'';
+    const msgs=[...(history||[]),{role:'user',content:userMsg+ragContext}];
+    const text=await callRealAPI(msgs,user);
+    return {text,mode:'real'};
+  }catch(e){
+    return {text:'⚠️ تعذّر الاتصال بالمساعد حالياً. تأكد من صحة مفتاح API بالإعدادات، أو حاول مرة أخرى بعد قليل.\n\n(تفصيل الخطأ: '+e.message+')',mode:'error',error:e.message};
+  }
+}
+
+/* ═══ حالة المحادثة ═══ */
+const HIST_KEY=KEY_HIST+user.id;
+let chatHistory=[]; /* {role:'user'|'assistant', content, mode?} */
+try{ chatHistory=JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch{ chatHistory=[]; }
+
+function saveHist(){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(chatHistory.slice(-30))); }catch{} }
+
+/* ═══ واجهة المستخدم ═══ */
+function renderModePill(){
+  const pill=document.getElementById('mode-pill');
+  if(hasRealKey()){
+    pill.className='mode-pill real';
+    pill.innerHTML='⚡ متصل';
+  } else {
+    pill.className='mode-pill demo';
+    pill.innerHTML='🔑 بانتظار المفتاح';
+  }
+}
+
+function renderWelcome(){
+  const meta=roleMeta(user.type);
+  document.getElementById('role-tag').innerHTML=`${meta.emoji} مساعد مخصّص لـ${meta.label}`;
+  const subMap={
+    idea:'أساعدك بصياغة وتجهيز فكرتك بشكل جذّاب للمستثمرين',
+    investor:'أساعدك بتحليل وفرز الفرص الاستثمارية المتاحة',
+    skill:'أساعدك تلاقي الطلبات التي تناسب خبرتك',
+    company:'أساعدك تلاقي فرص شراكة تخدم استراتيجية شركتك',
+  };
+  document.getElementById('welcome-sub').textContent=subMap[user.type]||subMap.idea;
+
+  const caps=roleCaps(user.type).concat(SHARED_CAPS);
+  document.getElementById('caps-grid').innerHTML=caps.map(c=>
+    `<button class="cap-card" onclick="useCap('${c.id}','${esc(c.label)}')"><span class="cap-emoji">${c.icon}</span><span class="cap-label">${esc(c.label)}</span></button>`
+  ).join('');
+}
+
+function renderMiniCaps(){
+  const caps=roleCaps(user.type).concat(SHARED_CAPS);
+  document.getElementById('mini-caps').innerHTML=caps.map(c=>
+    `<button class="mini-chip" onclick="useCap('${c.id}','${esc(c.label)}')">${c.icon} ${esc(c.label)}</button>`
+  ).join('');
+}
+
+function renderDemoBanner(){
+  document.getElementById('demo-banner').style.display = hasRealKey() ? 'none' : 'flex';
+}
+
+function msgHTML(m){
+  const isUser=m.role==='user';
+  const av=isUser?(user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(user.name)):`<svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" style="width:17px;height:17px"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 14h.01M15 14h.01"/></svg>`;
+  let tag='';
+  if(!isUser && m.mode){
+    if(m.mode==='real')tag=`<div class="msg-tag real">⚡ رد مولّد فعلياً</div>`;
+    else if(m.mode==='error')tag=`<div class="msg-tag" style="color:var(--err)">⚠️ تعذّر الاتصال</div>`;
+  }
+  return `<div class="msg-row ${isUser?'user':'agent'}">
+    <div class="msg-av ${isUser?'user':'agent'}">${av}</div>
+    <div class="msg-bubble">${esc(m.content)}${tag}</div>
+  </div>`;
+}
+
+function renderChat(){
+  const scroll=document.getElementById('chat-scroll');
+  if(chatHistory.length===0){
+    document.getElementById('welcome-screen').style.display='block';
+    document.getElementById('mini-caps').style.display='none';
+    scroll.querySelectorAll('.msg-row, .typing-dots-wrap').forEach(e=>e.remove());
+    return;
+  }
+  document.getElementById('welcome-screen').style.display='none';
+  document.getElementById('mini-caps').style.display='flex';
+  scroll.querySelectorAll('.msg-row').forEach(e=>e.remove());
+  const frag=document.createElement('div');
+  frag.innerHTML=chatHistory.map(msgHTML).join('');
+  while(frag.firstChild) scroll.appendChild(frag.firstChild);
+  scroll.scrollTop=scroll.scrollHeight;
+}
+
+function showTyping(){
+  const scroll=document.getElementById('chat-scroll');
+  const wrap=document.createElement('div');
+  wrap.className='msg-row agent typing-dots-wrap';
+  wrap.id='typing-indicator';
+  wrap.innerHTML=`<div class="msg-av agent"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" style="width:17px;height:17px"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/></svg></div><div class="msg-bubble" style="padding:0"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  scroll.appendChild(wrap);
+  scroll.scrollTop=scroll.scrollHeight;
+}
+function hideTyping(){ document.getElementById('typing-indicator')?.remove(); }
+
+/* ═══ منطق الإرسال ═══ */
+async function useCap(capId, label){
+  if(document.getElementById('send-btn').disabled) return;
+  chatHistory.push({role:'user', content:label});
+  renderChat(); saveHist();
+  await getAgentResponse({capId});
+}
+
+async function sendMessage(){
+  const input=document.getElementById('msg-input');
+  const text=input.value.trim();
+  if(!text) return;
+  chatHistory.push({role:'user', content:text});
+  input.value=''; autoGrow(input);
+  renderChat(); saveHist();
+  await getAgentResponse({freeText:text});
+}
+
+async function getAgentResponse({capId, freeText}){
+  document.getElementById('send-btn').disabled=true;
+  showTyping();
+  const apiHistory=chatHistory.filter(m=>m.role==='user'||m.role==='assistant').slice(-10).map(m=>({role:m.role,content:m.content}));
+  /* نزيل آخر رسالة مستخدم من apiHistory لأنها ستُرسل بشكل صريح ضمن ask */
+  apiHistory.pop();
+  const result=await askAgent({capId, freeText, history:apiHistory});
+  hideTyping();
+  chatHistory.push({role:'assistant', content:result.text, mode:result.mode});
+  renderChat(); saveHist();
+  document.getElementById('send-btn').disabled=false;
+  renderModePill();
+}
+
+function clearChat(){
+  if(chatHistory.length===0) return;
+  if(!confirm('بدء محادثة جديدة؟ سيُحذف السجل الحالي.')) return;
+  chatHistory=[];
+  saveHist();
+  renderChat();
+}
+
+function handleKey(e){
+  if(e.key==='Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+}
+function autoGrow(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,120)+'px';
+}
+
+/* ═══ init ═══ */
+function init(){
+  renderModePill();
+  renderWelcome();
+  renderMiniCaps();
+  renderDemoBanner();
+  renderChat();
+}
+init();
+</script>
+</body>
+</html>

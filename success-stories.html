@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة — قصص نجاح</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+body{transition:background-color .25s,color .25s}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+
+/* هيدر */
+.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;height:62px;padding:0 18px;max-width:880px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
+.theme-btn{margin-right:auto}
+[dir="ltr"] .theme-btn{margin-right:0;margin-left:auto}
+.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.back-btn:hover{border-color:var(--olive);color:var(--olive)}
+
+/* صفحة */
+.page{max-width:880px;margin:0 auto;padding:28px 18px 64px;display:flex;flex-direction:column;gap:22px}
+
+/* هيرو */
+.page-hero{text-align:center;padding:20px 0 4px}
+.page-hero h1{font-family:'Aref Ruqaa',serif;font-size:1.9rem;color:var(--olive-deep);margin-bottom:10px}
+.page-hero p{font-size:14.5px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.85}
+
+/* حالة الفراغ الرئيسية */
+.empty-hero{background:var(--card);border:1.5px dashed var(--line);border-radius:var(--rxl);padding:56px 32px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+.empty-icon-wrap{width:74px;height:74px;border-radius:50%;background:rgba(198,151,73,.12);display:flex;align-items:center;justify-content:center;color:var(--gold-dark)}
+.empty-icon-wrap svg{width:34px;height:34px}
+.empty-hero h2{font-family:'Aref Ruqaa',serif;font-size:1.3rem;color:var(--ink)}
+.empty-hero p{font-size:14px;color:var(--muted);max-width:420px;line-height:1.85}
+.empty-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(28,91,56,.08);color:var(--olive);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;margin-top:4px}
+
+/* كيف ستظهر القصص هنا — معاينة الهيكل */
+.preview-label{font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.preview-card{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px;opacity:.55}
+.preview-av{width:42px;height:42px;border-radius:50%;background:var(--cream-2);border:1px dashed var(--line)}
+.preview-line{height:9px;border-radius:5px;background:var(--cream-2)}
+.preview-line.w70{width:70%}
+.preview-line.w90{width:90%}
+.preview-line.w50{width:50%}
+
+/* شروط النشر */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.card h2{font-family:'Aref Ruqaa',serif;font-size:1.2rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.card h2 .ic{width:18px;height:18px;color:var(--gold-dark)}
+.cond-list{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.cond-row{display:flex;align-items:flex-start;gap:12px}
+.cond-num{width:26px;height:26px;border-radius:50%;background:rgba(28,91,56,.1);color:var(--olive);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:900;flex-shrink:0;margin-top:1px}
+.cond-row p{font-size:13.5px;color:var(--muted);line-height:1.7}
+.cond-row strong{color:var(--ink)}
+
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 22px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;border:2px solid transparent}
+.btn-olive{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+.btn-olive:hover{background:var(--olive-deep)}
+.btn-outline{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-outline:hover{border-color:var(--olive);color:var(--olive)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <a href="app.html" class="brand">
+      <div class="brand-mark">ع</div>
+      <span class="brand-text">عزّة</span>
+    </a>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="back-btn" onclick="history.back()">
+      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      رجوع
+    </button>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-hero">
+    <h1>قصص نجاح</h1>
+    <p>هون رح تنشر قصص حقيقية لأفكار ومشاريع انطلقت من عزّة — لسا ما في قصص منشورة، وهاي نقطة بداية المنصة، مش نقص بالمحتوى.</p>
+  </div>
+
+  <div class="empty-hero">
+    <div class="empty-icon-wrap">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <h2>أول قصة نجاح لسا بالطريق</h2>
+    <p>كل قصة هون رح تكون موثّقة وحقيقية 100% — مافي محتوى تجريبي أو أمثلة وهمية على عزّة. لما يصير عندنا أول شراكة أو تمويل حقيقي من خلال المنصة، رح تظهر قصته هون أول واحدة.</p>
+    <span class="empty-badge">
+      <svg class="ic" width="13" height="13" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+      محتوى حقيقي فقط — بدون استثناء
+    </span>
+  </div>
+
+  <div>
+    <div class="preview-label">
+      <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      شكل القصص لما تبدأ بالظهور
+    </div>
+    <div class="preview-grid">
+      <div class="preview-card">
+        <div class="preview-av"></div>
+        <div class="preview-line w90"></div>
+        <div class="preview-line w70"></div>
+        <div class="preview-line w50"></div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-av"></div>
+        <div class="preview-line w70"></div>
+        <div class="preview-line w90"></div>
+        <div class="preview-line w50"></div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-av"></div>
+        <div class="preview-line w50"></div>
+        <div class="preview-line w90"></div>
+        <div class="preview-line w70"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      كيف بتصير قصتك واحدة من القصص هون؟
+    </h2>
+    <div class="cond-list">
+      <div class="cond-row">
+        <div class="cond-num">١</div>
+        <p>لازم تكون <strong>شراكة أو تمويل حقيقي</strong> صار من خلال تواصل بدأ على عزّة — مش مجرد فكرة منشورة.</p>
+      </div>
+      <div class="cond-row">
+        <div class="cond-num">٢</div>
+        <p>موافقة الطرفين (صاحب الفكرة والمستثمر/الشريك) على نشر القصة بأسمائهم الحقيقية.</p>
+      </div>
+      <div class="cond-row">
+        <div class="cond-num">٣</div>
+        <p>تفاصيل واضحة عن النتيجة (قيمة التمويل، نوع الشراكة، أو الأثر الفعلي).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a href="app.html" class="btn btn-olive">استكشف الأفكار والمشاريع الحالية</a>
+    <a href="verification.html" class="btn btn-outline">تعرّف على نظام التوثيق</a>
+  </div>
+
+</div>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  try{ localStorage.setItem('azza_theme', document.body.classList.contains('dark') ? 'dark' : 'light'); }catch(e){}
+}
+(function(){
+  try{
+    const saved = localStorage.getItem('azza_theme');
+    if(saved === 'dark') document.body.classList.add('dark');
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>
