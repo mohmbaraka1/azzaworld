@@ -779,13 +779,13 @@ const ROLES={idea:'صاحب فكرة',skill:'خبير',investor:'مستثمر',c
 const TYPE_L={post:'💬 منشور',idea:'💡 فكرة',project:'🚀 مشروع',job:'📋 وظيفة'};
 const CAT_L={environment:'🌿 بيئة',tech:'💻 تقنية',education:'📚 تعليم',health:'🩺 صحة',business:'💼 أعمال',design:'🎨 تصميم'};
 
-/* شارات التوثيق حسب الدور */
+/* تسميات أنواع الحساب */
 const VERIFY={
-  idea:        {label:'صاحب فكرة موثّق', color:'#1c5b38', bg:'rgba(28,91,56,.1)'},
-  skill:       {label:'خبير موثّق',       color:'#0F6E56', bg:'rgba(15,110,86,.1)'},
-  investor:    {label:'مستثمر موثّق',     color:'#9b7420', bg:'rgba(155,116,32,.1)'},
-  company:     {label:'شركة موثّقة',      color:'#E07820', bg:'rgba(224,120,32,.1)'},
-  institution: {label:'مؤسسة موثّقة',     color:'#185FA5', bg:'rgba(24,95,165,.1)'},
+  idea:        {label:'صاحب فكرة', color:'#1c5b38', bg:'rgba(28,91,56,.1)'},
+  skill:       {label:'خبير',       color:'#0F6E56', bg:'rgba(15,110,86,.1)'},
+  investor:    {label:'مستثمر',     color:'#9b7420', bg:'rgba(155,116,32,.1)'},
+  company:     {label:'شركة',      color:'#E07820', bg:'rgba(224,120,32,.1)'},
+  institution: {label:'مؤسسة',     color:'#185FA5', bg:'rgba(24,95,165,.1)'},
 };
 
 /* ✓ علامة التوثيق الرسمي — أيقونة صفراء ملاصقة بالاسم (نمط تويتر) */
@@ -1072,7 +1072,7 @@ function postCard(p,idx){
       <div>
         <div class="post-name">${esc(p.author_name)} ${checkmarkById(p.author_id,14)}</div>
         <div class="post-meta">
-          <span style="background:${vc.bg};color:${vc.color};border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:700">✓ ${vc.label}</span>
+          <span style="background:${vc.bg};color:${vc.color};border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:700">${vc.label}</span>
         </div>
       </div>
       <span class="post-time">${timeAgo(p.created_at)}</span>
