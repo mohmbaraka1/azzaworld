@@ -1748,6 +1748,11 @@ function init(){
      ثم تحديث فعلي بالبيانات الحقيقية من Supabase فور وصولها (عادة أقل من ثانية) */
   buildStats();render();buildRight();
   loadInitialDataFromSupabase().then(()=>{
+    /* تزامن بيانات المستخدم الحالي نفسه مع Supabase — يحل خللاً حقيقياً اكتُشف:
+       متغيّر user يبقى نسخة قديمة من localStorage، فأي تعديل لاحق بقاعدة البيانات
+       (مثل تفعيل التوثيق) لا ينعكس إلا بعد تسجيل خروج/دخول يدوي بدون هذا الإصلاح */
+    const freshMe=(_usersMem||[]).find(u=>u.id===user.id);
+    if(freshMe){ user=freshMe; G.saveUser(user); }
     buildStats();render();buildRight();
   });
   initSoundUI();
