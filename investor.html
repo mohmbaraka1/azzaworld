@@ -18,7 +18,7 @@ a{text-decoration:none;color:inherit}
 
 /* ── هيدر ── */
 .top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-in{display:flex;align-items:center;justify-content:space-between;height:62px;padding:0 18px;max-width:1200px;margin:0 auto;gap:14px}
+.top-in{display:flex;align-items:center;justify-content:space-between;height:62px;padding:0 18px;max-width:1200px;margin:0 auto;gap:14px;min-width:0}
 .brand{display:flex;align-items:center;gap:9px;flex-shrink:0}
 .brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
 .brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
@@ -175,6 +175,9 @@ a{text-decoration:none;color:inherit}
   .layout{grid-template-columns:1fr}
   .side{display:none}
   body{padding-bottom:64px}
+  /* أزرار التنقل بالشريط العلوي (الفيد، ملفي، خروج) مكررة فعلياً مع الشريط السفلي
+     بالموبايل — نخفيها لتوفير مساحة، فقط زر تبديل المظهر والصورة الشخصية يبقيان */
+  .top-right .nav-btn,.top-right .logout{display:none}
 
   /* ══ شريط التنقل السفلي الثابت — نفس فلسفة app.html ══ */
   .bottom-nav{
@@ -513,14 +516,21 @@ function calcTrustScoreInv(u){
 }
 function isIdVerifiedInv(authorId){
   if(!authorId)return false;
-  if(authorId===user.id)return user.id_verified===true||calcTrustScoreInv(user)>=70;
+  if(authorId===user.id)return user.id_verified===true;
   const u=usersCacheInv.find(x=>x.id===authorId);
   if(!u)return false;
-  return u.id_verified===true||calcTrustScoreInv(u)>=70;
+  return u.id_verified===true;
+}
+const BADGE_COLORS={idea:'#1c5b38',skill:'#0F6E56',investor:'#854F0B',company:'#D85A30',institution:'#185FA5'};
+function shieldBadgeSVG(type,size){
+  const c=BADGE_COLORS[type]||BADGE_COLORS.idea;
+  return `<svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M11 1.5L17.5 4.8V10.5C17.5 14.8 14.7 18.6 11 20C7.3 18.6 4.5 14.8 4.5 10.5V4.8L11 1.5Z" fill="${c}"/><path d="M7.3 11l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function checkmarkInv(authorId,size=14){
   if(!isIdVerifiedInv(authorId))return'';
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة"><svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  const u=authorId===user.id?user:usersCacheInv.find(x=>x.id===authorId);
+  const type=u?(u.subtype==='institution'?'institution':u.type):'idea';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة">${shieldBadgeSVG(type,size)}</span>`;
 }
 
 let curTab='opps', pendingNdaId=null;

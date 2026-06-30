@@ -1058,14 +1058,22 @@ function calcTrustScore(u){
 }
 function isIdVerifiedById(authorId){
   if(!authorId)return false;
-  if(authorId===user.id)return user.id_verified===true||calcTrustScore(user)>=70;
+  if(authorId===user.id)return user.id_verified===true;
   const u=usersCache.find(x=>x.id===authorId);
   if(!u)return false;
-  return u.id_verified===true||calcTrustScore(u)>=70;
+  return u.id_verified===true;
+}
+/* ألوان الشارة حسب نوع الحساب — نفس نظام ألوان VERIFY الموجود بكل أنحاء المنصة */
+const BADGE_COLORS={idea:'#1c5b38',skill:'#0F6E56',investor:'#854F0B',company:'#D85A30',institution:'#185FA5'};
+function shieldBadgeSVG(type,size){
+  const c=BADGE_COLORS[type]||BADGE_COLORS.idea;
+  return `<svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M11 1.5L17.5 4.8V10.5C17.5 14.8 14.7 18.6 11 20C7.3 18.6 4.5 14.8 4.5 10.5V4.8L11 1.5Z" fill="${c}"/><path d="M7.3 11l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function checkmark(authorId,size=14){
   if(!isIdVerifiedById(authorId))return'';
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة"><svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  const u=authorId===user.id?user:usersCache.find(x=>x.id===authorId);
+  const type=u?(u.subtype==='institution'?'institution':u.type):'idea';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة">${shieldBadgeSVG(type,size)}</span>`;
 }
 
 /* ══ بحث موحّد بالهيدر — أشخاص + منشورات، نتائج فورية ══ */
@@ -1818,8 +1826,7 @@ function card(p){
     <div class="p-author-info">
       <div class="p-name" onclick="openUser('${p.author_id}')">${esc(p.author_name)} ${checkmark(p.author_id,13)}${p.author_username?` <span class="p-name-handle">@${esc(p.author_username)}</span>`:''}</div>
       <div class="p-meta-row">
-        <span class="p-badge" style="background:${vc.bg};color:${vc.c}">✓ ${vc.lbl}</span>
-        <span class="p-time">· ${ago(p.created_at)}</span>
+        <span class="p-time">${ago(p.created_at)}</span>
       </div>
     </div>
     <div class="p-head-actions">

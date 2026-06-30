@@ -42,7 +42,6 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
 .post-name:hover{color:var(--olive)}
 .post-handle{font-size:12px;color:var(--olive);font-weight:500}
 .post-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
-.verify-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px}
 .post-time{font-size:12px;color:var(--muted)}
 .post-menu-wrap{position:relative}
 .post-menu-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:7px;border-radius:9px;transition:.18s;display:flex}
@@ -428,14 +427,21 @@ function calcTrustScoreP(u){
 }
 function isIdVerifiedP(authorId){
   if(!authorId)return false;
-  if(authorId===me.id)return me.id_verified===true||calcTrustScoreP(me)>=70;
+  if(authorId===me.id)return me.id_verified===true;
   const u=usersCacheP.find(x=>x.id===authorId);
   if(!u)return false;
-  return u.id_verified===true||calcTrustScoreP(u)>=70;
+  return u.id_verified===true;
+}
+const BADGE_COLORS={idea:'#1c5b38',skill:'#0F6E56',investor:'#854F0B',company:'#D85A30',institution:'#185FA5'};
+function shieldBadgeSVG(type,size){
+  const c=BADGE_COLORS[type]||BADGE_COLORS.idea;
+  return `<svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M11 1.5L17.5 4.8V10.5C17.5 14.8 14.7 18.6 11 20C7.3 18.6 4.5 14.8 4.5 10.5V4.8L11 1.5Z" fill="${c}"/><path d="M7.3 11l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function checkmarkP(authorId,size=15){
   if(!isIdVerifiedP(authorId))return'';
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة"><svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  const u=authorId===me.id?me:usersCacheP.find(x=>x.id===authorId);
+  const type=u?(u.subtype==='institution'?'institution':u.type):'idea';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة">${shieldBadgeSVG(type,size)}</span>`;
 }
 
 function verifyType(u){return u?.subtype==='institution'?'institution':(u?.type||'idea');}
@@ -511,8 +517,7 @@ function renderAll(){
       <div class="post-author">
         <div class="post-name" onclick="openUser('${p.author_id}')">${esc(p.author_name)} ${checkmarkP(p.author_id,15)}${p.author_username?` <span class="post-handle">@${esc(p.author_username)}</span>`:''}</div>
         <div class="post-meta">
-          <span class="verify-pill" style="background:${pVc.bg};color:${pVc.color}">✓ ${pVc.label}</span>
-          <span class="post-time">· ${timeAgo(p.created_at)}</span>
+          <span class="post-time">${timeAgo(p.created_at)}</span>
         </div>
       </div>
       <div class="post-menu-wrap">
@@ -783,7 +788,6 @@ function buildAuthorCard(p,pVc){
         <div>
           <div style="font-size:14px;font-weight:700;cursor:pointer" onclick="openUser('${p.author_id}')">${esc(p.author_name)} ${checkmarkP(p.author_id,14)}</div>
           ${p.author_username?`<div style="font-size:12px;color:var(--olive)">@${esc(p.author_username)}</div>`:''}
-          <div style="margin-top:3px"><span class="verify-pill" style="background:${pVc.bg};color:${pVc.color};font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700">✓ ${pVc.label}</span></div>
         </div>
       </div>
       ${p.author_id!==me.id?`<button onclick="openUser('${p.author_id}')" style="width:100%;padding:9px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;transition:.2s" onmouseover="this.style.background='var(--olive-deep)'" onmouseout="this.style.background='var(--olive)'">عرض الملف الشخصي</button>`:''}

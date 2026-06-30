@@ -108,10 +108,10 @@ a{text-decoration:none;color:inherit}
 
   <div class="page-hero">
     <h1>التوثيق والمصداقية على عزّة</h1>
-    <p>علامة التوثيق (✓) مش شي بتشتريه — هي نتيجة طبيعية لبناء ملف موثوق وتفاعل حقيقي على المنصة. هاي الصفحة بتشرحلك بالتفصيل كيف تحسب، وكيف توصلها.</p>
+    <p>علامة التوثيق (✓) تمنحها منصة عزّة بعد مراجعة فريق الدعم لطلبك. درجة المصداقية أدناه مؤشر يساعدك تجهّز ملفك، لكنها لا تمنح الشارة تلقائياً وحدها.</p>
     <span class="hero-badge-demo">
       <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-      مثال: درجة المصداقية ≥ 70 = توثيق تلقائي
+      التوثيق يتم عبر طلب يراجعه فريق عزّة يدوياً
     </span>
   </div>
 
@@ -120,7 +120,7 @@ a{text-decoration:none;color:inherit}
       <svg class="ic" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
       كيف تُحسب درجة المصداقية؟
     </h2>
-    <p>درجة المصداقية (من 100) موجودة على ملفك الشخصي، وبتتكوّن من ثلاث محاور. كل محور له سقف أعلى، وما تقدر تتجاوزه حتى لو زدت بمحور واحد بس.</p>
+    <p>درجة المصداقية (من 100) موجودة على ملفك الشخصي، وبتتكوّن من ثلاث محاور. هاي الدرجة مؤشر داخلي يساعدك تعرف مدى جاهزية ملفك — <strong>هي وحدها لا تمنحك علامة التوثيق</strong>، لكنها معيار مهم يراجعه فريق الدعم عند تقييم طلبك.</p>
 
     <div class="score-rows">
       <div class="score-row">
@@ -164,7 +164,7 @@ a{text-decoration:none;color:inherit}
     </div>
 
     <div class="formula-box">
-      عندما تصل درجتك الإجمالية إلى <strong>70 من 100</strong> أو أكثر، تحصل على علامة التوثيق (✓) تلقائياً بجانب اسمك بكل المنصة.
+      لما تجهّز ملفك وتشعر إنك جاهز، اضغط زر "تقديم طلب توثيق" أدناه — فريق عزّة بيراجع طلبك يدوياً (الملف، النشاط، ودرجة المصداقية كمؤشر) ويفعّل علامة التوثيق (✓) بجانب اسمك إذا استوفيت الشروط.
     </div>
   </div>
 
@@ -183,6 +183,21 @@ a{text-decoration:none;color:inherit}
     </div>
   </div>
 
+  <div class="card" id="request-card">
+    <h2>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+      تقديم طلب توثيق
+    </h2>
+    <p id="request-status-text">جهّز ملفك الشخصي أولاً، ثم قدّم طلبك ليراجعه فريق عزّة.</p>
+    <div id="request-form-wrap" style="margin-top:14px">
+      <textarea id="request-msg" placeholder="اكتب رسالة قصيرة لفريق الدعم (اختياري) — مثلاً لماذا تستحق التوثيق، أو أي معلومة إضافية" style="width:100%;min-height:80px;border:1.5px solid var(--line);border-radius:var(--r2);padding:12px 14px;font-family:inherit;font-size:13.5px;background:var(--cream);outline:none;resize:vertical;margin-bottom:12px;color:var(--ink)"></textarea>
+      <button class="btn btn-olive" id="request-btn" onclick="submitVerificationRequest()">
+        <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        تقديم طلب توثيق
+      </button>
+    </div>
+  </div>
+
   <div class="card">
     <h2>
       <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
@@ -192,34 +207,34 @@ a{text-decoration:none;color:inherit}
     <div class="faq-list">
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          <span>هل أقدر أوثّق حسابي فوراً بدون ما أبني نشاط؟</span>
+          <span>كيف أحصل على علامة التوثيق؟</span>
           <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="faq-a">لا — التوثيق التلقائي مرتبط بدرجة المصداقية، وهاي بتُبنى مع الوقت من خلال نشاطك الحقيقي. ما في طريقة "اختصار" لتجاوز هذا، لأنه أصلاً هدفها إثبات إنك فعلاً موجود وفعّال على المنصة.</div>
+        <div class="faq-a">تقدّم طلباً من هاي الصفحة (زر "تقديم طلب توثيق")، ويراجعه فريق عزّة يدوياً خلال أيام قليلة. الملف المكتمل والنشاط الحقيقي على المنصة يزيدان من فرصة الموافقة.</div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          <span>أسرع طريقة أرفع درجتي؟</span>
+          <span>أسرع طريقة أجهّز ملفي قبل التقديم؟</span>
           <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="faq-a">أكمل ملفك الشخصي أول شي (صورة، نبذة، وسيلة تواصل) — هاي أسهل 30 نقطة وبتاخذ دقايق بس. بعدين النشاط المستمر (نشر أفكار حقيقية) والتفاعل الصادق مع المنصة بيبنوا باقي الدرجة بشكل طبيعي.</div>
+        <div class="faq-a">أكمل ملفك الشخصي أول شي (صورة، نبذة، وسيلة تواصل) — هاي أسهل 30 نقطة وبتاخذ دقايق بس. بعدين النشاط المستمر (نشر أفكار حقيقية) والتفاعل الصادق مع المنصة بيبنوا باقي درجتك المؤشّرة.</div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          <span>هل ممكن أخسر علامة التوثيق بعد ما أحصل عليها؟</span>
+          <span>كم بياخذ وقت لمراجعة طلبي؟</span>
           <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="faq-a">نعم — الدرجة بتُحسب بشكل مستمر، فإذا قل نشاطك بشكل كبير أو حذفت محتوى مهم من ملفك، ممكن تنخفض درجتك تحت 70 وتختفي العلامة تلقائياً.</div>
+        <div class="faq-a">عادة بضعة أيام، حسب عدد الطلبات. بتقدر تشوف حالة طلبك من نفس هاي الصفحة بعد التقديم.</div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          <span>شو الفرق بين التوثيق التلقائي والتوثيق الرسمي؟</span>
+          <span>إذا تم رفض طلبي، فيني أقدّم مرة ثانية؟</span>
           <svg class="ic" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="faq-a">التوثيق التلقائي مبني بالكامل على درجة المصداقية كما هو موضّح فوق. التوثيق الرسمي (عبر مراجعة يدوية من فريق عزّة) هو مسار إضافي مخطط له لاحقاً، خصوصاً للشركات والمؤسسات اللي بتحتاج تأكيد هوية رسمي أعمق.</div>
+        <div class="faq-a">أكيد — كمّل ملفك الشخصي ونشاطك على المنصة، وقدّم طلب جديد في أي وقت.</div>
       </div>
     </div>
   </div>
@@ -234,6 +249,63 @@ a{text-decoration:none;color:inherit}
 
 </div>
 
+<script src="supabase.js"></script>
+<script>
+const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
+
+const getUser=()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
+const user=getUser();
+if(!user){ location.href='login.html'; }
+
+async function loadRequestStatus(){
+  const statusEl=document.getElementById('request-status-text');
+  const formWrap=document.getElementById('request-form-wrap');
+
+  if(user.id_verified===true){
+    statusEl.innerHTML='✅ <strong>حسابك موثّق فعلياً!</strong> علامة التوثيق ظاهرة بجانب اسمك بكل المنصة.';
+    formWrap.style.display='none';
+    return;
+  }
+
+  try{
+    const {data,error}=await azzaDB.from('verification_requests')
+      .select('*').eq('user_id',user.id).order('created_at',{ascending:false}).limit(1);
+    if(error)throw error;
+    if(data&&data.length){
+      const req=data[0];
+      if(req.status==='pending'){
+        statusEl.innerHTML='⏳ <strong>طلبك قيد المراجعة</strong> — قدّمته بتاريخ '+new Date(req.created_at).toLocaleDateString('ar')+'. فريق عزّة بيراجعه قريباً.';
+        formWrap.style.display='none';
+      }else if(req.status==='rejected'){
+        statusEl.innerHTML='تم مراجعة طلبك السابق ولم تتم الموافقة عليه بعد. كمّل ملفك ونشاطك وقدّم طلباً جديداً:';
+        formWrap.style.display='block';
+      }
+    }
+  }catch(e){ console.error('تعذر جلب حالة الطلب:',e.message); }
+}
+
+async function submitVerificationRequest(){
+  const btn=document.getElementById('request-btn');
+  const msg=document.getElementById('request-msg').value.trim();
+  btn.disabled=true;btn.textContent='جاري الإرسال...';
+  try{
+    const {error}=await azzaDB.from('verification_requests').insert({
+      user_id:user.id,message:msg||null,status:'pending',
+    });
+    if(error)throw error;
+    document.getElementById('request-status-text').innerHTML='✅ <strong>تم إرسال طلبك بنجاح!</strong> فريق عزّة بيراجعه قريباً وبيتم إشعارك بالنتيجة.';
+    document.getElementById('request-form-wrap').style.display='none';
+  }catch(e){
+    btn.disabled=false;
+    btn.innerHTML='<svg class="ic" width="15" height="15" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>تقديم طلب توثيق';
+    alert('تعذّر إرسال الطلب: '+e.message);
+  }
+}
+
+loadRequestStatus();
+</script>
 <script>
 function toggleFaq(btn){
   const item = btn.closest('.faq-item');

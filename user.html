@@ -27,7 +27,7 @@ a{text-decoration:none;color:inherit}
 
 /* ══ تخطيط ══ */
 .layout{max-width:1000px;margin:0 auto;padding:20px 18px 60px;display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start}
-@media(max-width:740px){.layout{grid-template-columns:1fr}.side-col{position:static}}
+@media(max-width:740px){.layout{grid-template-columns:minmax(0,1fr)}.side-col{position:static}}
 
 /* ══ هيدر الملف (غلاف + معلومات) ══ */
 .profile-hero{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden;grid-column:1/-1}
@@ -430,12 +430,17 @@ function calcTrustScore(u){
 }
 function isIdVerified(u){
   if(!u)return false;
-  if(u.id_verified===true)return true; /* توثيق يدوي من المنصة (هوية مرفوعة) */
-  return calcTrustScore(u)>=70; /* توثيق تلقائي بدرجة المصداقية */
+  return u.id_verified===true; /* توثيق يدوي فقط — بعد مراجعة فريق الدعم لطلب التوثيق */
+}
+const BADGE_COLORS={idea:'#1c5b38',skill:'#0F6E56',investor:'#854F0B',company:'#D85A30',institution:'#185FA5'};
+function shieldBadgeSVG(type,size){
+  const c=BADGE_COLORS[type]||BADGE_COLORS.idea;
+  return `<svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M11 1.5L17.5 4.8V10.5C17.5 14.8 14.7 18.6 11 20C7.3 18.6 4.5 14.8 4.5 10.5V4.8L11 1.5Z" fill="${c}"/><path d="M7.3 11l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 function checkmarkHTML(u,size=16){
   if(!isIdVerified(u))return'';
-  return `<span class="id-check" title="حساب موثّق من عزّة" style="width:${size}px;height:${size}px"><svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><path d="M10.04 2.327c.474-.948 1.847-.948 2.32 0l.86 1.72a1.296 1.296 0 0 0 1.408.696l1.896-.339c1.025-.183 1.847.706 1.616 1.72l-.43 1.882a1.296 1.296 0 0 0 .582 1.39l1.65 1c.901.546.901 1.866 0 2.412l-1.65 1a1.296 1.296 0 0 0-.582 1.39l.43 1.882c.231 1.014-.591 1.903-1.616 1.72l-1.896-.339a1.296 1.296 0 0 0-1.408.696l-.86 1.72c-.473.948-1.846.948-2.32 0l-.86-1.72a1.296 1.296 0 0 0-1.408-.696l-1.896.339c-1.025.183-1.847-.706-1.616-1.72l.43-1.882a1.296 1.296 0 0 0-.582-1.39l-1.65-1c-.901-.546-.901-1.866 0-2.412l1.65-1a1.296 1.296 0 0 0 .582-1.39l-.43-1.882c-.231-1.014.591-1.903 1.616-1.72l1.896.339a1.296 1.296 0 0 0 1.408-.696z" fill="#c69749"/><path d="M7.5 11.3l2.1 2.1 4.3-4.7" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  const type=u?(u.subtype==='institution'?'institution':u.type):'idea';
+  return `<span class="id-check" title="حساب موثّق من عزّة" style="width:${size}px;height:${size}px">${shieldBadgeSVG(type,size)}</span>`;
 }
 
 function showToast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':'#c0392b';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2600);}
