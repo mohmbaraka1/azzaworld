@@ -964,7 +964,7 @@ function addComment(id){
   p.comments.push({id:genId(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:t,created_at:new Date().toISOString()});
   localStorage.setItem('azza_posts',JSON.stringify(a));renderContent();
   setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);
-  azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,content:t})
+  azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,author_username:user.username||'',content:t})
     .then(({error})=>{if(error)console.error('comment:',error.message);});
 }
 function delPost(id){if(!confirm('حذف هذا المنشور؟'))return;localStorage.setItem('azza_posts',JSON.stringify(getPosts().filter(p=>p.id!==id)));buildProfile();showToast('تم الحذف','err');}
