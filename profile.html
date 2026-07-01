@@ -781,12 +781,16 @@ async function loadInitialDataFromSupabase(){
       if(!reactsByPost[key][r.post_id])reactsByPost[key][r.post_id]=[];
       reactsByPost[key][r.post_id].push(r.user_id);
     });
-    _postsMem=posts.map(p=>({...p,
+    const sbPosts=posts.map(p=>({...p,
       comments:cmtsByPost[p.id]||[],
       votes:reactsByPost.votes[p.id]||[],
       r_insightful:reactsByPost.r_insightful[p.id]||[],
       r_collab:reactsByPost.r_collab[p.id]||[],
     }));
+    const sbIds=new Set(sbPosts.map(p=>p.id));
+    let localOnly=[];
+    try{localOnly=JSON.parse(localStorage.getItem('azza_posts')||'[]').filter(p=>!sbIds.has(p.id));}catch{}
+    _postsMem=[...sbPosts,...localOnly];
   }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
   try{
     const {data,error}=await azzaDB.from('users').select('*');

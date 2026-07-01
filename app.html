@@ -1018,14 +1018,19 @@ async function loadInitialDataFromSupabase(){
       reactsByPost[key][r.post_id].push(r.user_id);
     });
 
-    /* تطبيق البيانات الحقيقية على كل منشور */
-    _postsMem=posts.map(p=>({
+    /* تطبيق البيانات الحقيقية على كل منشور من Supabase */
+    const sbPosts=posts.map(p=>({
       ...p,
-      comments:cmtsByPost[p.id]||p.comments||[],
-      votes:reactsByPost.votes[p.id]||p.votes||[],
-      r_insightful:reactsByPost.r_insightful[p.id]||p.r_insightful||[],
-      r_collab:reactsByPost.r_collab[p.id]||p.r_collab||[],
+      comments:cmtsByPost[p.id]||[],
+      votes:reactsByPost.votes[p.id]||[],
+      r_insightful:reactsByPost.r_insightful[p.id]||[],
+      r_collab:reactsByPost.r_collab[p.id]||[],
     }));
+    const sbIds=new Set(sbPosts.map(p=>p.id));
+    /* منشورات localStorage غير الموجودة بـSupabase (محلية فقط) نحتفظ بها كما هي */
+    let localOnly=[];
+    try{localOnly=JSON.parse(localStorage.getItem('azza_posts')||'[]').filter(p=>!sbIds.has(p.id));}catch{}
+    _postsMem=[...sbPosts,...localOnly];
   }catch(e){
     console.error('تعذر جلب المنشورات من Supabase، استخدام النسخة المحلية:',e.message);
     _postsMem=null;
