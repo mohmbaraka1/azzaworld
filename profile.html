@@ -93,7 +93,8 @@ a{text-decoration:none;color:inherit}
 
 /* التبويبات */
 .tab-row{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px}
-.tab{flex:1;text-align:center;padding:9px 6px;border-radius:999px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
+.tab-row{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px;min-width:0}
+.tab{flex:1;min-width:0;text-align:center;padding:9px 6px;border-radius:999px;border:none;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tab.on{background:rgba(28,91,56,.09);color:var(--olive)}
 
 /* نشاط الحساب */
@@ -291,8 +292,8 @@ a{text-decoration:none;color:inherit}
 .endorse-btn.endorsed{background:rgba(28,91,56,.08);border-color:var(--olive);color:var(--olive)}
 .skill-remove{background:none;border:none;color:var(--muted);cursor:pointer;padding:3px;border-radius:6px;font-size:14px;line-height:1;transition:.18s;display:flex;align-items:center}
 .skill-remove:hover{color:var(--red);background:rgba(206,17,38,.08)}
-.add-skill-row{display:flex;gap:8px;align-items:center}
-.add-skill-in{flex:1;border:1.5px solid var(--line);border-radius:999px;background:var(--cream);padding:9px 16px;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;transition:.2s}
+.add-skill-row{display:flex;gap:8px;align-items:center;min-width:0}
+.add-skill-in{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:999px;background:var(--cream);padding:9px 16px;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;transition:.2s}
 .add-skill-in:focus{border-color:var(--olive);background:var(--card)}
 .add-skill-btn{padding:9px 18px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
 .add-skill-btn:hover{background:var(--olive-deep)}
@@ -356,7 +357,15 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
 .role-detail-icon{font-size:15px;flex-shrink:0}
 .role-detail-label{color:var(--muted);font-size:12px;min-width:100px;flex-shrink:0}
 .role-detail-val{color:var(--ink);font-weight:600}
-.sector-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(28,91,56,.08);border:1px solid rgba(28,91,56,.2);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;color:#0e3622}
+.sector-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(28,91,56,.08);border:1px solid rgba(28,91,56,.2);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;color:#0e3622}/* ══ شاشات موبايل صغيرة جداً (320px وما دون) — قياس فعلي مؤكد بالاختبار ══ */
+@media(max-width:340px){
+  .logout span,.logout{font-size:0}
+  .logout svg{font-size:0}
+  .logout{padding:8px;gap:0}
+  .user-name{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .trust-bars,.trust-bar-row{min-width:0}
+  .trust-bar-row{flex-wrap:wrap}
+}
 </style>
 <script src="supabase.js"></script>
 </head>

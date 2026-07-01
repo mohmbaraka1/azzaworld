@@ -240,6 +240,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
 .lb-x{position:absolute;top:18px;left:18px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+
+/* ══ شاشات موبايل صغيرة جداً (320px وما دون) — قياس فعلي مؤكد بالاختبار ══ */
+@media(max-width:340px){
+  .share-btn{font-size:0;padding:8px;gap:0}
+}
 </style>
 <script src="supabase.js"></script>
 </head>

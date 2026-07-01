@@ -34,7 +34,7 @@ a{text-decoration:none;color:inherit}
 .logout:hover{border-color:var(--red);color:var(--red)}
 
 /* تخطيط المحادثات — ارتفاع كامل */
-.chat-layout{display:flex;height:calc(var(--vh,1vh)*100 - 62px);overflow:hidden;width:100%;max-width:100%}
+.chat-layout{display:flex;height:calc(100vh - 62px);overflow:hidden;width:100%;max-width:100%}
 
 /* اللوحة اليمنى — قائمة المحادثات */
 .convs-panel{width:320px;flex-shrink:0;display:flex;flex-direction:column;background:var(--card);border-left:1px solid var(--line)}
@@ -146,10 +146,17 @@ a{text-decoration:none;color:inherit}
   .mobile-back-btn{display:flex !important}
   /* تثبيت شريط الإدخال بأسفل الشاشة دائماً — يحل مشكلة "انزلاق" الشريط
      الناتجة عن قياس height:100% غير الدقيق بمتصفحات الموبايل */
-  #chat-view{height:calc(var(--vh,1vh)*100);height:100dvh;width:100%;max-width:100%;overflow-x:hidden}
+  #chat-view{height:100vh;height:100dvh;width:100%;max-width:100%;overflow-x:hidden}
   .chat-layout{overflow-x:hidden}
   .convs-panel{overflow-x:hidden}
   .chat-input{position:sticky;bottom:0;z-index:5;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+}/* ══ شاشات موبايل صغيرة جداً (320px وما دون) — قياس فعلي مؤكد بالاختبار ══ */
+@media(max-width:340px){
+  .logout,.back-btn{font-size:0}
+  .logout{padding:8px;gap:0}
+  .back-btn{padding:8px;gap:0}
+  .top-name{max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+  .brand-text{display:none}
 }
 </style>
 <script src="supabase.js"></script>
@@ -264,22 +271,6 @@ a{text-decoration:none;color:inherit}
 <div id="toast"></div>
 
 <script>
-/* ── تثبيت الارتفاع الحقيقي للمتصفح على الموبايل ──
-   المتصفحات تخفي/تظهر شريط العنوان أثناء التمرير،
-   مما يغير الارتفاع الفعلي ويدفع زر الإرسال للخارج.
-   Visual Viewport API يعطينا الارتفاع الحقيقي المرئي في كل لحظة */
-function setVH(){
-  const vh=(window.visualViewport?.height||window.innerHeight)*0.01;
-  document.documentElement.style.setProperty('--vh',`${vh}px`);
-}
-setVH();
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',setVH);
-  window.visualViewport.addEventListener('scroll',setVH);
-}else{
-  window.addEventListener('resize',setVH);
-}
-
 /* ── الوضع الليلي ── */
 const THEME_KEY='azza_theme';
 function applyTheme(){
@@ -456,7 +447,6 @@ function renderConvs(){
 function openConv(convId){
   activeConvId=convId;
   markRead(convId);
-  subscribeToConv(convId);
   renderConvs();
   /* موبايل: إخفاء لوحة المحادثات */
   if(window.innerWidth<=720){
@@ -484,7 +474,7 @@ function openConv(convId){
       </button>
     </div>`;
   /* الرسائل */
-  renderMsgs(conv, true);
+  renderMsgs(conv);
   /* إظهار المحادثة */
   document.getElementById('chat-welcome').style.display='none';
   const cv=document.getElementById('chat-view');
@@ -492,10 +482,12 @@ function openConv(convId){
   document.getElementById('msg-input').focus();
 }
 
-/* رسم الرسائل — مع حماية الـ scroll من الاهتزاز */
-function buildMsgsHTML(conv){
+/* رسم الرسائل */
+function renderMsgs(conv){
+  const el=document.getElementById('chat-msgs');
   if(!conv.messages.length){
-    return `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px">ابدأ المحادثة 👋</div>`;
+    el.innerHTML=`<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px">ابدأ المحادثة 👋</div>`;
+    return;
   }
   let html=''; let lastDate='';
   conv.messages.forEach(m=>{
@@ -503,13 +495,19 @@ function buildMsgsHTML(conv){
     if(d!==lastDate){html+=`<div class="msg-date-sep">${d}</div>`;lastDate=d;}
     const mine=m.from===user.id;
     const ticks=mine?`<span class="msg-ticks ${m.read?'read':'sent'}">${m.read?'✓✓':'✓'}</span>`:'';
+
+    /* محتوى الرسالة — يتغيّر حسب: نوعها (نص/صورة/فيديو)، هل "مرة واحدة"، ومن يشاهدها (مُرسل أم مُستقبل) */
     let bodyHTML;
     if(m.id in _activeReveals){
+      /* عدّاد نشط حالياً بنفس اللحظة — نعرض المحتوى مع الثواني المتبقية الحقيقية،
+         تجنباً لقطع العرض بسبب التحديث الدوري السريع */
       const mediaHTML=m.image?`<img src="${m.image}" class="msg-media" alt="">`:m.video?`<video src="${m.video}" class="msg-media" controls autoplay></video>`:'';
       bodyHTML=`${mediaHTML}<div class="vo-countdown">${_activeReveals[m.id]}</div>`;
     }else if(m.view_duration>0 && !mine && m.viewed_at){
+      /* المُستقبل سبق وشاهدها — لا تُعرض مرة ثانية أبداً */
       bodyHTML=`<div class="vo-expired">👁️ تمّت مشاهدتها</div>`;
     }else if(m.view_duration>0 && (m.image||m.video) && !mine){
+      /* المُستقبل لم يشاهدها بعد — زر "اضغط للمشاهدة" بدل المحتوى المباشر */
       bodyHTML=`<button class="vo-reveal-btn" onclick="revealViewOnce('${m.id}')">👁️ اضغط للمشاهدة (${m.view_duration} ث)</button>`;
     }else{
       const mediaHTML=m.image?`<img src="${m.image}" class="msg-media" onclick="openLB('${m.image}')" alt="">`
@@ -518,6 +516,7 @@ function buildMsgsHTML(conv){
       bodyHTML=`${mediaHTML}${textHTML?`<div class="${mediaHTML?'msg-caption':''}">${textHTML}</div>`:''}`;
       if(m.view_duration>0 && mine)bodyHTML+=`<div class="vo-badge">👁️ ${m.view_duration} ث</div>`;
     }
+
     html+=`<div class="msg-row ${mine?'mine':'theirs'}" data-mid="${m.id}">
       <div class="msg-bubble">${bodyHTML}
         <div class="msg-footer">
@@ -527,22 +526,8 @@ function buildMsgsHTML(conv){
       </div>
     </div>`;
   });
-  return html;
-}
-
-function renderMsgs(conv, forceScroll=false){
-  const el=document.getElementById('chat-msgs');
-  const newHTML=buildMsgsHTML(conv);
-  /* تحقق: لو المحتوى نفسه تماماً، لا تلمس الـ DOM — يمنع أي اهتزاز */
-  if(el._lastHTML===newHTML && !forceScroll)return;
-  /* احفظ موضع الـ scroll قبل التحديث */
-  const wasAtBottom=el.scrollHeight-el.scrollTop-el.clientHeight<60;
-  el.innerHTML=newHTML;
-  el._lastHTML=newHTML;
-  /* ارجع للأسفل فقط لو كان المستخدم عند الأسفل أصلاً، أو إرسال جديد */
-  if(wasAtBottom||forceScroll){
-    el.scrollTop=el.scrollHeight;
-  }
+  el.innerHTML=html;
+  setTimeout(()=>el.scrollTop=el.scrollHeight,30);
 }
 
 /* كشف رسالة "مرة واحدة" عند الضغط — تُعرض لمدة محددة بالثواني، ثم تختفي تلقائياً ولا تُعرض مجدداً */
@@ -553,7 +538,7 @@ async function revealViewOnce(msgId){
   _activeReveals[msgId]=m.view_duration;
   m.viewed_at=new Date().toISOString();
   saveConvs(getConvs().map(c=>c.id===conv.id?conv:c));
-  renderMsgs(conv, true); /* عرض فوري بدون انتظار الشبكة — إحساس استجابة فورية بغض النظر عن سرعة الاتصال */
+  renderMsgs(conv); /* عرض فوري بدون انتظار الشبكة — إحساس استجابة فورية بغض النظر عن سرعة الاتصال */
 
   /* تسجيل وقت المشاهدة بقاعدة البيانات بالخلفية، حتى لا تُعرض الرسالة مجدداً من أي جهاز آخر */
   azzaDB.from('messages').update({viewed_at:m.viewed_at}).eq('id',msgId)
@@ -574,7 +559,6 @@ async function revealViewOnce(msgId){
 function closeChatMobile(){
   document.getElementById('convs-panel').classList.remove('hidden');
   activeConvId=null;
-  subscribeToConv(null);
   document.getElementById('chat-welcome').style.display='flex';
   document.getElementById('chat-view').style.display='none';
 }
@@ -690,7 +674,7 @@ async function sendMsg(){
   inp.value='';inp.style.height='auto';
   rmMsgMedia();
   if(duration>0){selectedDuration=0;document.getElementById('view-once-btn').classList.remove('active');document.querySelectorAll('.duration-opt').forEach(b=>b.classList.remove('selected'));}
-  renderMsgs(conv, true);renderConvs();
+  renderMsgs(conv);renderConvs();
 
   /* الإرسال الفعلي لقاعدة البيانات المركزية — هذا ما يضمن وصول الرسالة فعلياً للطرف الآخر
      من أي جهاز، لا فقط محليّاً بمتصفح المُرسل */
@@ -787,26 +771,14 @@ async function refreshActiveConv(){
 
       conv.messages=newMessages;
       saveConvs(all);
-      if(!nothingChanged)renderMsgs(conv, false); /* فقط نعيد الرسم لو فيه فعلياً شي جديد (رسالة، أو تأكيد مشاهدة) */
+      if(!nothingChanged)renderMsgs(conv); /* فقط نعيد الرسم لو فيه فعلياً شي جديد (رسالة، أو تأكيد مشاهدة) */
     }
   }catch(e){ console.error('تعذر تحديث المحادثة:',e.message); }
 }
 
-/* Supabase Realtime — استقبال الرسائل فورياً بدون polling */
-let _realtimeChannel=null;
-function subscribeToConv(convId){
-  if(_realtimeChannel){ azzaDB.removeChannel(_realtimeChannel); _realtimeChannel=null; }
-  if(!convId)return;
-  _realtimeChannel=azzaDB.channel('conv-'+convId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},
-      ()=>{ refreshActiveConv(); }
-    )
-    .subscribe();
-}
-
-/* تحديث كل 3 ثواني للمحادثة المفتوحة (توازن بين الاستجابة واستهلاك الشبكة)،
-   وتحديث شامل أبطأ كل 15 ثانية لباقي قائمة المحادثات */
-setInterval(refreshActiveConv,3000);
+/* تحديث سريع كل ثانية للمحادثة المفتوحة فقط (إحساس قريب من الفوري)،
+   وتحديث شامل أبطأ كل 15 ثانية لباقي قائمة المحادثات (لا حاجة لسرعة هنا) */
+setInterval(refreshActiveConv,1000);
 setInterval(async()=>{
   await loadInitialDataFromSupabase();
   renderConvs();

@@ -243,6 +243,15 @@ h3{font-size:1.2rem;font-weight:700}
      مما يتسع له عرض موبايل ضيق — نخفي الزر الثانوي الأقل أهمية، نحتفظ بالأهم */
   .nav-cta.btn-outline{display:none}
   .nav-right{gap:6px}
+}/* ══ شاشات موبايل صغيرة جداً (320px وما دون) — قياس فعلي مؤكد بالاختبار ══ */
+@media(max-width:340px){
+  .nav-in{padding:0 12px}
+  .nav-right{gap:4px}
+  .lang-btn{padding:5px 9px;font-size:12px}
+  .nav-cta{padding:7px 12px;font-size:12px}
+  .preview-title{font-size:1.2rem;word-break:break-word;overflow-wrap:anywhere}
+  .preview-sub{font-size:13px;max-width:100%;word-break:break-word}
+  .preview-grid>div{min-width:0;overflow:hidden}
 }
 </style>
 </head>
