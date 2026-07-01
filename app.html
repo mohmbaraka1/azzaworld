@@ -985,8 +985,10 @@ function _mapSupabasePost(row){
     image:row.image||null,video:row.video||null,pitch:row.pitch||'',
     nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
     job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
-    votes:row.votes||[],r_insightful:row.r_insightful||[],r_collab:row.r_collab||[],
-    comments:row.comments||[],views:row.views||0,created_at:row.created_at,
+    /* votes/reactions/comments لا تأتي من جدول posts —
+       بل من post_reactions وpost_comments المنفصلَين ويُدمجان لاحقاً بـloadInitialDataFromSupabase */
+    votes:[],r_insightful:[],r_collab:[],
+    comments:[],views:row.views||0,created_at:row.created_at,
   };
 }
 
