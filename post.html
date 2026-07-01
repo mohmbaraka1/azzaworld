@@ -902,26 +902,36 @@ function buildRelated(p){
 }
 
 /* ── إجراءات ── */
-function vote(){
-  const posts=getPosts();const p=posts.find(x=>x.id===postId);if(!p)return;
-  p.votes=p.votes||[];const i=p.votes.indexOf(me.id);const adding=i===-1;
-  adding?p.votes.push(me.id):p.votes.splice(i,1);
-  savePosts(posts);post=p;
-  const btn=document.getElementById('vote-btn');
-  const cnt=document.getElementById('vote-count');
-  if(btn)btn.classList.toggle('voted',adding);
-  if(cnt)cnt.textContent=p.votes.length||'';
-  if(adding){azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:'vote'}).then(({error})=>{if(error&&error.code!=='23505')console.error('vote:',error.message);});}
-  else{azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type','vote').then(({error})=>{if(error)console.error('vote del:',error.message);});}
+/* ══ دوال التفاعل — Supabase أولاً ثم loadAllData ثم render ══ */
+async function vote(){
+  const p=(_postsMem||[]).find(x=>x.id===postId);if(!p)return;
+  const already=(p.votes||[]).includes(me.id);
+  try{
+    if(already){await azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type','vote');}
+    else{await azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:'vote'});}
+    await loadAllData();
+    post=(_postsMem||[]).find(x=>x.id===postId)||post;
+  }catch(e){
+    p.votes=p.votes||[];
+    already?p.votes.splice(p.votes.indexOf(me.id),1):p.votes.push(me.id);
+    post=p;console.error('vote:',e.message);
+  }
+  renderAll();
 }
-function react(type){
-  const posts=getPosts();const p=posts.find(x=>x.id===postId);if(!p)return;
-  const key='r_'+type;p[key]=p[key]||[];
-  const i=p[key].indexOf(me.id);const adding=i===-1;
-  adding?p[key].push(me.id):p[key].splice(i,1);
-  savePosts(posts);post=p;renderAll();
-  if(adding){azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:type}).then(({error})=>{if(error&&error.code!=='23505')console.error('react:',error.message);});}
-  else{azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type',type).then(({error})=>{if(error)console.error('react del:',error.message);});}
+async function react(type){
+  const p=(_postsMem||[]).find(x=>x.id===postId);if(!p)return;
+  const k='r_'+type;const already=(p[k]||[]).includes(me.id);
+  try{
+    if(already){await azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type',type);}
+    else{await azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:type});}
+    await loadAllData();
+    post=(_postsMem||[]).find(x=>x.id===postId)||post;
+  }catch(e){
+    p[k]=p[k]||[];
+    already?p[k].splice(p[k].indexOf(me.id),1):p[k].push(me.id);
+    post=p;console.error('react:',e.message);
+  }
+  renderAll();
 }
 function toggleSave(){
   const k='azza_saved_'+me.id;

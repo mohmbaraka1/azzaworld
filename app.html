@@ -1998,35 +1998,96 @@ function card(p){
 
 /* إجراءات */
 function autoR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
-function vote(pid){
-  const posts=G.getPosts(),p=posts.find(x=>x.id===pid);if(!p)return;
-  p.votes=p.votes||[];const i=p.votes.indexOf(user.id);const adding=i===-1;
-  adding?p.votes.push(user.id):p.votes.splice(i,1);
-  G.savePosts(posts);render();buildStats();
-  if(adding){azzaDB.from('post_reactions').insert({post_id:pid,user_id:user.id,reaction_type:'vote'}).then(({error})=>{if(error&&error.code!=='23505')console.error('vote:',error.message);});}
-  else{azzaDB.from('post_reactions').delete().eq('post_id',pid).eq('user_id',user.id).eq('reaction_type','vote').then(({error})=>{if(error)console.error('vote del:',error.message);});}
+/* ══════════════════════════════════════════════════════════════
+   دوال التفاعل — مبنية من الصفر
+   المبدأ: Supabase أولاً → ثم loadAllData → ثم render
+   لا تعديل مباشر على _postsMem أبداً (يسبب تعارضات)
+   ══════════════════════════════════════════════════════════════ */
+
+async function vote(pid){
+  const p=(_postsMem||[]).find(x=>x.id===pid);if(!p)return;
+  const already=p.votes?.includes(user.id);
+  try{
+    if(already){
+      await azzaDB.from('post_reactions').delete()
+        .eq('post_id',pid).eq('user_id',user.id).eq('reaction_type','vote');
+    }else{
+      await azzaDB.from('post_reactions').insert(
+        {post_id:pid,user_id:user.id,reaction_type:'vote'}
+      );
+    }
+    await loadAllData();
+  }catch(e){
+    /* Optimistic fallback لو فشل الإرسال */
+    p.votes=p.votes||[];
+    already?p.votes.splice(p.votes.indexOf(user.id),1):p.votes.push(user.id);
+    console.error('vote error:',e.message);
+  }
+  render();buildStats();
 }
-function react(pid,t){
-  const posts=G.getPosts(),p=posts.find(x=>x.id===pid);if(!p)return;
-  const k='r_'+t;p[k]=p[k]||[];const i=p[k].indexOf(user.id);const adding=i===-1;
-  adding?p[k].push(user.id):p[k].splice(i,1);
-  G.savePosts(posts);render();
-  if(adding){azzaDB.from('post_reactions').insert({post_id:pid,user_id:user.id,reaction_type:t}).then(({error})=>{if(error&&error.code!=='23505')console.error('react:',error.message);});}
-  else{azzaDB.from('post_reactions').delete().eq('post_id',pid).eq('user_id',user.id).eq('reaction_type',t).then(({error})=>{if(error)console.error('react del:',error.message);});}
+
+async function react(pid,t){
+  const p=(_postsMem||[]).find(x=>x.id===pid);if(!p)return;
+  const k='r_'+t;const already=(p[k]||[]).includes(user.id);
+  try{
+    if(already){
+      await azzaDB.from('post_reactions').delete()
+        .eq('post_id',pid).eq('user_id',user.id).eq('reaction_type',t);
+    }else{
+      await azzaDB.from('post_reactions').insert(
+        {post_id:pid,user_id:user.id,reaction_type:t}
+      );
+    }
+    await loadAllData();
+  }catch(e){
+    p[k]=p[k]||[];
+    already?p[k].splice(p[k].indexOf(user.id),1):p[k].push(user.id);
+    console.error('react error:',e.message);
+  }
+  render();
 }
-function toggleCmt(pid){document.getElementById('cm-'+pid)?.classList.toggle('open');}
-function addCmt(pid){
+
+async function addCmt(pid){
   const inp=document.getElementById('ci-'+pid);
   const txt=(inp?.value||'').trim();if(!txt)return;
-  const posts=G.getPosts(),p=posts.find(x=>x.id===pid);if(!p)return;
-  p.comments=p.comments||[];
-  p.comments.push({id:id(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:txt,created_at:new Date().toISOString()});
-  G.savePosts(posts);inp.value='';render();writeNotif(pid,'comment');
-  azzaDB.from('post_comments').insert({post_id:pid,author_id:user.id,author_name:user.name,author_username:user.username||'',content:txt})
-    .then(({error})=>{if(error)console.error('comment:',error.message);});
+  inp.value='';
+  try{
+    const {error}=await azzaDB.from('post_comments').insert({
+      post_id:pid,author_id:user.id,
+      author_name:user.name,author_username:user.username||'',
+      content:txt,
+    });
+    if(error)throw error;
+    await loadAllData();
+    writeNotif(pid,'comment');
+  }catch(e){
+    /* Optimistic fallback */
+    const p=(_postsMem||[]).find(x=>x.id===pid);
+    if(p){
+      p.comments=p.comments||[];
+      p.comments.push({id:id(),author_id:user.id,author_name:user.name,
+        author_username:user.username||'',text:txt,created_at:new Date().toISOString()});
+    }
+    console.error('addCmt error:',e.message);
+    toast('تعذّر حفظ التعليق، تحقق من اتصالك','err');
+  }
+  render();
 }
+
+async function delPost(pid){
+  if(!confirm('حذف هذا المنشور؟'))return;
+  try{
+    await azzaDB.from('posts').delete().eq('id',pid).eq('author_id',user.id);
+    await loadAllData();
+  }catch(e){
+    _postsMem=(_postsMem||[]).filter(p=>p.id!==pid);
+    console.error('delPost error:',e.message);
+  }
+  render();buildStats();toast('تم الحذف','err');
+}
+
+function toggleCmt(pid){document.getElementById('cm-'+pid)?.classList.toggle('open');}
 function toggleSave(pid){const k='azza_saved_'+user.id;let s=JSON.parse(localStorage.getItem(k)||'[]');const i=s.indexOf(pid);i===-1?s.push(pid):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));render();toast(i===-1?'تم الحفظ 🔖':'أُزيل من المحفوظات','info');}
-function delPost(pid){if(!confirm('حذف؟'))return;G.savePosts(G.getPosts().filter(p=>p.id!==pid));render();buildStats();toast('تم الحذف','err');}
 function interest(pid){const ints=G.getInts();ints[pid]=ints[pid]||[];if(ints[pid].some(x=>x.id===user.id)){toast('أبديت اهتمامك مسبقاً');return;}ints[pid].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_interests',JSON.stringify(ints));writeNotif(pid,'interest');render();toast('تم إبداء الاهتمام ✅');}
 function openNda(pid){ndaId=pid;document.getElementById('nda-cb').checked=false;document.getElementById('nda-btn').disabled=true;document.getElementById('nda-ol').classList.add('open');}
 function closeNda(){document.getElementById('nda-ol').classList.remove('open');ndaId=null;}

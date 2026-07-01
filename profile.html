@@ -1001,26 +1001,46 @@ function saveEdit(){
 }
 
 /* تفاعلات المنشورات */
-function vote(id){
-  const a=getPosts(),p=a.find(x=>x.id===id);if(!p)return;
-  p.votes=p.votes||[];const i=p.votes.indexOf(user.id);const adding=i===-1;
-  adding?p.votes.push(user.id):p.votes.splice(i,1);
-  _postsMem=a;renderContent();
-  if(adding){azzaDB.from('post_reactions').insert({post_id:id,user_id:user.id,reaction_type:'vote'}).then(({error})=>{if(error&&error.code!=='23505')console.error('vote:',error.message);});}
-  else{azzaDB.from('post_reactions').delete().eq('post_id',id).eq('user_id',user.id).eq('reaction_type','vote').then(({error})=>{if(error)console.error('vote del:',error.message);});}
+/* ══ دوال التفاعل — Supabase أولاً ثم loadAllData ثم render ══ */
+async function vote(id){
+  const p=(_postsMem||[]).find(x=>x.id===id);if(!p)return;
+  const already=(p.votes||[]).includes(user.id);
+  try{
+    if(already){await azzaDB.from('post_reactions').delete().eq('post_id',id).eq('user_id',user.id).eq('reaction_type','vote');}
+    else{await azzaDB.from('post_reactions').insert({post_id:id,user_id:user.id,reaction_type:'vote'});}
+    await loadAllData();
+  }catch(e){
+    p.votes=p.votes||[];
+    already?p.votes.splice(p.votes.indexOf(user.id),1):p.votes.push(user.id);
+    console.error('vote:',e.message);
+  }
+  renderContent();
 }
 function toggleSave(id){const k='azza_saved_'+user.id;let s;try{s=JSON.parse(localStorage.getItem(k)||'[]');}catch{s=[];}const i=s.indexOf(id);i===-1?s.push(id):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));showToast(i===-1?'تم الحفظ 🔖':'أُزيل','info');renderContent();}
 function toggleComments(id){document.getElementById('cm-'+id)?.classList.toggle('open');}
-function addComment(id){
+async function addComment(id){
   const inp=document.getElementById('ci-'+id);const t=inp.value.trim();if(!t)return;
-  const a=getPosts(),p=a.find(x=>x.id===id);if(!p)return;
-  p.comments.push({id:genId(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:t,created_at:new Date().toISOString()});
-  _postsMem=a;renderContent();
-  setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);
-  azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,author_username:user.username||'',content:t})
-    .then(({error})=>{if(error)console.error('comment:',error.message);});
+  inp.value='';
+  try{
+    const {error}=await azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,author_username:user.username||'',content:t});
+    if(error)throw error;
+    await loadAllData();
+    setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);
+  }catch(e){
+    const p=(_postsMem||[]).find(x=>x.id===id);
+    if(p){p.comments=p.comments||[];p.comments.push({id:genId(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:t,created_at:new Date().toISOString()});}
+    console.error('addComment:',e.message);
+  }
+  renderContent();
 }
-function delPost(id){if(!confirm('حذف هذا المنشور؟'))return;_postsMem=(_postsMem||[]).filter(p=>p.id!==id);azzaDB.from('posts').delete().eq('id',id).eq('author_id',user.id).then(({error})=>{if(error)console.error('delPost:',error.message);});buildProfile();showToast('تم الحذف','err');}
+async function delPost(id){
+  if(!confirm('حذف هذا المنشور؟'))return;
+  try{
+    await azzaDB.from('posts').delete().eq('id',id).eq('author_id',user.id);
+    await loadAllData();
+  }catch(e){_postsMem=(_postsMem||[]).filter(p=>p.id!==id);console.error('delPost:',e.message);}
+  buildProfile();showToast('تم الحذف','err');
+}
 
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target);}});},{threshold:.06});
 
