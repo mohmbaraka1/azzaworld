@@ -362,16 +362,37 @@ function _mapSupabasePost(row){
     image:row.image||null,video:row.video||null,pitch:row.pitch||'',
     nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
     job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
-    votes:row.votes||[],r_insightful:row.r_insightful||[],r_collab:row.r_collab||[],
-    comments:row.comments||[],views:row.views||0,created_at:row.created_at,
+    votes:[],r_insightful:[],r_collab:[],
+    comments:[],views:row.views||0,created_at:row.created_at,
   };
 }
 
 async function loadInitialDataFromSupabase(){
   try{
-    const {data,error}=await azzaDB.from('posts').select('*').order('created_at',{ascending:false});
-    if(error)throw error;
-    _postsMem=(data||[]).map(_mapSupabasePost);
+    const [postsRes,commentsRes,reactionsRes]=await Promise.all([
+      azzaDB.from('posts').select('*').order('created_at',{ascending:false}),
+      azzaDB.from('post_comments').select('*').order('created_at',{ascending:true}),
+      azzaDB.from('post_reactions').select('*'),
+    ]);
+    if(postsRes.error)throw postsRes.error;
+    const posts=(postsRes.data||[]).map(_mapSupabasePost);
+    const cmtsByPost={};
+    (commentsRes.data||[]).forEach(c=>{
+      if(!cmtsByPost[c.post_id])cmtsByPost[c.post_id]=[];
+      cmtsByPost[c.post_id].push({id:String(c.id),author_id:c.author_id,author_name:c.author_name,author_username:c.author_username||'',text:c.content,created_at:c.created_at});
+    });
+    const reactsByPost={votes:{},r_insightful:{},r_collab:{}};
+    (reactionsRes.data||[]).forEach(r=>{
+      const key=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
+      if(!reactsByPost[key][r.post_id])reactsByPost[key][r.post_id]=[];
+      reactsByPost[key][r.post_id].push(r.user_id);
+    });
+    _postsMem=posts.map(p=>({...p,
+      comments:cmtsByPost[p.id]||[],
+      votes:reactsByPost.votes[p.id]||[],
+      r_insightful:reactsByPost.r_insightful[p.id]||[],
+      r_collab:reactsByPost.r_collab[p.id]||[],
+    }));
   }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
   try{
     const {data,error}=await azzaDB.from('users').select('*');
@@ -830,19 +851,24 @@ function buildRelated(p){
 /* ── إجراءات ── */
 function vote(){
   const posts=getPosts();const p=posts.find(x=>x.id===postId);if(!p)return;
-  p.votes=p.votes||[];const i=p.votes.indexOf(me.id);
-  i===-1?p.votes.push(me.id):p.votes.splice(i,1);
+  p.votes=p.votes||[];const i=p.votes.indexOf(me.id);const adding=i===-1;
+  adding?p.votes.push(me.id):p.votes.splice(i,1);
   savePosts(posts);post=p;
   const btn=document.getElementById('vote-btn');
   const cnt=document.getElementById('vote-count');
-  if(btn)btn.classList.toggle('voted',i===-1);
+  if(btn)btn.classList.toggle('voted',adding);
   if(cnt)cnt.textContent=p.votes.length||'';
+  if(adding){azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:'vote'}).then(({error})=>{if(error&&error.code!=='23505')console.error('vote:',error.message);});}
+  else{azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type','vote').then(({error})=>{if(error)console.error('vote del:',error.message);});}
 }
 function react(type){
   const posts=getPosts();const p=posts.find(x=>x.id===postId);if(!p)return;
   const key='r_'+type;p[key]=p[key]||[];
-  const i=p[key].indexOf(me.id);i===-1?p[key].push(me.id):p[key].splice(i,1);
+  const i=p[key].indexOf(me.id);const adding=i===-1;
+  adding?p[key].push(me.id):p[key].splice(i,1);
   savePosts(posts);post=p;renderAll();
+  if(adding){azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:type}).then(({error})=>{if(error&&error.code!=='23505')console.error('react:',error.message);});}
+  else{azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type',type).then(({error})=>{if(error)console.error('react del:',error.message);});}
 }
 function toggleSave(){
   const k='azza_saved_'+me.id;
