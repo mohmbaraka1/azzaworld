@@ -531,32 +531,63 @@ function filterFeed(tag){localStorage.setItem('azza_search',tag);location.href='
 
 /* ── تحميل ── */
 let _viewsCounted=false;
-function init(){
+async function init(){
   if(!postId){document.getElementById('layout').innerHTML=notFoundHTML('لم يتم تحديد منشور');return;}
-  const posts=getPosts();
-  post=posts.find(p=>p.id===postId);
-  if(!post){document.getElementById('layout').innerHTML=notFoundHTML('المنشور غير موجود أو تم حذفه');return;}
-  if(!_viewsCounted){
-    post.views=(post.views||0)+1;
-    const idx=posts.findIndex(p=>p.id===postId);
-    if(idx!==-1){posts[idx]=post;savePosts(posts);}
-    _viewsCounted=true;
+
+  /* عرض فوري من cache المحلي (إحساس استجابة سريعة) */
+  const cached=getPosts().find(p=>p.id===postId);
+  if(cached){post=cached;renderAll();}
+
+  /* جلب المنشور مع تعليقاته وتفاعلاته مباشرة من Supabase */
+  try{
+    const [postRes,cmtsRes,reactsRes]=await Promise.all([
+      azzaDB.from('posts').select('*').eq('id',postId).single(),
+      azzaDB.from('post_comments').select('*').eq('post_id',postId).order('created_at',{ascending:true}),
+      azzaDB.from('post_reactions').select('*').eq('post_id',postId),
+    ]);
+
+    if(postRes.error||!postRes.data){
+      if(!cached)document.getElementById('layout').innerHTML=notFoundHTML('المنشور غير موجود أو تم حذفه');
+      return;
+    }
+
+    /* بناء كائن المنشور الكامل */
+    post={..._mapPost(postRes.data)};
+    post.comments=(cmtsRes.data||[]).map(c=>({
+      id:String(c.id),author_id:c.author_id,
+      author_name:c.author_name||'',author_username:c.author_username||'',
+      text:c.content||'',created_at:c.created_at,
+    }));
+    const rm={votes:[],r_insightful:[],r_collab:[]};
+    (reactsRes.data||[]).forEach(r=>{
+      const k=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
+      rm[k].push(r.user_id);
+    });
+    post.votes=rm.votes;post.r_insightful=rm.r_insightful;post.r_collab=rm.r_collab;
+
+    /* تحديث _postsMem بهذا المنشور */
+    if(_postsMem){const idx=_postsMem.findIndex(p=>p.id===postId);if(idx>-1)_postsMem[idx]=post;else _postsMem.push(post);}
+
+    /* تسجيل المشاهدة */
+    if(!_viewsCounted){
+      _viewsCounted=true;
+      azzaDB.from('posts').update({views:(post.views||0)+1}).eq('id',postId).then(()=>{});
+    }
+
+    document.title=`${post.title||post.text?.substring(0,40)||'منشور'} — عزّة`;
+    renderAll();
+  }catch(e){
+    console.error('init post error:',e.message);
+    if(!cached)document.getElementById('layout').innerHTML=notFoundHTML('تعذّر تحميل المنشور');
   }
-  document.title=`${post.title||post.text?.substring(0,40)||'منشور'} — عزّة`;
-  renderAll();
+
   document.addEventListener('click',e=>{
     const cm=document.getElementById('ctx-menu');
     if(cm&&!cm.parentElement?.contains(e.target))cm.classList.remove('open');
   });
 }
-loadInitialDataFromSupabase().then(()=>{
-  /* تزامن بيانات المستخدم الحالي نفسه مع Supabase — يحل خلل عدم انعكاس
-     التعديلات اللاحقة (مثل تفعيل التوثيق) بدون تسجيل خروج/دخول يدوي.
-     me معرّفة بـconst هنا، فنحدّث خصائصها بدل استبدالها بالكامل */
-  const freshMe=(_usersMem||[]).find(u=>u.id===me.id);
-  if(freshMe){ Object.assign(me,freshMe); localStorage.setItem('azza_user',JSON.stringify(me)); }
-  init();
-});
+/* init تجلب بياناتها مباشرة من Supabase بشكل مستقل */
+init();
 
 function notFoundHTML(msg){
   return `<div style="grid-column:1/-1;text-align:center;padding:80px 20px">
