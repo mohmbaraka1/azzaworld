@@ -469,16 +469,16 @@ function notFoundHTML(msg){return `<div style="grid-column:1/-1;text-align:cente
 async function vote(){
   if(!post)return;
   const already=post.votes.includes(me.id);
-  /* Optimistic UI: تحديث فوري */
+  /* Optimistic UI فوري */
   already?post.votes.splice(post.votes.indexOf(me.id),1):post.votes.push(me.id);
   renderAll();
-  /* Supabase */
   try{
     if(already){await azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type','vote');}
     else{const {error}=await azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:'vote'});if(error&&error.code!=='23505')throw error;}
-    await fetchPost();renderAll();
+    /* جلب في الخلفية للتأكيد — لا يُرجع خطأ للمستخدم */
+    fetchPost().then(()=>renderAll()).catch(()=>{});
   }catch(e){
-    /* تراجع عن Optimistic UI لو فشل */
+    /* تراجع فقط لو فشل الإرسال نفسه */
     already?post.votes.push(me.id):post.votes.splice(post.votes.indexOf(me.id),1);
     renderAll();console.error('vote:',e.message);
   }
@@ -493,7 +493,7 @@ async function react(type){
   try{
     if(already){await azzaDB.from('post_reactions').delete().eq('post_id',postId).eq('user_id',me.id).eq('reaction_type',type);}
     else{const {error}=await azzaDB.from('post_reactions').insert({post_id:postId,user_id:me.id,reaction_type:type});if(error&&error.code!=='23505')throw error;}
-    await fetchPost();renderAll();
+    fetchPost().then(()=>renderAll()).catch(()=>{});
   }catch(e){
     already?post[k].push(me.id):post[k].splice(post[k].indexOf(me.id),1);
     renderAll();console.error('react:',e.message);
@@ -503,21 +503,36 @@ async function react(type){
 async function addComment(){
   const inp=document.getElementById('cmt-input');
   const text=(inp?.value||'').trim();if(!text||!post)return;
-  inp.value='';inp.style.height='auto';
   const btn=document.getElementById('cmt-send');if(btn)btn.disabled=true;
-  try{
-    const {error}=await azzaDB.from('post_comments').insert({
-      post_id:postId,author_id:me.id,
-      author_name:me.name,author_username:me.username||'',content:text,
-    });
-    if(error)throw error;
-    await fetchPost();renderAll();
-    writeNotif('comment');
-    showToast('تم نشر تعليقك ✅');
-    setTimeout(()=>{const cl=document.getElementById('comment-list');if(cl)cl.scrollTop=cl.scrollHeight;},100);
-  }catch(e){
-    showToast('تعذّر نشر التعليق','err');console.error('addComment:',e.message);
+
+  /* إرسال لـSupabase أولاً */
+  const {error}=await azzaDB.from('post_comments').insert({
+    post_id:postId,author_id:me.id,
+    author_name:me.name,author_username:me.username||'',content:text,
+  });
+
+  if(error){
+    showToast('تعذّر نشر التعليق','err');
+    console.error('addComment insert:',error.message);
+    if(btn)btn.disabled=false;
+    return;
   }
+
+  /* نجح الإرسال — امسح الحقل وأضف التعليق فوراً محلياً */
+  inp.value='';inp.style.height='auto';
+  post.comments.push({
+    id:genId(),author_id:me.id,
+    author_name:me.name,author_username:me.username||'',
+    text,created_at:new Date().toISOString(),
+  });
+  renderAll();
+  showToast('تم نشر تعليقك ✅');
+  writeNotif('comment');
+  setTimeout(()=>{const cl=document.getElementById('comment-list');if(cl)cl.scrollTop=cl.scrollHeight;},100);
+
+  /* جلب من Supabase في الخلفية للتحديث الكامل (بدون block) */
+  fetchPost().then(()=>renderAll()).catch(()=>{});
+
   if(btn)btn.disabled=false;
 }
 
