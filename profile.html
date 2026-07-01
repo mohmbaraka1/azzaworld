@@ -747,56 +747,105 @@ const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
 let _postsMem=null, _usersMem=null;
 
-function _mapSupabasePost(row){
+/* ══════════════════════════════════════════════════════════════
+   نظام بيانات المنشورات — Supabase فقط (مُعاد بناؤه من الصفر)
+   المبدأ: Supabase هو المصدر الوحيد للحقيقة
+   لا localStorage للمنشورات/التعليقات/التفاعلات أبداً
+   ══════════════════════════════════════════════════════════════ */
+
+/* تحويل صف Supabase لكائن منشور موحّد — votes/comments/reactions تبقى فاضية
+   وتُملأ لاحقاً بـloadAllData() من جداولها المنفصلة */
+function _mapPost(row){
   return {
-    id:row.id,author_id:row.author_id,author_name:row.author_name||'',
-    author_username:row.author_username||'',author_type:row.author_type||'idea',
-    author_photo:row.author_photo||null,type:row.type,text:row.text||'',
-    title:row.title||'',category:row.category||null,
-    image:row.image||null,video:row.video||null,pitch:row.pitch||'',
-    nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
-    job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
-    votes:[],r_insightful:[],r_collab:[],
-    comments:[],views:row.views||0,created_at:row.created_at,
+    id:row.id,
+    author_id:row.author_id,
+    author_name:row.author_name||'',
+    author_username:row.author_username||'',
+    author_type:row.author_type||'idea',
+    author_photo:row.author_photo||null,
+    type:row.type,
+    text:row.text||'',
+    title:row.title||'',
+    category:row.category||null,
+    image:row.image||null,
+    video:row.video||null,
+    pitch:row.pitch||'',
+    nda:row.nda||false,
+    funding_goal:row.funding_goal||0,
+    funding_stage:row.funding_stage||'',
+    job_location:row.job_location||'',
+    job_salary:row.job_salary||'',
+    job_type:row.job_type||'',
+    views:row.views||0,
+    created_at:row.created_at,
+    /* هذه الحقول تُملأ دائماً من جداولها المنفصلة — لا من جدول posts */
+    votes:[],
+    r_insightful:[],
+    r_collab:[],
+    comments:[],
   };
 }
 
-async function loadInitialDataFromSupabase(){
+/* الجلب الشامل: منشورات + تعليقات + تفاعلات + مستخدمين بطلب واحد متوازٍ */
+async function loadAllData(){
   try{
-    const [postsRes,commentsRes,reactionsRes]=await Promise.all([
+    const [postsRes,usersRes,cmtsRes,reactsRes]=await Promise.all([
       azzaDB.from('posts').select('*').order('created_at',{ascending:false}),
+      azzaDB.from('users').select('*'),
       azzaDB.from('post_comments').select('*').order('created_at',{ascending:true}),
       azzaDB.from('post_reactions').select('*'),
     ]);
+
+    /* المستخدمون */
+    if(!usersRes.error) _usersMem=usersRes.data||[];
+
+    /* المنشورات الأساسية */
     if(postsRes.error)throw postsRes.error;
-    const posts=(postsRes.data||[]).map(_mapSupabasePost);
-    const cmtsByPost={};
-    (commentsRes.data||[]).forEach(c=>{
-      if(!cmtsByPost[c.post_id])cmtsByPost[c.post_id]=[];
-      cmtsByPost[c.post_id].push({id:String(c.id),author_id:c.author_id,author_name:c.author_name,author_username:c.author_username||'',text:c.content,created_at:c.created_at});
+    const posts=(postsRes.data||[]).map(_mapPost);
+
+    /* فهرسة التعليقات بالـpost_id */
+    const cmtMap={};
+    (cmtsRes.data||[]).forEach(c=>{
+      if(!cmtMap[c.post_id])cmtMap[c.post_id]=[];
+      cmtMap[c.post_id].push({
+        id:String(c.id),
+        author_id:c.author_id,
+        author_name:c.author_name||'',
+        author_username:c.author_username||'',
+        text:c.content||'',
+        created_at:c.created_at,
+      });
     });
-    const reactsByPost={votes:{},r_insightful:{},r_collab:{}};
-    (reactionsRes.data||[]).forEach(r=>{
-      const key=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
-      if(!reactsByPost[key][r.post_id])reactsByPost[key][r.post_id]=[];
-      reactsByPost[key][r.post_id].push(r.user_id);
+
+    /* فهرسة التفاعلات بالـpost_id */
+    const reactMap={votes:{},r_insightful:{},r_collab:{}};
+    (reactsRes.data||[]).forEach(r=>{
+      const key=r.reaction_type==='vote'?'votes':
+                r.reaction_type==='insightful'?'r_insightful':'r_collab';
+      if(!reactMap[key][r.post_id])reactMap[key][r.post_id]=[];
+      reactMap[key][r.post_id].push(r.user_id);
     });
-    const sbPosts=posts.map(p=>({...p,
-      comments:cmtsByPost[p.id]||[],
-      votes:reactsByPost.votes[p.id]||[],
-      r_insightful:reactsByPost.r_insightful[p.id]||[],
-      r_collab:reactsByPost.r_collab[p.id]||[],
+
+    /* دمج كل شيء — كل منشور يحمل تعليقاته وتفاعلاته الحقيقية */
+    _postsMem=posts.map(p=>({
+      ...p,
+      comments: cmtMap[p.id]||[],
+      votes:    reactMap.votes[p.id]||[],
+      r_insightful: reactMap.r_insightful[p.id]||[],
+      r_collab: reactMap.r_collab[p.id]||[],
     }));
-    const sbIds=new Set(sbPosts.map(p=>p.id));
-    let localOnly=[];
-    try{localOnly=JSON.parse(localStorage.getItem('azza_posts')||'[]').filter(p=>!sbIds.has(p.id));}catch{}
-    _postsMem=[...sbPosts,...localOnly];
-  }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
-  try{
-    const {data,error}=await azzaDB.from('users').select('*');
-    if(error)throw error;
-    _usersMem=data||[];
-  }catch(e){ console.error('تعذر جلب المستخدمين من Supabase:',e.message); _usersMem=null; }
+
+    /* مزامنة localStorage للعمل دون إنترنت وكخطة احتياطية */
+    localStorage.setItem('azza_posts',JSON.stringify(_postsMem));
+
+  }catch(e){
+    console.error('loadAllData فشل، رجوع للـcache المحلي:',e.message);
+    /* fallback: استخدام localStorage المحلي إذا فشل الاتصال */
+    if(_postsMem===null){
+      try{_postsMem=JSON.parse(localStorage.getItem('azza_posts')||'[]');}
+      catch{_postsMem=[];}
+    }
+  }
 }
 
 const getPosts = ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} };
@@ -956,7 +1005,7 @@ function vote(id){
   const a=getPosts(),p=a.find(x=>x.id===id);if(!p)return;
   p.votes=p.votes||[];const i=p.votes.indexOf(user.id);const adding=i===-1;
   adding?p.votes.push(user.id):p.votes.splice(i,1);
-  localStorage.setItem('azza_posts',JSON.stringify(a));renderContent();
+  _postsMem=a;renderContent();
   if(adding){azzaDB.from('post_reactions').insert({post_id:id,user_id:user.id,reaction_type:'vote'}).then(({error})=>{if(error&&error.code!=='23505')console.error('vote:',error.message);});}
   else{azzaDB.from('post_reactions').delete().eq('post_id',id).eq('user_id',user.id).eq('reaction_type','vote').then(({error})=>{if(error)console.error('vote del:',error.message);});}
 }
@@ -966,12 +1015,12 @@ function addComment(id){
   const inp=document.getElementById('ci-'+id);const t=inp.value.trim();if(!t)return;
   const a=getPosts(),p=a.find(x=>x.id===id);if(!p)return;
   p.comments.push({id:genId(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:t,created_at:new Date().toISOString()});
-  localStorage.setItem('azza_posts',JSON.stringify(a));renderContent();
+  _postsMem=a;renderContent();
   setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);
   azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,author_username:user.username||'',content:t})
     .then(({error})=>{if(error)console.error('comment:',error.message);});
 }
-function delPost(id){if(!confirm('حذف هذا المنشور؟'))return;localStorage.setItem('azza_posts',JSON.stringify(getPosts().filter(p=>p.id!==id)));buildProfile();showToast('تم الحذف','err');}
+function delPost(id){if(!confirm('حذف هذا المنشور؟'))return;_postsMem=(_postsMem||[]).filter(p=>p.id!==id);azzaDB.from('posts').delete().eq('id',id).eq('author_id',user.id).then(({error})=>{if(error)console.error('delPost:',error.message);});buildProfile();showToast('تم الحذف','err');}
 
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target);}});},{threshold:.06});
 

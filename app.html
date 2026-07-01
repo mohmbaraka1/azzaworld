@@ -976,7 +976,13 @@ const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
 let _postsMem=null;
 let _usersMem=null;
 
-function _mapSupabasePost(row){
+/* ══════════════════════════════════════════════════════════════
+   نظام بيانات المنشورات — Supabase فقط (مُعاد بناؤه من الصفر)
+   المبدأ: Supabase هو المصدر الوحيد للحقيقة
+   لا localStorage للمنشورات/التعليقات/التفاعلات أبداً
+   ══════════════════════════════════════════════════════════════ */
+
+function _mapPost(row){
   return {
     id:row.id,author_id:row.author_id,author_name:row.author_name||'',
     author_username:row.author_username||'',author_type:row.author_type||'idea',
@@ -985,65 +991,66 @@ function _mapSupabasePost(row){
     image:row.image||null,video:row.video||null,pitch:row.pitch||'',
     nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
     job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
-    /* votes/reactions/comments لا تأتي من جدول posts —
-       بل من post_reactions وpost_comments المنفصلَين ويُدمجان لاحقاً بـloadInitialDataFromSupabase */
-    votes:[],r_insightful:[],r_collab:[],
-    comments:[],views:row.views||0,created_at:row.created_at,
+    views:row.views||0,created_at:row.created_at,
+    votes:[],r_insightful:[],r_collab:[],comments:[],
   };
 }
 
-async function loadInitialDataFromSupabase(){
+/* الجلب الشامل: منشورات + تعليقات + تفاعلات + مستخدمون — طلب واحد متوازٍ */
+async function loadAllData(){
   try{
-    /* جلب المنشورات + التعليقات + التفاعلات بثلاثة طلبات متوازية لأسرع أداء ممكن */
-    const [postsRes,commentsRes,reactionsRes]=await Promise.all([
+    const [postsRes,usersRes,cmtsRes,reactsRes]=await Promise.all([
       azzaDB.from('posts').select('*').order('created_at',{ascending:false}),
+      azzaDB.from('users').select('*'),
       azzaDB.from('post_comments').select('*').order('created_at',{ascending:true}),
       azzaDB.from('post_reactions').select('*'),
     ]);
+    if(!usersRes.error)_usersMem=usersRes.data||[];
     if(postsRes.error)throw postsRes.error;
-    const posts=(postsRes.data||[]).map(_mapSupabasePost);
 
-    /* دمج التعليقات مع منشوراتها */
-    const cmtsByPost={};
-    (commentsRes.data||[]).forEach(c=>{
-      if(!cmtsByPost[c.post_id])cmtsByPost[c.post_id]=[];
-      cmtsByPost[c.post_id].push({id:String(c.id),author_id:c.author_id,author_name:c.author_name,author_username:c.author_username||'',text:c.content,created_at:c.created_at});
+    /* فهرسة التعليقات */
+    const cmtMap={};
+    (cmtsRes.data||[]).forEach(c=>{
+      if(!cmtMap[c.post_id])cmtMap[c.post_id]=[];
+      cmtMap[c.post_id].push({
+        id:String(c.id),author_id:c.author_id,
+        author_name:c.author_name||'',author_username:c.author_username||'',
+        text:c.content||'',created_at:c.created_at,
+      });
     });
 
-    /* دمج التفاعلات (votes, insightful, collab) مع منشوراتها */
-    const reactsByPost={votes:{},r_insightful:{},r_collab:{}};
-    (reactionsRes.data||[]).forEach(r=>{
-      const key=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
-      if(!reactsByPost[key][r.post_id])reactsByPost[key][r.post_id]=[];
-      reactsByPost[key][r.post_id].push(r.user_id);
+    /* فهرسة التفاعلات */
+    const reactMap={votes:{},r_insightful:{},r_collab:{}};
+    (reactsRes.data||[]).forEach(r=>{
+      const k=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
+      if(!reactMap[k][r.post_id])reactMap[k][r.post_id]=[];
+      reactMap[k][r.post_id].push(r.user_id);
     });
 
-    /* تطبيق البيانات الحقيقية على كل منشور من Supabase */
-    const sbPosts=posts.map(p=>({
-      ...p,
-      comments:cmtsByPost[p.id]||[],
-      votes:reactsByPost.votes[p.id]||[],
-      r_insightful:reactsByPost.r_insightful[p.id]||[],
-      r_collab:reactsByPost.r_collab[p.id]||[],
-    }));
-    const sbIds=new Set(sbPosts.map(p=>p.id));
-    /* منشورات localStorage غير الموجودة بـSupabase (محلية فقط) نحتفظ بها كما هي */
-    let localOnly=[];
-    try{localOnly=JSON.parse(localStorage.getItem('azza_posts')||'[]').filter(p=>!sbIds.has(p.id));}catch{}
-    _postsMem=[...sbPosts,...localOnly];
+    /* دمج كل شيء — Supabase هو المصدر الوحيد */
+    _postsMem=(postsRes.data||[]).map(row=>{
+      const p=_mapPost(row);
+      p.comments=cmtMap[p.id]||[];
+      p.votes=reactMap.votes[p.id]||[];
+      p.r_insightful=reactMap.r_insightful[p.id]||[];
+      p.r_collab=reactMap.r_collab[p.id]||[];
+      return p;
+    });
+
+    /* حفظ بـlocalStorage كـcache احتياطي فقط */
+    try{localStorage.setItem('azza_posts',JSON.stringify(_postsMem));}catch{}
+
   }catch(e){
-    console.error('تعذر جلب المنشورات من Supabase، استخدام النسخة المحلية:',e.message);
-    _postsMem=null;
-  }
-  try{
-    const {data:usersData,error:usersErr}=await azzaDB.from('users').select('*');
-    if(usersErr)throw usersErr;
-    _usersMem=usersData||[];
-  }catch(e){
-    console.error('تعذر جلب المستخدمين من Supabase، استخدام النسخة المحلية:',e.message);
-    _usersMem=null;
+    console.error('loadAllData فشل، رجوع للـcache المحلي:',e.message);
+    if(_postsMem===null){
+      try{_postsMem=JSON.parse(localStorage.getItem('azza_posts')||'[]');}
+      catch{_postsMem=[];}
+    }
   }
 }
+
+/* للتوافق مع الكود القديم الذي يستدعي loadInitialDataFromSupabase */
+const loadInitialDataFromSupabase=loadAllData;
 
 const G = {
   getUser:  ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}},
@@ -1052,10 +1059,9 @@ const G = {
      وإلا ترجع تلقائياً لـlocalStorage كخطة احتياطية (مثلاً قبل اكتمال التحميل الأولي، أو عند فشل الاتصال) */
   getUsers: ()=>{ if(_usersMem!==null)return _usersMem; try{return JSON.parse(localStorage.getItem('azza_users')||'[]');}catch{return[];} },
   getPosts: ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} },
-  /* ملاحظة مهمة: savePosts تحدّث الذاكرة المؤقتة وlocalStorage فقط — لا ترسل تلقائياً لـSupabase.
-     فقط publish() الجديدة ترسل منشورات جديدة فعلياً لـSupabase (نطاق المرحلة 3 الحالي).
-     تعديلات أخرى (vote, react, تعليق, حذف) تبقى محلية فقط حتى نوسّع هذا لاحقاً. */
-  savePosts:p=>{ _postsMem=p; localStorage.setItem('azza_posts',JSON.stringify(p)); },
+  /* savePosts: تحدّث الذاكرة المؤقتة فقط — Supabase هو المصدر الوحيد للحقيقة
+     التعديلات الفعلية (vote,react,تعليق) ترسل مباشرة لـSupabase من دوالها */
+  savePosts:p=>{ _postsMem=p; try{localStorage.setItem('azza_posts',JSON.stringify(p));}catch{} },
   getInts:  ()=>{try{return JSON.parse(localStorage.getItem('azza_interests')||'{}');}catch{return{};}},
   getSigs:  ()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}},
 };
