@@ -347,14 +347,31 @@ async function deleteNotif(dbId){
   setTimeout(()=>render(),220);
 }
 
-/* ── التحميل الأول + polling كل 10 ثوانٍ ── */
+/* ── التحميل الأول + Supabase Realtime (لحظي بدل polling) ── */
 (async()=>{
   await fetchNotifs();
   render(false);
+
+  /* الاشتراك بـRealtime — يستقبل الإشعارات الجديدة لحظياً حين تُضاف بقاعدة البيانات
+     بدون أي تأخير، بدل الانتظار حتى جولة polling التالية */
+  azzaDB.channel('notifs_'+user.id)
+    .on('postgres_changes',{
+      event:'INSERT',
+      schema:'public',
+      table:'notifications',
+      filter:`user_id=eq.${user.id}`,
+    }, async(payload)=>{
+      /* وصل إشعار جديد — أعد جلب القائمة كاملة وأعرضها */
+      await fetchNotifs();
+      render(true);
+    })
+    .subscribe();
+
+  /* polling احتياطي كل 30 ثانية فقط (لو انقطع Realtime لأي سبب) */
   setInterval(async()=>{
     await fetchNotifs();
-    render(true);
-  },10000);
+    render(false);
+  },30000);
 })();
 
 initSoundUI();

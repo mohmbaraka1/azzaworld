@@ -1966,7 +1966,25 @@ function interest(pid){const ints=G.getInts();ints[pid]=ints[pid]||[];if(ints[pi
 function openNda(pid){ndaId=pid;document.getElementById('nda-cb').checked=false;document.getElementById('nda-btn').disabled=true;document.getElementById('nda-ol').classList.add('open');}
 function closeNda(){document.getElementById('nda-ol').classList.remove('open');ndaId=null;}
 function signNda(){if(!ndaId)return;const s=G.getSigs();s[ndaId]=s[ndaId]||[];if(!s[ndaId].some(x=>x.id===user.id))s[ndaId].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_nda_sigs',JSON.stringify(s));closeNda();interest(ndaId);}
-function writeNotif(pid,type){try{const posts=G.getPosts(),p=posts.find(x=>x.id===pid);if(!p||p.author_id===user.id)return;const k='azza_notifs_'+p.author_id;let n=[];try{n=JSON.parse(localStorage.getItem(k)||'[]');}catch{}n.unshift({id:id(),type,from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null,post_id:pid,post_text:p.title||p.text?.substring(0,60),at:new Date().toISOString(),read:false});localStorage.setItem(k,JSON.stringify(n));}catch{}}
+function writeNotif(pid,type){
+  try{
+    const posts=G.getPosts(),p=posts.find(x=>x.id===pid);
+    if(!p||p.author_id===user.id)return; /* لا إشعار لنفسك */
+    /* الإشعار المحلي — فوري بدون انتظار الشبكة */
+    const k='azza_notifs_'+p.author_id;
+    let n=[];try{n=JSON.parse(localStorage.getItem(k)||'[]');}catch{}
+    n.unshift({id:id(),type,from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null,post_id:pid,post_text:p.title||p.text?.substring(0,60),at:new Date().toISOString(),read:false});
+    localStorage.setItem(k,JSON.stringify(n));
+    /* الإرسال الحقيقي لقاعدة البيانات — يضمن وصول الإشعار للمستخدم الآخر على أي جهاز */
+    azzaDB.from('notifications').insert({
+      user_id:p.author_id,
+      type,
+      content:JSON.stringify({from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null,post_id:pid,post_text:p.title||p.text?.substring(0,60)}),
+      related_id:pid,
+      read:false,
+    }).then(({error})=>{if(error)console.error('تعذر إرسال الإشعار:',error.message);});
+  }catch{}
+}
 function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
 
 /* مودال النشر */
@@ -2025,7 +2043,26 @@ function buildRight(){
   const sl=document.getElementById('suggestions');
   if(sl)sl.innerHTML=users.length?users.map(u=>{const vc=VERIFY[vt(u)]||VERIFY.idea;const isF=following.includes(u.id);const av=u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(u.name);return `<div class="sug-item"><div class="sug-av" onclick="openUser('${u.id}')">${av}</div><div style="flex:1"><div class="sug-name" onclick="openUser('${u.id}')">${esc(u.name)}</div><div class="sug-role" style="color:${vc.c}">${vc.lbl}</div></div><button class="follow-b${isF?' on':''}" id="fw-${u.id}" onclick="toggleFollow('${u.id}',this)">${isF?'✓':'+'}</button></div>`;}).join(''):'<div style="font-size:13px;color:var(--muted)">لا مستخدمين آخرين</div>';
 }
-function toggleFollow(uid,btn){const k='azza_following_'+user.id;let f=JSON.parse(localStorage.getItem(k)||'[]');const i=f.indexOf(uid);i===-1?f.push(uid):f.splice(i,1);localStorage.setItem(k,JSON.stringify(f));btn.textContent=i===-1?'✓':'+';btn.classList.toggle('on',i===-1);toast(i===-1?'بدأت المتابعة ✅':'ألغيت المتابعة','info');}
+function toggleFollow(uid,btn){
+  const k='azza_following_'+user.id;
+  let f=JSON.parse(localStorage.getItem(k)||'[]');
+  const i=f.indexOf(uid);
+  i===-1?f.push(uid):f.splice(i,1);
+  localStorage.setItem(k,JSON.stringify(f));
+  btn.textContent=i===-1?'✓':'+';
+  btn.classList.toggle('on',i===-1);
+  toast(i===-1?'بدأت المتابعة ✅':'ألغيت المتابعة','info');
+  /* إرسال إشعار المتابعة لـSupabase فوراً */
+  if(i===-1){
+    azzaDB.from('notifications').insert({
+      user_id:uid,
+      type:'follow',
+      content:JSON.stringify({from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null}),
+      related_id:null,
+      read:false,
+    }).then(({error})=>{if(error)console.error('تعذر إرسال إشعار المتابعة:',error.message);});
+  }
+}
 
 init();
 </script>
