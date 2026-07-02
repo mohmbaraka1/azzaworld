@@ -2081,7 +2081,7 @@ function toggleCmt(pid){
             if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
           });
         }
-      });
+      }, (_postsMem||[]).find(p=>p.id===pid)?.author_id||null);
       AzzaComments.injectCSS();
       AzzaComments.renderInput(pid,'az-input-'+pid);
       AzzaComments.fetch(pid).then(cmts=>{

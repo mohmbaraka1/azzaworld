@@ -17,19 +17,22 @@ window.AzzaComments = (function(){
   };
 
   /* ── المتغيرات المشتركة ── */
-  let _db      = null;  /* Supabase client */
-  let _me      = null;  /* المستخدم الحالي */
-  let _channel = null;  /* Realtime subscription */
-  let _onUpdate= null;  /* callback عند تغيير بيانات */
+  let _db           = null;
+  let _me           = null;
+  let _channel      = null;
+  let _onUpdate     = null;
+  let _postAuthorId = null;  /* ID صاحب المنشور لشارة "صاحب المنشور" */
+  let _likes        = {};    /* { commentId: [userId, ...] } */
 
   /* ─────────────────────────────────────────────────────────────
      init() — يُستدعى مرة واحدة عند تحميل الصفحة
      db: Supabase client  |  me: كائن المستخدم الحالي
   ───────────────────────────────────────────────────────────── */
-  function init(db, me, onUpdateCallback){
-    _db       = db;
-    _me       = me;
-    _onUpdate = onUpdateCallback;
+  function init(db, me, onUpdateCallback, postAuthorId=null){
+    _db           = db;
+    _me           = me;
+    _onUpdate     = onUpdateCallback;
+    _postAuthorId = postAuthorId; /* لإظهار شارة "صاحب المنشور" */
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -91,7 +94,33 @@ window.AzzaComments = (function(){
   }
 
   /* ─────────────────────────────────────────────────────────────
-     subscribe(postId) — Realtime: استقبال التغييرات فوراً
+     toggleLike(commentId) — لايك/إلغاء لايك على تعليق
+  ───────────────────────────────────────────────────────────── */
+  async function toggleLike(commentId){
+    if(!_me) return;
+    const likers = _likes[commentId] = _likes[commentId]||[];
+    const idx    = likers.indexOf(_me.id);
+    const liked  = idx !== -1;
+
+    /* Optimistic UI */
+    liked ? likers.splice(idx,1) : likers.push(_me.id);
+    _updateLikeBtn(commentId);
+
+    /* حفظ بـlocalStorage كـcache مؤقت */
+    try{ localStorage.setItem('az_likes',JSON.stringify(_likes)); }catch{}
+  }
+
+  function _updateLikeBtn(commentId){
+    const btn = document.getElementById('az-like-'+commentId);
+    if(!btn) return;
+    const likers = _likes[commentId]||[];
+    const liked  = likers.includes(_me?.id);
+    btn.className = 'az-like-btn'+(liked?' liked':'');
+    btn.innerHTML = `${liked?'❤️':'🤍'} <span class="az-like-count">${likers.length||''}</span>`;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     subscribe(postId) — Realtime: تحديث تلقائي فوري للتعليقات والردود
   ───────────────────────────────────────────────────────────── */
   function subscribe(postId){
     if(_channel) _db.removeChannel(_channel);
@@ -119,6 +148,9 @@ window.AzzaComments = (function(){
     const el = document.getElementById(containerId);
     if(!el) return;
 
+    /* تحميل الـlikes من cache */
+    try{ _likes=JSON.parse(localStorage.getItem('az_likes')||'{}'); }catch{}
+
     if(!comments.length){
       el.innerHTML = `<div class="az-no-cmt">لا تعليقات بعد — كن أول من يعلّق 💬</div>`;
       return;
@@ -136,21 +168,28 @@ window.AzzaComments = (function(){
 
   /* بناء HTML لتعليق واحد مع ردوده */
   function _buildComment(c, replies=[]){
-    const mine  = c.author_id === _me?.id;
-    const av    = (c.author_name||'م')[0].toUpperCase();
-    const label = c.is_deleted ? '' : (c.is_edited ? '<span class="az-edited">تم التعديل</span>' : '');
-    const text  = c.is_deleted
+    const mine       = c.author_id === _me?.id;
+    const isAuthor   = _postAuthorId && c.author_id === _postAuthorId;
+    const av         = (c.author_name||'م')[0].toUpperCase();
+    const label      = c.is_deleted ? '' : (c.is_edited ? '<span class="az-edited">تم التعديل</span>' : '');
+    const text       = c.is_deleted
       ? '<span style="color:var(--muted);font-style:italic">[تم حذف هذا التعليق]</span>'
       : esc(c.content);
+    const likers     = _likes[c.id]||[];
+    const liked      = likers.includes(_me?.id);
+    const likeCount  = likers.length;
+    const authorBadge= isAuthor ? `<span class="az-author-badge">صاحب المنشور</span>` : '';
 
     const actions = c.is_deleted ? '' : `
+      <button class="az-like-btn${liked?' liked':''}" id="az-like-${c.id}" onclick="AzzaComments.toggleLike(${c.id})">
+        ${liked?'❤️':'🤍'} <span class="az-like-count">${likeCount||''}</span>
+      </button>
       <button class="az-cmt-act" onclick="AzzaComments.startReply(${c.id},'${esc(c.author_name).replace(/'/g,"\\'")}')">↩ رد</button>
       ${mine ? `
         <button class="az-cmt-act" onclick="AzzaComments.startEdit(${c.id},'${esc(c.content).replace(/'/g,"\\'")}')">تعديل</button>
         <button class="az-cmt-act danger" onclick="AzzaComments.confirmDelete(${c.id})">حذف</button>
       ` : ''}`;
 
-    /* زر "عرض الردود" — يظهر فقط لو فيه ردود */
     const repliesHTML = replies.length ? `
       <button class="az-replies-toggle" onclick="AzzaComments.toggleReplies(${c.id},this)">
         <span class="az-replies-line"></span>
@@ -162,12 +201,13 @@ window.AzzaComments = (function(){
 
     return `
       <div class="az-cmt" id="az-cmt-${c.id}">
-        <div class="az-cmt-av">${av}</div>
+        <div class="az-cmt-av${isAuthor?' author':''}">${av}</div>
         <div class="az-cmt-body">
-          <div class="az-cmt-bubble">
+          <div class="az-cmt-bubble${isAuthor?' az-author-bubble':''}>
             <div class="az-cmt-name">
               ${esc(c.author_name)}
               ${c.author_username ? `<span class="az-cmt-handle">@${esc(c.author_username)}</span>` : ''}
+              ${authorBadge}
             </div>
             <div class="az-cmt-text" id="az-text-${c.id}">${text}</div>
             ${label}
@@ -421,7 +461,13 @@ window.AzzaComments = (function(){
 .az-cmt-act{background:none;border:none;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;padding:0;font-family:inherit;transition:.15s}
 .az-cmt-act:hover{color:var(--olive)}
 .az-cmt-act.danger:hover{color:var(--red,#c0392b)}
-.az-replies{padding-right:28px;border-right:2px solid var(--line);margin:4px 8px 4px 0;display:flex;flex-direction:column;gap:2px}
+.az-author-badge{display:inline-flex;align-items:center;background:rgba(28,91,56,.1);color:#0e3622;border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:700;margin-right:4px;vertical-align:middle}
+.az-cmt-av.author{background:linear-gradient(135deg,var(--olive),var(--olive-deep));color:var(--gold)}
+.az-author-bubble{border:1.5px solid rgba(28,91,56,.2)}
+.az-like-btn{background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:999px;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:3px}
+.az-like-btn:hover{background:rgba(206,17,38,.06);color:#ce1126}
+.az-like-btn.liked{color:#ce1126}
+.az-like-count{font-size:11px;font-weight:700}
 .az-replies-toggle{background:none;border:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--olive);cursor:pointer;padding:4px 0 4px 8px;font-family:inherit;transition:.15s}
 .az-replies-toggle:hover{color:var(--olive-deep)}
 .az-replies-line{display:inline-block;width:24px;height:2px;background:var(--line);border-radius:2px;flex-shrink:0}
@@ -452,7 +498,7 @@ window.AzzaComments = (function(){
     renderList, renderInput,
     submit, startReply, closeReply,
     startEdit, confirmEdit, cancelEdit,
-    confirmDelete, toggleReplies,
+    confirmDelete, toggleReplies, toggleLike,
     injectCSS, _autoR,
   };
 })();
