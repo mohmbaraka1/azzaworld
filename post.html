@@ -247,6 +247,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
 }
 </style>
 <script src="supabase.js"></script>
+<script src="comments.js"></script>
 </head>
 <body>
 
@@ -451,6 +452,22 @@ async function init(){
     }
     document.title=`${post.title||post.text?.substring(0,40)||'منشور'} — عزّة`;
     renderAll();
+
+    /* تهيئة نظام التعليقات الجديد */
+    AzzaComments.injectCSS();
+    AzzaComments.init(azzaDB, me, async(pid)=>{
+      const cmts=await AzzaComments.fetch(postId);
+      AzzaComments.renderList(cmts,'az-list-main');
+      const cnt=document.getElementById('az-count-main');
+      if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||'';
+    });
+    AzzaComments.renderInput(postId,'az-input-main');
+    AzzaComments.fetch(postId).then(cmts=>{
+      AzzaComments.renderList(cmts,'az-list-main');
+      const cnt=document.getElementById('az-count-main');
+      if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||'';
+    });
+    AzzaComments.subscribe(postId);
   }catch(e){
     console.error('init:',e.message);
     document.getElementById('layout').innerHTML=notFoundHTML('المنشور غير موجود أو تم حذفه');
@@ -501,39 +518,11 @@ async function react(type){
 }
 
 async function addComment(){
-  const inp=document.getElementById('cmt-input');
-  const text=(inp?.value||'').trim();if(!text||!post)return;
-  const btn=document.getElementById('cmt-send');if(btn)btn.disabled=true;
-
-  /* إرسال لـSupabase أولاً */
-  const {error}=await azzaDB.from('post_comments').insert({
-    post_id:postId,author_id:me.id,
-    author_name:me.name,author_username:me.username||'',content:text,
+  const postIdVal=postId;
+  AzzaComments.init(azzaDB,me,async(pid)=>{
+    if(pid){const cmts=await AzzaComments.fetch(pid);AzzaComments.renderList(cmts,'az-list-main');}
   });
-
-  if(error){
-    showToast('تعذّر نشر التعليق','err');
-    console.error('addComment insert:',error.message);
-    if(btn)btn.disabled=false;
-    return;
-  }
-
-  /* نجح الإرسال — امسح الحقل وأضف التعليق فوراً محلياً */
-  inp.value='';inp.style.height='auto';
-  post.comments.push({
-    id:genId(),author_id:me.id,
-    author_name:me.name,author_username:me.username||'',
-    text,created_at:new Date().toISOString(),
-  });
-  renderAll();
-  showToast('تم نشر تعليقك ✅');
-  writeNotif('comment');
-  setTimeout(()=>{const cl=document.getElementById('comment-list');if(cl)cl.scrollTop=cl.scrollHeight;},100);
-
-  /* جلب من Supabase في الخلفية للتحديث الكامل (بدون block) */
-  fetchPost().then(()=>renderAll()).catch(()=>{});
-
-  if(btn)btn.disabled=false;
+  AzzaComments.submit(postIdVal);
 }
 
 async function deleteComment(cmtId){
@@ -741,16 +730,10 @@ function renderAll(){
         ${ndaBox}
       </div>
       ${reactBar}
-      <div class="comments-section" style="margin-top:12px">
-        <div class="comments-header"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>التعليقات ${p.comments.length?`<span style="color:var(--muted);font-size:13px;font-weight:500">(${p.comments.length})</span>`:''}</div>
-        <div class="comment-list" id="comment-list">${cmts||`<div class="no-comments">لا تعليقات بعد — كن أول من يعلّق 💬</div>`}</div>
-        <div class="add-comment">
-          <div class="add-cmt-av">${myAv}</div>
-          <div class="add-cmt-wrap">
-            <textarea class="cmt-input" id="cmt-input" placeholder="أضف تعليقاً..." oninput="autoResize(this);updateSendBtn()" onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addComment();}"></textarea>
-            <div class="cmt-send-row"><button class="cmt-send" id="cmt-send" onclick="addComment()" disabled>نشر</button></div>
-          </div>
-        </div>
+      <div class="comments-section" style="margin-top:12px" data-post-id="${postId}">
+        <div class="comments-header"><svg class="ic" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>التعليقات <span id="az-count-main" style="font-size:13px;color:var(--muted);font-weight:500">${p.comments.length||''}</span></div>
+        <div class="az-cmt-list" id="az-list-main"></div>
+        <div id="az-input-main"></div>
       </div>
     </div>
     <div class="aside-col">

@@ -368,6 +368,7 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
 }
 </style>
 <script src="supabase.js"></script>
+<script src="comments.js"></script>
 </head>
 <body>
 
@@ -1017,22 +1018,28 @@ async function vote(id){
   renderContent();
 }
 function toggleSave(id){const k='azza_saved_'+user.id;let s;try{s=JSON.parse(localStorage.getItem(k)||'[]');}catch{s=[];}const i=s.indexOf(id);i===-1?s.push(id):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));showToast(i===-1?'تم الحفظ 🔖':'أُزيل','info');renderContent();}
-function toggleComments(id){document.getElementById('cm-'+id)?.classList.toggle('open');}
-async function addComment(id){
-  const inp=document.getElementById('ci-'+id);const t=inp.value.trim();if(!t)return;
-  inp.value='';
-  try{
-    const {error}=await azzaDB.from('post_comments').insert({post_id:id,author_id:user.id,author_name:user.name,author_username:user.username||'',content:t});
-    if(error)throw error;
-    await loadAllData();
-    setTimeout(()=>document.getElementById('cm-'+id)?.classList.add('open'),30);
-  }catch(e){
-    const p=(_postsMem||[]).find(x=>x.id===id);
-    if(p){p.comments=p.comments||[];p.comments.push({id:genId(),author_id:user.id,author_name:user.name,author_username:user.username||'',text:t,created_at:new Date().toISOString()});}
-    console.error('addComment:',e.message);
+function toggleComments(id){
+  const wrap=document.getElementById('cm-'+id);
+  if(!wrap)return;
+  const isOpen=wrap.classList.toggle('open');
+  if(isOpen){
+    const listEl=document.getElementById('az-list-'+id);
+    if(listEl&&!listEl.dataset.loaded){
+      listEl.dataset.loaded='1';
+      AzzaComments.injectCSS();
+      AzzaComments.init(azzaDB,user,async(postId)=>{
+        if(postId){const cmts=await AzzaComments.fetch(postId);AzzaComments.renderList(cmts,'az-list-'+postId);}
+      });
+      AzzaComments.renderInput(id,'az-input-prof-'+id);
+      AzzaComments.fetch(id).then(cmts=>{
+        AzzaComments.renderList(cmts,'az-list-'+id);
+        AzzaComments.subscribe(id);
+      });
+    }
   }
-  renderContent();
 }
+async function addComment(id){ AzzaComments.submit(id); }
+
 async function delPost(id){
   if(!confirm('حذف هذا المنشور؟'))return;
   try{
@@ -1205,12 +1212,9 @@ function postCard(p,idx){
       <button class="pact" onclick="toggleComments('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> تعليق</button>
       <button class="pact ${sv?'saved':''}" onclick="toggleSave('${p.id}')"><svg class="ic" width="15" height="15" viewBox="0 0 24 24" ${sv?'fill="currentColor"':''}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> ${sv?'محفوظ':'حفظ'}</button>
     </div>
-    <div class="post-comments" id="cm-${p.id}">${cmts}
-      <div class="cmt-in-row">
-        <div class="cmt-av">${ini(user.name)}</div>
-        <input class="cmt-in" id="ci-${p.id}" placeholder="أضف تعليقاً..." onkeypress="if(event.key==='Enter')addComment('${p.id}')">
-        <button class="cmt-send" onclick="addComment('${p.id}')"><svg class="ic" width="14" height="14" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-      </div>
+    <div class="post-comments az-section" id="cm-${p.id}" data-post-id="${p.id}">
+      <div class="az-cmt-list" id="az-list-${p.id}"></div>
+      <div id="az-input-prof-${p.id}"></div>
     </div>
   </article>`;
 }

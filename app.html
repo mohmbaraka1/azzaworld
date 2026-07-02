@@ -657,6 +657,7 @@ html,body{ height:100%; overflow:hidden }
 }
 </style>
 <script src="supabase.js"></script>
+<script src="comments.js"></script>
 </head>
 <body>
 
@@ -1883,9 +1884,13 @@ function card(p){
   </div>`;
 
   /* comments section */
-  const cmtsH=(p.comments||[]).map(c=>`<div class="cmt"><div class="cmt-av">${ini(c.author_name)}</div><div class="cmt-content"><div class="cmt-bubble"><div class="cmt-name">${esc(c.author_name)}${c.author_username?` <span style="font-size:10.5px;color:var(--muted)">@${esc(c.author_username)}</span>`:''}</div><div class="cmt-text">${esc(c.text)}</div></div><div class="cmt-time">${ago(c.created_at)}</div></div></div>`).join('');
+  /* التعليقات تُعرض عبر AzzaComments.renderList() بعد فتح الـdropdown */
   const myav=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
-  const cmtBox=`<div class="cmts-wrap" id="cm-${p.id}"><div class="cmts-list">${cmtsH}</div><div class="cmt-input-row"><div class="my-av">${myav}</div><div class="cmt-field"><textarea class="cmt-ta" id="ci-${p.id}" rows="1" placeholder="أضف تعليقاً..." oninput="autoR(this);document.getElementById('cs-${p.id}').classList.toggle('on',this.value.trim().length>0)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addCmt('${p.id}')}"></textarea><button class="cmt-send" id="cs-${p.id}" onclick="addCmt('${p.id}')"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div></div>`;
+  const cmtBox=`<div class="cmts-wrap az-section" id="cm-${p.id}" data-post-id="${p.id}">
+    <div class="az-section-head">💬 التعليقات <span id="az-count-${p.id}" style="font-size:13px;color:var(--muted);font-weight:500">${p.comments?.length||0}</span></div>
+    <div class="az-cmt-list" id="az-list-${p.id}"></div>
+    <div id="az-input-${p.id}"></div>
+  </div>`;
 
   /* action bar */
   const acts=`<div class="p-actions">
@@ -2047,32 +2052,37 @@ async function react(pid,t){
   render();
 }
 
-async function addCmt(pid){
-  const inp=document.getElementById('ci-'+pid);
-  const txt=(inp?.value||'').trim();if(!txt)return;
-  inp.value='';
-  try{
-    const {error}=await azzaDB.from('post_comments').insert({
-      post_id:pid,author_id:user.id,
-      author_name:user.name,author_username:user.username||'',
-      content:txt,
-    });
-    if(error)throw error;
-    await loadAllData();
-    writeNotif(pid,'comment');
-  }catch(e){
-    /* Optimistic fallback */
-    const p=(_postsMem||[]).find(x=>x.id===pid);
-    if(p){
-      p.comments=p.comments||[];
-      p.comments.push({id:id(),author_id:user.id,author_name:user.name,
-        author_username:user.username||'',text:txt,created_at:new Date().toISOString()});
+/* ── نظام التعليقات الجديد (AzzaComments) ── */
+function toggleCmt(pid){
+  const wrap=document.getElementById('cm-'+pid);
+  if(!wrap)return;
+  const isOpen=wrap.classList.toggle('open');
+  if(isOpen){
+    const listEl=document.getElementById('az-list-'+pid);
+    if(listEl&&!listEl.dataset.loaded){
+      listEl.dataset.loaded='1';
+      AzzaComments.init(azzaDB,user,(postId)=>{
+        if(postId){
+          AzzaComments.fetch(postId).then(cmts=>{
+            AzzaComments.renderList(cmts,'az-list-'+postId);
+            const cnt=document.getElementById('az-count-'+postId);
+            if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
+          });
+        }
+      });
+      AzzaComments.injectCSS();
+      AzzaComments.renderInput(pid,'az-input-'+pid);
+      AzzaComments.fetch(pid).then(cmts=>{
+        AzzaComments.renderList(cmts,'az-list-'+pid);
+        const cnt=document.getElementById('az-count-'+pid);
+        if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
+        AzzaComments.subscribe(pid);
+      });
     }
-    console.error('addCmt error:',e.message);
-    toast('تعذّر حفظ التعليق، تحقق من اتصالك','err');
   }
-  render();
 }
+async function addCmt(pid){ AzzaComments.submit(pid); }
+
 
 async function delPost(pid){
   if(!confirm('حذف هذا المنشور؟'))return;
@@ -2086,7 +2096,6 @@ async function delPost(pid){
   render();buildStats();toast('تم الحذف','err');
 }
 
-function toggleCmt(pid){document.getElementById('cm-'+pid)?.classList.toggle('open');}
 function toggleSave(pid){const k='azza_saved_'+user.id;let s=JSON.parse(localStorage.getItem(k)||'[]');const i=s.indexOf(pid);i===-1?s.push(pid):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));render();toast(i===-1?'تم الحفظ 🔖':'أُزيل من المحفوظات','info');}
 function interest(pid){const ints=G.getInts();ints[pid]=ints[pid]||[];if(ints[pid].some(x=>x.id===user.id)){toast('أبديت اهتمامك مسبقاً');return;}ints[pid].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_interests',JSON.stringify(ints));writeNotif(pid,'interest');render();toast('تم إبداء الاهتمام ✅');}
 function openNda(pid){ndaId=pid;document.getElementById('nda-cb').checked=false;document.getElementById('nda-btn').disabled=true;document.getElementById('nda-ol').classList.add('open');}
