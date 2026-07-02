@@ -126,9 +126,10 @@ window.AzzaComments = (function(){
 
     /* فصل التعليقات الرئيسية عن الردود */
     const roots   = comments.filter(c => !c.parent_id);
-    const replies = comments.filter(c =>  c.parent_id);
     const byParent = {};
-    replies.forEach(r => { (byParent[r.parent_id]=byParent[r.parent_id]||[]).push(r); });
+    comments.filter(c => c.parent_id).forEach(r => {
+      (byParent[r.parent_id] = byParent[r.parent_id]||[]).push(r);
+    });
 
     el.innerHTML = roots.map(c => _buildComment(c, byParent[c.id]||[])).join('');
   }
@@ -143,14 +144,19 @@ window.AzzaComments = (function(){
       : esc(c.content);
 
     const actions = c.is_deleted ? '' : `
-      <button class="az-cmt-act" onclick="AzzaComments.startReply(${c.id},'${esc(c.author_name)}')">رد</button>
+      <button class="az-cmt-act" onclick="AzzaComments.startReply(${c.id},'${esc(c.author_name).replace(/'/g,"\\'")}')">↩ رد</button>
       ${mine ? `
         <button class="az-cmt-act" onclick="AzzaComments.startEdit(${c.id},'${esc(c.content).replace(/'/g,"\\'")}')">تعديل</button>
         <button class="az-cmt-act danger" onclick="AzzaComments.confirmDelete(${c.id})">حذف</button>
       ` : ''}`;
 
+    /* زر "عرض الردود" — يظهر فقط لو فيه ردود */
     const repliesHTML = replies.length ? `
-      <div class="az-replies">
+      <button class="az-replies-toggle" onclick="AzzaComments.toggleReplies(${c.id},this)">
+        <span class="az-replies-line"></span>
+        عرض ${replies.length} ${replies.length===1?'رد':'ردود'}
+      </button>
+      <div class="az-replies" id="az-replies-${c.id}" style="display:none">
         ${replies.map(r => _buildComment(r)).join('')}
       </div>` : '';
 
@@ -251,14 +257,34 @@ window.AzzaComments = (function(){
     if(btn) btn.disabled=false;
   }
 
-  /* إدراج تعليق مؤقت في الواجهة */
+  /* إدراج تعليق مؤقت في الواجهة مع auto-scroll */
   function _insertOptimistic(c){
-    const listEl = document.querySelector('.az-cmt-list');
+    const listEl = document.querySelector(`#az-list-${c.post_id}, .az-cmt-list`);
     if(!listEl) return;
+    /* إزالة رسالة "لا تعليقات" لو موجودة */
+    const empty = listEl.querySelector('.az-no-cmt');
+    if(empty) empty.remove();
     const div = document.createElement('div');
-    div.innerHTML = _buildComment(c);
-    div.firstElementChild && listEl.appendChild(div.firstElementChild);
-    listEl.scrollTop = listEl.scrollHeight;
+    div.innerHTML = _buildComment(c).trim();
+    const node = div.firstElementChild;
+    if(node){
+      node.style.animation = 'az-slide-in .25s ease';
+      listEl.appendChild(node);
+      /* auto-scroll للتعليق الجديد */
+      setTimeout(()=>node.scrollIntoView({behavior:'smooth',block:'nearest'}), 50);
+    }
+  }
+
+  /* إظهار/إخفاء الردود */
+  function toggleReplies(parentId, btn){
+    const repliesEl = document.getElementById('az-replies-'+parentId);
+    if(!repliesEl) return;
+    const isHidden = repliesEl.style.display === 'none';
+    repliesEl.style.display = isHidden ? 'block' : 'none';
+    const count = repliesEl.querySelectorAll('.az-cmt').length;
+    btn.innerHTML = isHidden
+      ? `<span class="az-replies-line"></span> إخفاء الردود`
+      : `<span class="az-replies-line"></span> عرض ${count} ${count===1?'رد':'ردود'}`;
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -395,7 +421,11 @@ window.AzzaComments = (function(){
 .az-cmt-act{background:none;border:none;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;padding:0;font-family:inherit;transition:.15s}
 .az-cmt-act:hover{color:var(--olive)}
 .az-cmt-act.danger:hover{color:var(--red,#c0392b)}
-.az-replies{padding-right:28px;border-right:2px solid var(--line);margin:4px 8px 4px 0}
+.az-replies{padding-right:28px;border-right:2px solid var(--line);margin:4px 8px 4px 0;display:flex;flex-direction:column;gap:2px}
+.az-replies-toggle{background:none;border:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--olive);cursor:pointer;padding:4px 0 4px 8px;font-family:inherit;transition:.15s}
+.az-replies-toggle:hover{color:var(--olive-deep)}
+.az-replies-line{display:inline-block;width:24px;height:2px;background:var(--line);border-radius:2px;flex-shrink:0}
+@keyframes az-slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .az-no-cmt{padding:32px;text-align:center;color:var(--muted);font-size:14px}
 .az-add-cmt{display:flex;gap:9px;padding:12px 14px;border-top:1px solid var(--line);align-items:flex-start}
 .az-reply-input{border-top:none;padding:6px 4px 4px 0;margin-top:4px}
@@ -422,7 +452,7 @@ window.AzzaComments = (function(){
     renderList, renderInput,
     submit, startReply, closeReply,
     startEdit, confirmEdit, cancelEdit,
-    confirmDelete, injectCSS,
-    _autoR,
+    confirmDelete, toggleReplies,
+    injectCSS, _autoR,
   };
 })();
