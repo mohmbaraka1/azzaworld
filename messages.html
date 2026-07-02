@@ -160,6 +160,7 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 <script src="supabase.js"></script>
+<script src="notifications.js"></script>
 </head>
 <body>
 
@@ -567,16 +568,26 @@ function closeChatMobile(){
 
 function writeNotif(toId,type,fromUser,postId,postText){
   if(!toId||toId===fromUser?.id)return;
+  /* تجنب التكرار المزعج: إشعار رسالة واحد كل ساعة لنفس المحادثة */
   const key='azza_notifs_'+toId;let n=[];
   try{n=JSON.parse(localStorage.getItem(key)||'[]');}catch{}
   const dup=n.find(x=>x.type===type&&x.from_id===fromUser.id&&x.post_id===(postId||null)&&(Date.now()-new Date(x.at))<3600000);
   if(dup)return;
+  /* الإشعار المحلي — فوري */
   n.unshift({id:Date.now().toString(36)+Math.random().toString(36).slice(2),
     type,from_id:fromUser.id,from_name:fromUser.name,from_username:fromUser.username||'',
     from_photo:fromUser.photo||null,post_id:postId||null,
     post_text:postText?postText.substring(0,60):null,at:new Date().toISOString(),read:false});
   if(n.length>100)n=n.slice(0,100);
   localStorage.setItem(key,JSON.stringify(n));
+  /* الإرسال الحقيقي لـSupabase — يضمن وصول الإشعار للمستخدم الآخر على أي جهاز */
+  azzaDB.from('notifications').insert({
+    user_id:toId,
+    type,
+    content:JSON.stringify({from_id:fromUser.id,from_name:fromUser.name,from_username:fromUser.username||'',from_photo:fromUser.photo||null,post_id:postId||null,post_text:postText?postText.substring(0,60):null}),
+    related_id:postId||null,
+    read:false,
+  }).then(({error})=>{if(error)console.error('تعذر إرسال إشعار الرسالة:',error.message);});
 }
 /* lightbox مبسّط لعرض الصور بحجم كامل عند الضغط عليها */
 function openLB(src){
@@ -694,7 +705,7 @@ async function sendMsg(){
   /* إشعار للطرف الآخر */
   const _conv=all.find(c=>c.id===activeConvId);
   if(_conv){const _other=_conv.participants.find(p=>p.id!==user.id);
-    if(_other)writeNotif(_other.id,'message',user,null,text);}
+    if(_other&&window.AzzaNotif) AzzaNotif.onMessage(_other.id,text);}
 }
 
 /* حذف محادثة */

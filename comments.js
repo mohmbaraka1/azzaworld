@@ -21,18 +21,21 @@ window.AzzaComments = (function(){
   let _me           = null;
   let _channel      = null;
   let _onUpdate     = null;
-  let _postAuthorId = null;  /* ID صاحب المنشور لشارة "صاحب المنشور" */
-  let _likes        = {};    /* { commentId: [userId, ...] } */
+  let _postAuthorId = null;
+  let _likes        = {};
+  let _currentPost  = null;   /* المنشور الحالي لإشعارات التعليق */
+  let _currentComments = [];  /* التعليقات الحالية لإشعارات الرد */
 
   /* ─────────────────────────────────────────────────────────────
      init() — يُستدعى مرة واحدة عند تحميل الصفحة
      db: Supabase client  |  me: كائن المستخدم الحالي
   ───────────────────────────────────────────────────────────── */
-  function init(db, me, onUpdateCallback, postAuthorId=null){
+  function init(db, me, onUpdateCallback, postAuthorId=null, post=null){
     _db           = db;
     _me           = me;
     _onUpdate     = onUpdateCallback;
-    _postAuthorId = postAuthorId; /* لإظهار شارة "صاحب المنشور" */
+    _postAuthorId = postAuthorId;
+    _currentPost  = post;
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -150,6 +153,9 @@ window.AzzaComments = (function(){
 
     /* تحميل الـlikes من cache */
     try{ _likes=JSON.parse(localStorage.getItem('az_likes')||'{}'); }catch{}
+
+    /* حفظ التعليقات للرجوع إليها عند الإشعارات */
+    _currentComments = comments;
 
     if(!comments.length){
       el.innerHTML = `<div class="az-no-cmt">لا تعليقات بعد — كن أول من يعلّق 💬</div>`;
@@ -284,7 +290,18 @@ window.AzzaComments = (function(){
 
     try{
       await add(postId, text, parentId);
-      /* Realtime سيحدّث تلقائياً — لكن نعمل refresh احتياطي */
+      /* إشعار: تعليق جديد أو رد */
+      if(window.AzzaNotif && _currentPost){
+        if(parentId){
+          /* رد على تعليق — أشعر صاحب التعليق */
+          const parentCmt=_currentComments?.find(c=>c.id==parentId);
+          if(parentCmt) AzzaNotif.onReply(parentCmt.author_id, _currentPost);
+          /* أشعر صاحب المنشور كذلك لو مختلف */
+          AzzaNotif.onComment(_currentPost);
+        }else{
+          AzzaNotif.onComment(_currentPost);
+        }
+      }
       if(_onUpdate) _onUpdate(postId);
     }catch(e){
       /* تراجع عن Optimistic لو فشل */
