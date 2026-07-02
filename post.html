@@ -355,6 +355,15 @@ const azzaDB=supabase.createClient(SB_URL,SB_ANON);
 /* ── بيانات المستخدم ── */
 const me=(()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}})();
 if(!me){location.href='login.html';}
+/* تحقق من جلسة Supabase Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){
+    localStorage.removeItem('azza_user');
+    localStorage.removeItem('azza_token');
+    location.href='login.html';
+  }
+})();
 const postId=new URLSearchParams(location.search).get('id');
 
 /* ── حالة عالمية ── */

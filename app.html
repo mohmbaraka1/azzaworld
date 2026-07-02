@@ -1226,6 +1226,18 @@ let user=G.getUser(), curF='all', curCat='all', searchQ='', curType='post', ndaI
 const vt = u=>(u?.subtype==='institution'?'institution':(u?.type||'idea'));
 if(!user){ location.href='login.html'; }
 
+/* تحقق من جلسة Supabase Auth — لو منتهية، أعد توجيه لـlogin
+   هذا يضمن إن RLS يعمل بشكل صحيح لكل العمليات (تعليق، تصويت، إلخ) */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){
+    /* جلسة Auth منتهية — امسح localStorage وأعد للـlogin */
+    localStorage.removeItem('azza_user');
+    localStorage.removeItem('azza_token');
+    location.href='login.html';
+  }
+})();
+
 /* toast */
 function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#c69749';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2800);}
 

@@ -857,6 +857,15 @@ const esc      = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 const isSaved  = id=>{try{return JSON.parse(localStorage.getItem('azza_saved_'+user?.id)||'[]').includes(id);}catch{return false;}};
 
 let user=getUser(); if(!user){location.href='login.html';}
+/* تحقق من جلسة Supabase Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){
+    localStorage.removeItem('azza_user');
+    localStorage.removeItem('azza_token');
+    location.href='login.html';
+  }
+})();
 let curTab='posts';
 
 const ROLES={idea:'صاحب فكرة',skill:'خبير',investor:'مستثمر',company:'شركة / مؤسسة'};
