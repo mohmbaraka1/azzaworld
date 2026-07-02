@@ -41,7 +41,7 @@ window.AzzaComments = (function(){
       .from('post_comments')
       .select('*')
       .eq('post_id', postId)
-      .eq('is_deleted', false)
+      .neq('is_deleted', true)  /* يجلب is_deleted=false وis_deleted=null معاً */
       .order('created_at', {ascending:true});
     if(error) throw error;
     return data || [];

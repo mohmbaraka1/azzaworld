@@ -1,0 +1,11 @@
+[33mcommit aa8c7e924d3a64991df8c330303ec37197001923[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: mohammed baraka <mohammedbaraka842@gmail.com>
+Date:   Thu Jul 2 12:11:45 2026 +0300
+
+    نظام تعليقات جديد - comments.js
+
+ app.html     |  61 [32m+++++[m[31m----[m
+ comments.js  | 428 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m
+ post.html    |  67 [32m++++[m[31m------[m
+ profile.html |  44 [32m+++[m[31m---[m
+ 4 files changed, 512 insertions(+), 88 deletions(-)
