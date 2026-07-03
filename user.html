@@ -174,6 +174,7 @@ a{text-decoration:none;color:inherit}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
 </style>
 <script src="supabase.js"></script>
+<script src="notifications.js"></script>
 </head>
 <body>
 
@@ -591,7 +592,7 @@ function toggleFollow(){
     let f2=JSON.parse(localStorage.getItem(k2)||'[]');
     if(!f2.includes(me.id)){f2.push(me.id);localStorage.setItem(k2,JSON.stringify(f2));}
     /* إشعار */
-    writeNotif(targetUser.id,'follow',null,null);
+    window.AzzaNotif ? AzzaNotif.onFollow(targetUser.id) : writeNotif(targetUser.id,'follow',null,null);
     showToast('بدأت متابعة '+targetUser.name+' ✅');
   } else {
     f.splice(i,1);
@@ -603,15 +604,9 @@ function toggleFollow(){
 }
 
 function writeNotif(toId,type,postId,postText){
-  try{
-    const k='azza_notifs_'+toId;
-    let n=[];try{n=JSON.parse(localStorage.getItem(k)||'[]');}catch{}
-    const dup=n.find(x=>x.type===type&&x.from_id===me.id&&(Date.now()-new Date(x.at))<3600000);
-    if(dup)return;
-    n.unshift({id:genId(),type,from_id:me.id,from_name:me.name,from_username:me.username||'',from_photo:me.photo||null,post_id:postId||null,post_text:postText||null,at:new Date().toISOString(),read:false});
-    if(n.length>100)n=n.slice(0,100);
-    localStorage.setItem(k,JSON.stringify(n));
-  }catch(e){}
+  if(!toId||!window.AzzaNotif) return;
+  if(type==='follow') AzzaNotif.onFollow(toId);
+  else AzzaNotif.send(toId, type, {post_id:postId, post_text:postText});
 }
 
 /* ── إحصائيات ── */

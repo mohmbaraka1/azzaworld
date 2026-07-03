@@ -207,6 +207,7 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 <script src="supabase.js"></script>
+<script src="notifications.js"></script>
 </head>
 <body>
 
@@ -797,13 +798,9 @@ function expressInterest(id){
 }
 
 function writeNotif(postId){
-  try{
-    const posts=getPosts();const p=posts.find(x=>x.id===postId);if(!p)return;
-    const k='azza_notifs_'+p.author_id;
-    let n=[];try{n=JSON.parse(localStorage.getItem(k)||'[]');}catch{}
-    n.unshift({id:genId(),type:'interest',from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null,post_id:postId,post_text:p.title||p.text?.substring(0,60),at:new Date().toISOString(),read:false});
-    localStorage.setItem(k,JSON.stringify(n));
-  }catch(e){}
+  if(!window.AzzaNotif) return;
+  const p=(_postsMem||[]).find(x=>x.id===postId);
+  if(p) AzzaNotif.onVote(p);
 }
 
 /* ── رسالة ── */

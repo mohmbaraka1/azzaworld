@@ -575,7 +575,13 @@ function closeEdit(){document.getElementById('edit-overlay').classList.remove('o
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 function updateSendBtn(){const v=(document.getElementById('cmt-input')?.value||'').trim();const btn=document.getElementById('cmt-send');if(btn)btn.disabled=!v;}
 function startMsg(targetId){let convs=getConvs();let conv=convs.find(c=>c.participants.some(p=>p.id===me.id)&&c.participants.some(p=>p.id===targetId));if(!conv){conv={id:genId(),participants:[{id:me.id,name:me.name,username:me.username||'',photo:me.photo||null},{id:targetId,name:'مستخدم'}],messages:[],createdAt:new Date().toISOString()};convs.push(conv);saveConvs(convs);}location.href='messages.html?conv='+conv.id;}
-function writeNotif(type){try{if(!post||post.author_id===me.id)return;azzaDB.from('notifications').insert({user_id:post.author_id,type,content:JSON.stringify({from_id:me.id,from_name:me.name,from_username:me.username||'',from_photo:me.photo||null,post_id:postId,post_text:post.title||post.text?.substring(0,60)}),related_id:postId,read:false}).then(({error})=>{if(error)console.error('notif:',error.message);});}catch(e){}}
+function writeNotif(type){
+  /* يستخدم AzzaNotif المركزية بدل منطق محلي */
+  if(!post||post.author_id===me.id||!window.AzzaNotif) return;
+  if(type==='comment')   AzzaNotif.onComment(post);
+  else if(type==='interest') AzzaNotif.onInterest(post);
+  else AzzaNotif.send(post.author_id, type, {post_id:postId, post_text:post.title||post.text?.substring(0,60)});
+}
 
 /* ════════════════════════════════════════════════════════════
    renderAll — رسم كل شيء من post الحالي
