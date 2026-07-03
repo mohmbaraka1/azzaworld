@@ -368,6 +368,7 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
 }
 </style>
 <script src="supabase.js"></script>
+<script src="notifications.js"></script>
 <script src="comments.js"></script>
 </head>
 <body>
@@ -1036,9 +1037,10 @@ function toggleComments(id){
     if(listEl&&!listEl.dataset.loaded){
       listEl.dataset.loaded='1';
       AzzaComments.injectCSS();
+      const _curPost=(_postsMem||[]).find(p=>p.id===id);
       AzzaComments.init(azzaDB,user,async(postId)=>{
         if(postId){const cmts=await AzzaComments.fetch(postId);AzzaComments.renderList(cmts,'az-list-'+postId);}
-      });
+      }, _curPost?.author_id||null, _curPost||null);
       AzzaComments.renderInput(id,'az-input-prof-'+id);
       AzzaComments.fetch(id).then(cmts=>{
         AzzaComments.renderList(cmts,'az-list-'+id);

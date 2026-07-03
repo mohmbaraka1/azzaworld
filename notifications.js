@@ -12,10 +12,16 @@ window.AzzaNotif = (function(){
   let _cb  = null;   /* callback عند وصول إشعار جديد */
 
   /* ── تهيئة — يُستدعى مرة واحدة عند تحميل أي صفحة ── */
-  function init(db, me, onNewNotif){
+  function init(db, me, onNewNotif, postAuthorId=null){
     _db = db;
     _me = me;
     _cb = onNewNotif;
+    /* مسح مفاتيح التكرار القديمة عند كل تهيئة */
+    try{
+      Object.keys(localStorage)
+        .filter(k=>k.startsWith('az_notif_'))
+        .forEach(k=>localStorage.removeItem(k));
+    }catch{}
   }
 
   /* ════════════════════════════════════════════════════════════
@@ -28,10 +34,10 @@ window.AzzaNotif = (function(){
     /* لا إشعار لنفسك */
     if(!toUserId || toUserId === _me?.id) return;
 
-    /* منع التكرار المزعج: نفس النوع + نفس الإشعار < 5 دقائق */
+    /* منع التكرار: نفس الإشعار < 30 ثانية فقط */
     const dupKey = `az_notif_${type}_${toUserId}_${meta.post_id||meta.related_id||''}`;
     const lastSent = parseInt(localStorage.getItem(dupKey)||'0');
-    if(Date.now() - lastSent < 5 * 60 * 1000) return;
+    if(Date.now() - lastSent < 30 * 1000) return;
     localStorage.setItem(dupKey, Date.now().toString());
 
     try{

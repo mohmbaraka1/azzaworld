@@ -1227,6 +1227,13 @@ let user=G.getUser(), curF='all', curCat='all', searchQ='', curType='post', ndaI
 const vt = u=>(u?.subtype==='institution'?'institution':(u?.type||'idea'));
 if(!user){ location.href='login.html'; }
 
+/* تهيئة AzzaNotif فوراً — لازم تكون جاهزة قبل أي تعليق أو تصويت */
+if(window.AzzaNotif && user){
+  AzzaNotif.init(azzaDB, user, ()=>{ if(typeof renderNotifPanel==='function') renderNotifPanel(); });
+  AzzaNotif.subscribe();
+  AzzaNotif.updateBadge();
+}
+
 /* تحقق من جلسة Supabase Auth */
 (async()=>{
   const {data}=await azzaDB.auth.getSession();
@@ -1808,12 +1815,6 @@ function init(){
     const freshMe=(_usersMem||[]).find(u=>u.id===user.id);
     if(freshMe){ user=freshMe; G.saveUser(user); }
     buildStats();render();buildRight();
-    /* تهيئة AzzaNotif بعد اكتمال تحميل البيانات */
-    if(window.AzzaNotif){
-      AzzaNotif.init(azzaDB, user, ()=>{ renderNotifPanel(); });
-      AzzaNotif.subscribe();
-      AzzaNotif.updateBadge();
-    }
   });
   initSoundUI();
   renderNotifPanel();
@@ -2078,6 +2079,7 @@ function toggleCmt(pid){
     const listEl=document.getElementById('az-list-'+pid);
     if(listEl&&!listEl.dataset.loaded){
       listEl.dataset.loaded='1';
+      const _curPost = (_postsMem||[]).find(p=>p.id===pid);
       AzzaComments.init(azzaDB,user,(postId)=>{
         if(postId){
           AzzaComments.fetch(postId).then(cmts=>{
@@ -2086,7 +2088,7 @@ function toggleCmt(pid){
             if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
           });
         }
-      }, (_postsMem||[]).find(p=>p.id===pid)?.author_id||null);
+      }, _curPost?.author_id||null, _curPost||null);
       AzzaComments.injectCSS();
       AzzaComments.renderInput(pid,'az-input-'+pid);
       AzzaComments.fetch(pid).then(cmts=>{
