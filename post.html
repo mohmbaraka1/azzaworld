@@ -470,7 +470,7 @@ async function init(){
       AzzaComments.renderList(cmts,'az-list-main');
       const cnt=document.getElementById('az-count-main');
       if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||'';
-    });
+    }, post?.author_id||null, post||null);
     AzzaComments.renderInput(postId,'az-input-main');
     AzzaComments.fetch(postId).then(cmts=>{
       AzzaComments.renderList(cmts,'az-list-main');
@@ -576,11 +576,10 @@ function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrol
 function updateSendBtn(){const v=(document.getElementById('cmt-input')?.value||'').trim();const btn=document.getElementById('cmt-send');if(btn)btn.disabled=!v;}
 function startMsg(targetId){let convs=getConvs();let conv=convs.find(c=>c.participants.some(p=>p.id===me.id)&&c.participants.some(p=>p.id===targetId));if(!conv){conv={id:genId(),participants:[{id:me.id,name:me.name,username:me.username||'',photo:me.photo||null},{id:targetId,name:'مستخدم'}],messages:[],createdAt:new Date().toISOString()};convs.push(conv);saveConvs(convs);}location.href='messages.html?conv='+conv.id;}
 function writeNotif(type){
-  /* يستخدم AzzaNotif المركزية بدل منطق محلي */
+  /* comment → يغطيه post_comments Trigger تلقائياً
+     interest → لا trigger، يُرسل يدوياً */
   if(!post||post.author_id===me.id||!window.AzzaNotif) return;
-  if(type==='comment')   AzzaNotif.onComment(post);
-  else if(type==='interest') AzzaNotif.onInterest(post);
-  else AzzaNotif.send(post.author_id, type, {post_id:postId, post_text:post.title||post.text?.substring(0,60)});
+  if(type==='interest') AzzaNotif.onInterest(post);
 }
 
 /* ════════════════════════════════════════════════════════════

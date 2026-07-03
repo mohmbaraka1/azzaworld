@@ -291,17 +291,8 @@ window.AzzaComments = (function(){
     try{
       await add(postId, text, parentId);
       /* إشعار: تعليق جديد أو رد */
-      if(window.AzzaNotif && _currentPost){
-        if(parentId){
-          /* رد على تعليق — أشعر صاحب التعليق */
-          const parentCmt=_currentComments?.find(c=>c.id==parentId);
-          if(parentCmt) AzzaNotif.onReply(parentCmt.author_id, _currentPost);
-          /* أشعر صاحب المنشور كذلك لو مختلف */
-          AzzaNotif.onComment(_currentPost);
-        }else{
-          AzzaNotif.onComment(_currentPost);
-        }
-      }
+      /* الإشعارات تُنشأ تلقائياً بـ post_comments Trigger في Supabase
+         لا حاجة لإرسال يدوي هنا — يمنع التكرار */
       if(_onUpdate) _onUpdate(postId);
     }catch(e){
       /* تراجع عن Optimistic لو فشل */

@@ -2120,14 +2120,15 @@ function interest(pid){const ints=G.getInts();ints[pid]=ints[pid]||[];if(ints[pi
 function openNda(pid){ndaId=pid;document.getElementById('nda-cb').checked=false;document.getElementById('nda-btn').disabled=true;document.getElementById('nda-ol').classList.add('open');}
 function closeNda(){document.getElementById('nda-ol').classList.remove('open');ndaId=null;}
 function signNda(){if(!ndaId)return;const s=G.getSigs();s[ndaId]=s[ndaId]||[];if(!s[ndaId].some(x=>x.id===user.id))s[ndaId].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_nda_sigs',JSON.stringify(s));closeNda();interest(ndaId);}
-/* writeNotif — wrapper للتوافق مع الكود القديم، يستخدم AzzaNotif داخلياً */
+/* writeNotif — فقط للأحداث التي لا تغطيها Supabase Triggers
+   comment/vote/reply → تُنشأ تلقائياً بالـTriggers
+   interest → لا trigger له، يُرسل يدوياً */
 function writeNotif(pid,type){
-  const p=(_postsMem||[]).find(x=>x.id===pid)||G.getPosts().find(x=>x.id===pid);
-  if(!p) return;
-  if(type==='comment') AzzaNotif.onComment(p);
-  else if(type==='interest') AzzaNotif.onInterest(p);
-  else if(type==='vote') AzzaNotif.onVote(p);
-  else AzzaNotif.send(p.author_id, type, {post_id:p.id, post_text:p.title||p.text?.substring(0,60)});
+  if(type==='interest'){
+    const p=(_postsMem||[]).find(x=>x.id===pid)||G.getPosts().find(x=>x.id===pid);
+    if(p && window.AzzaNotif) AzzaNotif.onInterest(p);
+  }
+  /* comment وvote تُعالجهم Triggers تلقائياً — لا إرسال يدوي */
 }
 function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
 
@@ -2197,15 +2198,9 @@ function toggleFollow(uid,btn){
   btn.classList.toggle('on',i===-1);
   toast(i===-1?'بدأت المتابعة ✅':'ألغيت المتابعة','info');
   /* إرسال إشعار المتابعة لـSupabase فوراً */
-  if(i===-1){
-    azzaDB.from('notifications').insert({
-      user_id:uid,
-      type:'follow',
-      content:JSON.stringify({from_id:user.id,from_name:user.name,from_username:user.username||'',from_photo:user.photo||null}),
-      related_id:null,
-      read:false,
-    }).then(({error})=>{if(error)console.error('تعذر إرسال إشعار المتابعة:',error.message);});
-  }
+  /* المتابعة لا تُكتب لجدول follows (لا يزال localStorage)
+     لذا نرسل الإشعار يدوياً عبر AzzaNotif */
+  if(i===-1 && window.AzzaNotif) AzzaNotif.onFollow(uid);
 }
 
 init();
