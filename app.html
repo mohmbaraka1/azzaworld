@@ -1227,12 +1227,17 @@ let user=G.getUser(), curF='all', curCat='all', searchQ='', curType='post', ndaI
 const vt = u=>(u?.subtype==='institution'?'institution':(u?.type||'idea'));
 if(!user){ location.href='login.html'; }
 
-/* تحقق من جلسة Supabase Auth — لو منتهية، أعد توجيه لـlogin
-   هذا يضمن إن RLS يعمل بشكل صحيح لكل العمليات (تعليق، تصويت، إلخ) */
+/* تهيئة AzzaNotif فوراً — قبل أي تعليق أو تصويت */
+if(window.AzzaNotif && user){
+  AzzaNotif.init(azzaDB, user, ()=>{ if(typeof renderNotifPanel==='function') renderNotifPanel(); });
+  AzzaNotif.subscribe();
+  AzzaNotif.updateBadge();
+}
+
+/* تحقق من جلسة Supabase Auth */
 (async()=>{
   const {data}=await azzaDB.auth.getSession();
   if(!data?.session){
-    /* جلسة Auth منتهية — امسح localStorage وأعد للـlogin */
     localStorage.removeItem('azza_user');
     localStorage.removeItem('azza_token');
     location.href='login.html';
@@ -1813,12 +1818,6 @@ function init(){
   });
   initSoundUI();
   renderNotifPanel();
-  /* تهيئة نظام الإشعارات المركزي */
-  AzzaNotif.init(azzaDB, user, (notif)=>{
-    renderNotifPanel(); /* تحديث لوحة الإشعارات فوراً */
-  });
-  AzzaNotif.subscribe();
-  AzzaNotif.updateBadge();
 }
 
 /* category dropdown */
@@ -2207,7 +2206,7 @@ function toggleFollow(uid,btn){
     }).then(({error})=>{if(error)console.error('تعذر إرسال إشعار المتابعة:',error.message);});
   }
 }
-
+س
 init();
 </script>
 </body>
