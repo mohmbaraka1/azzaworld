@@ -12,7 +12,7 @@ window.AzzaNotif = (function(){
   let _cb  = null;   /* callback عند وصول إشعار جديد */
 
   /* ── تهيئة — يُستدعى مرة واحدة عند تحميل أي صفحة ── */
-  function init(db, me, onNewNotif, postAuthorId=null){
+  function init(db, me, onNewNotif){
     _db = db;
     _me = me;
     _cb = onNewNotif;
@@ -38,10 +38,9 @@ window.AzzaNotif = (function(){
     const dupKey = `az_notif_${type}_${toUserId}_${meta.post_id||meta.related_id||''}`;
     const lastSent = parseInt(localStorage.getItem(dupKey)||'0');
     if(Date.now() - lastSent < 30 * 1000) return;
-    localStorage.setItem(dupKey, Date.now().toString());
 
     try{
-      await _db.from('notifications').insert({
+      const {error} = await _db.from('notifications').insert({
         user_id:    toUserId,
         type,
         content: JSON.stringify({
@@ -54,6 +53,9 @@ window.AzzaNotif = (function(){
         related_id: meta.post_id || meta.related_id || null,
         read: false,
       });
+      if(error) throw error;
+      /* نسجّل فقط بعد نجاح الإرسال الفعلي */
+      localStorage.setItem(dupKey, Date.now().toString());
     }catch(e){
       console.warn('AzzaNotif.send failed:', e.message);
     }
@@ -180,9 +182,11 @@ window.AzzaNotif = (function(){
   async function markRead(notifId=null){
     if(!_me?.id) return;
     try{
-      const q = _db.from('notifications').update({read:true}).eq('user_id',_me.id);
-      if(notifId) q.eq('id', notifId); else q.eq('read', false);
-      await q;
+      if(notifId){
+        await _db.from('notifications').update({read:true}).eq('id',notifId).eq('user_id',_me.id);
+      }else{
+        await _db.from('notifications').update({read:true}).eq('user_id',_me.id).eq('read',false);
+      }
       updateBadge();
     }catch(e){ console.warn('markRead:', e.message); }
   }
