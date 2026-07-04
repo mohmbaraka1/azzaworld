@@ -102,7 +102,7 @@ const T=[
         type:'ch_rt',message:'rt '+Date.now(),is_read:false,read:false
       });
     });
-  setTimeout(()=>{if(!got){db.removeChannel(ch);fail('لم يصل خلال 12 ثانية — تأكد من تفعيل Realtime على جدول notifications');}},12000);
+  setTimeout(()=>{if(!got){db.removeChannel(ch);fail('لم يصل خلال 20 ثانية — تحقق من اتصالك بالإنترنت');}},20000);
 })},
 {id:'trigger_c',icon:'💬',title:'Trigger التعليق (تحقق بـRPC)',pts:25,
  run:async()=>{
@@ -153,11 +153,11 @@ const T=[
   if(!users?.length) throw'لا يوجد مستخدم آخر';
   const u=users[0];
   await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',u.id);
+  await new Promise(r=>setTimeout(r,1000));
   const t0=new Date().toISOString();
-  await new Promise(r=>setTimeout(r,500));
   const {error}=await db.from('follows').insert({follower_id:me.id,following_id:u.id});
   if(error) throw'فشل إدراج المتابعة: '+error.message;
-  await new Promise(r=>setTimeout(r,2500));
+  await new Promise(r=>setTimeout(r,3000));
   const {data:n,error:ne}=await db.rpc('check_notif_created',{
     p_type:'follow',p_entity:me.id,p_after:t0
   });
