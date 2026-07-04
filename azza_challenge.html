@@ -177,11 +177,12 @@ const CHALLENGES = [
       });
       if(cmtErr) throw new Error('فشل إدراج التعليق: '+cmtErr.message);
       await new Promise(r=>setTimeout(r,2000));
+      await new Promise(r=>setTimeout(r,1000));
       const {data:n}=await db.from('notifications')
-        .select('id,type').eq('recipient_id',post.author_id)
+        .select('id,type,recipient_id').eq('recipient_id',post.author_id)
         .eq('type','comment').gte('created_at',t0).limit(1);
-      if(!n?.length) throw new Error('Trigger لم يُنشئ إشعاراً');
-      return `إشعار id=${n[0].id} وصل لـ${post.author_id}`;
+      if(!n?.length) throw new Error('Trigger لم يُنشئ إشعاراً — تأكد من تنفيذ azza_notifications_system.sql');
+      return `✓ إشعار id=${n[0].id} | recipient=${n[0].recipient_id.slice(0,8)}...`;
     }
   },
   {
@@ -199,11 +200,12 @@ const CHALLENGES = [
         post_id:post.id,user_id:me.id,reaction_type:'vote'
       });
       await new Promise(r=>setTimeout(r,2000));
+      await new Promise(r=>setTimeout(r,1000));
       const {data:n}=await db.from('notifications')
-        .select('id,type').eq('recipient_id',post.author_id)
+        .select('id,type,recipient_id').eq('recipient_id',post.author_id)
         .eq('type','vote').gte('created_at',t0).limit(1);
       if(!n?.length) throw new Error('Trigger التصويت لم يعمل');
-      return `إشعار تصويت id=${n[0].id}`;
+      return `✓ إشعار تصويت id=${n[0].id} | recipient=${n[0].recipient_id.slice(0,8)}...`;
     }
   },
   {
@@ -220,13 +222,14 @@ const CHALLENGES = [
       const {error:fErr}=await db.from('follows').insert({follower_id:me.id,following_id:target.id});
       if(fErr) throw new Error('فشل إدراج المتابعة: '+fErr.message);
       await new Promise(r=>setTimeout(r,2000));
+      await new Promise(r=>setTimeout(r,1000));
       const {data:n}=await db.from('notifications')
-        .select('id,type').eq('recipient_id',target.id)
+        .select('id,type,recipient_id').eq('recipient_id',target.id)
         .eq('type','follow').gte('created_at',t0).limit(1);
       /* تنظيف */
-      await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',target.id).then(()=>{});
+      await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',target.id);
       if(!n?.length) throw new Error('Trigger المتابعة لم يعمل');
-      return `إشعار متابعة id=${n[0].id} وصل لـ${target.name}`;
+      return `✓ إشعار متابعة id=${n[0].id} وصل لـ${target.name}`;
     }
   },
   {
