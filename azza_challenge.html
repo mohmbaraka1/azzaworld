@@ -171,10 +171,11 @@ const CHALLENGES = [
       if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر');
       const post=posts[0];
       const t0=new Date().toISOString();
-      await db.from('post_comments').insert({
+      const {error:cmtErr}=await db.from('post_comments').insert({
         post_id:post.id,author_id:me.id,author_name:me.name||'test',
-        content:'تحدي_تعليق_'+Date.now(),
+        content:'تحدي_'+Date.now()+'_'+Math.random().toString(36).slice(2),
       });
+      if(cmtErr) throw new Error('فشل إدراج التعليق: '+cmtErr.message);
       await new Promise(r=>setTimeout(r,2000));
       const {data:n}=await db.from('notifications')
         .select('id,type').eq('recipient_id',post.author_id)
@@ -192,9 +193,11 @@ const CHALLENGES = [
       if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر');
       const post=posts[0];
       const t0=new Date().toISOString();
+      /* احذف التصويت القديم لو موجود لضمان تفعيل الـTrigger */
+      await db.from('post_reactions').delete().eq('post_id',post.id).eq('user_id',me.id).eq('reaction_type','vote');
       await db.from('post_reactions').insert({
         post_id:post.id,user_id:me.id,reaction_type:'vote'
-      }).then(()=>{});
+      });
       await new Promise(r=>setTimeout(r,2000));
       const {data:n}=await db.from('notifications')
         .select('id,type').eq('recipient_id',post.author_id)
@@ -212,7 +215,10 @@ const CHALLENGES = [
       if(!users?.length) throw new Error('لا يوجد مستخدم آخر');
       const target=users[0];
       const t0=new Date().toISOString();
-      await db.from('follows').insert({follower_id:me.id,following_id:target.id}).then(()=>{});
+      /* احذف المتابعة القديمة لو موجودة */
+      await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',target.id);
+      const {error:fErr}=await db.from('follows').insert({follower_id:me.id,following_id:target.id});
+      if(fErr) throw new Error('فشل إدراج المتابعة: '+fErr.message);
       await new Promise(r=>setTimeout(r,2000));
       const {data:n}=await db.from('notifications')
         .select('id,type').eq('recipient_id',target.id)
