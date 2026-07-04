@@ -171,24 +171,33 @@ const TESTS = [
         .limit(1);
       if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر للاختبار');
       const post = posts[0];
-      const countBefore = (await db.from('notifications')
-        .select('*',{count:'exact',head:true})
-        .eq('recipient_id', post.author_id)).count;
-      /* إضافة تعليق */
-      await db.from('post_comments').insert({
-        post_id:      post.id,
-        author_id:    me.id,
-        author_name:  me.name || 'test',
-        content:      'تعليق اختبار تلقائي ' + Date.now(),
+
+      /* أدرج تعليق */
+      const testContent = 'trigger_test_' + Date.now();
+      const {error:cmtErr} = await db.from('post_comments').insert({
+        post_id:     post.id,
+        author_id:   me.id,
+        author_name: me.name || 'test',
+        content:     testContent,
       });
-      /* انتظر ثانية ثم تحقق */
-      await new Promise(r => setTimeout(r, 1500));
-      const countAfter = (await db.from('notifications')
-        .select('*',{count:'exact',head:true})
-        .eq('recipient_id', post.author_id)).count;
-      if(countAfter <= countBefore)
-        throw new Error('❌ Trigger لم يُنشئ إشعاراً — تأكد من تنفيذ azza_notifications_system.sql');
-      return `✓ Trigger يعمل\n✓ إشعار جديد وصل لـ ${post.author_id}\n✓ العدد: ${countBefore} → ${countAfter}`;
+      if(cmtErr) throw new Error('فشل إدراج التعليق: ' + cmtErr.message);
+
+      /* انتظر ثانيتين للـTrigger */
+      await new Promise(r => setTimeout(r, 2000));
+
+      /* تحقق من الإشعار مباشرة */
+      const {data:notifs} = await db.from('notifications')
+        .select('id,type,created_at')
+        .eq('recipient_id', post.author_id)
+        .eq('type', 'comment')
+        .gte('created_at', new Date(Date.now()-10000).toISOString())
+        .order('created_at', {ascending:false})
+        .limit(3);
+
+      if(!notifs?.length)
+        throw new Error('Trigger لم يُنشئ إشعاراً — تأكد من تنفيذ azza_notifications_system.sql');
+
+      return `✓ Trigger يعمل\n✓ إشعار جديد: id=${notifs[0].id}\n✓ وصل لـ ${post.author_id}`;
     }
   },
   {
