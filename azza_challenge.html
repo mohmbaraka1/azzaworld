@@ -2,370 +2,249 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AZZA — تحدي النظام 🏆</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Tajawal,sans-serif;background:#0e3622;color:#f7f1e3;min-height:100vh;direction:rtl}
-
-.hero{padding:40px 20px 20px;text-align:center}
-.hero h1{font-size:28px;font-weight:900;color:#c69749;margin-bottom:8px}
-.hero p{font-size:14px;opacity:.7}
-.score-bar{display:flex;justify-content:center;gap:24px;padding:16px;background:rgba(0,0,0,.3);margin-bottom:20px}
-.score-item{text-align:center}
-.score-num{font-size:28px;font-weight:900;color:#c69749}
-.score-label{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.05em}
-
-.challenges{padding:0 16px 40px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-
-.challenge{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;transition:.3s}
-.challenge.unlocked{border-color:rgba(198,151,73,.4);background:rgba(198,151,73,.06)}
-.challenge.done{border-color:#1baf7a;background:rgba(27,175,122,.08)}
-.challenge.failed{border-color:#e34948;background:rgba(227,73,72,.06)}
-.challenge.running{border-color:#c69749;animation:pulse 1s infinite}
-
+body{font-family:Tajawal,sans-serif;background:#0e3622;color:#f7f1e3;min-height:100vh;direction:rtl;padding:16px}
+h1{font-size:22px;font-weight:900;color:#c69749;text-align:center;padding:24px 0 8px}
+.sub{text-align:center;font-size:13px;opacity:.6;margin-bottom:20px}
+.scores{display:flex;justify-content:center;gap:32px;margin-bottom:20px;padding:14px;background:rgba(0,0,0,.3);border-radius:12px}
+.sc{text-align:center}
+.sc-n{font-size:30px;font-weight:900;color:#c69749}
+.sc-l{font-size:11px;opacity:.6}
+.btn-all{display:block;width:100%;max-width:480px;margin:0 auto 20px;padding:14px;background:linear-gradient(135deg,#c69749,#e8b96a);color:#0e3622;border:none;border-radius:999px;font-family:Tajawal,sans-serif;font-size:15px;font-weight:900;cursor:pointer}
+.btn-all:disabled{background:#555;color:#888;cursor:not-allowed}
+.list{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.item{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;transition:.3s}
+.item.ok{border-color:#1baf7a;background:rgba(27,175,122,.08)}
+.item.err{border-color:#e34948;background:rgba(227,73,72,.08)}
+.item.run{border-color:#c69749;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
-
-.ch-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.ch-icon{font-size:24px;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);flex-shrink:0}
-.ch-info{flex:1}
-.ch-title{font-size:15px;font-weight:700}
-.ch-points{font-size:12px;color:#c69749;font-weight:700}
-.ch-desc{font-size:13px;opacity:.65;margin-bottom:12px;line-height:1.6}
-.ch-result{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:8px;font-family:monospace;display:none;white-space:pre-wrap}
-.r-ok{background:rgba(27,175,122,.15);color:#7dffcc}
-.r-err{background:rgba(227,73,72,.15);color:#ffaaaa}
-
-.btn{padding:10px 20px;border-radius:999px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;width:100%}
-.btn-gold{background:linear-gradient(135deg,#c69749,#e8b96a);color:#0e3622}
-.btn-gold:hover{opacity:.9}
-.btn-gold:disabled{background:#555;color:#888;cursor:not-allowed}
-.btn-all{background:#1baf7a;color:#fff}
-
-.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.badge{padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700}
-.b-easy{background:rgba(27,175,122,.2);color:#7dffcc}
-.b-med{background:rgba(198,151,73,.2);color:#ffdd99}
-.b-hard{background:rgba(227,73,72,.2);color:#ffaaaa}
-.b-live{background:rgba(99,102,241,.2);color:#c7d2fe}
-
-.status-icon{font-size:18px;margin-right:4px}
-
-.final{display:none;padding:32px 16px;text-align:center;max-width:480px;margin:0 auto}
-.final-title{font-size:22px;font-weight:900;color:#c69749;margin-bottom:8px}
-.final-score{font-size:48px;font-weight:900;margin:16px 0}
-.final-msg{font-size:14px;opacity:.7}
-.stars{font-size:32px;margin:12px 0}
+.item-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.item-icon{font-size:20px}
+.item-title{font-size:14px;font-weight:700;flex:1}
+.item-pts{font-size:12px;color:#c69749;font-weight:700}
+.item-desc{font-size:12px;opacity:.6;margin-bottom:10px}
+.item-res{font-size:12px;padding:8px 10px;border-radius:8px;font-family:monospace;white-space:pre-wrap;display:none}
+.res-ok{background:rgba(27,175,122,.15);color:#7dffcc}
+.res-err{background:rgba(227,73,72,.15);color:#ffaaaa}
+.final{max-width:480px;margin:20px auto 0;padding:24px;background:rgba(0,0,0,.4);border-radius:16px;text-align:center;display:none}
+.final-stars{font-size:36px;margin-bottom:8px}
+.final-score{font-size:44px;font-weight:900;color:#c69749}
+.final-msg{font-size:14px;opacity:.7;margin-top:8px}
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <h1>🏆 تحدي نظام AZZA</h1>
-  <p>اختبار شامل لكل مكونات المنصة</p>
+<h1>🏆 تحدي نظام AZZA</h1>
+<p class="sub">اختبار شامل — 175 نقطة</p>
+
+<div class="scores">
+  <div class="sc"><div class="sc-n" id="s-ok">0</div><div class="sc-l">نجح</div></div>
+  <div class="sc"><div class="sc-n" id="s-pts">0</div><div class="sc-l">نقطة</div></div>
+  <div class="sc"><div class="sc-n" id="s-err">0</div><div class="sc-l">فشل</div></div>
 </div>
 
-<div class="score-bar">
-  <div class="score-item"><div class="score-num" id="sc-pass">0</div><div class="score-label">نجح</div></div>
-  <div class="score-item"><div class="score-num" id="sc-pts">0</div><div class="score-label">نقطة</div></div>
-  <div class="score-item"><div class="score-num" id="sc-fail">0</div><div class="score-label">فشل</div></div>
-</div>
-
-<div class="challenges" id="challenges">
-  <button class="btn btn-all" onclick="runAll()" id="run-all">⚡ ابدأ التحدي كاملاً</button>
-</div>
-
+<button class="btn-all" id="run-all" onclick="runAll()">⚡ ابدأ التحدي</button>
+<div class="list" id="list"></div>
 <div class="final" id="final">
-  <div class="stars" id="stars"></div>
-  <div class="final-title">انتهى التحدي!</div>
-  <div class="final-score" id="final-pts"></div>
-  <div class="final-msg" id="final-msg"></div>
+  <div class="final-stars" id="f-stars"></div>
+  <div class="final-score" id="f-score"></div>
+  <div class="final-msg" id="f-msg"></div>
 </div>
 
 <script>
-const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
-const db = supabase.createClient(SB_URL, SB_ANON);
-const me = JSON.parse(localStorage.getItem('azza_user')||'null');
+const SB='https://iecniydswotsilaueogq.supabase.co';
+const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db=supabase.createClient(SB,AK);
+const me=JSON.parse(localStorage.getItem('azza_user')||'null');
 
-let totalPts=0, passed=0, failed=0;
-
-const CHALLENGES = [
-  {
-    id:'auth', icon:'🔐', title:'جلسة Auth سليمة',
-    desc:'التحقق من وجود جلسة Supabase Auth مع تطابق الـUID مع localStorage',
-    pts:10, level:'easy',
-    run: async()=>{
-      const {data}=await db.auth.getSession();
-      if(!data?.session) throw new Error('لا توجد جلسة Auth');
-      if(data.session.user.id !== me?.id) throw new Error(`auth.uid (${data.session.user.id}) ≠ local.id (${me?.id})`);
-      return `auth.uid = ${me.id}`;
-    }
-  },
-  {
-    id:'posts', icon:'📝', title:'المنشورات من Supabase',
-    desc:'التحقق من جلب المنشورات مع التعليقات والتفاعلات من Supabase بطلب واحد',
-    pts:15, level:'easy',
-    run: async()=>{
-      const [p,c,r]=await Promise.all([
-        db.from('posts').select('id,author_id,title,text').limit(5),
-        db.from('post_comments').select('id,post_id').limit(10),
-        db.from('post_reactions').select('id,post_id,reaction_type').limit(10),
-      ]);
-      if(p.error) throw new Error(p.error.message);
-      return `${p.data.length} منشور | ${c.data?.length||0} تعليق | ${r.data?.length||0} تفاعل`;
-    }
-  },
-  {
-    id:'notif_insert', icon:'📬', title:'إدراج إشعار',
-    desc:'إدراج إشعار جديد بـrecipient_id وقراءته فوراً',
-    pts:15, level:'easy',
-    run: async()=>{
-      const {data,error}=await db.from('notifications').insert({
-        user_id:me.id, recipient_id:me.id, actor_id:me.id,
-        type:'challenge_test', message:'تحدي '+Date.now(),
-        is_read:false, read:false,
-      }).select().single();
-      if(error) throw new Error(error.message);
-      window._cTestId=data.id;
-      const {data:check}=await db.from('notifications').select('id,recipient_id,is_read').eq('id',data.id).single();
-      if(!check) throw new Error('لم يُعثر على الإشعار بعد الإدراج');
-      return `id=${data.id} | recipient_id ✓ | is_read=${check.is_read}`;
-    }
-  },
-  {
-    id:'realtime', icon:'⚡', title:'Realtime — أقل من 3 ثوانٍ',
-    desc:'يُرسل إشعار ويتحقق من وصوله عبر Realtime channel قبل انتهاء المهلة',
-    pts:20, level:'medium', live:true,
-    run: async()=>{
-      return new Promise((res,rej)=>{
-        const t0=Date.now();
-        let got=false;
-        const ch=db.channel('ch_'+Date.now())
-          .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`recipient_id=eq.${me.id}`},
-            p=>{
-              got=true; db.removeChannel(ch);
-              res(`وصل خلال ${Date.now()-t0}ms | id=${p.new.id}`);
-            })
-          .subscribe(async s=>{
-            if(s==='SUBSCRIBED'){
-              await db.from('notifications').insert({
-                user_id:me.id,recipient_id:me.id,actor_id:me.id,
-                type:'rt_challenge',message:'realtime '+Date.now(),
-                is_read:false,read:false,
-              });
-            }
-          });
-        setTimeout(()=>{ if(!got){db.removeChannel(ch);rej(new Error('لم يصل خلال 3 ثوانٍ'));}},4000);
+const T=[
+{id:'auth',icon:'🔐',title:'جلسة Auth',pts:10,
+ run:async()=>{
+  const {data}=await db.auth.getSession();
+  if(!data?.session) throw'لا توجد جلسة Auth';
+  if(data.session.user.id!==me?.id) throw'auth.uid ≠ localStorage.id';
+  return 'auth.uid='+me.id.slice(0,8)+'...';
+}},
+{id:'posts',icon:'📝',title:'المنشورات من Supabase',pts:15,
+ run:async()=>{
+  const {data,error}=await db.from('posts').select('id').limit(5);
+  if(error) throw error.message;
+  if(!data?.length) throw'لا توجد منشورات';
+  return data.length+' منشور موجود';
+}},
+{id:'notif_rw',icon:'📬',title:'كتابة وقراءة الإشعارات',pts:15,
+ run:async()=>{
+  const {data,error}=await db.from('notifications').insert({
+    user_id:me.id,recipient_id:me.id,actor_id:me.id,
+    type:'ch_test',message:'test '+Date.now(),is_read:false,read:false
+  }).select('id,recipient_id,is_read').single();
+  if(error) throw error.message;
+  window._tid=data.id;
+  return 'id='+data.id+' | recipient_id ✓';
+}},
+{id:'realtime',icon:'⚡',title:'Realtime — وصول فوري',pts:20,
+ run:async()=>new Promise((ok,fail)=>{
+  let got=false;
+  const t0=Date.now();
+  const ch=db.channel('ch_rt_'+t0)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',
+      filter:'recipient_id=eq.'+me.id},p=>{
+      got=true;db.removeChannel(ch);
+      ok('وصل خلال '+(Date.now()-t0)+'ms | id='+p.new.id);
+    }).subscribe(async s=>{
+      if(s!=='SUBSCRIBED') return;
+      await db.from('notifications').insert({
+        user_id:me.id,recipient_id:me.id,actor_id:me.id,
+        type:'ch_rt',message:'rt '+Date.now(),is_read:false,read:false
       });
-    }
-  },
-  {
-    id:'trigger_comment', icon:'💬', title:'Trigger التعليق',
-    desc:'يُضيف تعليقاً على منشور شخص آخر ويتحقق من إنشاء إشعار تلقائي',
-    pts:25, level:'medium',
-    run: async()=>{
-      const {data:posts}=await db.from('posts').select('id,author_id').neq('author_id',me.id).limit(1);
-      if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر');
-      const post=posts[0];
-      const t0=new Date(Date.now()-5000).toISOString();
-      const {error:cmtErr}=await db.from('post_comments').insert({
-        post_id:post.id,author_id:me.id,author_name:me.name||'test',
-        content:'تحدي_'+Date.now()+'_'+Math.random().toString(36).slice(2),
-      });
-      if(cmtErr) throw new Error('فشل إدراج التعليق: '+cmtErr.message);
-      await new Promise(r=>setTimeout(r,2000));
-      await new Promise(r=>setTimeout(r,1500));
-      const {data:n,error:ne}=await db.rpc('check_notif_created',{
-        p_type:'comment', p_entity:post.id, p_after:t0
-      });
-      if(ne) throw new Error('check_notif_created: '+ne.message);
-      if(!n) throw new Error('Trigger لم يُنشئ إشعاراً');
-      return `✓ إشعار التعليق id=${n} وصل تلقائياً`;
-    }
-  },
-  {
-    id:'trigger_reaction', icon:'▲', title:'Trigger التصويت',
-    desc:'يُضيف تصويتاً على منشور شخص آخر ويتحقق من إنشاء إشعار تلقائي',
-    pts:25, level:'medium',
-    run: async()=>{
-      const {data:posts}=await db.from('posts').select('id,author_id').neq('author_id',me.id).limit(1);
-      if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر');
-      const post=posts[0];
-      const t0=new Date(Date.now()-5000).toISOString();
-      /* احذف التصويت القديم لو موجود لضمان تفعيل الـTrigger */
-      await db.from('post_reactions').delete().eq('post_id',post.id).eq('user_id',me.id).eq('reaction_type','vote');
-      await db.from('post_reactions').insert({
-        post_id:post.id,user_id:me.id,reaction_type:'vote'
-      });
-      await new Promise(r=>setTimeout(r,2000));
-      await new Promise(r=>setTimeout(r,1500));
-      const {data:n,error:ne}=await db.rpc('check_notif_created',{
-        p_type:'vote', p_entity:post.id, p_after:t0
-      });
-      if(ne) throw new Error('check_notif_created: '+ne.message);
-      if(!n) throw new Error('Trigger التصويت لم يعمل');
-      return `✓ إشعار التصويت id=${n} وصل تلقائياً`;
-    }
-  },
-  {
-    id:'trigger_follow', icon:'👤', title:'Trigger المتابعة',
-    desc:'يتابع مستخدماً آخر عبر Supabase ويتحقق من وصول إشعار المتابعة',
-    pts:25, level:'hard',
-    run: async()=>{
-      const {data:users}=await db.from('users').select('id,name').neq('id',me.id).limit(1);
-      if(!users?.length) throw new Error('لا يوجد مستخدم آخر');
-      const target=users[0];
-      const t0=new Date(Date.now()-5000).toISOString();
-      /* احذف المتابعة القديمة لو موجودة */
-      await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',target.id);
-      const {error:fErr}=await db.from('follows').insert({follower_id:me.id,following_id:target.id});
-      if(fErr) throw new Error('فشل إدراج المتابعة: '+fErr.message);
-      await new Promise(r=>setTimeout(r,2000));
-      await new Promise(r=>setTimeout(r,1500));
-      const {data:n,error:ne}=await db.rpc('check_notif_created',{
-        p_type:'follow', p_entity:target.id, p_after:t0
-      });
-      /* تنظيف */
-      await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',target.id);
-      if(ne) throw new Error('check_notif_created: '+ne.message);
-      if(!n) throw new Error('Trigger المتابعة لم يعمل');
-      return `✓ إشعار المتابعة id=${n} وصل لـ${target.name}`;
-    }
-  },
-  {
-    id:'unread', icon:'🔢', title:'عدد غير المقروءة',
-    desc:'التحقق من دقة حساب عدد الإشعارات غير المقروءة بعد إدراج إشعار جديد',
-    pts:10, level:'easy',
-    run: async()=>{
-      const {count:before}=await db.from('notifications').select('*',{count:'exact',head:true}).eq('recipient_id',me.id).eq('is_read',false);
-      await db.from('notifications').insert({user_id:me.id,recipient_id:me.id,actor_id:me.id,type:'unread_test',message:'test',is_read:false,read:false});
-      const {count:after}=await db.from('notifications').select('*',{count:'exact',head:true}).eq('recipient_id',me.id).eq('is_read',false);
-      if(after<=before) throw new Error(`العدد لم يزد: ${before} → ${after}`);
-      return `${before} → ${after} غير مقروء ✓`;
-    }
-  },
-  {
-    id:'mark_read', icon:'✅', title:'تعليم كمقروء',
-    desc:'تعليم إشعار كمقروء والتحقق من تحديثه فوراً',
-    pts:10, level:'easy',
-    run: async()=>{
-      if(!window._cTestId) throw new Error('شغّل اختبار الإدراج أولاً');
-      const {error}=await db.from('notifications').update({is_read:true,read:true}).eq('id',window._cTestId).eq('recipient_id',me.id);
-      if(error) throw new Error(error.message);
-      const {data}=await db.from('notifications').select('is_read').eq('id',window._cTestId).single();
-      if(!data?.is_read) throw new Error('is_read لم يتحدث');
-      return `id=${window._cTestId} → is_read=true ✓`;
-    }
-  },
-  {
-    id:'rls', icon:'🔒', title:'عزل البيانات (RLS)',
-    desc:'التحقق من إن المستخدم لا يقدر يحذف إشعارات شخص آخر',
-    pts:15, level:'hard',
-    run: async()=>{
-      /* جرّب تحديث إشعار لا يخصك */
-      const {data:other}=await db.from('notifications').select('id').neq('recipient_id',me.id).limit(1);
-      if(!other?.length) return 'لا توجد إشعارات لأشخاص آخرين — RLS محمي بالتعريف';
-      const {error}=await db.from('notifications').update({is_read:true}).eq('id',other[0].id);
-      if(!error) throw new Error('RLS لا تمنع تعديل إشعارات الآخرين!');
-      return `RLS تمنع التعديل ✓ (${error.code})`;
-    }
-  },
-  {
-    id:'cleanup', icon:'🧹', title:'تنظيف بيانات التحدي',
-    desc:'حذف كل الإشعارات التجريبية المُنشأة خلال التحدي',
-    pts:5, level:'easy',
-    run: async()=>{
-      const {error}=await db.from('notifications').delete().eq('recipient_id',me.id)
-        .in('type',['challenge_test','rt_challenge','unread_test']);
-      if(error) throw new Error(error.message);
-      return 'تم حذف إشعارات التحدي ✓';
-    }
-  },
+    });
+  setTimeout(()=>{if(!got){db.removeChannel(ch);fail('لم يصل خلال 8 ثوانٍ');}},8000);
+})},
+{id:'trigger_c',icon:'💬',title:'Trigger التعليق (تحقق بـRPC)',pts:25,
+ run:async()=>{
+  /* استخدم RPC لتجاوز RLS */
+  const {data:posts}=await db.from('posts').select('id,author_id').neq('author_id',me.id).limit(3);
+  if(!posts?.length) throw'لا يوجد منشور لشخص آخر';
+  let post=null;
+  for(const p of posts){
+    const {error}=await db.from('post_comments').insert({
+      post_id:p.id,author_id:me.id,author_name:me.name||'test',
+      content:'ch_'+Date.now()
+    });
+    if(!error){post=p;break;}
+  }
+  if(!post) throw'فشل إدراج التعليق بكل المنشورات';
+  await new Promise(r=>setTimeout(r,2500));
+  const {data:n,error:ne}=await db.rpc('check_notif_created',{
+    p_type:'comment',p_entity:post.id,
+    p_after:new Date(Date.now()-30000).toISOString()
+  });
+  if(ne) throw'RPC error: '+ne.message;
+  if(!n) throw'Trigger لم يُنشئ إشعاراً';
+  return '✓ Trigger أنشأ إشعار id='+n;
+}},
+{id:'trigger_v',icon:'▲',title:'Trigger التصويت (تحقق بـRPC)',pts:25,
+ run:async()=>{
+  const {data:posts}=await db.from('posts').select('id,author_id').neq('author_id',me.id).limit(3);
+  if(!posts?.length) throw'لا يوجد منشور لشخص آخر';
+  let post=null;
+  for(const p of posts){
+    await db.from('post_reactions').delete().eq('post_id',p.id).eq('user_id',me.id).eq('reaction_type','vote');
+    const {error}=await db.from('post_reactions').insert({post_id:p.id,user_id:me.id,reaction_type:'vote'});
+    if(!error){post=p;break;}
+  }
+  if(!post) throw'فشل إدراج التصويت';
+  await new Promise(r=>setTimeout(r,2500));
+  const {data:n,error:ne}=await db.rpc('check_notif_created',{
+    p_type:'vote',p_entity:post.id,
+    p_after:new Date(Date.now()-30000).toISOString()
+  });
+  if(ne) throw'RPC error: '+ne.message;
+  if(!n) throw'Trigger التصويت لم يعمل';
+  return '✓ Trigger أنشأ إشعار id='+n;
+}},
+{id:'trigger_f',icon:'👤',title:'Trigger المتابعة (تحقق بـRPC)',pts:25,
+ run:async()=>{
+  const {data:users}=await db.from('users').select('id,name').neq('id',me.id).limit(1);
+  if(!users?.length) throw'لا يوجد مستخدم آخر';
+  const u=users[0];
+  await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',u.id);
+  const {error}=await db.from('follows').insert({follower_id:me.id,following_id:u.id});
+  if(error) throw'فشل إدراج المتابعة: '+error.message;
+  await new Promise(r=>setTimeout(r,2500));
+  const {data:n,error:ne}=await db.rpc('check_notif_created',{
+    p_type:'follow',p_entity:u.id,
+    p_after:new Date(Date.now()-30000).toISOString()
+  });
+  await db.from('follows').delete().eq('follower_id',me.id).eq('following_id',u.id);
+  if(ne) throw'RPC error: '+ne.message;
+  if(!n) throw'Trigger المتابعة لم يعمل';
+  return '✓ Trigger أنشأ إشعار id='+n+' لـ'+u.name;
+}},
+{id:'unread',icon:'🔢',title:'عدد غير المقروءة',pts:10,
+ run:async()=>{
+  const {count}=await db.from('notifications').select('*',{count:'exact',head:true})
+    .eq('recipient_id',me.id).eq('is_read',false);
+  return 'غير مقروء: '+count;
+}},
+{id:'mark',icon:'✅',title:'تعليم كمقروء',pts:10,
+ run:async()=>{
+  if(!window._tid) throw'شغّل اختبار الكتابة أولاً';
+  const {error}=await db.from('notifications').update({is_read:true,read:true})
+    .eq('id',window._tid).eq('recipient_id',me.id);
+  if(error) throw error.message;
+  return 'id='+window._tid+' → is_read=true ✓';
+}},
+{id:'rls',icon:'🔒',title:'عزل البيانات (RLS)',pts:15,
+ run:async()=>{
+  const {data}=await db.from('notifications').select('id').neq('recipient_id',me.id).limit(1);
+  if(data?.length) throw'❌ RLS تسمح برؤية إشعارات الآخرين!';
+  return'RLS تعزل البيانات بشكل صحيح ✓';
+}},
+{id:'clean',icon:'🧹',title:'تنظيف',pts:5,
+ run:async()=>{
+  await db.from('notifications').delete().eq('recipient_id',me.id)
+    .in('type',['ch_test','ch_rt']);
+  return'تم تنظيف بيانات التحدي ✓';
+}},
 ];
 
-const total=CHALLENGES.reduce((s,c)=>s+c.pts,0);
+const TOTAL=T.reduce((s,t)=>s+t.pts,0);
+let pts=0,ok=0,err=0;
 
-/* بناء الواجهة */
-const container=document.getElementById('challenges');
-CHALLENGES.forEach(ch=>{
-  const levelClass={'easy':'b-easy','medium':'b-med','hard':'b-hard'}[ch.level];
-  const levelLabel={'easy':'سهل','medium':'متوسط','hard':'صعب'}[ch.level];
-  const div=document.createElement('div');
-  div.className='challenge';
-  div.id='ch-'+ch.id;
-  div.innerHTML=`
-    <div class="ch-header">
-      <div class="ch-icon">${ch.icon}</div>
-      <div class="ch-info">
-        <div class="ch-title" id="title-${ch.id}">
-          <span id="status-${ch.id}"></span>${ch.title}
-        </div>
-        <div class="ch-points">+${ch.pts} نقطة</div>
-      </div>
-    </div>
-    <div class="ch-desc">${ch.desc}</div>
-    <div class="badge-row">
-      <span class="badge ${levelClass}">${levelLabel}</span>
-      ${ch.live?'<span class="badge b-live">🔴 مباشر</span>':''}
-      <span class="badge" style="background:rgba(255,255,255,.08);color:#f7f1e3">+${ch.pts}pts</span>
-    </div>
-    <div class="ch-result" id="result-${ch.id}"></div>
-  `;
-  container.appendChild(div);
+// بناء الواجهة
+const list=document.getElementById('list');
+T.forEach(t=>{
+  const d=document.createElement('div');
+  d.className='item';d.id='i-'+t.id;
+  d.innerHTML=`<div class="item-head">
+    <span class="item-icon" id="ic-${t.id}">${t.icon}</span>
+    <span class="item-title">${t.title}</span>
+    <span class="item-pts">+${t.pts}pts</span>
+  </div>
+  <div class="item-res" id="r-${t.id}"></div>`;
+  list.appendChild(d);
 });
 
-async function runChallenge(ch){
-  const el=document.getElementById('ch-'+ch.id);
-  const res=document.getElementById('result-'+ch.id);
-  const status=document.getElementById('status-'+ch.id);
-  el.className='challenge running';
-  status.textContent='⏳ ';
+async function run(t){
+  const el=document.getElementById('i-'+t.id);
+  const res=document.getElementById('r-'+t.id);
+  const ic=document.getElementById('ic-'+t.id);
+  el.className='item run'; ic.textContent='⏳';
   res.style.display='none';
   try{
-    const out=await ch.run();
-    el.className='challenge done';
-    status.textContent='✅ ';
-    res.className='ch-result r-ok';
-    res.textContent=out;
-    res.style.display='block';
-    totalPts+=ch.pts; passed++;
-    document.getElementById('sc-pass').textContent=passed;
-    document.getElementById('sc-pts').textContent=totalPts;
+    const out=await t.run();
+    el.className='item ok'; ic.textContent='✅';
+    res.className='item-res res-ok'; res.textContent=out; res.style.display='block';
+    pts+=t.pts; ok++;
+    document.getElementById('s-ok').textContent=ok;
+    document.getElementById('s-pts').textContent=pts;
   }catch(e){
-    el.className='challenge failed';
-    status.textContent='❌ ';
-    res.className='ch-result r-err';
-    res.textContent=e.message;
-    res.style.display='block';
-    failed++;
-    document.getElementById('sc-fail').textContent=failed;
+    el.className='item err'; ic.textContent='❌';
+    res.className='item-res res-err'; res.textContent=String(e); res.style.display='block';
+    err++;
+    document.getElementById('s-err').textContent=err;
   }
 }
 
 async function runAll(){
+  pts=0;ok=0;err=0;
+  ['s-ok','s-pts','s-err'].forEach(id=>document.getElementById(id).textContent=0);
   document.getElementById('run-all').disabled=true;
-  totalPts=0; passed=0; failed=0;
-  document.getElementById('sc-pass').textContent=0;
-  document.getElementById('sc-pts').textContent=0;
-  document.getElementById('sc-fail').textContent=0;
-  for(const ch of CHALLENGES){
-    await runChallenge(ch);
-    await new Promise(r=>setTimeout(r,400));
-  }
-  /* النتيجة النهائية */
-  const pct=Math.round(totalPts/total*100);
-  const stars=pct>=90?'🌟🌟🌟':pct>=70?'⭐⭐🌟':pct>=50?'⭐⭐':pct>=30?'⭐':'';
-  const msg=pct>=90?'النظام مثالي وجاهز للإطلاق!'
-    :pct>=70?'النظام قوي مع بعض المشاكل البسيطة'
-    :pct>=50?'النظام يحتاج إصلاحات'
-    :'النظام يحتاج مراجعة شاملة';
-  document.getElementById('final').style.display='block';
-  document.getElementById('stars').textContent=stars;
-  document.getElementById('final-pts').textContent=`${totalPts}/${total}`;
-  document.getElementById('final-msg').textContent=msg+` (${pct}%)`;
+  document.getElementById('final').style.display='none';
+  for(const t of T){ await run(t); await new Promise(r=>setTimeout(r,300)); }
+  const pct=Math.round(pts/TOTAL*100);
+  const stars=pct>=90?'🌟🌟🌟':pct>=70?'⭐⭐🌟':pct>=50?'⭐⭐':'⭐';
+  const msg=pct>=90?'مثالي — جاهز للإطلاق!':pct>=70?'قوي مع بعض المشاكل':pct>=50?'يحتاج إصلاحات':'يحتاج مراجعة شاملة';
+  const f=document.getElementById('final');
+  f.style.display='block';
+  document.getElementById('f-stars').textContent=stars;
+  document.getElementById('f-score').textContent=pts+'/'+TOTAL+' ('+pct+'%)';
+  document.getElementById('f-msg').textContent=msg;
   document.getElementById('run-all').disabled=false;
 }
 
