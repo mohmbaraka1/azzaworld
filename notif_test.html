@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZZA — اختبار نظام الإشعارات</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:#f7f1e3;color:#1c1a14;padding:20px;direction:rtl}
+h1{font-size:20px;margin-bottom:20px;color:#1c5b38}
+.test{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;border:1.5px solid #e8e0cc}
+.test-title{font-weight:700;font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.test-desc{font-size:13px;color:#6b6555;margin-bottom:10px}
+.btn{padding:9px 18px;border-radius:999px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-run{background:#1c5b38;color:#fff}
+.btn-run:hover{background:#0e3622}
+.btn-run:disabled{background:#ccc;cursor:not-allowed}
+.result{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:13px;font-family:monospace;white-space:pre-wrap;display:none}
+.r-ok{background:#e1f5ee;color:#085041;border:1px solid #b3e0cc}
+.r-err{background:#fcebeb;color:#501313;border:1px solid #f0b3b3}
+.r-info{background:#e6f1fb;color:#0c447c;border:1px solid #b3d4f0}
+.badge{display:inline-flex;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.b-pending{background:#fff3cd;color:#856404}
+.b-ok{background:#d1e7dd;color:#0f5132}
+.b-err{background:#f8d7da;color:#842029}
+.summary{background:#1c5b38;color:#fff;border-radius:12px;padding:16px;margin-top:20px;text-align:center}
+.summary-num{font-size:32px;font-weight:700}
+.summary-label{font-size:14px;opacity:.8}
+.progress{height:6px;background:#e8e0cc;border-radius:99px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;background:#1c5b38;border-radius:99px;transition:.3s;width:0%}
+</style>
+</head>
+<body>
+
+<h1>🧪 اختبار نظام الإشعارات — AZZA</h1>
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div id="tests-container"></div>
+<div class="summary" id="summary" style="display:none">
+  <div class="summary-num" id="sum-num">—</div>
+  <div class="summary-label" id="sum-label"></div>
+</div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db = supabase.createClient(SB_URL, SB_ANON);
+const me = JSON.parse(localStorage.getItem('azza_user') || 'null');
+
+const TESTS = [
+  {
+    id: 'auth',
+    title: '1. جلسة Auth',
+    desc: 'التحقق من وجود جلسة Supabase Auth صالحة',
+    run: async () => {
+      const {data} = await db.auth.getSession();
+      if(!data?.session) throw new Error('لا توجد جلسة Auth — سجّل دخول أولاً');
+      return `✓ auth.uid = ${data.session.user.id}\n✓ user.id (localStorage) = ${me?.id}\n✓ متطابقان: ${data.session.user.id === me?.id}`;
+    }
+  },
+  {
+    id: 'table',
+    title: '2. جدول notifications',
+    desc: 'التحقق من وجود الجدول وأعمدته',
+    run: async () => {
+      const {data, error} = await db.from('notifications').select('id,user_id,recipient_id,actor_id,type,is_read,read,message,content,created_at').limit(1);
+      if(error) throw new Error(error.message);
+      const cols = data.length ? Object.keys(data[0]) : ['id','user_id','recipient_id','actor_id','type'];
+      return `✓ الجدول موجود\n✓ الأعمدة: ${cols.join(', ')}`;
+    }
+  },
+  {
+    id: 'rls_read',
+    title: '3. RLS — القراءة',
+    desc: 'هل المستخدم يقدر يقرأ إشعاراته؟',
+    run: async () => {
+      const {data, error} = await db.from('notifications')
+        .select('id,recipient_id,user_id,type')
+        .or(`recipient_id.eq.${me.id},user_id.eq.${me.id}`)
+        .limit(5);
+      if(error) throw new Error('RLS تمنع القراءة: ' + error.message);
+      return `✓ يقدر يقرأ\n✓ عدد إشعاراته: ${data.length}`;
+    }
+  },
+  {
+    id: 'insert',
+    title: '4. إدراج إشعار',
+    desc: 'هل يمكن إدراج إشعار جديد في الجدول؟',
+    run: async () => {
+      const {data, error} = await db.from('notifications').insert({
+        user_id:      me.id,
+        recipient_id: me.id,
+        actor_id:     me.id,
+        type:         'test',
+        message:      'اختبار تلقائي ' + Date.now(),
+        is_read:      false,
+        read:         false,
+      }).select().single();
+      if(error) throw new Error('RLS تمنع الإدراج: ' + error.message);
+      window._testNotifId = data.id;
+      return `✓ تم الإدراج\n✓ id = ${data.id}`;
+    }
+  },
+  {
+    id: 'read_new',
+    title: '5. قراءة الإشعار الجديد بـrecipient_id',
+    desc: 'هل يظهر الإشعار لما نستعلم بـrecipient_id؟',
+    run: async () => {
+      if(!window._testNotifId) throw new Error('الاختبار 4 فشل أولاً');
+      const {data, error} = await db.from('notifications')
+        .select('*')
+        .eq('recipient_id', me.id)
+        .eq('id', window._testNotifId)
+        .single();
+      if(error) throw new Error(error.message);
+      if(!data) throw new Error('الإشعار غير موجود بـrecipient_id!');
+      return `✓ ظهر الإشعار بـrecipient_id\n✓ type = ${data.type}\n✓ is_read = ${data.is_read}`;
+    }
+  },
+  {
+    id: 'realtime',
+    title: '6. Supabase Realtime',
+    desc: 'هل يصل الإشعار فوراً بدون refresh؟ (انتظر 5 ثوانٍ)',
+    run: async () => {
+      return new Promise((resolve, reject) => {
+        let received = false;
+        const ch = db.channel('test_notif_' + Date.now())
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `recipient_id=eq.${me.id}`,
+          }, payload => {
+            received = true;
+            db.removeChannel(ch);
+            resolve(`✓ Realtime يعمل\n✓ استلم الإشعار: id=${payload.new.id}\n✓ type=${payload.new.type}`);
+          })
+          .subscribe(async (status) => {
+            if(status === 'SUBSCRIBED') {
+              /* أدرج إشعار تجريبي بعد الاشتراك */
+              await db.from('notifications').insert({
+                user_id:      me.id,
+                recipient_id: me.id,
+                actor_id:     me.id,
+                type:         'realtime_test',
+                message:      'اختبار Realtime ' + Date.now(),
+                is_read:      false,
+                read:         false,
+              });
+            }
+          });
+        setTimeout(() => {
+          if(!received) {
+            db.removeChannel(ch);
+            reject(new Error('Realtime لم يستلم الإشعار خلال 5 ثوانٍ'));
+          }
+        }, 6000);
+      });
+    }
+  },
+  {
+    id: 'trigger_comment',
+    title: '7. Trigger — تعليق',
+    desc: 'هل يُنشئ التعليق إشعاراً تلقائياً؟',
+    run: async () => {
+      /* جلب منشور لشخص آخر */
+      const {data:posts} = await db.from('posts')
+        .select('id,author_id')
+        .neq('author_id', me.id)
+        .limit(1);
+      if(!posts?.length) throw new Error('لا يوجد منشور لشخص آخر للاختبار');
+      const post = posts[0];
+      const countBefore = (await db.from('notifications')
+        .select('*',{count:'exact',head:true})
+        .eq('recipient_id', post.author_id)).count;
+      /* إضافة تعليق */
+      await db.from('post_comments').insert({
+        post_id:      post.id,
+        author_id:    me.id,
+        author_name:  me.name || 'test',
+        content:      'تعليق اختبار تلقائي ' + Date.now(),
+      });
+      /* انتظر ثانية ثم تحقق */
+      await new Promise(r => setTimeout(r, 1500));
+      const countAfter = (await db.from('notifications')
+        .select('*',{count:'exact',head:true})
+        .eq('recipient_id', post.author_id)).count;
+      if(countAfter <= countBefore)
+        throw new Error('❌ Trigger لم يُنشئ إشعاراً — تأكد من تنفيذ azza_notifications_system.sql');
+      return `✓ Trigger يعمل\n✓ إشعار جديد وصل لـ ${post.author_id}\n✓ العدد: ${countBefore} → ${countAfter}`;
+    }
+  },
+  {
+    id: 'unread_count',
+    title: '8. عدد غير المقروءة',
+    desc: 'هل يحسب عدد الإشعارات غير المقروءة بشكل صحيح؟',
+    run: async () => {
+      const {count, error} = await db.from('notifications')
+        .select('*', {count:'exact', head:true})
+        .eq('recipient_id', me.id)
+        .eq('is_read', false);
+      if(error) throw new Error(error.message);
+      return `✓ عدد غير المقروءة = ${count}`;
+    }
+  },
+  {
+    id: 'mark_read',
+    title: '9. تعليم كمقروء',
+    desc: 'هل يمكن تعليم الإشعار كمقروء؟',
+    run: async () => {
+      if(!window._testNotifId) throw new Error('الاختبار 4 فشل أولاً');
+      const {error} = await db.from('notifications')
+        .update({is_read:true, read:true})
+        .eq('id', window._testNotifId)
+        .eq('recipient_id', me.id);
+      if(error) throw new Error(error.message);
+      return `✓ تم تعليم الإشعار ${window._testNotifId} كمقروء`;
+    }
+  },
+  {
+    id: 'cleanup',
+    title: '10. تنظيف بيانات الاختبار',
+    desc: 'حذف إشعارات الاختبار التجريبية',
+    run: async () => {
+      const {error} = await db.from('notifications')
+        .delete()
+        .eq('recipient_id', me.id)
+        .in('type', ['test', 'realtime_test']);
+      if(error) throw new Error(error.message);
+      return '✓ تم حذف إشعارات الاختبار';
+    }
+  },
+];
+
+/* بناء الواجهة */
+const container = document.getElementById('tests-container');
+TESTS.forEach(t => {
+  container.innerHTML += `
+    <div class="test" id="test-${t.id}">
+      <div class="test-title">
+        ${t.title}
+        <span class="badge b-pending" id="badge-${t.id}">انتظار</span>
+      </div>
+      <div class="test-desc">${t.desc}</div>
+      <button class="btn btn-run" onclick="runTest('${t.id}')">▶ تشغيل</button>
+      <button class="btn btn-run" onclick="runAll()" style="background:#854F0B;margin-right:8px" id="run-all-btn">⚡ تشغيل الكل</button>
+      <div class="result" id="result-${t.id}"></div>
+    </div>`;
+});
+/* إخفاء زر تشغيل الكل من كل اختبار إلا الأول */
+document.querySelectorAll('#run-all-btn').forEach((b,i) => { if(i>0) b.style.display='none'; });
+
+let passed=0, failed=0;
+
+async function runTest(id) {
+  const test = TESTS.find(t=>t.id===id);
+  const badge = document.getElementById('badge-'+id);
+  const result = document.getElementById('result-'+id);
+  badge.className='badge b-pending'; badge.textContent='جاري...';
+  result.style.display='none';
+  try {
+    const out = await test.run();
+    badge.className='badge b-ok'; badge.textContent='✓ نجح';
+    result.className='result r-ok'; result.textContent=out; result.style.display='block';
+    passed++;
+  } catch(e) {
+    badge.className='badge b-err'; badge.textContent='✗ فشل';
+    result.className='result r-err'; result.textContent='✗ '+e.message; result.style.display='block';
+    failed++;
+  }
+  updateProgress();
+}
+
+async function runAll() {
+  passed=0; failed=0;
+  document.getElementById('summary').style.display='none';
+  for(const t of TESTS) {
+    await runTest(t.id);
+    await new Promise(r=>setTimeout(r,300));
+  }
+  const total=passed+failed;
+  const s=document.getElementById('summary');
+  s.style.display='block';
+  s.style.background=failed===0?'#1c5b38':'#c0392b';
+  document.getElementById('sum-num').textContent=`${passed}/${total}`;
+  document.getElementById('sum-label').textContent=failed===0?'كل الاختبارات نجحت ✅':`${failed} اختبار فشل`;
+}
+
+function updateProgress() {
+  const done=passed+failed;
+  document.getElementById('prog').style.width=(done/TESTS.length*100)+'%';
+}
+
+if(!me) document.body.innerHTML='<div style="padding:40px;text-align:center;color:#c0392b;font-size:18px">❌ لا يوجد مستخدم — افتح app.html وسجّل دخولاً أولاً ثم ارجع لهذه الصفحة</div>';
+</script>
+</body>
+</html>
