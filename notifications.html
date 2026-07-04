@@ -227,22 +227,27 @@ let _notifs=[];
 async function fetchAndRender(){
   try{
     const {data,error}=await azzaDB.from('notifications')
-      .select('*').eq('recipient_id',user.id)
+      .select('*, actor:actor_id(id,name,photo,username)')
+      .eq('recipient_id',user.id)
       .order('created_at',{ascending:false}).limit(50);
     if(error)throw error;
     _notifs=(data||[]).map(row=>{
+      /* metadata قد يكون jsonb (object) أو text — نتعامل مع الحالتين */
       let meta={};
-      try{ meta=JSON.parse(row.content||row.metadata||'{}'); }catch{}
+      try{
+        if(typeof row.metadata === 'object' && row.metadata) meta=row.metadata;
+        else if(typeof row.metadata === 'string') meta=JSON.parse(row.metadata);
+        else if(typeof row.content === 'string') meta=JSON.parse(row.content);
+      }catch{}
       return {
         ...row,
         meta,
         _db_id:    row.id,
-        /* توحيد الحقول القديمة والجديدة */
-        from_name: row.actor?.name  || meta.from_name  || meta.actor_name  || 'مستخدم',
-        from_photo:row.actor?.photo || meta.from_photo || meta.from_photo  || null,
-        from_id:   row.actor_id     || meta.from_id    || null,
-        post_id:   row.entity_id    || row.related_id  || meta.post_id     || null,
-        post_text: meta.post_text   || meta.comment_text|| null,
+        from_name: row.actor?.name  || meta.from_name  || meta.actor_name  || row.message?.split(' ')[0] || 'مستخدم',
+        from_photo:row.actor?.photo || meta.from_photo || null,
+        from_id:   row.actor_id     || row.actor?.id   || meta.from_id    || null,
+        post_id:   row.entity_id    || row.related_id  || meta.post_id    || null,
+        post_text: meta.post_text   || meta.message_preview || meta.comment_text || null,
         at:        row.created_at,
         read:      row.is_read      || row.read         || false,
       };
@@ -292,16 +297,25 @@ function render(){
 /* ── إجراءات ── */
 async function goNotif(n){
   await azzaDB.from('notifications').update({read:true}).eq('id',n._db_id);
-  const fromId  = n.from_id  || n.meta?.from_id  || n.actor_id;
-  const postId   = n.post_id  || n.meta?.post_id  || n.entity_id || n.related_id;
+  const fromId  = n.from_id  || n.meta?.from_id  || n.actor_id || n.actor?.id;
+  const postId  = n.post_id  || n.meta?.post_id  || n.entity_id || n.related_id;
+  const convId  = n.meta?.conversation_id || n.entity_id;
+
   if(n.type==='message'){
-    const convs=JSON.parse(localStorage.getItem('azza_conversations')||'[]');
-    const conv=convs.find(c=>c.participants?.some(p=>p.id===fromId)&&c.participants?.some(p=>p.id===user.id));
-    location.href=conv?`messages.html?conv=${conv.id}`:'messages.html';
+    if(convId){
+      location.href='messages.html?conv='+convId;
+    }else{
+      /* ابحث عن المحادثة بـfromId */
+      const convs=JSON.parse(localStorage.getItem('azza_conversations')||'[]');
+      const conv=convs.find(c=>c.participants?.some(p=>p.id===fromId));
+      location.href=conv?`messages.html?conv=${conv.id}`:'messages.html';
+    }
   }else if(n.type==='follow'){
-    location.href='user.html?id='+fromId;
+    location.href=fromId?'user.html?id='+fromId:'app.html';
   }else if(postId){
     location.href='post.html?id='+postId;
+  }else if(fromId){
+    location.href='user.html?id='+fromId;
   }else{
     location.href='app.html';
   }
