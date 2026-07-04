@@ -77,8 +77,8 @@ window.AzzaNotif = (function(){
     if(!_me?.id) return [];
     try{
       const {data, error} = await _db
-        .from('notifications_with_actor')
-        .select('*')
+        .from('notifications')
+        .select('*, actor:actor_id(id,name,photo,username)')
         .eq('recipient_id', _me.id)
         .order('created_at', {ascending:false})
         .range(offset, offset + limit - 1);

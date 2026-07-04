@@ -227,15 +227,27 @@ let _notifs=[];
 async function fetchAndRender(){
   try{
     const {data,error}=await azzaDB.from('notifications')
-      .select('*').eq('user_id',user.id)
+      .select('*').eq('recipient_id',user.id)
       .order('created_at',{ascending:false}).limit(50);
     if(error)throw error;
     _notifs=(data||[]).map(row=>{
-      let meta={};try{meta=JSON.parse(row.content||'{}');}catch{}
-      return {...row, meta, _db_id:row.id};
+      let meta={};
+      try{ meta=JSON.parse(row.content||row.metadata||'{}'); }catch{}
+      return {
+        ...row,
+        meta,
+        _db_id:    row.id,
+        /* توحيد الحقول القديمة والجديدة */
+        from_name: row.actor?.name  || meta.from_name  || meta.actor_name  || 'مستخدم',
+        from_photo:row.actor?.photo || meta.from_photo || meta.from_photo  || null,
+        from_id:   row.actor_id     || meta.from_id    || null,
+        post_id:   row.entity_id    || row.related_id  || meta.post_id     || null,
+        post_text: meta.post_text   || meta.comment_text|| null,
+        at:        row.created_at,
+        read:      row.is_read      || row.read         || false,
+      };
     });
     render();
-    AzzaNotif.markRead(); /* تعليم الكل مقروء عند فتح الصفحة */
   }catch(e){console.error('fetchNotifs:',e.message);}
 }
 
@@ -252,11 +264,11 @@ function render(){
 
   el.innerHTML=_notifs.map(n=>{
     const t=AzzaNotif.getType(n.type);
-    const av=n.meta.from_photo?`<img src="${esc(n.meta.from_photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(n.meta.from_name||'م');
-    const preview=n.meta.post_text?`
+    const av=n.from_photo?`<img src="${esc(n.from_photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(n.from_name||'م');
+    const preview=n.post_text?`
       <div class="post-preview">
         <div class="post-preview-stripe" style="background:${t.color}"></div>
-        <span class="post-preview-text">${esc(n.meta.post_text)}</span>
+        <span class="post-preview-text">${esc(n.post_text)}</span>
         <span class="post-preview-arrow">←</span>
       </div>`:'';
     return `<div class="notif-item${n.read?'':' unread'}" data-id="${n.id}" onclick="goNotif(${JSON.stringify(n).replace(/"/g,'&quot;')})">
@@ -266,9 +278,9 @@ function render(){
         <div class="type-badge">${t.emoji}</div>
       </div>
       <div class="notif-content">
-        <div class="notif-text"><strong>${esc(n.meta.from_name||'مستخدم')}</strong> <span class="action">${t.text}</span></div>
+        <div class="notif-text"><strong>${esc(n.from_name||'مستخدم')}</strong> <span class="action">${t.text}</span></div>
         ${preview}
-        <div class="notif-time">${timeAgo(n.created_at)}</div>
+        <div class="notif-time">${timeAgo(n.at||n.created_at)}</div>
       </div>
       <button class="del-btn" onclick="event.stopPropagation();deleteNotif(${n._db_id})">
         <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -280,21 +292,23 @@ function render(){
 /* ── إجراءات ── */
 async function goNotif(n){
   await azzaDB.from('notifications').update({read:true}).eq('id',n._db_id);
+  const fromId  = n.from_id  || n.meta?.from_id  || n.actor_id;
+  const postId   = n.post_id  || n.meta?.post_id  || n.entity_id || n.related_id;
   if(n.type==='message'){
     const convs=JSON.parse(localStorage.getItem('azza_conversations')||'[]');
-    const conv=convs.find(c=>c.participants.some(p=>p.id===n.meta.from_id)&&c.participants.some(p=>p.id===user.id));
+    const conv=convs.find(c=>c.participants?.some(p=>p.id===fromId)&&c.participants?.some(p=>p.id===user.id));
     location.href=conv?`messages.html?conv=${conv.id}`:'messages.html';
   }else if(n.type==='follow'){
-    location.href='user.html?id='+n.meta.from_id;
-  }else if(n.meta.post_id||n.related_id){
-    location.href='post.html?id='+(n.meta.post_id||n.related_id);
+    location.href='user.html?id='+fromId;
+  }else if(postId){
+    location.href='post.html?id='+postId;
   }else{
     location.href='app.html';
   }
 }
 
 async function markAllRead(){
-  await azzaDB.from('notifications').update({read:true}).eq('user_id',user.id).eq('read',false);
+  await azzaDB.from('notifications').update({is_read:true,read:true,updated_at:new Date().toISOString()}).eq('recipient_id',user.id).eq('is_read',false);
   _notifs=_notifs.map(n=>({...n,read:true}));
   render();showToast('تم تحديد الكل كمقروء ✅');
 }
@@ -312,4 +326,4 @@ AzzaNotif.subscribe(); /* Realtime من AzzaNotif مباشرة */
 initSoundUI();
 </script>
 </body>
-</html> 
+</html>
