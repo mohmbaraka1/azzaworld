@@ -498,12 +498,25 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
           </div>
           <label class="toggle"><input type="checkbox" id="prv-collab" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
         </div>
-        <div class="toggle-row">
+        <div class="toggle-row" style="flex-direction:column;align-items:flex-start;gap:10px">
           <div class="toggle-info">
-            <div class="toggle-label">السماح بالرسائل المباشرة</div>
-            <div class="toggle-desc">يسمح للمستخدمين الآخرين بمراسلتك</div>
+            <div class="toggle-label">من يستطيع مراسلتك؟</div>
+            <div class="toggle-desc">تحكم بمن يستطيع إرسال رسائل أو طلبات مراسلة</div>
           </div>
-          <label class="toggle"><input type="checkbox" id="prv-msg" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+              <input type="radio" name="msg_privacy" value="everyone" id="mp-all" onchange="saveMsgPrivacy(this.value)">
+              🌍 الجميع
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+              <input type="radio" name="msg_privacy" value="followers" id="mp-followers" onchange="saveMsgPrivacy(this.value)">
+              👥 المتابعون فقط
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+              <input type="radio" name="msg_privacy" value="none" id="mp-none" onchange="saveMsgPrivacy(this.value)">
+              🔒 لا أحد
+            </label>
+          </div>
         </div>
         <div class="toggle-row">
           <div class="toggle-info">
@@ -840,6 +853,7 @@ async function saveAccount(){
   if(!name){ showToast('الاسم مطلوب','err'); return; }
   const bio = document.getElementById('s-bio').value.trim();
   if(bio.length>200){ showToast('النبذة أطول من 200 حرف','err'); return; }
+
   const upd = {
     ...user,
     name,
@@ -848,31 +862,70 @@ async function saveAccount(){
     phone:       document.getElementById('s-phone').value.trim(),
     institution: document.getElementById('s-institution').value.trim(),
   };
-  saveUser(upd); user=upd;
-  const av=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
-  document.getElementById('settings-av').innerHTML=av;
+
+  /* 1) احفظ بـSupabase أولاً */
+  const {error} = await azzaDB.from('users').update({
+    name:        upd.name,
+    email:       upd.email,
+    bio:         upd.bio,
+    phone:       upd.phone,
+    institution: upd.institution,
+  }).eq('id', user.id);
+
+  if(error){
+    showToast('تعذّر الحفظ: ' + error.message, 'err');
+    return;
+  }
+
+  /* 2) حدّث localStorage بعد نجاح Supabase */
+  saveUser(upd); user = upd;
+  const av = user.photo
+    ? `<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    : ini(user.name);
+  document.getElementById('settings-av').innerHTML = av;
   showToast('تم حفظ التغييرات ✅');
 }
 
 /* ── الصورة ── */
-function uploadAvatar(inp){
+async function uploadAvatar(inp){
   const f=inp.files[0]; if(!f)return;
   if(f.size>3*1024*1024){ showToast('الصورة أكبر من 3MB','err'); return; }
-  const r=new FileReader();
-  r.onload=e=>{
-    const img=new Image(); img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      canvas.width=200; canvas.height=200;
-      const ctx=canvas.getContext('2d');
-      const min=Math.min(img.width,img.height);
-      ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);
-      const dataUrl=canvas.toDataURL('image/jpeg',.85);
-      const upd={...user,photo:dataUrl};
-      saveUser(upd); user=upd;
-      document.getElementById('settings-av').innerHTML=`<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      showToast('تم تحديث الصورة ✅');
-    }; img.src=e.target.result;
-  }; r.readAsDataURL(f);
+  showToast('جاري رفع الصورة...','info');
+
+  /* ضغط الصورة أولاً */
+  const dataUrl = await new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image(); img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        canvas.width=200; canvas.height=200;
+        const ctx=canvas.getContext('2d');
+        const min=Math.min(img.width,img.height);
+        ctx.drawImage(img,(img.width-min)/2,(img.height-min)/2,min,min,0,0,200,200);
+        res(canvas.toDataURL('image/jpeg',.85));
+      }; img.src=e.target.result;
+    }; r.readAsDataURL(f);
+  });
+
+  /* رفع لـSupabase Storage */
+  let photoUrl = dataUrl;
+  try{
+    const ext=f.name.split('.').pop()||'jpg';
+    const path=`avatars/${user.id}.${ext}`;
+    const blob=await(await fetch(dataUrl)).blob();
+    const {error:upErr}=await azzaDB.storage.from('avatars').upload(path,blob,{upsert:true,contentType:'image/jpeg'});
+    if(!upErr){
+      const {data}=azzaDB.storage.from('avatars').getPublicUrl(path);
+      photoUrl=data.publicUrl+'?t='+Date.now();
+    }
+  }catch{}
+
+  /* حفظ بـSupabase users وlocalStorage */
+  await azzaDB.from('users').update({photo:photoUrl}).eq('id',user.id);
+  const upd={...user,photo:photoUrl};
+  saveUser(upd); user=upd;
+  document.getElementById('settings-av').innerHTML=`<img src="${photoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  showToast('تم تحديث الصورة ✅');
 }
 function removeAvatar(){
   if(!confirm('حذف الصورة الشخصية؟')) return;
@@ -1002,17 +1055,17 @@ function clearPwFields(){
   checkPwStrength(); checkPwMatch();
 }
 async function changePassword(){
-  const cur  = document.getElementById('s-pw-current').value;
+  const cur   = document.getElementById('s-pw-current').value;
   const newPw = document.getElementById('s-pw-new').value;
-  const conf = document.getElementById('s-pw-confirm').value;
+  const conf  = document.getElementById('s-pw-confirm').value;
   if(!cur||!newPw||!conf){ showToast('أكمل جميع الحقول','err'); return; }
   if(newPw!==conf){ showToast('كلمتا المرور غير متطابقتين','err'); return; }
   if(newPw.length<8){ showToast('كلمة المرور يجب أن تكون 8 أحرف على الأقل','err'); return; }
-  const curHash = await sha256(cur);
-  if(curHash !== user.password){ showToast('كلمة المرور الحالية غير صحيحة','err'); return; }
-  const newHash = await sha256(newPw);
-  const upd = {...user, password:newHash};
-  saveUser(upd); user=upd;
+
+  /* تغيير كلمة المرور عبر Supabase Auth */
+  const {error} = await azzaDB.auth.updateUser({password: newPw});
+  if(error){ showToast('تعذّر التغيير: '+error.message,'err'); return; }
+
   clearPwFields();
   showToast('تم تغيير كلمة المرور ✅');
 }
@@ -1144,8 +1197,11 @@ function loadPrivacy(){
   document.getElementById('prv-email').checked  = p.show_email!==false;
   document.getElementById('prv-public').checked = p.public_profile!==false;
   document.getElementById('prv-collab').checked = p.show_collab!==false;
-  document.getElementById('prv-msg').checked    = p.allow_msg!==false;
   document.getElementById('prv-trust').checked  = p.show_trust!==false;
+  /* تحميل خيار الرسائل */
+  const mp = user.msg_privacy||'everyone';
+  const radio = document.querySelector(`input[name="msg_privacy"][value="${mp}"]`);
+  if(radio) radio.checked=true;
 }
 function savePrivacy(){
   const upd = {...user, privacy:{
@@ -1153,11 +1209,17 @@ function savePrivacy(){
     show_email:   document.getElementById('prv-email').checked,
     public_profile:document.getElementById('prv-public').checked,
     show_collab:  document.getElementById('prv-collab').checked,
-    allow_msg:    document.getElementById('prv-msg').checked,
     show_trust:   document.getElementById('prv-trust').checked,
   }};
   saveUser(upd); user=upd;
   showToast('تم حفظ إعدادات الخصوصية ✅');
+}
+async function saveMsgPrivacy(val){
+  const upd={...user, msg_privacy:val};
+  const {error}=await azzaDB.from('users').update({msg_privacy:val}).eq('id',user.id);
+  if(error){ showToast('تعذّر الحفظ','err'); return; }
+  saveUser(upd); user=upd;
+  showToast(val==='everyone'?'الجميع يستطيع مراسلتك':val==='followers'?'المتابعون فقط':'لا أحد يستطيع مراسلتك','info');
 }
 
 /* ── الإشعارات ── */

@@ -402,13 +402,14 @@ async function loadData(){
 
   if(convRows?.length){
     const deletedConvs=JSON.parse(localStorage.getItem('azza_del_convs')||'[]');
-    const ids = convRows.filter(c=>!deletedConvs.includes(c.id)).map(c=>c.id);
-    const {data:msgs} = await db.from('messages')
+    const filteredConvs=convRows.filter(r=>!deletedConvs.includes(r.id));
+    const ids = filteredConvs.map(r=>r.id);
+    const {data:msgs} = ids.length ? await db.from('messages')
       .select('*').in('conversation_id',ids)
       .eq('deleted',false)
-      .order('created_at',{ascending:true});
+      .order('created_at',{ascending:true}) : {data:[]};
 
-    _convs = convRows.filter(c=>!deletedConvs.includes(c.id)).map(c=>{
+    _convs = filteredConvs.map(c=>{
       const otherId = c.participant_a===me.id?c.participant_b:c.participant_a;
       return {
         id:c.id,
@@ -772,31 +773,31 @@ async function sendMsg(){
    طلب المراسلة
    ══════════════════════════════════════════════ */
 async function startConvWith(targetId){
-  /* تحقق إذا في محادثة موجودة */
-  const existing = _convs.find(c=>c.otherId===targetId);
+  const existing=_convs.find(c=>c.otherId===targetId);
   if(existing){ openConv(existing.id); return; }
 
-  /* تحقق إذا الطرف الآخر أرسل طلب مسبقاً */
+  /* جلب بيانات المستهدف مع خصوصية الرسائل */
+  if(!_users[targetId]){
+    const {data:u}=await db.from('users').select('id,name,photo,username,msg_privacy').eq('id',targetId).single();
+    if(u) _users[targetId]=u;
+  }
+  const privacy=_users[targetId]?.msg_privacy||'everyone';
+
+  if(privacy==='none'){ toast('هذا المستخدم لا يقبل الرسائل 🔒','err'); return; }
+  if(privacy==='followers'){
+    const {data:f}=await db.from('follows').select('id').eq('follower_id',me.id).eq('following_id',targetId).maybeSingle();
+    if(!f){ toast('هذا المستخدم يقبل رسائل المتابعين فقط 👥','err'); return; }
+  }
+
   const {data:myReq}=await db.from('message_requests')
-    .select('id,status').eq('from_id',me.id).eq('to_id',targetId).single();
+    .select('id,status').eq('from_id',me.id).eq('to_id',targetId).maybeSingle();
+  if(myReq?.status==='pending'){ toast('طلبك قيد الانتظار ⏳','info'); return; }
+  if(myReq?.status==='declined'){ toast('رفض المستخدم طلبك','err'); return; }
 
-  if(myReq?.status==='pending'){
-    toast('طلبك قيد الانتظار ⏳','info'); return;
-  }
-  if(myReq?.status==='declined'){
-    toast('رفض المستخدم طلبك','err'); return;
-  }
-
-  /* إنشاء طلب جديد */
   const {error}=await db.from('message_requests').insert({from_id:me.id,to_id:targetId});
-  if(error&&error.code!=='23505'){
-    toast('تعذّر إرسال الطلب','err'); return;
-  }
-
-  /* إشعار للمستخدم الآخر */
+  if(error&&error.code!=='23505'){ toast('تعذّر إرسال الطلب','err'); return; }
   if(window.AzzaNotif) AzzaNotif.send(targetId,'message_request',{entity_type:'user'});
-
-  toast('تم إرسال طلب المراسلة ✅');
+  toast('تم إرسال طلب المراسلة ✅ — انتظر قبول الطرف الآخر','info');
 }
 
 async function acceptRequest(reqId, fromId){

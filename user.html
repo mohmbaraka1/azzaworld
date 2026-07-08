@@ -568,17 +568,8 @@ function buildActions(){
 }
 
 function startMsg(){
-  let convs=getConvs();
-  let conv=convs.find(c=>c.participants.some(p=>p.id===me.id)&&c.participants.some(p=>p.id===targetUser.id));
-  if(!conv){
-    conv={id:genId(),
-      participants:[
-        {id:me.id,name:me.name,username:me.username||'',photo:me.photo||null,type:me.type},
-        {id:targetUser.id,name:targetUser.name,username:targetUser.username||'',photo:targetUser.photo||null,type:targetUser.type}
-      ],messages:[],createdAt:new Date().toISOString()};
-    convs.push(conv);saveConvs(convs);
-  }
-  location.href='messages.html?conv='+conv.id;
+  /* انتقل لـmessages.html مع تمرير ID المستخدم — ستتحقق الصفحة تلقائياً */
+  location.href='messages.html?user='+targetUser.id;
 }
 
 function toggleFollow(){
