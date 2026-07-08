@@ -300,7 +300,7 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
             oninput="autoResize(this);handleTyping()"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
         </div>
-        <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>
+        <button class="send-btn" id="send-btn" disabled>
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
@@ -714,12 +714,22 @@ async function sendMsg(){
     /* رفع الميديا لو موجودة */
     let image_url=null, file_url=null, file_name=null;
     if(_media){
-      const path=`messages/${me.id}/${Date.now()}_${_media.name}`;
-      const {error:upErr}=await db.storage.from('messages').upload(path,_media.file,{upsert:true});
-      if(!upErr){
-        const {data}=db.storage.from('messages').getPublicUrl(path);
-        if(_media.type==='image') image_url=data.publicUrl;
-        else{ file_url=data.publicUrl; file_name=_media.name; }
+      try{
+        /* حاول رفع لـSupabase Storage أولاً */
+        const path=`messages/${me.id}/${Date.now()}_${_media.name}`;
+        const {error:upErr}=await db.storage.from('messages').upload(path,_media.file,{upsert:true});
+        if(!upErr){
+          const {data}=db.storage.from('messages').getPublicUrl(path);
+          if(_media.type==='image') image_url=data.publicUrl;
+          else{ file_url=data.publicUrl; file_name=_media.name; }
+        }else{
+          /* Fallback: base64 مباشرة */
+          if(_media.type==='image') image_url=_media.url;
+          else{ file_url=_media.url; file_name=_media.name; }
+        }
+      }catch{
+        if(_media.type==='image') image_url=_media.url;
+        else{ file_url=_media.url; file_name=_media.name; }
       }
     }
 
@@ -1114,6 +1124,9 @@ async function checkUrlParam(){
   await loadData();
   subscribeRealtime();
   await checkUrlParam();
+
+  /* تهيئة زر الإرسال */
+  document.getElementById('send-btn').onclick = sendMsg;
 
   /* scroll listener لإخفاء زر الرسائل الجديدة */
   document.getElementById('msgs-wrap').addEventListener('scroll',()=>{
