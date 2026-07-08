@@ -159,6 +159,16 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
 .attach-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* ── Lightbox ── */
+.ctx-menu{position:fixed;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:500;min-width:160px;display:none}
+.ctx-menu.open{display:block;animation:fadeUp .15s ease}
+.ctx-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);cursor:pointer;border-radius:8px;text-align:right;transition:.15s}
+.ctx-item:hover{background:var(--cream2)}
+.ctx-item.danger{color:#c0392b}
+.ctx-item.danger:hover{background:rgba(192,57,43,.08)}
+.ctx-sep{height:0.5px;background:var(--line);margin:4px 0}
+.edit-bar{padding:8px 14px;background:var(--gold-bg);border-top:1.5px solid var(--gold);display:none;align-items:center;gap:10px}
+.edit-bar.show{display:flex}
+.edit-bar-label{flex:1;font-size:13px;color:var(--olive);font-weight:700}
 .lb{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999;display:none;align-items:center;justify-content:center;cursor:zoom-out}
 .lb.open{display:flex}
 .lb img{max-width:92vw;max-height:90vh;border-radius:8px;object-fit:contain}
@@ -251,6 +261,14 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
         </div>
       </div>
 
+      <!-- Edit Bar -->
+      <div class="edit-bar" id="edit-bar">
+        <span class="edit-bar-label">✏️ تعديل الرسالة</span>
+        <button class="icon-btn" onclick="cancelEdit()">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
       <!-- Reply Bar -->
       <div class="reply-bar" id="reply-bar">
         <div class="reply-bar-content">
@@ -288,6 +306,14 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
       </div>
     </div>
   </div>
+</div>
+
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <button class="ctx-item" id="ctx-reply" onclick="ctxAction('reply')">↩️ رد</button>
+  <button class="ctx-item" id="ctx-edit" onclick="ctxAction('edit')">✏️ تعديل</button>
+  <div class="ctx-sep"></div>
+  <button class="ctx-item danger" id="ctx-delete" onclick="ctxAction('delete')">🗑️ حذف</button>
 </div>
 
 <!-- Lightbox -->
@@ -375,13 +401,14 @@ async function loadData(){
     .order('updated_at',{ascending:false});
 
   if(convRows?.length){
-    const ids = convRows.map(c=>c.id);
+    const deletedConvs=JSON.parse(localStorage.getItem('azza_del_convs')||'[]');
+    const ids = convRows.filter(c=>!deletedConvs.includes(c.id)).map(c=>c.id);
     const {data:msgs} = await db.from('messages')
       .select('*').in('conversation_id',ids)
       .eq('deleted',false)
       .order('created_at',{ascending:true});
 
-    _convs = convRows.map(c=>{
+    _convs = convRows.filter(c=>!deletedConvs.includes(c.id)).map(c=>{
       const otherId = c.participant_a===me.id?c.participant_b:c.participant_a;
       return {
         id:c.id,
@@ -602,7 +629,13 @@ function renderMsgs(){
     html+=`<div class="msg-row ${mine?'mine':'other'}" id="msg-${m.id}">
       ${mine?'':av}
       <div style="max-width:65%;min-width:0">
-        <div class="msg-bubble" ondblclick="startReply(${m.id})" oncontextmenu="msgMenu(event,${m.id},${mine})">${content}</div>
+        <div class="msg-bubble" 
+          ondblclick="startReply(${m.id})" 
+          oncontextmenu="msgMenu(event,${m.id},${mine})"
+          ontouchstart="onMsgTouchStart(event,${m.id},${mine})"
+          ontouchend="onMsgTouchEnd()"
+          ontouchmove="onMsgTouchEnd()"
+          style="cursor:pointer">${content}${m.edited?'<div style="font-size:10px;opacity:.6;margin-top:2px">تم التعديل</div>':''}</div>
         <div class="msg-footer">
           <span class="msg-time">${time}</span>
           ${status}
@@ -844,11 +877,98 @@ function startReply(msgId){
 }
 function cancelReply(){ _replyTo=null; document.getElementById('reply-bar').classList.remove('show'); }
 
-function msgMenu(e,msgId,mine){
+/* ══════════════════════════════════════════════
+   قائمة السياق — حذف وتعديل وردّ
+   ══════════════════════════════════════════════ */
+let _ctxMsgId = null;
+let _ctxMine  = false;
+let _editMsgId= null;
+let _longPressTimer = null;
+
+function msgMenu(e, msgId, mine){
   e.preventDefault();
-  if(!mine) return;
-  if(confirm('حذف هذه الرسالة للجميع؟')) deleteMsg(msgId);
+  showCtxMenu(e.clientX, e.clientY, msgId, mine);
 }
+
+function showCtxMenu(x, y, msgId, mine){
+  _ctxMsgId = msgId;
+  _ctxMine  = mine;
+  const menu = document.getElementById('ctx-menu');
+  document.getElementById('ctx-edit').style.display   = mine ? 'flex' : 'none';
+  document.getElementById('ctx-delete').style.display = mine ? 'flex' : 'none';
+  document.getElementById('ctx-sep').style.display    = mine ? 'block': 'none';
+  /* ضع القائمة بمكان النقر مع تجنب الخروج من الشاشة */
+  menu.style.display = 'block';
+  const mw = menu.offsetWidth, mh = menu.offsetHeight;
+  menu.style.left = Math.min(x, window.innerWidth  - mw - 8) + 'px';
+  menu.style.top  = Math.min(y, window.innerHeight - mh - 8) + 'px';
+  menu.classList.add('open');
+}
+
+function closeCtxMenu(){
+  document.getElementById('ctx-menu').classList.remove('open');
+  document.getElementById('ctx-menu').style.display = 'none';
+}
+
+function ctxAction(action){
+  closeCtxMenu();
+  if(action==='reply')  startReply(_ctxMsgId);
+  if(action==='edit')   startEdit(_ctxMsgId);
+  if(action==='delete') confirmDelete(_ctxMsgId);
+}
+
+/* تعديل رسالة */
+function startEdit(msgId){
+  const msg = _activeConv?.messages.find(m=>String(m.id)===String(msgId)||m.id===msgId);
+  if(!msg||msg.sender_id!==me.id) return;
+  _editMsgId = msgId;
+  const ta = document.getElementById('msg-ta');
+  ta.value = msg.content||'';
+  ta.focus();
+  autoResize(ta);
+  document.getElementById('edit-bar').classList.add('show');
+  document.getElementById('send-btn').onclick = saveEdit;
+}
+
+async function saveEdit(){
+  const ta   = document.getElementById('msg-ta');
+  const text = ta.value.trim();
+  if(!text||!_editMsgId) return;
+  const {error} = await db.from('messages').update({content:text,edited:true}).eq('id',_editMsgId).eq('sender_id',me.id);
+  if(error){ toast('تعذّر التعديل','err'); return; }
+  const msg = _activeConv?.messages.find(m=>String(m.id)===String(_editMsgId));
+  if(msg){ msg.content=text; msg.edited=true; }
+  cancelEdit();
+  renderMsgs();
+}
+
+function cancelEdit(){
+  _editMsgId = null;
+  document.getElementById('edit-bar').classList.remove('show');
+  document.getElementById('msg-ta').value='';
+  document.getElementById('send-btn').onclick = sendMsg;
+  autoResize(document.getElementById('msg-ta'));
+}
+
+/* حذف رسالة */
+async function confirmDelete(msgId){
+  if(!confirm('حذف هذه الرسالة للجميع؟')) return;
+  await deleteMsg(msgId);
+}
+
+/* Long Press للموبايل */
+function onMsgTouchStart(e, msgId, mine){
+  _longPressTimer = setTimeout(()=>{
+    const t = e.touches[0];
+    showCtxMenu(t.clientX, t.clientY, msgId, mine);
+  }, 600);
+}
+function onMsgTouchEnd(){ clearTimeout(_longPressTimer); }
+
+/* إغلاق القائمة عند النقر خارجها */
+document.addEventListener('click', e=>{
+  if(!document.getElementById('ctx-menu').contains(e.target)) closeCtxMenu();
+});
 async function deleteMsg(msgId){
   await db.from('messages').update({deleted:true,content:'[تم الحذف]'}).eq('id',msgId).eq('sender_id',me.id);
   const msg=_activeConv?.messages.find(m=>m.id===msgId||m.id===String(msgId));
@@ -858,12 +978,16 @@ async function deleteMsg(msgId){
 
 async function deleteConvUI(){
   if(!_activeConv||!confirm('حذف هذه المحادثة؟')) return;
-  await db.from('messages').delete().eq('conversation_id',_activeConv.id);
-  await db.from('conversations').delete().eq('id',_activeConv.id);
-  _convs=_convs.filter(c=>c.id!==_activeConv.id);
+  const convId=_activeConv.id;
+  await db.from('messages').delete().eq('conversation_id',convId);
+  await db.from('conversations').delete().eq('id',convId);
+  const del=JSON.parse(localStorage.getItem('azza_del_convs')||'[]');
+  del.push(convId);
+  localStorage.setItem('azza_del_convs',JSON.stringify(del));
+  _convs=_convs.filter(c=>c.id!==convId);
   closeChat();
   renderConvList();
-  toast('تم الحذف','err');
+  toast('تم حذف المحادثة','err');
 }
 
 /* ══════════════════════════════════════════════
