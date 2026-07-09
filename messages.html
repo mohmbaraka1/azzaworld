@@ -781,28 +781,29 @@ async function sendMsg(){
   };
   _activeConv.messages.push(tempMsg);
   renderMsgs(); scrollToBottom();
+
+  /* احفظ نسخة من الميديا قبل المسح */
+  const mediaToUpload = _media ? {..._media} : null;
   cancelReply(); cancelMedia();
 
   try{
     /* رفع الميديا لو موجودة */
     let image_url=null, file_url=null, file_name=null;
-    if(_media){
+    if(mediaToUpload){
       try{
-        /* حاول رفع لـSupabase Storage أولاً */
-        const path=`messages/${me.id}/${Date.now()}_${_media.name}`;
-        const {error:upErr}=await db.storage.from('messages').upload(path,_media.file,{upsert:true});
+        const path=`messages/${me.id}/${Date.now()}_${mediaToUpload.name}`;
+        const {error:upErr}=await db.storage.from('messages').upload(path,mediaToUpload.file,{upsert:true,contentType:mediaToUpload.file.type});
         if(!upErr){
           const {data}=db.storage.from('messages').getPublicUrl(path);
-          if(_media.type==='image') image_url=data.publicUrl;
-          else{ file_url=data.publicUrl; file_name=_media.name; }
+          if(mediaToUpload.type==='image') image_url=data.publicUrl;
+          else{ file_url=data.publicUrl; file_name=mediaToUpload.name; }
         }else{
-          /* Fallback: base64 مباشرة */
-          if(_media.type==='image') image_url=_media.url;
-          else{ file_url=_media.url; file_name=_media.name; }
+          if(mediaToUpload.type==='image') image_url=mediaToUpload.url;
+          else{ file_url=mediaToUpload.url; file_name=mediaToUpload.name; }
         }
       }catch{
-        if(_media.type==='image') image_url=_media.url;
-        else{ file_url=_media.url; file_name=_media.name; }
+        if(mediaToUpload.type==='image') image_url=mediaToUpload.url;
+        else{ file_url=mediaToUpload.url; file_name=mediaToUpload.name; }
       }
     }
 
