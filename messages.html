@@ -125,6 +125,23 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
 .file-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
 .new-msg-bar{position:sticky;bottom:8px;display:flex;justify-content:center;pointer-events:none}
 .new-msg-btn{background:var(--olive);color:var(--cream);border:none;border-radius:99px;padding:7px 16px;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;pointer-events:all;box-shadow:0 3px 12px rgba(14,54,34,.3);display:none;animation:fadeUp .2s ease}
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,var(--cream2) 25%,var(--cream3) 50%,var(--cream2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:10px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-row{display:flex;align-items:flex-end;gap:8px;padding:4px 0}
+.sk-row.r{flex-direction:row-reverse}
+.sk-av{width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.sk-bubble{height:36px;border-radius:14px}
+.sk-row:nth-child(odd) .sk-bubble{width:180px}
+.sk-row:nth-child(even) .sk-bubble{width:120px}
+.sk-row.r .sk-bubble{width:150px}
+/* Forward Modal */
+.fwd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center}
+.fwd-overlay.open{display:flex}
+.fwd-modal{background:var(--card);border-radius:16px;padding:20px;width:90%;max-width:380px;max-height:70vh;overflow-y:auto}
+.fwd-title{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--olive)}
+.fwd-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;transition:.15s}
+.fwd-item:hover{background:var(--cream2)}
 .typing-bubble{display:flex;align-items:center;gap:4px;padding:8px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;border-bottom-left-radius:4px;width:fit-content}
 .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bounce .9s infinite}
 .typing-dot:nth-child(2){animation-delay:.15s}
@@ -310,10 +327,20 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
 
 <!-- Context Menu -->
 <div class="ctx-menu" id="ctx-menu">
-  <button class="ctx-item" id="ctx-reply" onclick="ctxAction('reply')">↩️ رد</button>
+  <button class="ctx-item" onclick="ctxAction('reply')">↩️ رد</button>
+  <button class="ctx-item" onclick="ctxAction('copy')">📋 نسخ</button>
+  <button class="ctx-item" onclick="ctxAction('forward')">↪️ توجيه</button>
   <button class="ctx-item" id="ctx-edit" onclick="ctxAction('edit')">✏️ تعديل</button>
   <div class="ctx-sep"></div>
-  <button class="ctx-item danger" id="ctx-delete" onclick="ctxAction('delete')">🗑️ حذف</button>
+  <button class="ctx-item danger" onclick="ctxAction('delete')">🗑️ حذف للجميع</button>
+</div>
+
+<!-- Forward Modal -->
+<div class="fwd-overlay" id="fwd-overlay" onclick="if(event.target===this)closeFwd()">
+  <div class="fwd-modal">
+    <div class="fwd-title">↪️ إعادة توجيه إلى...</div>
+    <div id="fwd-list"></div>
+  </div>
 </div>
 
 <!-- Lightbox -->
@@ -537,30 +564,35 @@ function openConv(convId){
   const conv = _convs.find(c=>c.id===convId);
   if(!conv) return;
   _activeConv = conv;
+  _page = 0;
 
-  /* Mobile: إخفاء الـsidebar */
   document.getElementById('sidebar').classList.add('hidden');
-
-  /* تحديث الـheader */
   const u = _users[conv.otherId]||{name:'مستخدم'};
   const av = u.photo?`<img src="${esc(u.photo)}">`:`${ini(u.name)}`;
   document.getElementById('chat-av').innerHTML=av;
   document.getElementById('chat-name').textContent=u.name;
   document.getElementById('chat-status').textContent='';
-
-  /* إظهار منطقة الشات */
   document.getElementById('chat-welcome').style.display='none';
   const cv=document.getElementById('chat-view');
-  cv.style.display='flex';cv.style.flexDirection='column';
+  cv.style.display='flex'; cv.style.flexDirection='column';
 
-  /* علّم الرسائل كمقروءة */
-  markConvRead(conv);
-
-  renderMsgs();
+  /* Skeleton فوري قبل البيانات */
+  if(!conv.messages.length){
+    document.getElementById('msgs-wrap').innerHTML=`
+      <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:8px">
+        ${[1,2,3,4,5].map((_,i)=>`<div class="sk-row${i%2?' r':''}">
+          <div class="conv-av skeleton sk-av"></div>
+          <div class="skeleton sk-bubble"></div>
+        </div>`).join('')}
+      </div>`;
+    /* جلب الرسائل في الخلفية */
+    loadConvMsgs(conv).then(()=>{ renderMsgs(); scrollToBottom(false); });
+  }else{
+    markConvRead(conv);
+    renderMsgs();
+    scrollToBottom(false);
+  }
   renderConvList();
-  scrollToBottom();
-
-  /* تفعيل typing listener */
   subscribeTyping(conv.id);
 }
 
@@ -576,8 +608,48 @@ function openUserPage(){
 }
 
 /* ══════════════════════════════════════════════
-   عرض الرسائل
+   تحميل رسائل محادثة مع Pagination
    ══════════════════════════════════════════════ */
+let _page = 0;
+const PAGE_SIZE = 30;
+let _loadingMore = false;
+let _hasMore = true;
+
+async function loadConvMsgs(conv, prepend=false){
+  if(_loadingMore) return;
+  _loadingMore = true;
+  try{
+    const offset = prepend ? conv.messages.length : 0;
+    const {data:msgs} = await db.from('messages')
+      .select('*').eq('conversation_id',conv.id)
+      .eq('deleted',false)
+      .order('created_at',{ascending:false})
+      .range(offset, offset+PAGE_SIZE-1);
+    if(!msgs?.length){ _hasMore=false; _loadingMore=false; return; }
+    const sorted = msgs.reverse();
+    if(prepend){
+      const wrap=document.getElementById('msgs-wrap');
+      const prevH=wrap.scrollHeight;
+      conv.messages.unshift(...sorted);
+      renderMsgs();
+      wrap.scrollTop=wrap.scrollHeight-prevH; /* حافظ على الموضع */
+    }else{
+      conv.messages = sorted;
+      _hasMore = msgs.length>=PAGE_SIZE;
+    }
+    markConvRead(conv);
+  }catch(e){ console.error('loadConvMsgs:',e.message); }
+  _loadingMore=false;
+}
+
+/* Infinite Scroll للأعلى */
+document.getElementById('msgs-wrap').addEventListener('scroll', async()=>{
+  const w=document.getElementById('msgs-wrap');
+  if(w.scrollTop < 60 && _hasMore && _activeConv && !_loadingMore){
+    await loadConvMsgs(_activeConv, true);
+  }
+  if(isAtBottom()) hideNewMsgBtn();
+});
 function renderMsgs(){
   const wrap = document.getElementById('msgs-wrap');
   if(!_activeConv){ wrap.innerHTML=''; return; }
@@ -923,9 +995,21 @@ function closeCtxMenu(){
 
 function ctxAction(action){
   closeCtxMenu();
-  if(action==='reply')  startReply(_ctxMsgId);
-  if(action==='edit')   startEdit(_ctxMsgId);
-  if(action==='delete') confirmDelete(_ctxMsgId);
+  const msg=_activeConv?.messages.find(m=>String(m.id)===String(_ctxMsgId)||m.id===_ctxMsgId);
+  if(action==='reply')   startReply(_ctxMsgId);
+  if(action==='edit')    startEdit(_ctxMsgId);
+  if(action==='delete')  confirmDelete(_ctxMsgId);
+  if(action==='copy'){
+    const text=msg?.content||'';
+    navigator.clipboard?.writeText(text).then(()=>toast('تم النسخ 📋')).catch(()=>{
+      /* fallback */
+      const ta=document.createElement('textarea');
+      ta.value=text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      ta.remove(); toast('تم النسخ 📋');
+    });
+  }
+  if(action==='forward') openFwd(_ctxMsgId);
 }
 
 /* تعديل رسالة */
@@ -1040,8 +1124,42 @@ async function newConvModal(){
 }
 
 /* ══════════════════════════════════════════════
-   Realtime
+   إعادة توجيه الرسالة
    ══════════════════════════════════════════════ */
+let _fwdMsgId=null;
+function openFwd(msgId){
+  _fwdMsgId=msgId;
+  const list=document.getElementById('fwd-list');
+  const others=_convs.filter(c=>c.id!==_activeConv?.id);
+  if(!others.length){
+    list.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">لا توجد محادثات أخرى</div>';
+  }else{
+    list.innerHTML=others.map(c=>{
+      const u=_users[c.otherId]||{name:'مستخدم'};
+      const av=u.photo?`<img src="${esc(u.photo)}" style="width:100%;height:100%;object-fit:cover">`:`${ini(u.name)}`;
+      return `<div class="fwd-item" onclick="sendFwd('${c.id}')">
+        <div class="conv-av" style="width:38px;height:38px;font-size:13px">${av}</div>
+        <div>${esc(u.name)}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('fwd-overlay').classList.add('open');
+}
+function closeFwd(){ document.getElementById('fwd-overlay').classList.remove('open'); _fwdMsgId=null; }
+async function sendFwd(toConvId){
+  closeFwd();
+  if(!_fwdMsgId) return;
+  const msg=_activeConv?.messages.find(m=>String(m.id)===String(_fwdMsgId)||m.id===_fwdMsgId);
+  if(!msg) return;
+  const {error}=await db.from('messages').insert({
+    conversation_id:toConvId, sender_id:me.id,
+    content:(msg.content?'↪️ '+msg.content:null),
+    image_url:msg.image_url, file_url:msg.file_url, file_name:msg.file_name,
+    status:'sent', read:false,
+  });
+  if(!error){ toast('تم التوجيه ✅'); await db.from('conversations').update({updated_at:new Date().toISOString()}).eq('id',toConvId); }
+  else toast('تعذّر التوجيه','err');
+}
 function subscribeRealtime(){
   /* رسائل جديدة */
   db.channel('msgs_rt_'+me.id)
