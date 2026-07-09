@@ -791,19 +791,26 @@ async function sendMsg(){
     let image_url=null, file_url=null, file_name=null;
     if(mediaToUpload){
       try{
-        const path=`messages/${me.id}/${Date.now()}_${mediaToUpload.name}`;
-        const {error:upErr}=await db.storage.from('messages').upload(path,mediaToUpload.file,{upsert:true,contentType:mediaToUpload.file.type});
+        const ext = mediaToUpload.name.split('.').pop()||'jpg';
+        const path=`${me.id}/${Date.now()}.${ext}`;
+        /* تحويل blob URL لـFile قبل الرفع */
+        const fileToUpload = mediaToUpload.file instanceof File
+          ? mediaToUpload.file
+          : await fetch(mediaToUpload.url).then(r=>r.blob()).then(b=>new File([b],mediaToUpload.name,{type:b.type}));
+        const {data:upData, error:upErr}=await db.storage
+          .from('messages').upload(path, fileToUpload, {upsert:true, contentType:fileToUpload.type});
         if(!upErr){
-          const {data}=db.storage.from('messages').getPublicUrl(path);
-          if(mediaToUpload.type==='image') image_url=data.publicUrl;
-          else{ file_url=data.publicUrl; file_name=mediaToUpload.name; }
+          const {data:urlData}=db.storage.from('messages').getPublicUrl(path);
+          if(mediaToUpload.type==='image') image_url=urlData.publicUrl;
+          else{ file_url=urlData.publicUrl; file_name=mediaToUpload.name; }
         }else{
-          if(mediaToUpload.type==='image') image_url=mediaToUpload.url;
-          else{ file_url=mediaToUpload.url; file_name=mediaToUpload.name; }
+          console.error('Storage upload error:', upErr.message);
+          toast('تعذّر رفع الصورة: '+upErr.message,'err');
+          /* لا نحفظ blob في DB */
         }
-      }catch{
-        if(mediaToUpload.type==='image') image_url=mediaToUpload.url;
-        else{ file_url=mediaToUpload.url; file_name=mediaToUpload.name; }
+      }catch(e){
+        console.error('Upload catch:', e.message);
+        toast('تعذّر رفع الصورة','err');
       }
     }
 
