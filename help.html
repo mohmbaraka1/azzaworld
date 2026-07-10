@@ -2,525 +2,2229 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مركز المساعدة — AZZA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عزّة</title>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-:root{
-  --gold:#c69749;--gold-s:#e8b96a;--olive:#1c5b38;--olive-d:#0e3622;
-  --cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;
-  --line:rgba(28,26,20,.1);--card:#fff;--r:14px;
-}
-.dark{--cream:#1a1a12;--cream2:#222218;--ink:#f0e8d0;--muted:#9a9080;--line:rgba(255,255,255,.08);--card:#242418}
+/* ══════════════════════════════════════
+   AZZA — Design System
+   (الألوان والأبعاد موحّدة الآن بملف tokens.css)
+══════════════════════════════════════ */
+body{transition:background-color .25s,color .25s}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;line-height:1.6}
+body{font-family:'Tajawal',sans-serif;color:var(--ink);background:var(--cream)}
 
-/* Header */
-.header{background:linear-gradient(135deg,var(--olive-d),var(--olive));padding:60px 20px 80px;text-align:center;position:relative;overflow:hidden}
-.header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
-.header-logo{font-size:28px;font-weight:900;color:var(--gold);margin-bottom:8px;position:relative}
-.header h1{font-size:clamp(22px,4vw,36px);font-weight:900;color:#fff;margin-bottom:12px;position:relative}
-.header p{font-size:16px;color:rgba(255,255,255,.75);margin-bottom:32px;position:relative}
-.search-wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
-.search-inp{width:100%;height:54px;border-radius:999px;border:none;padding:0 56px 0 20px;font-family:Tajawal,sans-serif;font-size:15px;color:var(--ink);background:#fff;outline:none;box-shadow:0 8px 32px rgba(0,0,0,.15)}
-.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-.search-results{position:absolute;top:58px;right:0;left:0;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);max-height:320px;overflow-y:auto;display:none;z-index:10}
-.search-results.open{display:block}
-.sr-item{padding:12px 18px;cursor:pointer;border-bottom:.5px solid var(--line);display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)}
-.sr-item:hover{background:var(--cream)}
-.sr-cat{font-size:11px;color:var(--muted);margin-top:2px}
-.sr-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
+/* ══ LAYOUT ══
+   Fixed header + fixed sidebars + only feed scrolls
+   (مثل Twitter / Discord)
+══ */
+html,body{ height:100%; overflow:hidden }
 
-/* Nav */
-.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 20px;display:flex;align-items:center;gap:16px;overflow-x:auto;position:sticky;top:0;z-index:100}
-.nav a{padding:14px 4px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s}
-.nav a:hover,.nav a.active{color:var(--olive);border-color:var(--olive)}
-.nav-home{font-weight:700;color:var(--olive)!important}
+/* هيدر ثابت */
+.header{
+  position:fixed; top:0; right:0; left:0; z-index:200;
+  height:var(--hh);
+  background:rgba(247,241,227,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 16px; gap:12px;
+}
+.brand{display:flex;align-items:center;gap:8px;flex-shrink:0;text-decoration:none}
+.brand-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
+.brand-name{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-2)}
+.header-search{flex:1;max-width:300px;min-width:0;position:relative}
+.header-search input{width:100%;border:1.5px solid var(--border);border-radius:999px;padding:8px 14px 8px 36px;background:var(--cream-2);font-family:inherit;font-size:13px;outline:none;transition:.2s;color:var(--ink)}
+.header-search input:focus{border-color:var(--olive);background:var(--card)}
+.header-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
-/* Main Layout */
-.main{max-width:1100px;margin:0 auto;padding:40px 20px;display:grid;grid-template-columns:240px 1fr;gap:40px}
-@media(max-width:768px){.main{grid-template-columns:1fr;padding:20px}.sidebar{display:none}}
+/* نتائج البحث الفورية */
+.search-dropdown{position:absolute;top:calc(100% + 8px);right:0;left:0;background:var(--card);border:1px solid var(--border);border-radius:var(--rxl);box-shadow:0 10px 40px rgba(28,26,20,.15);z-index:300;max-height:420px;overflow-y:auto;opacity:0;transform:translateY(-6px);pointer-events:none;transition:.16s}
+.search-dropdown.show{opacity:1;transform:none;pointer-events:auto}
+.sr-group-lbl{padding:9px 14px 5px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.sr-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;transition:.13s}
+.sr-item:hover{background:var(--cream-2)}
+.sr-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;overflow:hidden;flex-shrink:0}
+.sr-post-ic{width:32px;height:32px;border-radius:10px;background:rgba(28,91,56,.08);color:var(--olive);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.sr-main{flex:1;min-width:0}
+.sr-title{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-sub{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13px}
+.sr-seeall{display:block;text-align:center;padding:10px;font-size:12.5px;font-weight:700;color:var(--olive);border-top:1px solid var(--border);cursor:pointer;transition:.15s}
+.sr-seeall:hover{background:var(--cream-2)}
+.header-right{margin-right:auto;display:flex;align-items:center;gap:8px}
+.hbtn{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;position:relative}
+.hbtn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
+.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid var(--cream)}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:.2s}
+.avatar-btn:hover{border-color:var(--olive)}
 
-/* Sidebar */
-.sidebar{position:sticky;top:64px;height:fit-content}
-.sidebar-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.sidebar ul{list-style:none}
-.sidebar li a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none;transition:.15s}
-.sidebar li a:hover{background:var(--cream2);color:var(--olive)}
-.sidebar li a.active{background:rgba(28,91,56,.08);color:var(--olive);font-weight:700}
-.sidebar-sep{height:.5px;background:var(--line);margin:12px 0}
+/* قائمة dropdown */
+.drop-menu{position:fixed;top:calc(var(--hh) + 8px);left:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--rxl);padding:6px;min-width:220px;box-shadow:0 10px 40px rgba(28,26,20,.15);z-index:300;opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;transition:.18s}
+.drop-menu.show{opacity:1;transform:none;pointer-events:auto}
+.drop-user{display:flex;align-items:center;gap:10px;padding:10px 12px 12px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.drop-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-weight:900;overflow:hidden;flex-shrink:0}
+.drop-name{font-size:14px;font-weight:700}
+.drop-handle{font-size:12px;color:var(--olive);font-weight:600}
+.drop-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;text-align:right;font-family:inherit}
+.drop-item:hover{background:var(--cream)}
+.drop-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
+.drop-item.danger{color:var(--red)}.drop-item.danger svg{color:var(--red)}.drop-item.danger:hover{background:rgba(206,17,38,.06)}
+.drop-sep{height:1px;background:var(--border);margin:4px 0}
 
-/* Categories Grid */
-.cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:48px}
-.cat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:20px;cursor:pointer;transition:.2s;text-decoration:none;display:block}
-.cat-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
-.cat-icon{font-size:28px;margin-bottom:10px}
-.cat-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
-.cat-count{font-size:12px;color:var(--muted)}
+/* ══ Notification Dropdown ══ */
+.notif-panel{
+  position:fixed;top:calc(var(--hh) + 8px);
+  width:380px;max-width:calc(100vw - 24px);
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--rxl);
+  box-shadow:0 12px 48px rgba(28,26,20,.18);
+  z-index:350;
+  opacity:0;transform:translateY(-8px) scale(.97);
+  pointer-events:none;transition:.2s;
+  display:flex;flex-direction:column;
+  max-height:min(560px,80vh);
+  overflow:hidden;
+}
+.notif-panel.open{opacity:1;transform:none;pointer-events:auto}
+.np-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px 10px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.np-title{font-family:'Aref Ruqaa',serif;font-size:1.1rem;color:var(--ink);display:flex;align-items:center;gap:7px}
+.np-ubadge{background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px}
+.np-actions{display:flex;align-items:center;gap:6px}
+.np-btn{padding:5px 10px;border-radius:999px;border:1.5px solid var(--border);background:transparent;font-family:inherit;font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
+.np-btn:hover{border-color:var(--olive);color:var(--olive)}
+.np-list{overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--cream-2) transparent}
+.np-list::-webkit-scrollbar{width:3px}
+.np-list::-webkit-scrollbar-thumb{background:var(--cream-2);border-radius:999px}
+.np-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:.5px solid rgba(28,26,20,.06);cursor:pointer;transition:.13s;position:relative}
+.np-item:last-child{border-bottom:none}
+.np-item:hover{background:var(--cream)}
+.np-item.unread{background:rgba(28,91,56,.035)}
+.np-item.unread:hover{background:rgba(28,91,56,.065)}
+.np-udot{width:7px;height:7px;border-radius:50%;background:var(--olive);flex-shrink:0;margin-top:6px}
+.np-av-wrap{position:relative;flex-shrink:0}
+.np-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold-2);font-weight:900;font-size:.9rem;overflow:hidden}
+.np-av img{width:100%;height:100%;object-fit:cover}
+.np-badge{position:absolute;bottom:-2px;left:-2px;width:17px;height:17px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:9.5px;border:2px solid var(--card)}
+.np-body{flex:1;min-width:0}
+.np-text{font-size:13px;color:var(--ink);line-height:1.45;margin-bottom:5px}
+.np-text strong{font-weight:700}
+.np-text em{font-style:normal;color:var(--muted)}
+.np-post{display:flex;align-items:center;gap:6px;background:var(--cream);border-radius:8px;padding:5px 9px;margin-bottom:4px}
+.np-post-bar{width:3px;height:18px;border-radius:999px;flex-shrink:0}
+.np-post-txt{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.np-time{font-size:11px;color:var(--muted)}
+.np-footer{padding:10px 14px;border-top:1px solid var(--border);text-align:center;flex-shrink:0}
+.np-see-all{font-size:13px;font-weight:700;color:var(--olive);cursor:pointer;background:none;border:none;font-family:inherit;padding:4px;width:100%}
+.np-see-all:hover{opacity:.75}
+.np-empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.np-empty-icon{font-size:2.5rem;margin-bottom:12px}
+.np-empty b{display:block;font-size:14px;color:var(--ink);margin-bottom:4px}
 
-/* Article */
-.article{display:none}
-.article.active{display:block}
-.article-meta{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.article-tag{padding:3px 10px;border-radius:99px;background:rgba(28,91,56,.1);color:var(--olive);font-size:12px;font-weight:700}
-.article-time{font-size:12px;color:var(--muted)}
-.article h1{font-size:clamp(20px,3vw,28px);font-weight:900;margin-bottom:20px;line-height:1.3}
-.article h2{font-size:18px;font-weight:700;margin:28px 0 12px;color:var(--olive)}
-.article h3{font-size:15px;font-weight:700;margin:20px 0 8px}
-.article p{font-size:15px;color:var(--ink);margin-bottom:14px;line-height:1.8}
-.article ul,.article ol{margin:12px 0 16px 20px;font-size:15px}
-.article li{margin-bottom:8px;line-height:1.7}
-.article .tip{background:rgba(28,91,56,.06);border-right:4px solid var(--olive);padding:14px 16px;border-radius:8px;margin:16px 0;font-size:14px}
-.article .warn{background:rgba(198,151,73,.08);border-right:4px solid var(--gold);padding:14px 16px;border-radius:8px;margin:16px 0;font-size:14px}
-.article .step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
-.step-num{width:30px;height:30px;border-radius:50%;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
-.step-content{flex:1}
-.article-nav{display:flex;justify-content:space-between;margin-top:40px;padding-top:20px;border-top:1px solid var(--line);gap:12px}
-.art-nav-btn{padding:10px 18px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);transition:.2s;flex:1;text-align:center}
-.art-nav-btn:hover{border-color:var(--olive);color:var(--olive)}
-.feedback{margin-top:32px;padding:20px;background:var(--cream2);border-radius:12px;text-align:center}
-.feedback p{font-size:14px;color:var(--muted);margin-bottom:12px}
-.fb-btns{display:flex;justify-content:center;gap:10px}
-.fb-btn{padding:8px 24px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;transition:.2s}
-.fb-btn:hover{border-color:var(--olive);color:var(--olive)}
-.fb-btn.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+/* صوت */
+.sound-wrap{position:relative}
+.sound-toggle{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;padding:0}
+.sound-toggle:hover,.sound-toggle.on{border-color:var(--olive);color:var(--olive)}
+.sound-toggle.on{background:rgba(28,91,56,.07)}
+.sound-drop{position:absolute;top:calc(100%+6px);left:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;min-width:170px;box-shadow:0 8px 28px rgba(28,26,20,.14);z-index:500;display:none}
+.sound-drop.open{display:block}
+.sound-opt{display:flex;align-items:center;gap:7px;width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;border-radius:8px;transition:.12s;text-align:right}
+.sound-opt:hover{background:var(--cream)}
+.sound-opt.on{color:var(--olive);background:rgba(28,91,56,.07)}
+.sound-play{margin-right:auto;font-size:10px;color:var(--olive);font-weight:700;background:none;border:none;cursor:pointer;padding:0;font-family:inherit}
 
-/* Home content */
-.home-section{margin-bottom:48px}
-.section-title{font-size:20px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;gap:10px}
-.popular-list{display:flex;flex-direction:column;gap:8px}
-.popular-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:.15s;text-decoration:none;color:var(--ink)}
-.popular-item:hover{border-color:var(--gold);background:rgba(198,151,73,.04)}
-.popular-num{font-size:13px;font-weight:700;color:var(--muted);width:20px}
-.popular-text{flex:1;font-size:14px}
-.popular-cat{font-size:11px;color:var(--muted);background:var(--cream2);padding:2px 8px;border-radius:99px}
+/* ══ 3 أعمدة ══ */
+.app{
+  display:grid;
+  grid-template-columns:240px minmax(0,1fr) 260px;
+  height:calc(100vh - var(--hh));
+  margin-top:var(--hh);
+  overflow:hidden; /* المهم */
+}
 
-/* Toast */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal,sans-serif}
+/* شريط التنقل السفلي وقائمة الأفاتار المنبثقة — مخفيان افتراضياً، تظهران فقط بالموبايل (داخل @media لاحقاً) */
+.bottom-nav{display:none}
+.sheet-overlay{display:none}
+
+/* العمود الأيسر — التنقل */
+.sidebar{
+  border-left:none;
+  background:transparent;
+  overflow-y:auto;
+  scrollbar-width:none;
+  padding:14px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.sidebar::-webkit-scrollbar{display:none}
+.sb-label{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.5px;padding:8px 12px 4px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r2);font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;border:none;background:transparent;width:100%;text-align:right;font-family:inherit}
+.sb-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb-item:hover{background:rgba(28,26,20,.06);color:var(--ink)}
+.sb-item.active{background:rgba(28,91,56,.09);color:var(--olive)}
+.sb-compose{display:none}
+
+/* ══ الفيد — الوحيد اللي يـ scroll ══ */
+.feed-col{
+  overflow-y:auto;
+  overflow-x:hidden;
+  min-width:0;
+  scrollbar-width:thin;
+  scrollbar-color:var(--cream-2) transparent;
+  padding:16px 20px;
+  background:var(--cream);
+}
+.feed-col::-webkit-scrollbar{width:4px}
+.feed-col::-webkit-scrollbar-thumb{background:var(--cream-2);border-radius:999px}
+.feed-inner{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+/* العمود الأيمن */
+.right-col{
+  border-right:none;
+  background:transparent;
+  overflow-y:auto;
+  scrollbar-width:none;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.right-col::-webkit-scrollbar{display:none}
+
+/* ══ بوكس نشر سريع (LinkedIn style) ══ */
+.compose-box{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--rxl);
+  padding:13px 14px;
+  display:flex;align-items:center;gap:11px;
+}
+.compose-av{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--olive),var(--olive-2));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold-2);font-weight:900;font-size:.95rem;
+  overflow:hidden;flex-shrink:0;cursor:pointer;
+}
+.compose-prompt{
+  flex:1;min-width:0;padding:10px 16px;
+  border-radius:999px;border:1.5px solid var(--border);
+  background:var(--cream);font-family:inherit;
+  font-size:14px;color:var(--muted);
+  cursor:pointer;text-align:right;
+  transition:.2s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.compose-prompt:hover{border-color:var(--olive);background:rgba(28,91,56,.04);color:var(--ink)}
+.compose-actions{display:flex;gap:3px;flex-shrink:0}
+.compose-qbtn{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 10px;border-radius:10px;
+  border:none;background:transparent;
+  color:var(--muted);font-family:inherit;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:.15s;white-space:nowrap;
+}
+.compose-qbtn:hover{background:var(--cream);color:var(--ink)}
+
+/* ══ فلاتر ══ */
+.filters{
+  display:flex;gap:4px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  min-width:0;
+}
+.filters::-webkit-scrollbar{display:none}
+.f-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:10px;
+  border:none;background:transparent;
+  color:var(--muted);font-family:inherit;
+  font-size:13px;font-weight:600;
+  cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0;
+}
+.f-btn:hover{background:var(--cream);color:var(--ink)}
+.f-btn.on{background:var(--olive);color:#fff}
+.cat-btn{
+  padding:6px 14px;border-radius:999px;
+  border:1.5px solid var(--border);background:var(--card);
+  font-family:inherit;font-size:12.5px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:.15s;
+}
+.cat-btn:hover{border-color:var(--olive);color:var(--olive)}
+.cat-btn.on{border-color:var(--olive);background:rgba(28,91,56,.08);color:var(--olive)}
+
+/* ══ بانر ══ */
+.banner{background:linear-gradient(135deg,var(--olive-2),var(--olive));border-radius:var(--rxl);padding:18px 20px;position:relative;overflow:hidden}
+.banner::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(198,151,73,.07) 0,rgba(198,151,73,.07) 1px,transparent 0,transparent 50%);background-size:22px 22px}
+.banner-inner{position:relative;z-index:1}
+.banner-hi{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px}
+.banner-tip{font-size:13px;color:rgba(247,241,227,.68)}
+
+/* ══ بطاقات المنشورات — نمط LinkedIn ══ */
+.post{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--rxl);
+  overflow:hidden;
+  transition:box-shadow .2s, transform .15s;
+}
+.post:hover{box-shadow:0 6px 24px rgba(28,26,20,.1)}
+
+/* شريط لوني رفيع في الأعلى */
+.post-stripe{height:3px;flex-shrink:0}
+
+/* ══ رأس البطاقة الموحّد ══ */
+.post-head{
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+  padding:14px 16px 10px;
+}
+.p-av{
+  width:44px;height:44px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--olive),var(--olive-2));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold-2);font-weight:900;flex-shrink:0;
+  overflow:hidden;font-size:1rem;cursor:pointer;
+  border:2px solid rgba(28,91,56,.15);
+  transition:.15s;
+}
+.p-av:hover{border-color:var(--olive)}
+.p-author-info{flex:1;min-width:0}
+.p-name{font-size:14px;font-weight:700;cursor:pointer;line-height:1.3;margin-bottom:2px}
+.p-name:hover{color:var(--olive)}
+.p-name-handle{font-size:11.5px;color:var(--olive);font-weight:500}
+.p-meta-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:1px}
+.p-time{font-size:11px;color:var(--muted)}
+.p-head-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.p-badge{display:inline-flex;align-items:center;border-radius:999px;padding:2px 9px;font-size:10.5px;font-weight:700;line-height:1.6}
+
+/* نوع البادج */
+.badge-idea{background:rgba(28,91,56,.08);color:#0e3622;border:1px solid rgba(28,91,56,.18)}
+.badge-proj{background:rgba(198,151,73,.1);color:#8a6415;border:1px solid rgba(198,151,73,.28)}
+.badge-job{background:rgba(24,95,165,.08);color:#0c447c;border:1px solid rgba(24,95,165,.2)}
+.badge-nda{background:rgba(14,54,34,.1);color:#0e3622;border:1px solid rgba(14,54,34,.25)}
+.badge-new{background:rgba(15,110,86,.1);color:#085041;border:1px solid rgba(15,110,86,.22)}
+.badge-hot{background:rgba(206,17,38,.07);color:#9b1220;border:1px solid rgba(206,17,38,.18)}
+.badge-cat{background:rgba(28,26,20,.05);color:var(--muted);border:1px solid var(--border)}
+
+/* ══ محتوى البطاقة ══ */
+.p-content{padding:0 16px 12px}
+.p-title{
+  font-family:'Aref Ruqaa',serif;
+  font-size:1.15rem;font-weight:700;
+  color:var(--ink);margin-bottom:6px;
+  line-height:1.45;cursor:pointer;
+}
+.p-title:hover{color:var(--olive)}
+.p-body{font-size:14px;line-height:1.85;color:var(--ink);white-space:pre-wrap;word-break:break-word;margin-bottom:2px}
+.p-media{width:100%;display:block;max-height:380px;object-fit:cover;margin-bottom:0}
+.p-badges-row{display:flex;gap:5px;flex-wrap:wrap;padding:0 16px 10px}
+
+/* ══ بطاقة الفكرة — مع vote pill ══ */
+.idea-vote-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 14px 7px 12px;
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  background:var(--cream);
+  cursor:pointer;
+  transition:.18s;
+  font-family:inherit;
+  margin-bottom:10px;
+}
+.idea-vote-pill:hover{border-color:var(--olive);background:rgba(28,91,56,.05)}
+.idea-vote-pill.voted{background:var(--olive);border-color:var(--olive);color:#fff}
+.vote-arr{font-size:14px;line-height:1}
+.vote-n{font-family:'Aref Ruqaa',serif;font-size:1.1rem;font-weight:700;line-height:1}
+.vote-lbl{font-size:12px;font-weight:600}
+
+/* ══ بطاقة مشروع — شريط التمويل ══ */
+.fund-box{
+  background:linear-gradient(135deg,rgba(28,91,56,.04),rgba(198,151,73,.04));
+  border:1px solid rgba(28,91,56,.12);
+  border-radius:14px;
+  padding:13px 15px;
+  margin-bottom:12px;
+}
+.fund-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.fund-amt{font-family:'Aref Ruqaa',serif;font-size:1.3rem;font-weight:700;color:var(--olive)}
+.fund-goal{font-size:12px;color:var(--muted)}
+.fund-bar{height:7px;background:rgba(28,26,20,.08);border-radius:999px;overflow:hidden;margin-bottom:9px}
+.fund-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));border-radius:999px;transition:.4s}
+.fund-meta{display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.fund-meta strong{color:var(--ink)}
+.fund-stage-tag{padding:2px 9px;border-radius:999px;background:rgba(198,151,73,.12);color:#8a6415;font-size:11px;font-weight:700;border:1px solid rgba(198,151,73,.25)}
+
+.job-box{
+  background:linear-gradient(135deg,rgba(24,95,165,.05),rgba(24,95,165,.02));
+  border:1px solid rgba(24,95,165,.15);
+  border-radius:14px;
+  padding:13px 15px;
+  margin-bottom:12px;
+}
+.job-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);margin-bottom:6px}
+.job-row:last-child{margin-bottom:0}
+.job-row svg{width:15px;height:15px;stroke:#185fa5;flex-shrink:0}
+.job-salary{font-weight:700;color:#0c447c}
+
+/* ══ أكشن بار LinkedIn-style ══ */
+.p-actions{
+  display:flex;align-items:center;
+  padding:4px 8px 4px;
+  border-top:1px solid var(--border);
+  gap:2px;
+}
+.p-act{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 11px;
+  border-radius:10px;border:none;
+  background:transparent;color:var(--muted);
+  font-family:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.p-act:hover{background:var(--cream);color:var(--ink)}
+.p-act.voted{color:var(--olive);background:rgba(28,91,56,.08)}
+.p-act.saved{color:var(--gold)}
+.p-act.react-on{color:#185FA5;background:rgba(24,95,165,.07)}
+.p-act svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.interest-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:999px;
+  background:var(--olive);color:#fff;
+  border:none;font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s;margin-right:auto;
+}
+.interest-btn:hover{background:var(--olive-2)}
+.interest-btn.done{
+  background:transparent;color:var(--olive);
+  border:1.5px solid var(--olive);
+}
+
+/* إحصائيات */
+.p-stats{display:flex;align-items:center;gap:12px;padding:5px 16px 9px;font-size:11.5px;color:var(--muted)}
+.p-detail{color:var(--olive);font-weight:700;cursor:pointer;font-size:12px;margin-right:auto;text-decoration:none;opacity:.85}
+.p-detail:hover{opacity:1;text-decoration:underline}
+
+/* تعليقات */
+.cmts-wrap{border-top:1px solid var(--border);background:rgba(247,241,227,.5);display:none}
+.cmts-wrap.open{display:block}
+.cmts-list{padding:10px 14px 4px;display:flex;flex-direction:column;gap:8px}
+.cmt{display:flex;gap:9px}
+.cmt-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden}
+.cmt-bubble{background:var(--card);border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:8px 12px;flex:1}
+.cmt-name{font-size:12px;font-weight:700;color:var(--olive);margin-bottom:2px}
+.cmt-text{font-size:13.5px;color:var(--ink);line-height:1.6}
+.cmt-time{font-size:11px;color:var(--muted);margin-top:3px}
+.cmt-input-row{display:flex;gap:9px;padding:8px 14px 12px;align-items:flex-end}
+.my-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;overflow:hidden}
+.cmt-field{flex:1;position:relative}
+.cmt-ta{width:100%;border:1.5px solid var(--border);border-radius:20px;padding:9px 42px 9px 14px;background:var(--card);font-family:inherit;font-size:14px;outline:none;resize:none;line-height:1.5;max-height:90px;display:block;transition:.2s}
+.cmt-ta:focus{border-color:var(--olive)}
+.cmt-send{position:absolute;left:8px;bottom:7px;width:28px;height:28px;border-radius:50%;background:var(--olive);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.45;transition:.18s}
+.cmt-send:hover,.cmt-send.on{opacity:1}
+.cmt-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ══ اليمين ══ */
+.rc-card{background:var(--cream);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.rc-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rc-title svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center}
+.st-box strong{display:block;font-family:'Aref Ruqaa',serif;font-size:1.4rem;color:var(--ink)}
+.st-box span{font-size:11px;color:var(--muted)}
+.trend-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:.5px solid var(--border);font-size:13px;cursor:pointer;transition:.15s}
+.trend-item:last-child{border-bottom:none}.trend-item:hover{color:var(--olive)}
+.trend-rank{font-size:11px;color:var(--muted)}
+.sug-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:.5px solid var(--border)}
+.sug-item:last-child{border-bottom:none}
+.sug-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;overflow:hidden;flex-shrink:0;cursor:pointer}
+.sug-name{font-size:13px;font-weight:700;cursor:pointer;flex:1}.sug-name:hover{color:var(--olive)}
+.sug-role{font-size:11px;color:var(--muted)}
+.follow-b{padding:5px 12px;border-radius:999px;border:1.5px solid var(--border);background:transparent;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.18s;color:var(--ink);flex-shrink:0}
+.follow-b:hover{border-color:var(--olive);color:var(--olive)}
+.follow-b.on{background:rgba(28,91,56,.09);border-color:var(--olive);color:var(--olive)}
+
+/* ══ مودال النشر ══ */
+.overlay{position:fixed;inset:0;background:rgba(14,54,34,.4);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:400;padding:20px}
+.overlay.open{display:flex}
+.modal{width:100%;max-width:540px;background:var(--card);border-radius:var(--rxl);overflow:hidden;animation:pop .2s ease}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:15px;font-weight:700}
+.modal-x{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;transition:.15s;display:flex}
+.modal-x:hover{background:var(--cream)}
+.modal-body{padding:16px}
+.type-row{display:flex;gap:6px;margin-bottom:14px}
+.type-btn{padding:8px 15px;border-radius:999px;border:1.5px solid var(--border);background:transparent;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.18s;color:var(--muted)}
+.type-btn:hover{border-color:var(--olive);color:var(--olive)}
+.type-btn.on{background:var(--olive);color:#fff;border-color:var(--olive)}
+.mfield input,.mfield textarea,.mfield select{width:100%;border:1.5px solid var(--border);border-radius:var(--r2);padding:10px 13px;font-family:inherit;font-size:14px;background:var(--cream);outline:none;transition:.2s;color:var(--ink);margin-bottom:10px}
+.mfield input:focus,.mfield textarea:focus{border-color:var(--olive);background:var(--card)}
+.mfield textarea{min-height:90px;resize:none}
+/* وسائط */
+.media-preview{display:none;margin-bottom:10px;border-radius:14px;overflow:hidden;position:relative;background:var(--cream-2);border:1px solid var(--border)}
+.media-preview img,.media-preview video{width:100%;max-height:260px;object-fit:cover;display:block}
+.media-rm{position:absolute;top:8px;left:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.media-btns{display:flex;gap:8px;margin-bottom:10px}
+.media-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:.18s;font-family:inherit}
+.media-btn:hover{border-color:var(--olive);color:var(--olive)}
+.media-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.modal-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid var(--border)}
+.pub-btn{padding:10px 24px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.pub-btn:hover{background:var(--olive-2)}
+.cancel-btn{padding:9px 18px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
+
+/* NDA مودال */
+.nda-list{background:var(--cream);border-radius:12px;padding:12px 14px;margin-bottom:12px;list-style:none}
+.nda-list li{font-size:13px;line-height:1.8;padding-right:12px;position:relative}.nda-list li::before{content:'•';position:absolute;right:0;color:var(--olive)}
+.nda-agree-row{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.nda-agree-row input{width:17px;height:17px;accent-color:var(--olive)}
+.nda-sign-btn{width:100%;padding:12px;background:var(--olive);color:#fff;border:none;border-radius:999px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.nda-sign-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* FAB — دايماً ظاهر مع قائمة speed-dial */
+.fab-wrap{position:fixed;bottom:32px;left:32px;z-index:300;display:flex;flex-direction:column;align-items:center;gap:10px}
+.fab{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-2));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(28,91,56,.45);transition:.2s;flex-shrink:0}
+.fab:hover{transform:scale(1.07);box-shadow:0 8px 32px rgba(28,91,56,.55)}
+.fab svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;transition:.25s}
+.fab.open svg{transform:rotate(45deg)}
+.fab-menu{display:flex;flex-direction:column;gap:8px;align-items:center;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s}
+.fab-menu.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+.fab-item{display:flex;align-items:center;gap:9px;padding:9px 16px 9px 14px;border-radius:999px;background:var(--card);border:1px solid var(--border);box-shadow:0 3px 14px rgba(28,26,20,.12);cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap;transition:.15s}
+.fab-item:hover{background:var(--cream);border-color:var(--olive);color:var(--olive)}
+.fab-item span{font-size:16px}
+
+/* ── زر الإيجنت العائم ── */
+.agent-fab-wrap{position:fixed;bottom:32px;right:32px;z-index:300;cursor:grab;touch-action:none}
+.agent-fab-wrap:active{cursor:grabbing}
+.agent-fab{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--olive-2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(198,151,73,.5);transition:.2s;position:relative}
+.agent-fab:hover{transform:scale(1.07);box-shadow:0 8px 32px rgba(198,151,73,.6)}
+.agent-fab svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.agent-fab-badge{position:absolute;top:-3px;left:-3px;width:16px;height:16px;background:var(--olive);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--cream)}
+
+/* نافذة الإيجنت المصغّرة */
+.agent-popup{position:fixed;bottom:100px;right:32px;width:370px;max-height:560px;background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 16px 50px rgba(28,26,20,.22);z-index:301;display:flex;flex-direction:column;opacity:0;transform:translateY(14px) scale(.97);pointer-events:none;transition:.2s;overflow:hidden}
+.agent-popup.open{opacity:1;transform:none;pointer-events:auto}
+.agent-pop-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(28,91,56,.06),transparent)}
+.agent-pop-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0}
+.agent-pop-icon svg{width:17px;height:17px}
+.agent-pop-title{font-size:14px;font-weight:700;color:var(--ink);flex:1}
+.agent-pop-mode{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;flex-shrink:0}
+.agent-pop-mode.demo{background:var(--cream-2);color:var(--muted)}
+.agent-pop-mode.real{background:rgba(198,151,73,.15);color:#9b7420}
+.agent-pop-x{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;flex-shrink:0}
+.agent-pop-x:hover{background:var(--cream)}
+.agent-pop-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:160px}
+.agent-pop-welcome{text-align:center;padding:12px 6px;color:var(--muted);font-size:12.5px;line-height:1.7}
+.agent-pop-caps{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.agent-pop-cap{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--border);border-radius:11px;padding:9px 12px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink);text-align:right;transition:.15s}
+.agent-pop-cap:hover{border-color:var(--olive);background:rgba(28,91,56,.05)}
+.agent-pop-msg{display:flex;gap:8px;max-width:100%}
+.agent-pop-msg.user{flex-direction:row-reverse}
+.agent-pop-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10.5px;overflow:hidden}
+.agent-pop-av.agent{background:linear-gradient(135deg,var(--olive),var(--olive-2));color:var(--gold)}
+.agent-pop-av.user{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--olive-2)}
+.agent-pop-bubble{max-width:80%;padding:9px 12px;border-radius:13px;font-size:12.5px;line-height:1.6;white-space:pre-wrap}
+.agent-pop-msg.agent .agent-pop-bubble{background:var(--cream);border:1px solid var(--border);border-top-right-radius:3px}
+.agent-pop-msg.user .agent-pop-bubble{background:var(--olive);color:#fff;border-top-left-radius:3px}
+.agent-pop-foot{border-top:1px solid var(--border);padding:10px 12px;display:flex;gap:7px;align-items:flex-end}
+.agent-pop-input{flex:1;border:1.5px solid var(--border);border-radius:14px;padding:8px 12px;font-family:inherit;font-size:12.5px;background:var(--cream);outline:none;resize:none;max-height:70px;transition:.2s}
+.agent-pop-input:focus{border-color:var(--olive);background:var(--card)}
+.agent-pop-send{width:32px;height:32px;border-radius:50%;background:var(--olive);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s}
+.agent-pop-send:hover{background:var(--olive-2)}
+.agent-pop-send:disabled{opacity:.4;cursor:not-allowed}
+.agent-pop-typing{display:flex;gap:4px;padding:9px 12px}
+.agent-pop-typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:apbounce 1.2s infinite}
+.agent-pop-typing span:nth-child(2){animation-delay:.15s}
+.agent-pop-typing span:nth-child(3){animation-delay:.3s}
+@keyframes apbounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.agent-pop-expand{font-size:11px;color:var(--olive);text-decoration:none;font-weight:700;cursor:pointer}
+@media (max-width:540px){
+  .agent-popup{right:14px;left:14px;width:auto;bottom:96px;max-height:65vh}
+}
+
+/* لايت بوكس */
+.lightbox{position:fixed;inset:0;background:rgba(14,54,34,.92);display:none;align-items:center;justify-content:center;z-index:500;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90%;max-height:90%;border-radius:12px;object-fit:contain}
+
+/* فارغ */
+.empty-feed{padding:48px 20px;text-align:center;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:var(--rxl)}
+.empty-feed svg{width:36px;height:36px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin:0 auto 12px;display:block}
+.empty-feed b{display:block;font-size:16px;color:var(--ink);margin-bottom:6px}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:600;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
+
+/* ══ Category dropdown ══ */
+.cat-drop-wrap{position:relative;flex-shrink:0}
+.cat-drop-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 13px;border-radius:12px;
+  border:1.5px solid var(--border);
+  background:var(--card);
+  font-family:inherit;font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer;transition:.15s;
+  white-space:nowrap;
+}
+.cat-drop-btn:hover{border-color:var(--olive);color:var(--olive)}
+.cat-drop-btn.active{border-color:var(--olive);background:rgba(28,91,56,.07);color:var(--olive)}
+.cat-drop-menu{
+  position:absolute;top:calc(100% + 6px);left:0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:5px;
+  min-width:150px;
+  box-shadow:0 8px 32px rgba(28,26,20,.13);
+  z-index:250;
+  opacity:0;transform:translateY(-6px) scale(.97);
+  pointer-events:none;transition:.18s;
+}
+.cat-drop-menu.open{opacity:1;transform:none;pointer-events:auto}
+.cat-drop-item{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:9px 12px;
+  border:none;background:transparent;
+  font-family:inherit;font-size:13px;font-weight:600;
+  color:var(--ink);cursor:pointer;border-radius:10px;
+  transition:.13s;text-align:right;
+}
+.cat-drop-item:hover{background:var(--cream)}
+.cat-drop-item.on{background:rgba(28,91,56,.08);color:var(--olive)}
+
+
+@media(max-width:1100px){
+  .app{grid-template-columns:220px minmax(0,1fr)}
+  .right-col{display:none}
+}
+@media(max-width:820px){
+  html,body{overflow:auto}
+  .app{grid-template-columns:1fr;height:auto;overflow:visible;padding-bottom:64px}
+  .sidebar{display:none}
+  .feed-col{height:auto;overflow-y:visible;overflow-x:hidden;padding:12px}
+  .fab-wrap{display:none}
+
+  /* ══ الهيدر — إخفاء نص أزرار الإشعارات/الرسائل، الاعتماد على الأيقونة فقط ══ */
+  .header-right{gap:4px}
+  .hbtn span:not(.notif-dot){display:none}
+  .hbtn{padding:7px 9px}
+
+  /* ══ شريط التنقل السفلي الثابت — نمط Instagram/TikTok ══ */
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;right:0;left:0;z-index:500;
+    background:var(--card);border-top:1px solid var(--line);
+    padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));
+    box-shadow:0 -2px 12px rgba(28,26,20,.06)
+  }
+  .bn-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;color:var(--muted);padding:6px 2px;
+    font-family:'Tajawal',sans-serif;font-size:10.5px;cursor:pointer;border-radius:10px
+  }
+  .bn-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .bn-item.active{color:var(--olive)}
+  .bn-item.active svg{stroke-width:2.3}
+  .bn-compose{flex:1;display:flex;align-items:center;justify-content:center;margin-top:-22px}
+  .bn-compose-btn{
+    width:46px;height:46px;border-radius:50%;background:var(--olive);color:#fff;
+    border:3px solid var(--card);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 10px rgba(28,91,56,.35);cursor:pointer
+  }
+  .bn-compose-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.3;stroke-linecap:round}
+
+  /* قائمة منبثقة من الأسفل (bottom sheet) — تستخدم للأفاتار وأي قائمة منسدلة أخرى بالموبايل */
+  .sheet-overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,18,12,.45);z-index:800
+  }
+  .sheet-overlay.open{display:block}
+  .sheet-panel{
+    position:fixed;right:0;left:0;bottom:0;z-index:801;background:var(--card);
+    border-radius:18px 18px 0 0;padding:8px 6px calc(14px + env(safe-area-inset-bottom));
+    transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+    max-height:70vh;overflow-y:auto
+  }
+  .sheet-overlay.open .sheet-panel{transform:translateY(0)}
+  .sheet-handle{width:36px;height:4px;background:var(--line);border-radius:99px;margin:6px auto 10px}
+}
 </style>
+<script src="supabase.js"></script>
+<script src="notifications.js"></script>
+<script src="comments.js"></script>
 </head>
 <body>
 
-<!-- Header -->
-<div class="header">
-  <div class="header-logo">✦ AZZA</div>
-  <h1>كيف يمكننا مساعدتك؟</h1>
-  <p>ابحث في مقالات المساعدة أو تصفح الفئات أدناه</p>
-  <div class="search-wrap">
-    <input class="search-inp" id="search-inp" placeholder="ابحث عن أي موضوع..." oninput="doSearch(this.value)" onfocus="doSearch(this.value)">
-    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <div class="search-results" id="search-results"></div>
+<!-- هيدر -->
+<header class="header">
+  <a href="index.html" class="brand">
+    <div class="brand-logo">ع</div>
+    <span class="brand-name">عزّة</span>
+  </a>
+  <div class="header-search" id="header-search-wrap">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search-in" placeholder="ابحث..." autocomplete="off" oninput="searchQ=this.value;render();handleSearchInput(this.value)" onfocus="if(this.value.trim())handleSearchInput(this.value)">
+    <div class="search-dropdown" id="search-dropdown"></div>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
+      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="hbtn" id="notif-btn" onclick="toggleNotifPanel(event)">
+      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>إشعارات</span>
+      <span class="notif-dot" id="notif-dot" data-notif-badge style="display:none"></span>
+    </button>
+    <button class="hbtn" onclick="location.href='messages.html'">
+      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>الرسائل</span>
+    </button>
+    <button class="hbtn" onclick="location.href='help.html'" title="المساعدة">
+      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>مساعدة</span>
+    </button>
+    <div class="avatar-btn" id="av-btn" onclick="toggleDrop(event)">م</div>
+  </div>
+</header>
+
+<!-- قائمة الأفاتار -->
+<div class="drop-menu" id="drop-menu">
+  <div class="drop-user">
+    <div class="drop-av" id="drop-av">م</div>
+    <div><div class="drop-name" id="drop-name">—</div><div class="drop-handle" id="drop-handle"></div></div>
+  </div>
+  <button class="drop-item" onclick="go('profile.html')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ملفي الشخصي</button>
+  <button class="drop-item" onclick="go('explore.html')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>استكشف</button>
+  <button class="drop-item" id="inv-link" onclick="go('investor.html')" style="display:none"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>لوحة المستثمر</button>
+  <div class="drop-sep"></div>
+  <button class="drop-item" onclick="go('success-stories.html')"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>قصص نجاح</button>
+  <button class="drop-item" onclick="go('verification.html')"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>التوثيق والمصداقية</button>
+  <div class="drop-sep"></div>
+  <button class="drop-item" onclick="go('settings.html')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>الإعدادات</button>
+  <div class="drop-sep"></div>
+  <button class="drop-item danger" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>تسجيل الخروج</button>
+  <button class="drop-item" onclick="location.href='help.html'"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>مركز المساعدة</button>
+</div>
+
+<!-- panel الإشعارات -->
+<div class="notif-panel" id="notif-panel">
+  <div class="np-head">
+    <div class="np-title">
+      الإشعارات
+      <span class="np-ubadge" id="np-ubadge" style="display:none">0</span>
+    </div>
+    <div class="np-actions">
+      <!-- صوت -->
+      <div class="sound-wrap">
+        <button class="sound-toggle" id="sound-toggle" onclick="toggleSoundDrop(event)" title="نغمة الإشعارات">
+          <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+        <div class="sound-drop" id="sound-drop">
+          <div style="font-size:10.5px;color:var(--muted);padding:3px 10px 5px;font-weight:700">نغمة الإشعار</div>
+          <button class="sound-opt on" data-s="none"  onclick="setSound('none',this)">🔕 بلا صوت</button>
+          <button class="sound-opt"   data-s="ding"  onclick="setSound('ding',this)">🔔 نغمة <button class="sound-play" onclick="event.stopPropagation();previewSound('ding')">▶</button></button>
+          <button class="sound-opt"   data-s="pop"   onclick="setSound('pop',this)">💬 نبضة <button class="sound-play" onclick="event.stopPropagation();previewSound('pop')">▶</button></button>
+          <button class="sound-opt"   data-s="chime" onclick="setSound('chime',this)">✨ رنين <button class="sound-play" onclick="event.stopPropagation();previewSound('chime')">▶</button></button>
+          <button class="sound-opt"   data-s="alert" onclick="setSound('alert',this)">📣 تنبيه <button class="sound-play" onclick="event.stopPropagation();previewSound('alert')">▶</button></button>
+        </div>
+      </div>
+      <button class="np-btn" onclick="markAllNotifsRead()">قراءة الكل</button>
+    </div>
+  </div>
+  <div class="np-list" id="np-list"></div>
+  <div class="np-footer">
+    <button class="np-see-all" onclick="closeNotifPanel();location.href='notifications.html'">عرض كل الإشعارات</button>
   </div>
 </div>
 
-<!-- Nav -->
-<div class="nav">
-  <a href="#home" class="nav-home" onclick="showHome()">🏠 الرئيسية</a>
-  <a href="#start" onclick="showCat('start')">البداية</a>
-  <a href="#account" onclick="showCat('account')">الحساب</a>
-  <a href="#posts" onclick="showCat('posts')">المنشورات</a>
-  <a href="#messages" onclick="showCat('messages')">الرسائل</a>
-  <a href="#notifications" onclick="showCat('notifications')">الإشعارات</a>
-  <a href="#investors" onclick="showCat('investors')">المستثمرون</a>
-  <a href="#troubleshoot" onclick="showCat('troubleshoot')">حل المشاكل</a>
+<!-- التطبيق -->
+<div class="app">
+
+  <!-- الشريط الجانبي الأيسر -->
+  <nav class="sidebar" id="sidebar">
+    <button class="sb-compose" onclick="openCompose()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      نشر جديد
+    </button>
+    <!-- تملأ بالـ JS -->
+  </nav>
+
+  <!-- الفيد — الوحيد اللي يـ scroll -->
+  <div class="feed-col" id="feed-col">
+    <div class="feed-inner">
+
+      <!-- بوكس نشر سريع -->
+      <div class="compose-box">
+        <div class="compose-av" id="compose-av" onclick="openCompose()">م</div>
+        <button class="compose-prompt" onclick="openCompose()" id="compose-placeholder">شارك فكرتك أو مشروعك...</button>
+        <div class="compose-actions">
+          <button class="compose-qbtn" onclick="pickTypeAndOpen('idea')" title="فكرة">💡 فكرة</button>
+          <button class="compose-qbtn" onclick="pickTypeAndOpen('project')" title="مشروع">🚀 مشروع</button>
+        </div>
+      </div>
+
+      <!-- فلاتر النوع + dropdown الفئة في صف واحد -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="filters" id="filters" style="flex:1">
+          <button class="f-btn on" data-f="all"      onclick="setFilter(this)">الكل</button>
+          <button class="f-btn"    data-f="idea"     onclick="setFilter(this)">💡 أفكار</button>
+          <button class="f-btn"    data-f="project"  onclick="setFilter(this)">🚀 مشاريع</button>
+          <button class="f-btn"    data-f="job"      onclick="setFilter(this)">📋 وظائف</button>
+          <button class="f-btn"    data-f="trending" onclick="setFilter(this)">🔥 ترند</button>
+          <button class="f-btn"    data-f="mine"     onclick="setFilter(this)">👤 منشوراتي</button>
+        </div>
+        <div class="cat-drop-wrap">
+          <button class="cat-drop-btn" id="cat-drop-btn" onclick="toggleCatDrop()">
+            <span id="cat-drop-label">🗂 الفئة</span>
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="cat-drop-menu" id="cat-drop-menu">
+            <button class="cat-drop-item on" data-c="all" onclick="setCatDrop(this,'all','🗂 الفئة')">🌐 الكل</button>
+            <button class="cat-drop-item" data-c="tech" onclick="setCatDrop(this,'tech','💻 تقنية')">💻 تقنية</button>
+            <button class="cat-drop-item" data-c="health" onclick="setCatDrop(this,'health','🩺 صحة')">🩺 صحة</button>
+            <button class="cat-drop-item" data-c="education" onclick="setCatDrop(this,'education','📚 تعليم')">📚 تعليم</button>
+            <button class="cat-drop-item" data-c="environment" onclick="setCatDrop(this,'environment','🌿 بيئة')">🌿 بيئة</button>
+            <button class="cat-drop-item" data-c="business" onclick="setCatDrop(this,'business','💼 أعمال')">💼 أعمال</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- المنشورات -->
+      <div id="feed"></div>
+
+    </div>
+  </div>
+
+  <!-- العمود الأيمن -->
+  <aside class="right-col">
+
+    <div class="rc-card">
+      <div class="rc-title"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>ملفك</div>
+      <div class="stats-grid">
+        <div class="st-box"><strong id="st-p">0</strong><span>منشور</span></div>
+        <div class="st-box"><strong id="st-v" style="color:var(--olive)">0</strong><span>تصويت</span></div>
+        <div class="st-box"><strong id="st-n" style="color:var(--gold)">0</strong><span>NDA</span></div>
+      </div>
+    </div>
+
+    <div class="rc-card">
+      <div class="rc-title"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>الأكثر تداولاً</div>
+      <div id="trends"></div>
+    </div>
+
+    <div class="rc-card">
+      <div class="rc-title"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>تعرّف على</div>
+      <div id="suggestions"></div>
+    </div>
+
+  </aside>
 </div>
 
+<!-- شريط التنقل السفلي — يظهر فقط بالموبايل (max-width:820px)، يُعبّى بنفس منطق الـsidebar -->
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<!-- قائمة الأفاتار المنبثقة من الأسفل (bottom sheet) — تستخدم بالموبايل بدل القائمة المنسدلة -->
+<div class="sheet-overlay" id="avatar-sheet-overlay" onclick="closeAvatarSheet(event)">
+  <div class="sheet-panel" id="avatar-sheet-panel" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div id="avatar-sheet-content"></div>
+  </div>
+</div>
+
+<!-- FAB + speed-dial -->
+<div class="fab-wrap" id="fab-wrap">
+  <div class="fab-menu" id="fab-menu">
+    <button class="fab-item" onclick="pickTypeAndOpen('project');closeFab()"><span>🚀</span>مشروع</button>
+    <button class="fab-item" onclick="pickTypeAndOpen('idea');closeFab()"><span>💡</span>فكرة</button>
+    <button class="fab-item" onclick="pickTypeAndOpen('post');closeFab()"><span>💬</span>منشور</button>
+  </div>
+  <button class="fab" id="fab-btn" onclick="toggleFab()">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
+
+<!-- ── زر الإيجنت العائم ── -->
+<div class="agent-fab-wrap" id="agent-fab-wrap">
+  <button class="agent-fab" id="agent-fab-btn" onclick="toggleAgentPopup()">
+    <svg viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M9 14h.01M15 14h.01"/></svg>
+    <span class="agent-fab-badge" id="agent-fab-badge"></span>
+  </button>
+</div>
+
+<div class="agent-popup" id="agent-popup">
+  <div class="agent-pop-head">
+    <div class="agent-pop-icon">
+      <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/></svg>
+    </div>
+    <span class="agent-pop-title">مساعد عزّة</span>
+    <span class="agent-pop-mode" id="agent-pop-mode">—</span>
+    <button class="agent-pop-x" onclick="toggleAgentPopup()">
+      <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="agent-pop-body" id="agent-pop-body"></div>
+  <div class="agent-pop-foot">
+    <textarea class="agent-pop-input" id="agent-pop-input" placeholder="اكتب سؤالك..." rows="1" onkeydown="handleAgentKey(event)" oninput="agentAutoGrow(this)"></textarea>
+    <button class="agent-pop-send" id="agent-pop-send" onclick="sendAgentPopupMsg()">
+      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- مودال النشر -->
+<div class="overlay" id="compose-ol" onclick="if(event.target===this)closeCompose()">
+  <div class="modal">
+    <div class="modal-head">
+      <button class="modal-x" onclick="closeCompose()"><svg style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <span class="modal-title">منشور جديد</span>
+      <span style="width:28px"></span>
+    </div>
+    <div class="modal-body">
+      <div class="type-row">
+        <button class="type-btn on" data-t="post"    onclick="pickType(this)">💬 منشور</button>
+        <button class="type-btn"    data-t="idea"    onclick="pickType(this)">💡 فكرة</button>
+        <button class="type-btn"    data-t="project" onclick="pickType(this)">🚀 مشروع</button>
+        <button class="type-btn"    data-t="job"      onclick="pickType(this)">📋 وظيفة</button>
+      </div>
+      <div id="idea-extra" style="display:none">
+        <div class="mfield"><input id="idea-title" placeholder="عنوان الفكرة"></div>
+        <div class="mfield"><input id="idea-pitch" placeholder="اشرح الفكرة بجملة"></div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;margin-bottom:10px;cursor:pointer">
+          <input type="checkbox" id="nda-pub" style="width:16px;height:16px;accent-color:var(--olive)"> حماية NDA 🔒
+        </label>
+      </div>
+      <div id="proj-extra" style="display:none">
+        <div class="mfield"><input id="proj-title" placeholder="اسم المشروع"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" class="mfield">
+          <input type="number" id="fund-goal" placeholder="هدف التمويل ($)" style="margin-bottom:0">
+          <select id="fund-stage" style="border:1.5px solid var(--border);border-radius:var(--r2);padding:10px;font-family:inherit;font-size:13px;background:var(--cream);outline:none;color:var(--muted);margin-bottom:0">
+            <option value="">المرحلة</option>
+            <option>Pre-Seed</option><option>Seed</option><option>Series A</option><option>MVP</option>
+          </select>
+        </div>
+      </div>
+      <div id="job-extra" style="display:none">
+        <div class="mfield"><input id="job-title" placeholder="عنوان الوظيفة"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" class="mfield">
+          <input id="job-location" placeholder="الموقع (عن بُعد، رام الله...)" style="margin-bottom:0">
+          <input id="job-salary" placeholder="الراتب (اختياري)" style="margin-bottom:0">
+        </div>
+        <select id="job-type" style="border:1.5px solid var(--border);border-radius:var(--r2);padding:9px;font-family:inherit;font-size:13px;background:var(--cream);outline:none;color:var(--muted);margin-bottom:10px;width:100%">
+          <option value="">نوع التوظيف (اختياري)</option>
+          <option value="fulltime">دوام كامل</option>
+          <option value="parttime">دوام جزئي</option>
+          <option value="freelance">عمل حر / مستقل</option>
+          <option value="internship">تدريب</option>
+        </select>
+      </div>
+      <div class="mfield"><textarea id="compose-txt" placeholder="شارك فكرتك..."></textarea></div>
+      <div class="mfield">
+        <select id="cat-sel" style="border:1.5px solid var(--border);border-radius:var(--r2);padding:9px;font-family:inherit;font-size:13px;background:var(--cream);outline:none;color:var(--muted)">
+          <option value="">الفئة (اختياري)</option>
+          <option value="tech">💻 تقنية</option>
+          <option value="health">🩺 صحة</option>
+          <option value="education">📚 تعليم</option>
+          <option value="environment">🌿 بيئة</option>
+          <option value="business">💼 أعمال</option>
+        </select>
+      </div>
+      <!-- وسائط -->
+      <div class="media-preview" id="media-prev">
+        <img id="img-prev" style="display:none"><video id="vid-prev" style="display:none" controls></video>
+        <button class="media-rm" onclick="rmMedia()">×</button>
+      </div>
+      <div class="media-btns">
+        <label class="media-btn"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>صورة<input type="file" accept="image/*" style="display:none" onchange="handleImg(this)"></label>
+        <label class="media-btn"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>فيديو<input type="file" accept="video/*" style="display:none" onchange="handleVid(this)"></label>
+        <span id="media-hint" style="font-size:11.5px;color:var(--muted);align-self:center"></span>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="cancel-btn" onclick="closeCompose()">إلغاء</button>
+      <button class="pub-btn" onclick="publish()">نشر</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال NDA -->
+<div class="overlay" id="nda-ol" onclick="if(event.target===this)closeNda()">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-head">
+      <button class="modal-x" onclick="closeNda()"><svg style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <span class="modal-title">🔒 اتفاقية السرية</span>
+      <span style="width:28px"></span>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:12px">لإبداء اهتمامك وقّع أولاً:</p>
+      <ul class="nda-list"><li>عدم مشاركة تفاصيل الفكرة مع أي طرف</li><li>استخدام المعلومات لأغراض التقييم فقط</li><li>الالتزام التام بالسرية</li></ul>
+      <label class="nda-agree-row"><input type="checkbox" id="nda-cb" onchange="document.getElementById('nda-btn').disabled=!this.checked"> أوافق على الاتفاقية</label>
+      <button class="nda-sign-btn" id="nda-btn" disabled onclick="signNda()">✍️ وقّع وأبدِ اهتمامك</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lb" onclick="this.classList.remove('open')"><img id="lb-img" src="" alt=""></div>
 <div id="toast"></div>
 
-<div class="main">
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-title">الفئات</div>
-    <ul id="sidebar-links"></ul>
-  </div>
-
-  <!-- Content -->
-  <div id="content">
-
-    <!-- Home -->
-    <div id="home-view">
-      <div class="home-section">
-        <div class="section-title">📚 تصفح حسب الفئة</div>
-        <div class="cats-grid" id="cats-grid"></div>
-      </div>
-      <div class="home-section">
-        <div class="section-title">🔥 المقالات الأكثر طلباً</div>
-        <div class="popular-list" id="popular-list"></div>
-      </div>
-    </div>
-
-    <!-- Articles -->
-    <div id="articles-view" style="display:none"></div>
-
-  </div>
-</div>
-
 <script>
-/* ══════════════════════════════════════════════
-   AZZA Help Center — نظام مقالات المساعدة
-   ══════════════════════════════════════════════ */
+/* ══ AZZA ══ */
+/* === Supabase - تهيئة العميل (اسم azzaDB لتجنب التعارض مع متغير sb المحلي الخاص بالـsidebar) === */
+const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
 
-const CATS = [
-  {id:'start',      icon:'🚀', name:'البداية',          desc:'كيفية إنشاء حساب والبدء بالمنصة'},
-  {id:'account',    icon:'👤', name:'الحساب والملف الشخصي', desc:'إعدادات الحساب والخصوصية'},
-  {id:'posts',      icon:'📝', name:'المنشورات والتعليقات', desc:'نشر الأفكار والمشاريع'},
-  {id:'messages',   icon:'💬', name:'الرسائل',           desc:'التواصل مع المستخدمين'},
-  {id:'notifications',icon:'🔔',name:'الإشعارات',        desc:'إدارة الإشعارات'},
-  {id:'investors',  icon:'💰', name:'المستثمرون والفرص', desc:'الاستثمار وإبداء الاهتمام'},
-  {id:'map',        icon:'🗺️', name:'الخريطة التفاعلية', desc:'استكشاف المستخدمين جغرافياً'},
-  {id:'ai',         icon:'🤖', name:'المساعد الذكي',     desc:'استخدام الذكاء الاصطناعي'},
-  {id:'verification',icon:'✅',name:'التوثيق',           desc:'كيفية توثيق حسابك'},
-  {id:'security',   icon:'🔒', name:'الأمان والخصوصية', desc:'حماية حسابك ومعلوماتك'},
-  {id:'troubleshoot',icon:'🔧',name:'حل المشاكل',        desc:'حلول للمشاكل الشائعة'},
-  {id:'guidelines', icon:'📋', name:'سياسات الاستخدام',  desc:'قواعد المجتمع والشروط'},
-];
+let _postsMem=null;
+let _usersMem=null;
 
-const ARTICLES = [
-  /* ── البداية ── */
-  {id:'create-account', cat:'start', title:'كيف أنشئ حساباً على AZZA؟', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">البداية</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>كيف أنشئ حساباً على AZZA؟</h1>
-    <p>AZZA منصة تربط أصحاب الأفكار بالمستثمرين والخبراء. إنشاء حساب سهل ومجاني.</p>
-    <h2>الخطوات</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>افتح صفحة التسجيل</strong><br>روح <a href="login.html" style="color:var(--olive)">login.html</a> واضغط "إنشاء حساب جديد"</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>اختر نوع حسابك</strong><br>صاحب فكرة / خبير / مستثمر / شركة / مؤسسة</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>أدخل بياناتك</strong><br>الاسم، اسم المستخدم، البريد الإلكتروني، كلمة المرور</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>اختر موقعك</strong><br>الدولة والمدينة لتظهر على الخريطة التفاعلية</div></div>
-    <div class="step"><div class="step-num">5</div><div class="step-content"><strong>اضغط "إنشاء الحساب"</strong><br>ستنتقل تلقائياً للفيد الرئيسي</div></div>
-    <div class="tip">💡 يمكنك أيضاً التسجيل بحساب Google بضغطة واحدة أسرع وأسهل.</div>
-    <h2>أنواع الحسابات</h2>
-    <ul>
-      <li><strong>صاحب فكرة</strong> — تنشر أفكارك وتبحث عن تمويل ودعم</li>
-      <li><strong>خبير</strong> — تقدم خدماتك ومهاراتك للمشاريع</li>
-      <li><strong>مستثمر</strong> — تبحث عن فرص استثمار واعدة</li>
-      <li><strong>شركة / مؤسسة</strong> — تعلن عن فرص وشراكات</li>
-    </ul>
-   `},
+/* ══════════════════════════════════════════════════════════════
+   نظام بيانات المنشورات — Supabase فقط (مُعاد بناؤه من الصفر)
+   المبدأ: Supabase هو المصدر الوحيد للحقيقة
+   لا localStorage للمنشورات/التعليقات/التفاعلات أبداً
+   ══════════════════════════════════════════════════════════════ */
 
-  {id:'first-post', cat:'start', title:'كيف أنشر أول فكرة أو مشروع؟', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">البداية</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>كيف أنشر أول فكرة أو مشروع؟</h1>
-    <p>نشر فكرتك على AZZA يجعلها مرئية للمستثمرين والخبراء.</p>
-    <div class="step"><div class="step-num">1</div><div class="step-content">افتح الفيد الرئيسي (<a href="app.html" style="color:var(--olive)">app.html</a>)</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط زر <strong>✦ نشر فكرة</strong> في أسفل الشاشة</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">اختر نوع المنشور: فكرة / مشروع / وظيفة</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content">اكتب العنوان والوصف والفئة</div></div>
-    <div class="step"><div class="step-num">5</div><div class="step-content">اضغط <strong>نشر</strong></div></div>
-    <div class="tip">💡 يمكنك إضافة صورة أو فيديو لزيادة جاذبية منشورك.</div>
-    <div class="warn">⚠️ إذا كانت فكرتك حساسة، فعّل خيار NDA لحمايتها قبل النشر.</div>
-   `},
-
-  /* ── الحساب ── */
-  {id:'edit-profile', cat:'account', title:'كيف أعدّل ملفي الشخصي؟',
-   content:`
-    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>كيف أعدّل ملفي الشخصي؟</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content">روح <a href="settings.html" style="color:var(--olive)">الإعدادات</a></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">عدّل الاسم أو البيو أو الصورة</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">اضغط <strong>حفظ التغييرات</strong></div></div>
-    <p>التغييرات تُحفظ فوراً في قاعدة البيانات وتظهر لجميع المستخدمين.</p>
-   `},
-
-  {id:'change-password', cat:'account', title:'كيف أغيّر كلمة المرور؟',
-   content:`
-    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>كيف أغيّر كلمة المرور؟</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content">روح <a href="settings.html" style="color:var(--olive)">الإعدادات</a> → الأمان</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">أدخل كلمة المرور الحالية والجديدة</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">اضغط <strong>تغيير كلمة المرور</strong></div></div>
-    <div class="tip">💡 استخدم كلمة مرور قوية (8 أحرف على الأقل مع أرقام ورموز).</div>
-   `},
-
-  {id:'privacy-settings', cat:'account', title:'إعدادات الخصوصية ومن يراسلك', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>إعدادات الخصوصية ومن يراسلك</h1>
-    <p>تحكم بمن يستطيع التواصل معك على AZZA.</p>
-    <h2>خصوصية الرسائل</h2>
-    <ul>
-      <li><strong>الجميع</strong> — أي مستخدم يستطيع إرسال طلب مراسلة</li>
-      <li><strong>المتابعون فقط</strong> — فقط من تتابعهم يستطيعون مراسلتك</li>
-      <li><strong>لا أحد</strong> — أغلق باب المراسلة تماماً</li>
-    </ul>
-    <p>لتغيير هذا الإعداد: <a href="settings.html" style="color:var(--olive)">الإعدادات</a> → الخصوصية → من يستطيع مراسلتك</p>
-   `},
-
-  /* ── المنشورات ── */
-  {id:'nda', cat:'posts', title:'ما هو NDA وكيف أستخدمه؟',
-   content:`
-    <div class="article-meta"><span class="article-tag">المنشورات</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>ما هو NDA وكيف أستخدمه؟</h1>
-    <p>NDA (اتفاقية عدم الإفصاح) يحمي فكرتك من الاستخدام دون إذنك.</p>
-    <h2>كيف يعمل؟</h2>
-    <p>عند تفعيل NDA على منشور، يجب على أي مستخدم يريد إبداء اهتمامه التوقيع على الاتفاقية أولاً.</p>
-    <div class="step"><div class="step-num">1</div><div class="step-content">عند نشر فكرة، فعّل خيار <strong>🔒 حماية NDA</strong></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">المستثمرون سيرون "توقيع NDA وإبداء الاهتمام"</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">بعد التوقيع، يصلك إشعار باهتمامهم</div></div>
-    <div class="tip">💡 NDA مناسب للأفكار الحساسة التي لم تُطلق بعد.</div>
-   `},
-
-  {id:'delete-post', cat:'posts', title:'كيف أحذف منشوراً؟',
-   content:`
-    <div class="article-meta"><span class="article-tag">المنشورات</span><span class="article-time">⏱ 30 ثانية</span></div>
-    <h1>كيف أحذف منشوراً؟</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content">افتح تفاصيل المنشور</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط ⋮ (ثلاث نقاط) في أعلى المنشور</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">اختر <strong>حذف</strong> وأكّد</div></div>
-    <div class="warn">⚠️ الحذف نهائي ولا يمكن التراجع عنه.</div>
-   `},
-
-  /* ── الرسائل ── */
-  {id:'message-request', cat:'messages', title:'كيف أرسل رسالة لمستخدم آخر؟', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">الرسائل</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>كيف أرسل رسالة لمستخدم آخر؟</h1>
-    <p>AZZA تستخدم نظام طلبات المراسلة لحماية المستخدمين من الرسائل غير المرغوبة.</p>
-    <h2>الخطوات</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-content">افتح صفحة المستخدم الذي تريد مراسلته</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط <strong>💬 رسالة</strong></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">يُرسل طلب مراسلة للطرف الآخر</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content">عند القبول، تُفتح المحادثة تلقائياً</div></div>
-    <div class="tip">💡 إذا كان المستخدم يقبل رسائل من "الجميع"، يمكنك مراسلته مباشرة.</div>
-   `},
-
-  {id:'message-tips', cat:'messages', title:'مميزات نظام الرسائل',
-   content:`
-    <div class="article-meta"><span class="article-tag">الرسائل</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>مميزات نظام الرسائل في AZZA</h1>
-    <ul>
-      <li>📨 <strong>رسائل فورية</strong> — تصل في الحال بدون تحديث الصفحة</li>
-      <li>✓✓ <strong>حالة القراءة</strong> — تعرف متى قرأ الطرف الآخر رسالتك</li>
-      <li>⌨️ <strong>مؤشر الكتابة</strong> — يظهر "يكتب..." عند كتابة الطرف الآخر</li>
-      <li>📎 <strong>صور وملفات</strong> — أرسل صوراً وملفات PDF ووثائق</li>
-      <li>↩️ <strong>رد على رسالة</strong> — ردّ على رسالة محددة</li>
-      <li>✏️ <strong>تعديل الرسائل</strong> — كليك يمين أو ضغط طويل → تعديل</li>
-      <li>🗑️ <strong>حذف للجميع</strong> — احذف رسالتك من عند الجميع</li>
-      <li>↪️ <strong>توجيه الرسائل</strong> — أعد إرسال رسالة لمحادثة أخرى</li>
-    </ul>
-   `},
-
-  /* ── الإشعارات ── */
-  {id:'notif-types', cat:'notifications', title:'ما هي أنواع الإشعارات في AZZA؟',
-   content:`
-    <div class="article-meta"><span class="article-tag">الإشعارات</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>أنواع الإشعارات في AZZA</h1>
-    <ul>
-      <li>💬 <strong>تعليق</strong> — علّق أحد على منشورك</li>
-      <li>↩️ <strong>رد</strong> — ردّ أحد على تعليقك</li>
-      <li>▲ <strong>تصويت</strong> — صوّت أحد على منشورك</li>
-      <li>👤 <strong>متابعة</strong> — بدأ أحد متابعتك</li>
-      <li>✉️ <strong>رسالة</strong> — أرسل لك أحد رسالة</li>
-      <li>⭐ <strong>اهتمام</strong> — أبدى أحد اهتمامه بمشروعك</li>
-      <li>✅ <strong>توثيق</strong> — تم توثيق حسابك</li>
-    </ul>
-    <p>الإشعارات تصل فوراً بدون تحديث الصفحة، ويظهر عدادها 🔔 في الهيدر.</p>
-   `},
-
-  {id:'notif-missing', cat:'notifications', title:'لماذا لا تصلني الإشعارات؟', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">الإشعارات</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>لماذا لا تصلني الإشعارات؟</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>تأكد من تسجيل الدخول</strong><br>الإشعارات تتطلب جلسة نشطة</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>جرّب من متصفح آخر</strong><br>Edge وChrome يعملان بشكل أفضل</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>تحقق من اتصال الإنترنت</strong><br>الإشعارات تتطلب اتصالاً نشطاً</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>سجّل خروجاً ودخولاً من جديد</strong><br>يجدد الجلسة ويحل معظم المشاكل</div></div>
-    <div class="tip">💡 لو سجّلت دخولاً من متصفح جديد، تأكد من أن الجلسة نشطة (لا تغلق المتصفح مباشرة).</div>
-   `},
-
-  /* ── المستثمرون ── */
-  {id:'how-to-invest', cat:'investors', title:'كيف أجد فرص استثمار على AZZA؟', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">المستثمرون</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>كيف أجد فرص استثمار على AZZA؟</h1>
-    <p>AZZA تجمع بين أصحاب الأفكار والمستثمرين في مكان واحد.</p>
-    <h2>طرق إيجاد الفرص</h2>
-    <ul>
-      <li><strong>الفيد الرئيسي</strong> — فلتر "مشاريع" لرؤية الفرص</li>
-      <li><strong>لوحة المستثمر</strong> — صفحة مخصصة لعرض الفرص حسب القطاع</li>
-      <li><strong>البحث</strong> — ابحث بكلمات مفتاحية مثل "تقنية" أو "صحة"</li>
-      <li><strong>الخريطة</strong> — اكتشف الفرص حسب الموقع الجغرافي</li>
-    </ul>
-    <h2>كيف أبدي اهتمامي؟</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-content">افتح المنشور الذي يثير اهتمامك</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط <strong>⭐ اهتمام</strong></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content">إذا كان المنشور محمياً بـNDA، وقّع الاتفاقية أولاً</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content">يصل إشعار لصاحب الفكرة بأنك مهتم</div></div>
-   `},
-
-  /* ── حل المشاكل ── */
-  {id:'login-issues', cat:'troubleshoot', title:'لا أستطيع تسجيل الدخول', popular:true,
-   content:`
-    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقتان</span></div>
-    <h1>لا أستطيع تسجيل الدخول</h1>
-    <h2>الأسباب الشائعة والحلول</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>كلمة مرور خاطئة</strong><br>اضغط "نسيت كلمة المرور" لإعادة تعيينها</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>البريد غير مسجّل</strong><br>تأكد من استخدام نفس البريد الذي سجّلت به</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>مشكلة في الكاش</strong><br>امسح كاش المتصفح أو جرّب نافذة خاصة (Incognito)</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>جرّب Google</strong><br>إذا سجّلت بـGoogle، استخدم نفس الطريقة للدخول</div></div>
-    <div class="warn">⚠️ إذا لم تنجح هذه الحلول، تواصل مع الدعم.</div>
-   `},
-
-  {id:'image-upload', cat:'troubleshoot', title:'الصور لا تُرفع أو لا تظهر',
-   content:`
-    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>الصور لا تُرفع أو لا تظهر</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>تحقق من حجم الصورة</strong><br>الحد الأقصى 20MB للرسائل، 3MB للصورة الشخصية</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>تحقق من نوع الملف</strong><br>مقبول: JPG, PNG, GIF, WebP</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>تحقق من الاتصال</strong><br>رفع الصور يتطلب اتصالاً قوياً</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>سجّل خروجاً ودخولاً</strong><br>يجدد صلاحيات الرفع</div></div>
-   `},
-
-  {id:'slow-perf', cat:'troubleshoot', title:'المنصة بطيئة أو لا تستجيب',
-   content:`
-    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقة</span></div>
-    <h1>المنصة بطيئة أو لا تستجيب</h1>
-    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>امسح الكاش</strong><br>Ctrl+Shift+R (Hard Refresh)</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>أغلق التبويبات الأخرى</strong><br>AZZA يستخدم Realtime يحتاج ذاكرة</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>جرّب متصفحاً آخر</strong><br>Chrome أو Edge يعملان بشكل مثالي</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>تحقق من الإنترنت</strong><br>جرّب تشغيل موقع آخر للتأكد</div></div>
-   `},
-];
-
-/* ── بناء الصفحة ── */
-let currentView = 'home';
-
-function buildHome(){
-  const grid = document.getElementById('cats-grid');
-  grid.innerHTML = CATS.map(c=>`
-    <a class="cat-card" onclick="showCat('${c.id}')" href="javascript:void(0)">
-      <div class="cat-icon">${c.icon}</div>
-      <div class="cat-name">${c.name}</div>
-      <div class="cat-count">${ARTICLES.filter(a=>a.cat===c.id).length} مقال</div>
-    </a>`).join('');
-
-  const popular = document.getElementById('popular-list');
-  const pop = ARTICLES.filter(a=>a.popular);
-  popular.innerHTML = pop.map((a,i)=>`
-    <a class="popular-item" onclick="showArticle('${a.id}')" href="javascript:void(0)">
-      <span class="popular-num">${i+1}</span>
-      <span class="popular-text">${a.title}</span>
-      <span class="popular-cat">${CATS.find(c=>c.id===a.cat)?.icon} ${CATS.find(c=>c.id===a.cat)?.name}</span>
-    </a>`).join('');
+function _mapPost(row){
+  return {
+    id:row.id,author_id:row.author_id,author_name:row.author_name||'',
+    author_username:row.author_username||'',author_type:row.author_type||'idea',
+    author_photo:row.author_photo||null,type:row.type,text:row.text||'',
+    title:row.title||'',category:row.category||null,
+    image:row.image||null,video:row.video||null,pitch:row.pitch||'',
+    nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
+    job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
+    views:row.views||0,created_at:row.created_at,
+    votes:[],r_insightful:[],r_collab:[],comments:[],
+  };
 }
 
-function buildSidebar(catId){
-  const arts = ARTICLES.filter(a=>a.cat===catId);
-  const cat  = CATS.find(c=>c.id===catId);
-  const links = document.getElementById('sidebar-links');
-  links.innerHTML = `<li><a href="javascript:void(0)" onclick="showHome()" style="color:var(--muted)">← الرئيسية</a></li>
-    <li style="padding:8px 12px;font-size:13px;font-weight:700;color:var(--olive)">${cat?.icon} ${cat?.name}</li>` +
-    arts.map(a=>`<li><a href="javascript:void(0)" id="sl-${a.id}" onclick="showArticle('${a.id}')">${a.title}</a></li>`).join('') +
-    `<div class="sidebar-sep"></div><li><a href="javascript:void(0)" onclick="showCat('troubleshoot')">🔧 حل المشاكل</a></li>`;
+/* الجلب الشامل: منشورات + تعليقات + تفاعلات + مستخدمون — طلب واحد متوازٍ */
+let _loadingData=false;
+async function loadAllData(){
+  if(_loadingData) return;
+  _loadingData=true;
+  try{
+    const [postsRes,usersRes,cmtsRes,reactsRes]=await Promise.all([
+      azzaDB.from('posts').select('*').order('created_at',{ascending:false}),
+      azzaDB.from('users').select('*'),
+      azzaDB.from('post_comments').select('*').order('created_at',{ascending:true}),
+      azzaDB.from('post_reactions').select('*'),
+    ]);
+    if(!usersRes.error)_usersMem=usersRes.data||[];
+    if(postsRes.error)throw postsRes.error;
+
+    /* فهرسة التعليقات */
+    const cmtMap={};
+    (cmtsRes.data||[]).forEach(c=>{
+      if(!cmtMap[c.post_id])cmtMap[c.post_id]=[];
+      cmtMap[c.post_id].push({
+        id:String(c.id),author_id:c.author_id,
+        author_name:c.author_name||'',author_username:c.author_username||'',
+        text:c.content||'',created_at:c.created_at,
+      });
+    });
+
+    /* فهرسة التفاعلات */
+    const reactMap={votes:{},r_insightful:{},r_collab:{}};
+    (reactsRes.data||[]).forEach(r=>{
+      const k=r.reaction_type==='vote'?'votes':r.reaction_type==='insightful'?'r_insightful':'r_collab';
+      if(!reactMap[k][r.post_id])reactMap[k][r.post_id]=[];
+      reactMap[k][r.post_id].push(r.user_id);
+    });
+
+    /* دمج كل شيء — Supabase هو المصدر الوحيد */
+    _postsMem=(postsRes.data||[]).map(row=>{
+      const p=_mapPost(row);
+      p.comments=cmtMap[p.id]||[];
+      p.votes=reactMap.votes[p.id]||[];
+      p.r_insightful=reactMap.r_insightful[p.id]||[];
+      p.r_collab=reactMap.r_collab[p.id]||[];
+      return p;
+    });
+
+    /* حفظ بـlocalStorage كـcache احتياطي فقط */
+    try{localStorage.setItem('azza_posts',JSON.stringify(_postsMem));}catch{}
+    _loadingData=false;
+
+  }catch(e){
+    console.error('loadAllData فشل، رجوع للـcache المحلي:',e.message);
+    _loadingData=false;
+    if(_postsMem===null){
+      try{_postsMem=JSON.parse(localStorage.getItem('azza_posts')||'[]');}
+      catch{_postsMem=[];}
+    }
+  }
 }
 
-function showHome(){
-  currentView='home';
-  document.getElementById('home-view').style.display='block';
-  document.getElementById('articles-view').style.display='none';
-  document.getElementById('sidebar-links').innerHTML='';
-  window.scrollTo(0,0);
+/* للتوافق مع الكود القديم الذي يستدعي loadInitialDataFromSupabase */
+const loadInitialDataFromSupabase=loadAllData;
+
+const G = {
+  getUser:  ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}},
+  saveUser: u=>{localStorage.setItem('azza_user',JSON.stringify(u));try{const a=JSON.parse(localStorage.getItem('azza_users')||'[]'),i=a.findIndex(x=>x.id===u.id);if(i>-1){a[i]=u;localStorage.setItem('azza_users',JSON.stringify(a));}}catch{}},
+  /* getUsers/getPosts: تقرأ من ذاكرة Supabase المؤقتة (_usersMem/_postsMem) لو محمَّلة فعلياً،
+     وإلا ترجع تلقائياً لـlocalStorage كخطة احتياطية (مثلاً قبل اكتمال التحميل الأولي، أو عند فشل الاتصال) */
+  getUsers: ()=>{ if(_usersMem!==null)return _usersMem; try{return JSON.parse(localStorage.getItem('azza_users')||'[]');}catch{return[];} },
+  getPosts: ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} },
+  /* savePosts: تحدّث الذاكرة المؤقتة فقط — Supabase هو المصدر الوحيد للحقيقة
+     التعديلات الفعلية (vote,react,تعليق) ترسل مباشرة لـSupabase من دوالها */
+  savePosts:p=>{ _postsMem=p; try{localStorage.setItem('azza_posts',JSON.stringify(p));}catch{} },
+  getInts:  ()=>{try{return JSON.parse(localStorage.getItem('azza_interests')||'{}');}catch{return{};}},
+  getSigs:  ()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}},
+};
+const id    = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const ini   = n=>(n||'م').trim()[0].toUpperCase();
+const esc   = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const ago   = iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+'د';const h=Math.floor(m/60);if(h<24)return h+'س';return Math.floor(h/24)+' يوم';};
+const link  = s=>esc(s).replace(/#([\p{L}\p{N}_]+)/gu,'<span style="color:var(--olive);font-weight:700">#$1</span>');
+
+const VERIFY={
+  idea:       {lbl:'صاحب فكرة',c:'#1c5b38',bg:'rgba(28,91,56,.1)'},
+  skill:      {lbl:'خبير',     c:'#0F6E56',bg:'rgba(15,110,86,.1)'},
+  investor:   {lbl:'مستثمر',   c:'#854F0B',bg:'rgba(133,79,11,.1)'},
+  company:    {lbl:'شركة',     c:'#D85A30',bg:'rgba(216,90,48,.1)'},
+  institution:{lbl:'مؤسسة',   c:'#185FA5',bg:'rgba(24,95,165,.1)'},
+};
+const CAT_C={tech:'#185FA5',health:'#D85A30',education:'#854F0B',environment:'#0F6E56',business:'#3B6D11'};
+const CAT_L={tech:'💻 تقنية',health:'🩺 صحة',education:'📚 تعليم',environment:'🌿 بيئة',business:'💼 أعمال'};
+const STAGE={pre_seed:'Pre-Seed',seed:'Seed',series_a:'Series A',mvp:'MVP','Pre-Seed':'Pre-Seed','Seed':'Seed','Series A':'Series A','MVP':'MVP'};
+
+/* ✓ علامة التوثيق الرسمي — أيقونة صفراء ملاصقة بالاسم (نمط تويتر) */
+let usersCache=G.getUsers();
+function calcTrustScore(u){
+  if(!u)return 0;
+  const posts=G.getPosts().filter(p=>p.author_id===u.id);
+  let s={profile:0,nda:0,activity:0};
+  if(u.photo)s.profile+=8;if((u.bio||'').length>10)s.profile+=8;
+  if(u.phone||u.email)s.profile+=5;if(u.linkedin||u.twitter||u.website)s.profile+=5;
+  if(u.institution)s.profile+=4;s.profile=Math.min(30,s.profile);
+  const sigs=G.getSigs();let ndaT=0;
+  posts.filter(p=>p.nda).forEach(p=>{ndaT+=(sigs[p.id]||[]).length;});
+  s.nda=Math.min(35,Math.round(ndaT*3));
+  const views=posts.reduce((a,p)=>a+(p.views||0),0);
+  s.activity=Math.min(35,posts.length*4+Math.floor(views/25));
+  return Math.min(100,s.profile+s.nda+s.activity);
+}
+function isIdVerifiedById(authorId){
+  if(!authorId)return false;
+  if(authorId===user.id)return user.id_verified===true;
+  const u=usersCache.find(x=>x.id===authorId);
+  if(!u)return false;
+  return u.id_verified===true;
+}
+/* ألوان الشارة حسب نوع الحساب — نفس نظام ألوان VERIFY الموجود بكل أنحاء المنصة */
+const BADGE_COLORS={idea:'#1c5b38',skill:'#0F6E56',investor:'#854F0B',company:'#D85A30',institution:'#185FA5'};
+function shieldBadgeSVG(type,size){
+  const c=BADGE_COLORS[type]||BADGE_COLORS.idea;
+  return `<svg viewBox="0 0 22 22" width="${size}" height="${size}"><path d="M11 1.5L17.5 4.8V10.5C17.5 14.8 14.7 18.6 11 20C7.3 18.6 4.5 14.8 4.5 10.5V4.8L11 1.5Z" fill="${c}"/><path d="M7.3 11l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function checkmark(authorId,size=14){
+  if(!isIdVerifiedById(authorId))return'';
+  const u=authorId===user.id?user:usersCache.find(x=>x.id===authorId);
+  const type=u?(u.subtype==='institution'?'institution':u.type):'idea';
+  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;vertical-align:middle;flex-shrink:0" title="حساب موثّق من عزّة">${shieldBadgeSVG(type,size)}</span>`;
 }
 
-function showCat(catId){
-  const arts = ARTICLES.filter(a=>a.cat===catId);
-  if(!arts.length) return;
-  buildSidebar(catId);
-  document.getElementById('home-view').style.display='none';
-  const av = document.getElementById('articles-view');
-  av.style.display='block';
-  const cat = CATS.find(c=>c.id===catId);
-  av.innerHTML=`
-    <h2 style="font-size:22px;font-weight:900;margin-bottom:20px">${cat?.icon} ${cat?.name}</h2>
-    <div class="popular-list">
-      ${arts.map(a=>`<a class="popular-item" onclick="showArticle('${a.id}')" href="javascript:void(0)">
-        <span class="popular-text">${a.title}</span>
-      </a>`).join('')}
-    </div>`;
-  window.scrollTo(0,0);
+/* ══ بحث موحّد بالهيدر — أشخاص + منشورات، نتائج فورية ══ */
+let _searchDebounce=null;
+function handleSearchInput(qRaw){
+  clearTimeout(_searchDebounce);
+  const dd=document.getElementById('search-dropdown');
+  const q=qRaw.trim();
+  if(q.length<1){dd.classList.remove('show');dd.innerHTML='';return;}
+  _searchDebounce=setTimeout(()=>runUnifiedSearch(q),150);
+}
+function runUnifiedSearch(q){
+  const dd=document.getElementById('search-dropdown');
+  const qLower=q.toLowerCase();
+  const allUsers=G.getUsers().filter(u=>u.id!==user.id);
+  const matchedUsers=allUsers.filter(u=>
+    (u.name||'').toLowerCase().includes(qLower) ||
+    (u.username||'').toLowerCase().includes(qLower)
+  ).slice(0,4);
+  const allPosts=G.getPosts();
+  const matchedPosts=allPosts.filter(p=>
+    (p.title||'').toLowerCase().includes(qLower) ||
+    (p.text||'').toLowerCase().includes(qLower)
+  ).slice(0,4);
+
+  if(matchedUsers.length===0&&matchedPosts.length===0){
+    dd.innerHTML=`<div class="sr-empty">لا نتائج لـ"${esc(q)}"</div>`;
+    dd.classList.add('show');
+    return;
+  }
+
+  let html='';
+  if(matchedUsers.length){
+    html+=`<div class="sr-group-lbl">أشخاص</div>`;
+    html+=matchedUsers.map(u=>{
+      const av=u.photo?`<img src="${u.photo}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:ini(u.name);
+      const vc=VERIFY[vt(u)]||VERIFY.idea;
+      return `<div class="sr-item" onclick="location.href='user.html?id=${u.id}'">
+        <div class="sr-av">${av}</div>
+        <div class="sr-main">
+          <div class="sr-title">${esc(u.name)} ${checkmark(u.id,12)}</div>
+          <div class="sr-sub">${u.username?'@'+esc(u.username)+' · ':''}${vc.lbl}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if(matchedPosts.length){
+    html+=`<div class="sr-group-lbl">منشورات</div>`;
+    html+=matchedPosts.map(p=>{
+      const icon=p.type==='project'?'🚀':p.type==='idea'?'💡':p.type==='job'?'📋':'📝';
+      const titleText=p.title||((p.text||'').slice(0,40)+((p.text||'').length>40?'…':''));
+      return `<div class="sr-item" onclick="location.href='post.html?id=${p.id}'">
+        <div class="sr-post-ic">${icon}</div>
+        <div class="sr-main">
+          <div class="sr-title">${esc(titleText)}</div>
+          <div class="sr-sub">${esc(p.author_name||'')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  html+=`<div class="sr-seeall" onclick="location.href='explore.html?q=${encodeURIComponent(q)}'">عرض كل النتائج بـ اكتشف ←</div>`;
+  dd.innerHTML=html;
+  dd.classList.add('show');
+}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('header-search-wrap');
+  if(wrap&&!wrap.contains(e.target)){
+    document.getElementById('search-dropdown').classList.remove('show');
+  }
+});
+
+const MATCH={idea:['investor','skill','company'],skill:['idea','company'],investor:['idea','company','skill'],company:['skill','idea'],institution:['idea','skill']};
+const ROLE={
+  idea:       {e:'💡',l:'صاحب فكرة',tip:'انشر فكرتك واجذب مستثمرين',nav:[['الرئيسية','app.html'],['اكتشف','explore.html'],['ملفي','profile.html'],['الرسائل','messages.html']]},
+  skill:      {e:'🏅',l:'خبير',tip:'استعرض الأفكار التي تحتاج خبرتك',nav:[['الرئيسية','app.html'],['اكتشف','explore.html'],['ملفي','profile.html'],['الرسائل','messages.html']]},
+  investor:   {e:'💼',l:'مستثمر',tip:'استعرض المشاريع التي تبحث عن تمويل',nav:[['الرئيسية','app.html'],['لوحتي','investor.html'],['اكتشف','explore.html'],['ملفي','profile.html'],['الرسائل','messages.html']]},
+  company:    {e:'🏢',l:'شركة',tip:'أعلن عن فرص وشراكات',nav:[['الرئيسية','app.html'],['اكتشف','explore.html'],['ملفي','profile.html'],['الرسائل','messages.html']]},
+  institution:{e:'🏛️',l:'مؤسسة',tip:'تواصل مع أصحاب الأفكار',nav:[['الرئيسية','app.html'],['اكتشف','explore.html'],['ملفي','profile.html'],['الرسائل','messages.html']]},
+};
+const NAV_I={
+  'app.html':     '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  'investor.html':'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  'explore.html': '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  'profile.html': '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  'messages.html':'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  'settings.html':'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+};
+
+/* ── الوضع الليلي — مفتاح localStorage مشترك بكل صفحات المنصة ── */
+const THEME_KEY='azza_theme';
+function applyTheme(){
+  const saved=localStorage.getItem(THEME_KEY);
+  document.body.classList.toggle('dark',saved==='dark');
+  const icon=document.getElementById('theme-icon');
+  if(icon)icon.innerHTML=saved==='dark'
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains('dark');
+  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
+  applyTheme();
+}
+applyTheme();
+
+let user=G.getUser(), curF='all', curCat='all', searchQ='', curType='post', ndaId=null, mediaData=null;
+const vt = u=>(u?.subtype==='institution'?'institution':(u?.type||'idea'));
+if(!user){ location.href='login.html'; }
+
+/* تهيئة AzzaNotif فوراً — لازم تكون جاهزة قبل أي تعليق أو تصويت */
+if(window.AzzaNotif && user){
+  AzzaNotif.init(azzaDB, user, ()=>{ if(typeof renderNotifPanel==='function') renderNotifPanel(); });
+  AzzaNotif.subscribe();
+  AzzaNotif.updateBadge();
 }
 
-function showArticle(id){
-  const art = ARTICLES.find(a=>a.id===id);
-  if(!art) return;
-  buildSidebar(art.cat);
-  document.getElementById('home-view').style.display='none';
-  const av = document.getElementById('articles-view');
-  av.style.display='block';
-  /* ترتيب المقالات في نفس الفئة */
-  const catArts = ARTICLES.filter(a=>a.cat===art.cat);
-  const idx = catArts.findIndex(a=>a.id===id);
-  const prev = catArts[idx-1];
-  const next = catArts[idx+1];
+/* تحقق من جلسة Supabase Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){
+    localStorage.removeItem('azza_user');
+    localStorage.removeItem('azza_token');
+    location.href='login.html';
+  }
+})();
 
-  av.innerHTML=`
-    <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
-      <a href="javascript:void(0)" onclick="showHome()" style="color:var(--muted);text-decoration:none">الرئيسية</a> ›
-      <a href="javascript:void(0)" onclick="showCat('${art.cat}')" style="color:var(--muted);text-decoration:none">${CATS.find(c=>c.id===art.cat)?.name}</a> ›
-      ${art.title}
-    </div>
-    ${art.content}
-    <div class="article-nav">
-      ${prev?`<button class="art-nav-btn" onclick="showArticle('${prev.id}')">← ${prev.title}</button>`:'<div></div>'}
-      ${next?`<button class="art-nav-btn" onclick="showArticle('${next.id}')">${next.title} →</button>`:'<div></div>'}
-    </div>
-    <div class="feedback">
-      <p>هل كان هذا المقال مفيداً؟</p>
-      <div class="fb-btns">
-        <button class="fb-btn" onclick="feedback(this,'yes')">👍 نعم</button>
-        <button class="fb-btn" onclick="feedback(this,'no')">👎 لا</button>
+/* toast */
+function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#c69749';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2800);}
+
+/* nav */
+function go(u){document.getElementById('drop-menu').classList.remove('show');location.href=u;}
+function openUser(uid){if(uid===user?.id)location.href='profile.html';else location.href='user.html?id='+uid;}
+function openPost(pid){location.href='post.html?id='+pid;}
+async function logout(){if(confirm('تسجيل الخروج؟')){try{await azzaDB.auth.signOut();}catch(e){console.error('تعذر إنهاء جلسة Supabase:',e.message);}localStorage.removeItem('azza_token');localStorage.removeItem('azza_user');location.href='index.html';}}
+
+/* FAB speed-dial */
+function toggleFab(){
+  const m=document.getElementById('fab-menu');
+  const b=document.getElementById('fab-btn');
+  m.classList.toggle('open');
+  b.classList.toggle('open');
+}
+function closeFab(){
+  document.getElementById('fab-menu')?.classList.remove('open');
+  document.getElementById('fab-btn')?.classList.remove('open');
+}
+
+/* ══ Notification Panel ══ */
+const NTYPES={
+  like:     {e:'❤️',t:'أعجب بـ',          c:'#ce1126'},
+  comment:  {e:'💬',t:'علّق على',          c:'#1c5b38'},
+  interest: {e:'🤝',t:'أبدى اهتمامه بـ',  c:'#854F0B'},
+  nda:      {e:'🔒',t:'وقّع NDA على',     c:'#0e3622'},
+  follow:   {e:'👤',t:'بدأ متابعتك',       c:'#185FA5'},
+  message:  {e:'✉️',t:'أرسل لك رسالة',    c:'#0F6E56'},
+  insightful:{e:'💡',t:'وجد رأيك ثاقباً', c:'#854F0B'},
+  collab:   {e:'🤜',t:'يريد التعاون',      c:'#185FA5'},
+};
+const nAgo=iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+'د';const h=Math.floor(m/60);if(h<24)return h+'س';return Math.floor(h/24)+' يوم';};
+
+/* صوت */
+let curSound=localStorage.getItem('azza_notif_sound')||'none';
+const SOUNDS={
+  ding: ()=>synth(660,.18,'sine'),
+  pop:  ()=>synth(880,.08,'sine'),
+  chime:()=>{synth(523,.15,'sine');setTimeout(()=>synth(659,.15,'sine'),120);setTimeout(()=>synth(784,.2,'sine'),240);},
+  alert:()=>{synth(440,.1,'square');setTimeout(()=>synth(440,.1,'square'),150);},
+};
+function synth(freq,dur,type='sine'){
+  try{const ac=new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.22,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+dur);o.start();o.stop(ac.currentTime+dur);}catch(e){}
+}
+function previewSound(s){if(SOUNDS[s])SOUNDS[s]();}
+function setSound(s,btn){
+  curSound=s;localStorage.setItem('azza_notif_sound',s);
+  document.querySelectorAll('.sound-opt').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  document.getElementById('sound-toggle').classList.toggle('on',s!=='none');
+  document.getElementById('sound-drop').classList.remove('open');
+  if(s!=='none')previewSound(s);
+}
+function toggleSoundDrop(e){e.stopPropagation();document.getElementById('sound-drop').classList.toggle('open');}
+function initSoundUI(){
+  document.getElementById('sound-toggle').classList.toggle('on',curSound!=='none');
+  document.querySelectorAll('.sound-opt').forEach(b=>b.classList.toggle('on',b.dataset.s===curSound));
+}
+
+/* panel */
+let notifPanelOpen=false;
+let lastNotifCount=0;
+
+function getMyNotifs(){try{return JSON.parse(localStorage.getItem('azza_notifs_'+user.id)||'[]');}catch{return[];}}
+function saveMyNotifs(n){localStorage.setItem('azza_notifs_'+user.id,JSON.stringify(n));}
+
+async function renderNotifPanel(){
+  let notifs=[];
+  try{
+    const {data}=await azzaDB.from('notifications_with_actor')
+      .select('*').eq('recipient_id',user.id)
+      .order('created_at',{ascending:false}).limit(30);
+    notifs=data||[];
+  }catch{
+    notifs=getMyNotifs().map(n=>({...n,actor_name:n.from_name,actor_photo:n.from_photo,is_read:n.read}));
+  }
+
+  const unread=notifs.filter(n=>!n.is_read&&!n.read).length;
+  const dot=document.getElementById('notif-dot');
+  if(dot){dot.textContent=unread||'';dot.style.display=unread?'flex':'none';}
+  const ub=document.getElementById('np-ubadge');
+  if(ub){ub.textContent=unread||'';ub.style.display=unread?'inline':'none';}
+  document.querySelectorAll('[data-notif-badge]').forEach(el=>{
+    el.textContent=unread>99?'99+':(unread||'');
+    el.style.display=unread?'inline-flex':'none';
+  });
+
+  if(!notifPanelOpen)return;
+  const el=document.getElementById('np-list');
+  if(!notifs.length){
+    el.innerHTML=`<div class="np-empty"><div class="np-empty-icon">🔔</div><b>لا إشعارات بعد</b><span style="font-size:13px">ستظهر هنا عند تفاعل الآخرين</span></div>`;
+    return;
+  }
+  el.innerHTML=notifs.map(n=>{
+    const name=n.actor_name||n.from_name||'مستخدم';
+    const photo=n.actor_photo||n.from_photo||null;
+    const isRead=n.is_read||n.read||false;
+    const time=n.created_at||n.at||new Date().toISOString();
+    const t=NTYPES[n.type]||{e:'🔔',t:'إشعار',c:'#6b6555'};
+    const av=photo?`<img src="${esc(photo)}" style="width:100%;height:100%;object-fit:cover">`:ini(name);
+    let postTxt=n.post_text||'';
+    if(!postTxt&&n.metadata){try{postTxt=JSON.parse(n.metadata).post_text||'';}catch{}}
+    const post=postTxt?`<div class="np-post"><div class="np-post-bar" style="background:${t.c}"></div><span class="np-post-txt">${esc(postTxt)}</span></div>`:'';
+    const dispMsg=n.message||t.t;
+    const notifData={...n,from_name:name,from_photo:photo,post_text:postTxt};
+    return `<div class="np-item${isRead?'':' unread'}" onclick="goNotifItem(${JSON.stringify(notifData).replace(/"/g,'&quot;')})">
+      ${!isRead?'<div class="np-udot"></div>':'<div style="width:7px;flex-shrink:0"></div>'}
+      <div class="np-av-wrap"><div class="np-av">${av}</div><div class="np-badge">${t.e}</div></div>
+      <div class="np-body">
+        <div class="np-text"><strong>${esc(name)}</strong> ${esc(dispMsg)}</div>
+        ${post}
+        <div class="np-time">${nAgo(time)}</div>
       </div>
     </div>`;
-
-  /* تعليم النشط بالـsidebar */
-  document.querySelectorAll('[id^="sl-"]').forEach(l=>l.classList.remove('active'));
-  const sl = document.getElementById('sl-'+id);
-  if(sl) sl.classList.add('active');
-  window.scrollTo(0,0);
+  }).join('');
 }
 
-function feedback(btn, type){
-  btn.parentElement.querySelectorAll('.fb-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const fb = btn.closest('.feedback');
-  fb.innerHTML=type==='yes'
-    ?'<p style="color:var(--olive);font-weight:700">✅ شكراً! سعداء بمساعدتك.</p>'
-    :'<p style="color:var(--muted)">شكراً على ملاحظتك — سنحسّن هذا المقال.</p>';
+function flashNotifBtn(){
+  const btn=document.getElementById('notif-btn');
+  if(!btn)return;
+  btn.style.borderColor='var(--olive)';btn.style.color='var(--olive)';
+  setTimeout(()=>{btn.style.borderColor='';btn.style.color='';},1500);
 }
 
-/* ── بحث ── */
-function doSearch(q){
-  const res = document.getElementById('search-results');
-  q = q.trim();
-  if(!q){ res.classList.remove('open'); return; }
-  const found = ARTICLES.filter(a=>
-    a.title.includes(q) ||
-    a.content.replace(/<[^>]+>/g,'').includes(q) ||
-    CATS.find(c=>c.id===a.cat)?.name.includes(q)
-  ).slice(0,6);
-  if(!found.length){
-    res.innerHTML='<div class="sr-empty">لا نتائج — جرّب كلمة أخرى</div>';
-  }else{
-    res.innerHTML=found.map(a=>`
-      <div class="sr-item" onclick="showArticle('${a.id}');document.getElementById('search-inp').value='';document.getElementById('search-results').classList.remove('open')">
-        <div>
-          <div>${a.title}</div>
-          <div class="sr-cat">${CATS.find(c=>c.id===a.cat)?.icon} ${CATS.find(c=>c.id===a.cat)?.name}</div>
-        </div>
-      </div>`).join('');
+function toggleNotifPanel(e){
+  e.stopPropagation();
+  notifPanelOpen=!notifPanelOpen;
+  const panel=document.getElementById('notif-panel');
+  const btn=document.getElementById('notif-btn');
+
+  if(notifPanelOpen&&btn){
+    /* حسب موقع الزر */
+    const r=btn.getBoundingClientRect();
+    const panelW=380;
+    /* نحاول نحطها تحت الزر ومحاذية له من اليسار */
+    let left=r.left;
+    /* إذا طلعت من الشاشة من اليسار نضبطها */
+    if(left+panelW>window.innerWidth-12)left=window.innerWidth-panelW-12;
+    if(left<12)left=12;
+    panel.style.left=left+'px';
+    panel.style.top=(r.bottom+8)+'px';
   }
-  res.classList.add('open');
+
+  panel.classList.toggle('open',notifPanelOpen);
+  document.getElementById('drop-menu')?.classList.remove('show');
+  if(notifPanelOpen){
+    renderNotifPanel();
+    setTimeout(()=>{
+      const notifs=getMyNotifs().map(n=>({...n,read:true}));
+      saveMyNotifs(notifs);
+      renderNotifPanel();
+    },2000);
+  }
+}
+function closeNotifPanel(){
+  notifPanelOpen=false;
+  document.getElementById('notif-panel')?.classList.remove('open');
+}
+
+function goNotifItem(n){
+  closeNotifPanel();
+  if(n.type==='message'){
+    try{const convs=JSON.parse(localStorage.getItem('azza_conversations')||'[]');const conv=convs.find(c=>c.participants.some(p=>p.id===n.from_id)&&c.participants.some(p=>p.id===user.id));location.href=conv?`messages.html?conv=${conv.id}`:'messages.html';}
+    catch{location.href='messages.html';}
+  } else if(n.type==='follow'){
+    location.href='user.html?id='+n.from_id;
+  } else if(n.post_id){
+    location.href='post.html?id='+n.post_id;
+  } else {
+    location.href='app.html';
+  }
+}
+
+function markAllNotifsRead(){
+  saveMyNotifs(getMyNotifs().map(n=>({...n,read:true})));
+  renderNotifPanel();
+  toast('تم تحديد الكل كمقروء ✅');
+}
+
+/* polling */
+setInterval(renderNotifPanel,4000);
+
+/* dropdown */
+function toggleDrop(e){
+  e.stopPropagation();closeNotifPanel();
+  if(window.innerWidth<=820){ openAvatarSheet(); return; }
+  document.getElementById('drop-menu').classList.toggle('show');
+}
+
+/* ── قائمة الأفاتار كـ bottom sheet بالموبايل (نفس محتوى drop-menu، منسوخ تلقائياً) ── */
+function openAvatarSheet(){
+  const content=document.getElementById('avatar-sheet-content');
+  const original=document.getElementById('drop-menu');
+  if(content&&original) content.innerHTML=original.innerHTML;
+  document.getElementById('avatar-sheet-overlay').classList.add('open');
+}
+function closeAvatarSheet(e){
+  if(e&&e.target!==e.currentTarget) return;
+  document.getElementById('avatar-sheet-overlay')?.classList.remove('open');
 }
 
 document.addEventListener('click',e=>{
-  if(!document.getElementById('search-results').contains(e.target)&&
-     e.target!==document.getElementById('search-inp'))
-    document.getElementById('search-results').classList.remove('open');
+  document.getElementById('drop-menu')?.classList.remove('show');
+  const catMenu=document.getElementById('cat-drop-menu');
+  if(catMenu&&!catMenu.contains(e.target)&&!document.getElementById('cat-drop-btn')?.contains(e.target))catMenu.classList.remove('open');
+  const fabWrap=document.getElementById('fab-wrap');
+  if(fabWrap&&!fabWrap.contains(e.target))closeFab();
+  /* إغلاق panel الإشعارات */
+  const np=document.getElementById('notif-panel');
+  const nb=document.getElementById('notif-btn');
+  if(np&&notifPanelOpen&&!np.contains(e.target)&&!nb?.contains(e.target))closeNotifPanel();
+  /* إغلاق قائمة الصوت */
+  const sd=document.getElementById('sound-drop');
+  const st=document.getElementById('sound-toggle');
+  if(sd&&!sd.contains(e.target)&&!st?.contains(e.target))sd.classList.remove('open');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('drop-menu')?.classList.remove('show');closeAvatarSheet();closeCompose();closeNda();closeFab();closeNotifPanel();if(agentPopupOpen){agentPopupOpen=false;document.getElementById('agent-popup')?.classList.remove('open');}}});
+
+/* فلاتر */
+function setFilter(btn){curF=btn.dataset.f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.toggle('on',b.dataset.f===curF));localStorage.setItem('azza_last_filter',curF);render();}
+
+/* ═══════════════════════════════════════════════════
+   نظام الإيجنت — الزر العائم (نسخة مصغّرة من agent.html)
+   ═══════════════════════════════════════════════════ */
+const AG_KEY_API='azza_agent_api_key';
+const AG_HIST_KEY='azza_agent_chat_'+user.id;
+const agGetApiKey=()=>localStorage.getItem(AG_KEY_API)||'';
+const agHasRealKey=()=>agGetApiKey().trim().length>10;
+
+const AG_ROLE_META={idea:{label:'صاحب فكرة',emoji:'💡'},skill:{label:'خبير',emoji:'🏅'},investor:{label:'مستثمر',emoji:'💼'},company:{label:'شركة',emoji:'🏢'}};
+const agRoleMeta=t=>AG_ROLE_META[t]||AG_ROLE_META.idea;
+
+const AG_ROLE_CAPS={
+  idea:[
+    {id:'pitch',icon:'📝',label:'جهّز لي Pitch مختصر',prompt:'جهّز لي نص Pitch مختصر واحترافي لفكرتي، يشمل المشكلة والحل والفرصة السوقية.'},
+    {id:'plan',icon:'📋',label:'اكتب خطة عمل أولية',prompt:'اكتب لي خطة عمل أولية ومنظمة لفكرتي، بأقسام واضحة.'},
+    {id:'improve',icon:'✨',label:'حسّن وصف فكرتي',prompt:'راجع وصف فكرتي وأعطني نسخة محسّنة أكثر جاذبية واحترافية.'},
+  ],
+  investor:[
+    {id:'analyze',icon:'🔍',label:'حلّل فرصة استثمارية',prompt:'حلّل لي هذه الفرصة الاستثمارية من ناحية الجدوى والمخاطر والفرص.'},
+    {id:'filter',icon:'🧭',label:'حدد معايير بحثي',prompt:'ساعدني أحدد معايير واضحة للبحث عن فرص تناسب thesis الاستثماري.'},
+    {id:'questions',icon:'❓',label:'أسئلة لصاحب الفكرة',prompt:'اقترح لي قائمة أسئلة ذكية أسألها لصاحب فكرة قبل اتخاذ قرار استثماري.'},
+  ],
+  skill:[
+    {id:'match',icon:'🧩',label:'أي طلبات تناسب خبرتي؟',prompt:'بناءً على خبرتي، ساعدني أحدد أي نوع طلبات على المنصة قد تناسبني.'},
+    {id:'pitch',icon:'📝',label:'اكتب عرض خدماتي',prompt:'اكتب لي نص قصير أقدّم فيه خدماتي ومهاراتي بشكل جاذب.'},
+  ],
+  company:[
+    {id:'scout',icon:'🔭',label:'كيف أبحث عن شراكة؟',prompt:'ساعدني أحدد استراتيجية للبحث عن أفكار مناسبة للشراكة.'},
+    {id:'rfp',icon:'📋',label:'اكتب طلب تعاون',prompt:'اكتب لي نص طلب تعاون أو شراكة رسمي.'},
+  ],
+};
+const agRoleCaps=t=>AG_ROLE_CAPS[t]||AG_ROLE_CAPS.idea;
+const AG_SHARED=[
+  {id:'navigate',icon:'🧭',label:'وين ألاقي كذا بالمنصة؟',prompt:'كيف أستخدم المنصة؟'},
+  {id:'cv',icon:'📄',label:'جهّز لي سيرة ذاتية',prompt:'بدي أسوي سيرة ذاتية (CV). اسألني الأسئلة اللازمة واحداً تلو الآخر، وبعد ما أجاوبك جهّز لي السيرة كاملة.'},
+  {id:'launch',icon:'🚀',label:'خطة إطلاق لمشروعي',prompt:'بدي خطة إطلاق لمشروعي. اسألني الأسئلة اللازمة واحداً تلو الآخر، وبعد ما أجاوبك جهّز لي خطة إطلاق كاملة.'},
+];
+
+function agSystemPrompt(u){
+  const meta=agRoleMeta(u?.type);
+  const AZA_IDENTITY=`أنت "مساعد أزا" الرسمي لمنصة AZA، منصة عربية متكاملة تجمع أصحاب الأفكار ورواد الأعمال والمستثمرين والشركات والمؤسسات والطلاب والباحثين عن عمل والخبراء والمستشارين في مكان واحد. مهمتك الأساسية هي مساعدة المستخدمين على استخدام المنصة وتحقيق أهدافهم داخلها. يجب أن تكون إجاباتك احترافية وواضحة وسريعة ومفيدة، وأن تركز دائمًا على ريادة الأعمال والاستثمار والتوظيف والتدريب والمنح والمسابقات والشراكات والمشاريع الناشئة والخدمات المتوفرة داخل المنصة.
+يجب أن تساعد المستخدمين في إنشاء المشاريع وتحسينها وتجهيزها للاستثمار، وشرح كيفية البحث عن المستثمرين والتواصل معهم، ومساعدة الشركات على نشر الوظائف والتدريبات والفرص، ومساعدة الطلاب في العثور على التدريب ومشاريع التخرج والمنح والمسابقات، ومساعدة الباحثين عن عمل في بناء ملفاتهم الشخصية وتحسين فرصهم المهنية، ومساعدة المؤسسات في نشر برامجها وفرصها ومنحها. كما يجب أن تشرح للمستخدمين كيفية استخدام الرسائل والإشعارات والإعدادات والتوثيق والملفات الشخصية والخريطة التفاعلية وجميع أقسام المنصة.
+إذا كان لديك وصول إلى بيانات المنصة، فابحث داخلها واقترح مشاريع أو مستثمرين أو شركات أو وظائف أو فرص مناسبة حسب طلب المستخدم. عند الإجابة استخدم خطوات عملية واضحة واقتراحات قابلة للتنفيذ، وقدم نصائح احترافية تساعد المستخدم على تحقيق نتائج أفضل.
+إذا سأل المستخدم سؤالًا لا يتعلق بمنصة أزا أو ريادة الأعمال أو الاستثمار أو الوظائف أو التدريب أو الشركات أو المؤسسات أو الخدمات الموجودة داخل المنصة، فقم بتوجيهه بلطف للمواضيع التي يتخصص بها مساعد أزا، واذكر أنك متخصص في خدمات المنصة وريادة الأعمال والاستثمار والفرص المهنية.
+حافظ دائمًا على أسلوب عربي احترافي وودود، وقدم إجابات قصيرة عندما يكون السؤال بسيطًا، وإجابات مفصلة عندما يطلب المستخدم شرحًا أو خطة أو تحليلًا. عند عدم توفر معلومات كافية، اطلب تفاصيل إضافية قبل الإجابة. عند عدم معرفة الإجابة أو عدم توفر البيانات، أخبر المستخدم بذلك بوضوح واقترح عليه مراجعة مركز المساعدة أو التواصل مع الدعم. هدفك النهائي هو أن تكون المساعد الذكي الأول للمستخدمين داخل منصة أزا وأن تساعدهم على العثور على الفرص المناسبة، بناء المشاريع، جذب المستثمرين، تطوير أعمالهم، وتوسيع شبكاتهم المهنية داخل العالم العربي.`;
+
+  return `${AZA_IDENTITY}
+
+── سياق المستخدم الحالي ──
+دوره: ${meta.label}. اسمه: ${u?.name||'مستخدم'}.
+
+${PLATFORM_KNOWLEDGE}
+إذا سألك المستخدم عن المنصة نفسها، استخدم المعلومات أعلاه للإجابة بدقة.
+لو طلب سيرة ذاتية أو خطة إطلاق، اسأله الأسئلة اللازمة بالتسلسل (واحد بكل مرة) قبل كتابة المخرج النهائي.
+لا تخترع بيانات وهمية. أجب بشكل مباشر ومفيد، بدون مقدمات طويلة. ردودك هنا قصيرة نسبياً لأنها تظهر بنافذة منبثقة صغيرة.`;
+}
+
+/* قاعدة معرفة مختصرة عن المنصة — نسخة مصغّرة من agent.html لأن هذه نافذة سريعة */
+const PLATFORM_KNOWLEDGE=`معلومات عن منصة عزّة: app.html (الفيد)، explore.html (استكشاف: أشخاص/أفكار/وظائف/خريطة)، profile.html (ملفي)، investor.html (لوحة المستثمر)، messages.html (الرسائل)، settings.html (الإعدادات والمفتاح)، verification.html (شرح التوثيق)، success-stories.html (قصص نجاح). نظام التوثيق: درجة مصداقية من 100 (اكتمال الملف 30 + NDA 35 + نشاط 35)، التوثيق التلقائي عند 70+. أنواع المنشورات: فكرة، مشروع، وظيفة. البيانات تُخزَّن محلياً بالمتصفح حالياً.`;
+
+const SUPABASE_URL='https://iecniydswotsilaueogq.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+
+async function agGetQueryEmbedding(text,geminiKey){
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'models/gemini-embedding-001',content:{parts:[{text}]}}),
+  });
+  if(!res.ok)throw new Error(`Embedding error ${res.status}`);
+  const data=await res.json();
+  return data.embedding.values;
+}
+async function agBuildRagContext(userQuestion,geminiKey){
+  try{
+    const embedding=await agGetQueryEmbedding(userQuestion,geminiKey);
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_kb_chunks`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`},
+      body:JSON.stringify({query_embedding:embedding,match_count:3,similarity_threshold:0.4}),
+    });
+    if(!res.ok)return '';
+    const chunks=await res.json();
+    if(!chunks||chunks.length===0)return '';
+    return '\n\nمعلومات ذات صلة من قاعدة معرفة المنصة:\n'+chunks.map(c=>`- ${c.source_title}: ${c.content}`).join('\n');
+  }catch(e){return '';}
+}
+
+async function agCallRealAPI(messages,u){
+  const key=agGetApiKey();
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      systemInstruction:{parts:[{text:agSystemPrompt(u)}]},
+      contents:messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
+      generationConfig:{maxOutputTokens:700}
+    }),
+  });
+  if(!res.ok){const errBody=await res.text().catch(()=>'');throw new Error(`API_ERROR_${res.status}: ${errBody.slice(0,200)}`);}
+  const data=await res.json();
+  const text=data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join('\n').trim();
+  return text||'لم يصلني رد واضح، حاول مرة أخرى.';
+}
+
+async function agAsk({capId,freeText,history}){
+  if(!agHasRealKey()){
+    return{text:'⚠️ هذا المساعد يحتاج مفتاح Gemini API مجاني. احصل عليه من aistudio.google.com، ثم أدخله من الإعدادات.',mode:'no_key'};
+  }
+  try{
+    const key=agGetApiKey();
+    const userMsg=freeText||(agRoleCaps(user.type).concat(AG_SHARED).find(c=>c.id===capId)?.prompt)||freeText;
+    const ragContext=freeText?await agBuildRagContext(userMsg,key):'';
+    const msgs=[...(history||[]),{role:'user',content:userMsg+ragContext}];
+    const text=await agCallRealAPI(msgs,user);
+    return{text,mode:'real'};
+  }catch(e){
+    return{text:'⚠️ تعذّر الاتصال بالمساعد. تأكد من صحة المفتاح بالإعدادات.\n\n('+e.message+')',mode:'error'};
+  }
+}
+
+let agChatHistory=[];
+let agentPopupOpen=false;
+try{agChatHistory=JSON.parse(localStorage.getItem(AG_HIST_KEY)||'[]');}catch{agChatHistory=[];}
+function agSaveHist(){try{localStorage.setItem(AG_HIST_KEY,JSON.stringify(agChatHistory.slice(-20)));}catch{}}
+
+function agMsgHTML(m){
+  const isUser=m.role==='user';
+  const av=isUser?(user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(user.name)):'🤖';
+  let tag='';
+  if(!isUser&&m.mode){
+    if(m.mode==='real')tag=`<div style="font-size:9.5px;color:#9b7420;margin-top:5px">⚡ مولّد فعلياً</div>`;
+    else if(m.mode==='error')tag=`<div style="font-size:9.5px;color:var(--err);margin-top:5px">⚠️ تعذّر الاتصال</div>`;
+  }
+  return `<div class="agent-pop-msg ${isUser?'user':'agent'}"><div class="agent-pop-av ${isUser?'user':'agent'}">${av}</div><div class="agent-pop-bubble">${esc(m.content)}${tag}</div></div>`;
+}
+
+function agRenderPopupBody(){
+  const body=document.getElementById('agent-pop-body');
+  if(agChatHistory.length===0){
+    const meta=agRoleMeta(user.type);
+    const caps=agRoleCaps(user.type).concat(AG_SHARED);
+    body.innerHTML=`<div class="agent-pop-welcome">${meta.emoji} هلا فيك! أنا مساعدك المخصّص كـ${meta.label}.<br>كيف أقدر أساعدك؟</div>
+      <div class="agent-pop-caps">${caps.map(c=>`<button class="agent-pop-cap" onclick="agUseCap('${c.id}','${esc(c.label)}')"><span>${c.icon}</span><span>${esc(c.label)}</span></button>`).join('')}</div>
+      <div style="text-align:center;margin-top:6px"><a class="agent-pop-expand" href="agent.html">فتح بصفحة كاملة ↗</a></div>`;
+    return;
+  }
+  body.innerHTML=agChatHistory.map(agMsgHTML).join('')+`<div style="text-align:center;margin-top:2px"><a class="agent-pop-expand" href="agent.html">فتح بصفحة كاملة ↗</a></div>`;
+  body.scrollTop=body.scrollHeight;
+}
+
+function agRenderModePill(){
+  const pill=document.getElementById('agent-pop-mode');
+  if(agHasRealKey()){pill.className='agent-pop-mode real';pill.textContent='⚡ متصل';}
+  else{pill.className='agent-pop-mode demo';pill.textContent='🔑 بانتظار المفتاح';}
+}
+
+function agShowTyping(){
+  const body=document.getElementById('agent-pop-body');
+  const wrap=document.createElement('div');
+  wrap.className='agent-pop-msg agent';
+  wrap.id='agent-typing';
+  wrap.innerHTML=`<div class="agent-pop-av agent">🤖</div><div class="agent-pop-bubble" style="padding:0"><div class="agent-pop-typing"><span></span><span></span><span></span></div></div>`;
+  body.appendChild(wrap);
+  body.scrollTop=body.scrollHeight;
+}
+function agHideTyping(){document.getElementById('agent-typing')?.remove();}
+
+async function agUseCap(capId,label){
+  if(document.getElementById('agent-pop-send').disabled)return;
+  agChatHistory.push({role:'user',content:label});
+  agRenderPopupBody();agSaveHist();
+  await agGetResponse({capId});
+}
+async function sendAgentPopupMsg(){
+  const input=document.getElementById('agent-pop-input');
+  const text=input.value.trim();
+  if(!text)return;
+  agChatHistory.push({role:'user',content:text});
+  input.value='';agentAutoGrow(input);
+  agRenderPopupBody();agSaveHist();
+  await agGetResponse({freeText:text});
+}
+async function agGetResponse({capId,freeText}){
+  document.getElementById('agent-pop-send').disabled=true;
+  agShowTyping();
+  const apiHist=agChatHistory.filter(m=>m.role==='user'||m.role==='assistant').slice(-8).map(m=>({role:m.role,content:m.content}));
+  apiHist.pop();
+  const result=await agAsk({capId,freeText,history:apiHist});
+  agHideTyping();
+  agChatHistory.push({role:'assistant',content:result.text,mode:result.mode});
+  agRenderPopupBody();agSaveHist();
+  document.getElementById('agent-pop-send').disabled=false;
+  agRenderModePill();
+}
+function handleAgentKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAgentPopupMsg();}}
+function agentAutoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,70)+'px';}
+
+function toggleAgentPopup(){
+  agentPopupOpen=!agentPopupOpen;
+  document.getElementById('agent-popup').classList.toggle('open',agentPopupOpen);
+  if(agentPopupOpen){
+    agRenderModePill();
+    agRenderPopupBody();
+    closeFab();closeNotifPanel();
+    document.getElementById('drop-menu')?.classList.remove('show');
+  }
+}
+
+/* ── سحب زر الإيجنت لأي مكان بالشاشة، مع حفظ الموقع بـlocalStorage ── */
+const AG_POS_KEY='azza_agent_pos';
+function initAgentDraggable(){
+  const wrap=document.getElementById('agent-fab-wrap');
+  if(!wrap)return;
+
+  /* استرجاع الموقع المحفوظ سابقاً، إن وجد */
+  try{
+    const saved=JSON.parse(localStorage.getItem(AG_POS_KEY));
+    if(saved&&typeof saved.top==='number'&&typeof saved.left==='number'){
+      _agApplyPosition(saved.top,saved.left);
+    }
+  }catch(e){}
+
+  let dragging=false,moved=false,startX=0,startY=0,startTop=0,startLeft=0;
+
+  function onStart(clientX,clientY){
+    dragging=true;moved=false;
+    const r=wrap.getBoundingClientRect();
+    startX=clientX;startY=clientY;startTop=r.top;startLeft=r.left;
+    wrap.style.transition='none';
+  }
+  function onMove(clientX,clientY){
+    if(!dragging)return;
+    const dx=clientX-startX,dy=clientY-startY;
+    if(Math.abs(dx)>4||Math.abs(dy)>4)moved=true;
+    if(!moved)return;
+    let newTop=startTop+dy,newLeft=startLeft+dx;
+    /* لا تسمح بخروج الزر عن حدود الشاشة المرئية */
+    const w=wrap.offsetWidth,h=wrap.offsetHeight;
+    newTop=Math.max(8,Math.min(window.innerHeight-h-8,newTop));
+    newLeft=Math.max(8,Math.min(window.innerWidth-w-8,newLeft));
+    _agApplyPosition(newTop,newLeft);
+  }
+  function onEnd(){
+    if(!dragging)return;
+    dragging=false;
+    wrap.style.transition='';
+    if(moved){
+      const r=wrap.getBoundingClientRect();
+      try{localStorage.setItem(AG_POS_KEY,JSON.stringify({top:r.top,left:r.left}));}catch(e){}
+    }
+  }
+
+  wrap.addEventListener('mousedown',e=>{onStart(e.clientX,e.clientY);e.preventDefault();});
+  document.addEventListener('mousemove',e=>onMove(e.clientX,e.clientY));
+  document.addEventListener('mouseup',onEnd);
+
+  wrap.addEventListener('touchstart',e=>{const t=e.touches[0];onStart(t.clientX,t.clientY);},{passive:true});
+  document.addEventListener('touchmove',e=>{if(dragging){const t=e.touches[0];onMove(t.clientX,t.clientY);}},{passive:true});
+  document.addEventListener('touchend',onEnd);
+
+  /* منع فتح نافذة المحادثة لو كانت هذي نهاية سحب فعلي، لا ضغطة عادية */
+  const btn=document.getElementById('agent-fab-btn');
+  btn.addEventListener('click',e=>{
+    if(moved){e.preventDefault();e.stopPropagation();moved=false;}
+  });
+}
+function _agApplyPosition(top,left){
+  const wrap=document.getElementById('agent-fab-wrap');
+  wrap.style.top=top+'px';
+  wrap.style.left=left+'px';
+  wrap.style.bottom='auto';
+  wrap.style.right='auto';
+}
+document.addEventListener('DOMContentLoaded',initAgentDraggable);
+if(document.readyState!=='loading')initAgentDraggable();
+
+document.addEventListener('click',e=>{
+  const pop=document.getElementById('agent-popup');
+  const btn=document.getElementById('agent-fab-btn');
+  if(agentPopupOpen&&pop&&!pop.contains(e.target)&&!btn.contains(e.target)){
+    agentPopupOpen=false;
+    pop.classList.remove('open');
+  }
 });
 
-/* ── التشغيل ── */
-buildHome();
+/* init */
+function init(){
+  const rc=ROLE[vt(user)]||ROLE.idea;
+  const av=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
+
+  /* أفاتار */
+  ['av-btn','drop-av'].forEach(x=>{const el=document.getElementById(x);if(el)el.innerHTML=av;});
+  const dn=document.getElementById('drop-name');const dh=document.getElementById('drop-handle');
+  if(dn)dn.innerHTML=esc(user.name||'—')+' '+checkmark(user.id,13);if(dh)dh.textContent=user.username?'@'+user.username:'';
+  document.getElementById('inv-link').style.display=user.type==='investor'?'flex':'none';
+
+  /* compose box */
+  const cab=document.getElementById('compose-av');
+  if(cab){
+    if(user.photo)cab.innerHTML=`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    else cab.textContent=ini(user.name);
+  }
+  const cp=document.getElementById('compose-placeholder');
+  if(cp)cp.textContent=`شارك شيئاً، ${(user.name||'').split(' ')[0]}...`;
+
+  /* بانر — نبقّى الـ banner-hi و banner-tip للـ JS الباقي */
+  const h=new Date().getHours();const g=h<12?'صباح الخير':h<18?'مساء الخير':'مساء النور';
+  // banner removed; greeting now in compose placeholder
+
+  /* إشعارات — تُعالج بـ renderNotifPanel() */
+
+  /* الشريط الجانبي */
+  const sb=document.getElementById('sidebar');
+  const page=location.pathname.split('/').pop()||'app.html';
+  const items=rc.nav.map(([l,u])=>`<button class="sb-item${u===page?' active':''}" onclick="location.href='${u}'"><svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24">${NAV_I[u]||''}</svg>${l}</button>`).join('');
+  sb.innerHTML=`<button class="sb-compose" onclick="openCompose()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>نشر جديد</button>${items}`;
+
+  /* شريط التنقل السفلي للموبايل — نفس روابط rc.nav بدون "ملفي" (يبقى بالـsidebar فقط)
+     نضمن دائماً 4 روابط (2+2 متماثلة حول زر النشر) — نضيف "الإعدادات" تلقائياً لو نقص العدد عن 4 */
+  const bn=document.getElementById('bottom-nav');
+  if(bn){
+    let mobileNav=rc.nav.filter(([l,u])=>u!=='profile.html');
+    if(mobileNav.length<4 && !mobileNav.some(([l,u])=>u==='settings.html')){
+      mobileNav=[...mobileNav,['الإعدادات','settings.html']];
+    }
+    const half=Math.ceil(mobileNav.length/2);
+    const navItems=mobileNav.slice(0,half).map(([l,u])=>
+      `<button class="bn-item${u===page?' active':''}" onclick="location.href='${u}'"><svg viewBox="0 0 24 24">${NAV_I[u]||''}</svg>${l}</button>`
+    ).join('');
+    const restItems=mobileNav.slice(half).map(([l,u])=>
+      `<button class="bn-item${u===page?' active':''}" onclick="location.href='${u}'"><svg viewBox="0 0 24 24">${NAV_I[u]||''}</svg>${l}</button>`
+    ).join('');
+    bn.innerHTML=navItems+
+      `<div class="bn-compose"><button class="bn-compose-btn" onclick="openCompose()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></div>`+
+      restItems;
+  }
+
+
+  /* الفلتر المحفوظ */
+  const sf=localStorage.getItem('azza_last_filter');
+  if(sf){curF=sf;document.querySelectorAll('.f-btn').forEach(b=>b.classList.toggle('on',b.dataset.f===sf));}
+  else if(user.type==='investor'){curF='project';document.querySelectorAll('.f-btn').forEach(b=>b.classList.toggle('on',b.dataset.f==='project'));}
+
+  /* عرض فوري أول بالبيانات المحلية المتوفرة حالياً (إحساس استجابة سريعة)،
+     ثم تحديث فعلي بالبيانات الحقيقية من Supabase فور وصولها (عادة أقل من ثانية) */
+  buildStats();render();buildRight();
+  loadInitialDataFromSupabase().then(()=>{
+    /* تزامن بيانات المستخدم الحالي نفسه مع Supabase — يحل خللاً حقيقياً اكتُشف:
+       متغيّر user يبقى نسخة قديمة من localStorage، فأي تعديل لاحق بقاعدة البيانات
+       (مثل تفعيل التوثيق) لا ينعكس إلا بعد تسجيل خروج/دخول يدوي بدون هذا الإصلاح */
+    const freshMe=(_usersMem||[]).find(u=>u.id===user.id);
+    if(freshMe){ user=freshMe; G.saveUser(user); }
+    buildStats();render();buildRight();
+  });
+  initSoundUI();
+  renderNotifPanel();
+}
+
+/* category dropdown */
+function toggleCatDrop(){
+  const m=document.getElementById('cat-drop-menu');
+  const b=document.getElementById('cat-drop-btn');
+  const open=m.classList.toggle('open');
+  b.classList.toggle('active',open);
+}
+function setCatDrop(btn,cat,label){
+  curCat=cat;
+  document.querySelectorAll('.cat-drop-item').forEach(b=>b.classList.toggle('on',b===btn));
+  document.getElementById('cat-drop-label').textContent=label;
+  document.getElementById('cat-drop-btn').classList.toggle('active',cat!=='all');
+  document.getElementById('cat-drop-menu').classList.remove('open');
+  render();
+}
+
+/* FAB speed-dial */
+function buildStats(){
+  const posts=G.getPosts().filter(p=>p.author_id===user.id);
+  const votes=posts.reduce((s,p)=>s+(p.votes?.length||0),0);
+  const ndas=Object.values(G.getSigs()).flat().filter(x=>x.id===user.id).length;
+  const sp=document.getElementById('st-p');const sv=document.getElementById('st-v');const sn=document.getElementById('st-n');
+  if(sp)sp.textContent=posts.length;if(sv)sv.textContent=votes;if(sn)sn.textContent=ndas;
+}
+
+/* render */
+function render(){
+  usersCache=G.getUsers(); /* تحديث الكاش لضمان دقّة علامة التوثيق */
+  const fd=document.getElementById('feed');if(!fd)return;
+  let posts=G.getPosts();
+  if(curF==='mine')     posts=posts.filter(p=>p.author_id===user.id);
+  else if(curF==='idea')    posts=posts.filter(p=>p.type==='idea');
+  else if(curF==='project') posts=posts.filter(p=>p.type==='project');
+  else if(curF==='job')     posts=posts.filter(p=>p.type==='job');
+  else if(curF==='trending')posts=posts.filter(p=>(p.votes?.length||0)>=3);
+  if(curCat!=='all')posts=posts.filter(p=>p.category===curCat);
+  if(searchQ){const q=searchQ.toLowerCase();posts=posts.filter(p=>(p.title||p.text||'').toLowerCase().includes(q)||(p.author_name||'').toLowerCase().includes(q));}
+  if(curF==='trending')posts.sort((a,b)=>(b.votes?.length||0)-(a.votes?.length||0));
+  else posts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!posts.length){fd.innerHTML='<div class="empty-feed"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><b>لا منشورات بعد</b><span>اضغط "نشر جديد" للبدء</span></div>';return;}
+  fd.innerHTML=posts.map(p=>{try{return card(p);}catch(e){console.error('card err:',e.message,p.id);return '';}}).join('');
+}
+
+/* card */
+function card(p){
+  const mine=p.author_id===user.id;
+  const vn=(p.votes||[]).length, voted=(p.votes||[]).includes(user.id);
+  const saved=(JSON.parse(localStorage.getItem('azza_saved_'+user.id)||'[]')).includes(p.id);
+  const isInt=(G.getInts()[p.id]||[]).some(x=>x.id===user.id);
+  const isSig=(G.getSigs()[p.id]||[]).some(x=>x.id===user.id);
+  const cc=CAT_C[p.category]||'#1c5b38';
+  const vc=VERIFY[vt({type:p.author_type})]||VERIFY.idea;
+  const av=p.author_photo?`<img src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover">`:ini(p.author_name);
+  const isNew=(Date.now()-new Date(p.created_at))<48*3600000;
+  const isHot=vn>=3;
+
+  /* badges */
+  let badges='';
+  if(p.type==='idea')    badges+=`<span class="p-badge badge-idea">💡 فكرة</span>`;
+  if(p.type==='project') badges+=`<span class="p-badge badge-proj">🚀 مشروع</span>`;
+  if(p.type==='job')      badges+=`<span class="p-badge badge-job">📋 وظيفة</span>`;
+  if(p.category&&CAT_L[p.category])badges+=`<span class="p-badge badge-cat">${CAT_L[p.category]}</span>`;
+  if(p.nda)  badges+=`<span class="p-badge badge-nda">🔒 NDA</span>`;
+  if(isHot)  badges+=`<span class="p-badge badge-hot">🔥 ترند</span>`;
+  if(isNew)  badges+=`<span class="p-badge badge-new">✨ جديد</span>`;
+
+  /* unified LinkedIn-style header */
+  const header=`<div class="post-head">
+    <div class="p-av" onclick="openUser('${p.author_id}')">${av}</div>
+    <div class="p-author-info">
+      <div class="p-name" onclick="openUser('${p.author_id}')">${esc(p.author_name)} ${checkmark(p.author_id,13)}${p.author_username?` <span class="p-name-handle">@${esc(p.author_username)}</span>`:''}</div>
+      <div class="p-meta-row">
+        <span class="p-time">${ago(p.created_at)}</span>
+      </div>
+    </div>
+    <div class="p-head-actions">
+      ${badges?`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${badges}</div>`:''}
+      ${mine?`<button class="p-act" onclick="delPost('${p.id}')" style="color:var(--red);padding:5px 6px" title="حذف">🗑️</button>`:''}
+    </div>
+  </div>`;
+
+  /* comments section */
+  /* التعليقات تُعرض عبر AzzaComments.renderList() بعد فتح الـdropdown */
+  const myav=user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(user.name);
+  const cmtBox=`<div class="cmts-wrap az-section" id="cm-${p.id}" data-post-id="${p.id}">
+    <div class="az-section-head">💬 التعليقات <span id="az-count-${p.id}" style="font-size:13px;color:var(--muted);font-weight:500">${p.comments?.length||0}</span></div>
+    <div class="az-cmt-list" id="az-list-${p.id}"></div>
+    <div id="az-input-${p.id}"></div>
+  </div>`;
+
+  /* action bar */
+  const acts=`<div class="p-actions">
+    <button class="p-act${voted?' voted':''}" onclick="vote('${p.id}')">
+      <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${vn||''}
+    </button>
+    <button class="p-act${(p.r_insightful||[]).includes(user.id)?' react-on':''}" onclick="react('${p.id}','insightful')">
+      💡 <span style="font-size:12px">${(p.r_insightful||[]).length||''}</span>
+    </button>
+    <button class="p-act${(p.r_collab||[]).includes(user.id)?' react-on':''}" onclick="react('${p.id}','collab')">
+      🤝 <span style="font-size:12px">${(p.r_collab||[]).length||''}</span>
+    </button>
+    <button class="p-act" onclick="toggleCmt('${p.id}')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span style="font-size:12px">${(p.comments||[]).length||''}</span>
+    </button>
+    <button class="p-act${saved?' saved':''}" onclick="toggleSave('${p.id}')">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    ${(p.type==='idea'||p.type==='project')&&!mine?`<button class="interest-btn${isInt?' done':''}" onclick="${p.nda&&!isSig?`openNda('${p.id}')`:`interest('${p.id}')`}">${isInt?'✅ مهتم':'🤝 أبدِ اهتمامك'}</button>`:''}
+  </div>`;
+
+  const stats=`<div class="p-stats"><span>▲ ${vn}</span><span>💬 ${(p.comments||[]).length}</span><span>👁 ${p.views||0}</span><span class="p-detail" onclick="openPost('${p.id}')">عرض التفاصيل ←</span></div>`;
+
+  /* ── بطاقة فكرة ── */
+  if(p.type==='idea'){
+    const media=p.image?`<img src="${p.image}" class="p-media" onclick="openLB('${p.image}')" alt="" style="border-radius:0;margin:0 0 12px">`:p.video?`<video class="p-media" controls src="${p.video}" style="border-radius:0;margin:0 0 12px"></video>`:'' ;
+    return `<article class="post" id="post-${p.id}">
+      <div class="post-stripe" style="background:${cc}"></div>
+      ${header}
+      <div class="p-content">
+        <button class="idea-vote-pill${voted?' voted':''}" onclick="vote('${p.id}')">
+          <span class="vote-arr">▲</span>
+          <span class="vote-n">${vn}</span>
+          <span class="vote-lbl">تصويت</span>
+        </button>
+        ${p.title?`<div class="p-title" onclick="openPost('${p.id}')">${esc(p.title)}</div>`:''}
+        ${p.pitch?`<div class="p-body" style="color:var(--muted);font-size:13.5px">${esc(p.pitch)}</div>`:''}
+        ${p.text?`<div class="p-body">${link(p.text)}</div>`:''}
+      </div>
+      ${media}
+      ${acts}${stats}${cmtBox}
+    </article>`;
+  }
+
+  /* ── بطاقة مشروع ── */
+  if(p.type==='project'){
+    let fb='';
+    if(p.funding_goal>0){
+      const ic=(G.getInts()[p.id]||[]).length;
+      const r=Math.min(p.funding_goal,Math.round(ic*(p.funding_goal/15)));
+      const pc=Math.round(r/p.funding_goal*100);
+      fb=`<div class="fund-box">
+        <div class="fund-top">
+          <span class="fund-amt">$${r.toLocaleString()}</span>
+          <span class="fund-goal">من $${p.funding_goal.toLocaleString()}</span>
+        </div>
+        <div class="fund-bar"><div class="fund-fill" style="width:${pc}%"></div></div>
+        <div class="fund-meta">
+          <span><strong>${pc}%</strong> مكتمل</span>
+          <span><strong>${ic}</strong> مهتم</span>
+          ${p.funding_stage?`<span class="fund-stage-tag">${STAGE[p.funding_stage]||p.funding_stage}</span>`:''}
+        </div>
+      </div>`;
+    }
+    const media=p.image?`<img src="${p.image}" class="p-media" style="border-radius:0;margin-bottom:12px" onclick="openLB('${p.image}')" alt="">`:p.video?`<video class="p-media" controls src="${p.video}" style="border-radius:0;margin-bottom:12px"></video>`:'' ;
+    return `<article class="post" id="post-${p.id}">
+      <div class="post-stripe" style="background:${cc}"></div>
+      ${header}
+      <div class="p-content">
+        ${p.title?`<div class="p-title" onclick="openPost('${p.id}')">${esc(p.title)}</div>`:''}
+        ${p.text?`<div class="p-body" style="color:var(--muted);font-size:13.5px">${link(p.text)}</div>`:''}
+        ${fb}
+      </div>
+      ${media}
+      ${acts}${stats}${cmtBox}
+    </article>`;
+  }
+
+  /* ── بطاقة وظيفة ── */
+  if(p.type==='job'){
+    const media=p.image?`<img src="${p.image}" class="p-media" style="border-radius:0;margin-bottom:12px" onclick="openLB('${p.image}')" alt="">`:p.video?`<video class="p-media" controls src="${p.video}" style="border-radius:0;margin-bottom:12px"></video>`:'' ;
+    return `<article class="post" id="post-${p.id}">
+      <div class="post-stripe" style="background:${cc}"></div>
+      ${header}
+      <div class="p-content">
+        ${p.title?`<div class="p-title" onclick="openPost('${p.id}')">${esc(p.title)}</div>`:''}
+        <div class="job-box">
+          ${p.job_location?`<div class="job-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(p.job_location)}</div>`:''}
+          ${p.job_salary?`<div class="job-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span class="job-salary">${esc(p.job_salary)}</span></div>`:''}
+          ${p.job_type?`<div class="job-row"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${({fulltime:'دوام كامل',parttime:'دوام جزئي',freelance:'عمل حر / مستقل',internship:'تدريب'})[p.job_type]||p.job_type}</div>`:''}
+        </div>
+        ${p.text?`<div class="p-body">${link(p.text)}</div>`:''}
+      </div>
+      ${media}
+      ${acts}${stats}${cmtBox}
+    </article>`;
+  }
+
+  /* ── منشور عادي ── */
+  const med=p.image?`<img src="${p.image}" class="p-media" onclick="openLB('${p.image}')" alt="" style="border-radius:0;margin-bottom:0">`:p.video?`<video class="p-media" controls src="${p.video}" style="border-radius:0"></video>`:'';
+  return `<article class="post" id="post-${p.id}">
+    <div class="post-stripe" style="background:${cc}"></div>
+    ${header}
+    ${p.text?`<div class="p-content"><div class="p-body">${link(p.text)}</div></div>`:''}
+    ${med}
+    ${acts}${stats}${cmtBox}
+  </article>`;
+}
+
+/* إجراءات */
+function autoR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,90)+'px';}
+/* ══════════════════════════════════════════════════════════════
+   دوال التفاعل — مبنية من الصفر
+   المبدأ: Supabase أولاً → ثم loadAllData → ثم render
+   لا تعديل مباشر على _postsMem أبداً (يسبب تعارضات)
+   ══════════════════════════════════════════════════════════════ */
+
+async function vote(pid){
+  const p=(_postsMem||[]).find(x=>x.id===pid);if(!p)return;
+  const already=p.votes?.includes(user.id);
+  try{
+    if(already){
+      await azzaDB.from('post_reactions').delete()
+        .eq('post_id',pid).eq('user_id',user.id).eq('reaction_type','vote');
+    }else{
+      await azzaDB.from('post_reactions').insert(
+        {post_id:pid,user_id:user.id,reaction_type:'vote'}
+      );
+    }
+    await loadAllData();
+  }catch(e){
+    /* Optimistic fallback لو فشل الإرسال */
+    p.votes=p.votes||[];
+    already?p.votes.splice(p.votes.indexOf(user.id),1):p.votes.push(user.id);
+    console.error('vote error:',e.message);
+  }
+  render();buildStats();
+}
+
+async function react(pid,t){
+  const p=(_postsMem||[]).find(x=>x.id===pid);if(!p)return;
+  const k='r_'+t;const already=(p[k]||[]).includes(user.id);
+  try{
+    if(already){
+      await azzaDB.from('post_reactions').delete()
+        .eq('post_id',pid).eq('user_id',user.id).eq('reaction_type',t);
+    }else{
+      await azzaDB.from('post_reactions').insert(
+        {post_id:pid,user_id:user.id,reaction_type:t}
+      );
+    }
+    await loadAllData();
+  }catch(e){
+    p[k]=p[k]||[];
+    already?p[k].splice(p[k].indexOf(user.id),1):p[k].push(user.id);
+    console.error('react error:',e.message);
+  }
+  render();
+}
+
+/* ── نظام التعليقات الجديد (AzzaComments) ── */
+function toggleCmt(pid){
+  const wrap=document.getElementById('cm-'+pid);
+  if(!wrap)return;
+  const isOpen=wrap.classList.toggle('open');
+  if(isOpen){
+    const listEl=document.getElementById('az-list-'+pid);
+    if(listEl&&!listEl.dataset.loaded){
+      listEl.dataset.loaded='1';
+      const _curPost = (_postsMem||[]).find(p=>p.id===pid);
+      AzzaComments.init(azzaDB,user,(postId)=>{
+        if(postId){
+          AzzaComments.fetch(postId).then(cmts=>{
+            AzzaComments.renderList(cmts,'az-list-'+postId);
+            const cnt=document.getElementById('az-count-'+postId);
+            if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
+          });
+        }
+      }, _curPost?.author_id||null, _curPost||null);
+      AzzaComments.injectCSS();
+      AzzaComments.renderInput(pid,'az-input-'+pid);
+      AzzaComments.fetch(pid).then(cmts=>{
+        AzzaComments.renderList(cmts,'az-list-'+pid);
+        const cnt=document.getElementById('az-count-'+pid);
+        if(cnt)cnt.textContent=cmts.filter(c=>!c.parent_id).length||0;
+        AzzaComments.subscribe(pid);
+      });
+    }
+  }
+}
+async function addCmt(pid){ AzzaComments.submit(pid); }
+
+
+async function delPost(pid){
+  if(!confirm('حذف هذا المنشور؟'))return;
+  try{
+    await azzaDB.from('posts').delete().eq('id',pid).eq('author_id',user.id);
+    await loadAllData();
+  }catch(e){
+    _postsMem=(_postsMem||[]).filter(p=>p.id!==pid);
+    console.error('delPost error:',e.message);
+  }
+  render();buildStats();toast('تم الحذف','err');
+}
+
+function toggleSave(pid){const k='azza_saved_'+user.id;let s=JSON.parse(localStorage.getItem(k)||'[]');const i=s.indexOf(pid);i===-1?s.push(pid):s.splice(i,1);localStorage.setItem(k,JSON.stringify(s));render();toast(i===-1?'تم الحفظ 🔖':'أُزيل من المحفوظات','info');}
+function interest(pid){const ints=G.getInts();ints[pid]=ints[pid]||[];if(ints[pid].some(x=>x.id===user.id)){toast('أبديت اهتمامك مسبقاً');return;}ints[pid].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_interests',JSON.stringify(ints));writeNotif(pid,'interest');render();toast('تم إبداء الاهتمام ✅');}
+function openNda(pid){ndaId=pid;document.getElementById('nda-cb').checked=false;document.getElementById('nda-btn').disabled=true;document.getElementById('nda-ol').classList.add('open');}
+function closeNda(){document.getElementById('nda-ol').classList.remove('open');ndaId=null;}
+function signNda(){if(!ndaId)return;const s=G.getSigs();s[ndaId]=s[ndaId]||[];if(!s[ndaId].some(x=>x.id===user.id))s[ndaId].push({id:user.id,name:user.name,at:new Date().toISOString()});localStorage.setItem('azza_nda_sigs',JSON.stringify(s));closeNda();interest(ndaId);}
+/* writeNotif — فقط للأحداث التي لا تغطيها Supabase Triggers
+   comment/vote/reply → تُنشأ تلقائياً بالـTriggers
+   interest → لا trigger له، يُرسل يدوياً */
+function writeNotif(pid,type){
+  if(type==='interest'){
+    const p=(_postsMem||[]).find(x=>x.id===pid)||G.getPosts().find(x=>x.id===pid);
+    if(p && window.AzzaNotif) AzzaNotif.onInterest(p);
+  }
+  /* comment وvote تُعالجهم Triggers تلقائياً — لا إرسال يدوي */
+}
+function openLB(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');}
+
+/* مودال النشر */
+function openCompose(){document.getElementById('compose-ol').classList.add('open');}
+function pickTypeAndOpen(t){openCompose();setTimeout(()=>{curType=t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));document.getElementById('idea-extra').style.display=t==='idea'?'block':'none';document.getElementById('proj-extra').style.display=t==='project'?'block':'none';document.getElementById('job-extra').style.display=t==='job'?'block':'none';},50);}
+function closeCompose(){document.getElementById('compose-ol').classList.remove('open');}
+function pickType(btn){curType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===curType));document.getElementById('idea-extra').style.display=curType==='idea'?'block':'none';document.getElementById('proj-extra').style.display=curType==='project'?'block':'none';document.getElementById('job-extra').style.display=curType==='job'?'block':'none';}
+async function publish(){
+  const text=document.getElementById('compose-txt').value.trim();
+  const cat=document.getElementById('cat-sel').value;
+  if(!text&&curType==='post'){toast('اكتب شيئاً أولاً','err');return;}
+  const p={id:id(),author_id:user.id,author_name:user.name,author_username:user.username||'',author_type:user.type,author_photo:user.photo||null,type:curType,text,category:cat||null,image:mediaData?.type==='image'?mediaData.data:null,video:mediaData?.type==='video'?mediaData.data:null,votes:[],r_insightful:[],r_collab:[],comments:[],views:0,created_at:new Date().toISOString()};
+  if(curType==='idea'){p.title=document.getElementById('idea-title').value.trim();p.pitch=document.getElementById('idea-pitch').value.trim();p.nda=document.getElementById('nda-pub').checked;}
+  if(curType==='project'){p.title=document.getElementById('proj-title').value.trim();p.funding_goal=parseInt(document.getElementById('fund-goal').value)||0;p.funding_stage=document.getElementById('fund-stage').value;}
+  if(curType==='job'){p.title=document.getElementById('job-title').value.trim();p.job_location=document.getElementById('job-location').value.trim();p.job_salary=document.getElementById('job-salary').value.trim();p.job_type=document.getElementById('job-type').value;}
+
+  /* عرض فوري محلي أولاً (إحساس استجابة سريعة)، بينما الإرسال الفعلي لـSupabase يجري بالخلفية */
+  const posts=G.getPosts();posts.unshift(p);G.savePosts(posts);
+  closeCompose();rmMedia();
+  ['compose-txt','idea-title','idea-pitch','proj-title','fund-goal'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
+  document.getElementById('nda-pub').checked=false;document.getElementById('fund-stage').value='';document.getElementById('cat-sel').value='';
+  curType='post';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t==='post'));
+  document.getElementById('idea-extra').style.display='none';document.getElementById('proj-extra').style.display='none';document.getElementById('job-extra').style.display='none';
+  curF='all';document.querySelectorAll('.f-btn').forEach(b=>b.classList.toggle('on',b.dataset.f==='all'));
+  render();buildStats();toast('تم النشر ✅');
+
+  /* الإرسال الفعلي لقاعدة البيانات الحقيقية — لو فشل، المنشور يبقى محلياً فقط (يُعلن بصمت بـconsole دون كسر تجربة المستخدم) */
+  try{
+    const {error}=await azzaDB.from('posts').insert({
+      id:p.id,author_id:p.author_id,author_name:p.author_name,author_username:p.author_username,
+      author_type:p.author_type,author_photo:p.author_photo,type:p.type,text:p.text,
+      title:p.title||null,category:p.category,image:p.image,video:p.video,
+      pitch:p.pitch||null,nda:p.nda||false,funding_goal:p.funding_goal||null,
+      funding_stage:p.funding_stage||null,job_location:p.job_location||null,
+      job_salary:p.job_salary||null,job_type:p.job_type||null,views:0,
+    });
+    if(error)throw error;
+  }catch(e){
+    console.error('تعذّر حفظ المنشور بقاعدة البيانات المركزية (بقي محفوظاً محلياً فقط):',e.message);
+  }
+}
+
+/* وسائط */
+function handleImg(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');const M=1200;let w=img.width,h=img.height;if(w>M){h=Math.round(h*M/w);w=M;}c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);const d=c.toDataURL('image/jpeg',.85);mediaData={type:'image',data:d};document.getElementById('img-prev').src=d;document.getElementById('img-prev').style.display='block';document.getElementById('vid-prev').style.display='none';document.getElementById('media-prev').style.display='block';document.getElementById('media-hint').textContent=Math.round(d.length*.75/1024)+' KB';};img.src=e.target.result;};r.readAsDataURL(f);inp.value='';}
+function handleVid(inp){const f=inp.files[0];if(!f)return;const u=URL.createObjectURL(f);const v=document.createElement('video');v.src=u;v.onloadedmetadata=()=>{if(v.duration>120){toast('الفيديو أطول من دقيقتين','err');URL.revokeObjectURL(u);inp.value='';return;}if(f.size>20*1024*1024){toast('الفيديو أكبر من 20MB','err');URL.revokeObjectURL(u);inp.value='';return;}const r=new FileReader();r.onload=e=>{mediaData={type:'video',data:e.target.result};const vp=document.getElementById('vid-prev');vp.src=e.target.result;vp.style.display='block';document.getElementById('img-prev').style.display='none';document.getElementById('media-prev').style.display='block';document.getElementById('media-hint').textContent=(f.size/1024/1024).toFixed(1)+' MB · '+Math.round(v.duration)+'ث';URL.revokeObjectURL(u);};r.readAsDataURL(f);inp.value='';};}
+function rmMedia(){mediaData=null;document.getElementById('media-prev').style.display='none';document.getElementById('img-prev').src='';document.getElementById('vid-prev').src='';document.getElementById('media-hint').textContent='';}
+
+/* اليمين */
+function buildRight(){
+  const posts=G.getPosts().sort((a,b)=>(b.votes?.length||0)-(a.votes?.length||0)).slice(0,5);
+  const tl=document.getElementById('trends');
+  if(tl)tl.innerHTML=posts.length?posts.map((p,i)=>`<div class="trend-item" onclick="openPost('${p.id}')"><span>${i+1}. ${esc((p.title||p.text||'').substring(0,28))}${(p.title||p.text||'').length>28?'...':''}</span><span class="trend-rank">▲${p.votes?.length||0}</span></div>`).join(''):'<div style="font-size:13px;color:var(--muted)">لا منشورات بعد</div>';
+  const myT=vt(user);const pri=MATCH[myT]||[];
+  const users=G.getUsers().filter(u=>u.id!==user.id).sort((a,b)=>{const ap=pri.indexOf(vt(a)),bp=pri.indexOf(vt(b));return(ap===-1?99:ap)-(bp===-1?99:bp);}).slice(0,3);
+  const following=JSON.parse(localStorage.getItem('azza_following_'+user.id)||'[]');
+  const sl=document.getElementById('suggestions');
+  if(sl)sl.innerHTML=users.length?users.map(u=>{const vc=VERIFY[vt(u)]||VERIFY.idea;const isF=following.includes(u.id);const av=u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(u.name);return `<div class="sug-item"><div class="sug-av" onclick="openUser('${u.id}')">${av}</div><div style="flex:1"><div class="sug-name" onclick="openUser('${u.id}')">${esc(u.name)}</div><div class="sug-role" style="color:${vc.c}">${vc.lbl}</div></div><button class="follow-b${isF?' on':''}" id="fw-${u.id}" onclick="toggleFollow('${u.id}',this)">${isF?'✓':'+'}</button></div>`;}).join(''):'<div style="font-size:13px;color:var(--muted)">لا مستخدمين آخرين</div>';
+}
+async function toggleFollow(uid,btn){
+  const k='azza_following_'+user.id;
+  let f=JSON.parse(localStorage.getItem(k)||'[]');
+  const i=f.indexOf(uid);
+  const following=i===-1;
+  following?f.push(uid):f.splice(i,1);
+  localStorage.setItem(k,JSON.stringify(f));
+  btn.textContent=following?'✓':'+';
+  btn.classList.toggle('on',following);
+  toast(following?'بدأت المتابعة ✅':'ألغيت المتابعة','info');
+  /* كتابة لـSupabase follows — يُفعّل الـTrigger تلقائياً لإرسال الإشعار */
+  try{
+    if(following){
+      await azzaDB.from('follows').insert({follower_id:user.id,following_id:uid});
+    }else{
+      await azzaDB.from('follows').delete().eq('follower_id',user.id).eq('following_id',uid);
+    }
+  }catch(e){
+    /* fallback: أرسل الإشعار يدوياً لو الـTrigger لم يعمل */
+    if(following && window.AzzaNotif) AzzaNotif.onFollow(uid);
+  }
+}
+
+init();
 </script>
 </body>
 </html>
