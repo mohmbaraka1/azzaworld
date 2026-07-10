@@ -513,35 +513,7 @@ html,body{ height:100%; overflow:hidden }
 .agent-fab-badge{position:absolute;top:-3px;left:-3px;width:16px;height:16px;background:var(--olive);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--cream)}
 
 /* نافذة الإيجنت المصغّرة */
-.agent-popup{position:fixed;bottom:100px;right:32px;width:370px;max-height:560px;background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 16px 50px rgba(28,26,20,.22);z-index:301;display:flex;flex-direction:column;opacity:0;transform:translateY(14px) scale(.97);pointer-events:none;transition:.2s;overflow:hidden}
-.agent-popup.open{opacity:1;transform:none;pointer-events:auto}
-.agent-pop-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(28,91,56,.06),transparent)}
-.agent-pop-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-2));display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0}
-.agent-pop-icon svg{width:17px;height:17px}
-.agent-pop-title{font-size:14px;font-weight:700;color:var(--ink);flex:1}
-.agent-pop-mode{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;flex-shrink:0}
-.agent-pop-mode.demo{background:var(--cream-2);color:var(--muted)}
-.agent-pop-mode.real{background:rgba(198,151,73,.15);color:#9b7420}
-.agent-pop-x{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;border-radius:8px;flex-shrink:0}
-.agent-pop-x:hover{background:var(--cream)}
-.agent-pop-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:160px}
-.agent-pop-welcome{text-align:center;padding:12px 6px;color:var(--muted);font-size:12.5px;line-height:1.7}
-.agent-pop-caps{display:flex;flex-direction:column;gap:7px;margin-top:10px}
-.agent-pop-cap{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--border);border-radius:11px;padding:9px 12px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink);text-align:right;transition:.15s}
-.agent-pop-cap:hover{border-color:var(--olive);background:rgba(28,91,56,.05)}
-.agent-pop-msg{display:flex;gap:8px;max-width:100%}
-.agent-pop-msg.user{flex-direction:row-reverse}
-.agent-pop-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10.5px;overflow:hidden}
-.agent-pop-av.agent{background:linear-gradient(135deg,var(--olive),var(--olive-2));color:var(--gold)}
-.agent-pop-av.user{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--olive-2)}
-.agent-pop-bubble{max-width:80%;padding:9px 12px;border-radius:13px;font-size:12.5px;line-height:1.6;white-space:pre-wrap}
-.agent-pop-msg.agent .agent-pop-bubble{background:var(--cream);border:1px solid var(--border);border-top-right-radius:3px}
-.agent-pop-msg.user .agent-pop-bubble{background:var(--olive);color:#fff;border-top-left-radius:3px}
-.agent-pop-foot{border-top:1px solid var(--border);padding:10px 12px;display:flex;gap:7px;align-items:flex-end}
-.agent-pop-input{flex:1;border:1.5px solid var(--border);border-radius:14px;padding:8px 12px;font-family:inherit;font-size:12.5px;background:var(--cream);outline:none;resize:none;max-height:70px;transition:.2s}
-.agent-pop-input:focus{border-color:var(--olive);background:var(--card)}
-.agent-pop-send{width:32px;height:32px;border-radius:50%;background:var(--olive);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s}
-.agent-pop-send:hover{background:var(--olive-2)}
+/* agent popup CSS removed */
 .agent-pop-send:disabled{opacity:.4;cursor:not-allowed}
 .agent-pop-typing{display:flex;gap:4px;padding:9px 12px}
 .agent-pop-typing span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:apbounce 1.2s infinite}
@@ -550,7 +522,6 @@ html,body{ height:100%; overflow:hidden }
 @keyframes apbounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
 .agent-pop-expand{font-size:11px;color:var(--olive);text-decoration:none;font-weight:700;cursor:pointer}
 @media (max-width:540px){
-  .agent-popup{right:14px;left:14px;width:auto;bottom:96px;max-height:65vh}
 }
 
 /* لايت بوكس */
@@ -686,6 +657,10 @@ html,body{ height:100%; overflow:hidden }
       <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span>الرسائل</span>
     </button>
+    <button class="hbtn" onclick="location.href='help.html'" title="المساعدة">
+      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>مساعدة</span>
+    </button>
     <div class="avatar-btn" id="av-btn" onclick="toggleDrop(event)">م</div>
   </div>
 </header>
@@ -706,6 +681,7 @@ html,body{ height:100%; overflow:hidden }
   <button class="drop-item" onclick="go('settings.html')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>الإعدادات</button>
   <div class="drop-sep"></div>
   <button class="drop-item danger" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>تسجيل الخروج</button>
+  <button class="drop-item" onclick="location.href='help.html'"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>مركز المساعدة</button>
 </div>
 
 <!-- panel الإشعارات -->
@@ -853,25 +829,7 @@ html,body{ height:100%; overflow:hidden }
   </button>
 </div>
 
-<div class="agent-popup" id="agent-popup">
-  <div class="agent-pop-head">
-    <div class="agent-pop-icon">
-      <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/></svg>
-    </div>
-    <span class="agent-pop-title">مساعد عزّة</span>
-    <span class="agent-pop-mode" id="agent-pop-mode">—</span>
-    <button class="agent-pop-x" onclick="toggleAgentPopup()">
-      <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="agent-pop-body" id="agent-pop-body"></div>
-  <div class="agent-pop-foot">
-    <textarea class="agent-pop-input" id="agent-pop-input" placeholder="اكتب سؤالك..." rows="1" onkeydown="handleAgentKey(event)" oninput="agentAutoGrow(this)"></textarea>
-    <button class="agent-pop-send" id="agent-pop-send" onclick="sendAgentPopupMsg()">
-      <svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-</div>
+<!-- agent popup removed -->
 
 <!-- مودال النشر -->
 <div class="overlay" id="compose-ol" onclick="if(event.target===this)closeCompose()">
@@ -1473,10 +1431,9 @@ function setFilter(btn){curF=btn.dataset.f;document.querySelectorAll('.f-btn').f
 /* ═══════════════════════════════════════════════════
    نظام الإيجنت — الزر العائم (نسخة مصغّرة من agent.html)
    ═══════════════════════════════════════════════════ */
-const AG_KEY_API='azza_agent_api_key';
-const AG_HIST_KEY='azza_agent_chat_'+user.id;
-const agGetApiKey=()=>localStorage.getItem(AG_KEY_API)||'';
-const agHasRealKey=()=>agGetApiKey().trim().length>10;
+
+
+
 
 const AG_ROLE_META={idea:{label:'صاحب فكرة',emoji:'💡'},skill:{label:'خبير',emoji:'🏅'},investor:{label:'مستثمر',emoji:'💼'},company:{label:'شركة',emoji:'🏢'}};
 const agRoleMeta=t=>AG_ROLE_META[t]||AG_ROLE_META.idea;
@@ -1508,141 +1465,7 @@ const AG_SHARED=[
   {id:'launch',icon:'🚀',label:'خطة إطلاق لمشروعي',prompt:'بدي خطة إطلاق لمشروعي. اسألني الأسئلة اللازمة واحداً تلو الآخر، وبعد ما أجاوبك جهّز لي خطة إطلاق كاملة.'},
 ];
 
-function agSystemPrompt(u){
-  const meta=agRoleMeta(u?.type);
-  const AZA_IDENTITY=`أنت "مساعد أزا" الرسمي لمنصة AZA، منصة عربية متكاملة تجمع أصحاب الأفكار ورواد الأعمال والمستثمرين والشركات والمؤسسات والطلاب والباحثين عن عمل والخبراء والمستشارين في مكان واحد. مهمتك الأساسية هي مساعدة المستخدمين على استخدام المنصة وتحقيق أهدافهم داخلها. يجب أن تكون إجاباتك احترافية وواضحة وسريعة ومفيدة، وأن تركز دائمًا على ريادة الأعمال والاستثمار والتوظيف والتدريب والمنح والمسابقات والشراكات والمشاريع الناشئة والخدمات المتوفرة داخل المنصة.
-يجب أن تساعد المستخدمين في إنشاء المشاريع وتحسينها وتجهيزها للاستثمار، وشرح كيفية البحث عن المستثمرين والتواصل معهم، ومساعدة الشركات على نشر الوظائف والتدريبات والفرص، ومساعدة الطلاب في العثور على التدريب ومشاريع التخرج والمنح والمسابقات، ومساعدة الباحثين عن عمل في بناء ملفاتهم الشخصية وتحسين فرصهم المهنية، ومساعدة المؤسسات في نشر برامجها وفرصها ومنحها. كما يجب أن تشرح للمستخدمين كيفية استخدام الرسائل والإشعارات والإعدادات والتوثيق والملفات الشخصية والخريطة التفاعلية وجميع أقسام المنصة.
-إذا كان لديك وصول إلى بيانات المنصة، فابحث داخلها واقترح مشاريع أو مستثمرين أو شركات أو وظائف أو فرص مناسبة حسب طلب المستخدم. عند الإجابة استخدم خطوات عملية واضحة واقتراحات قابلة للتنفيذ، وقدم نصائح احترافية تساعد المستخدم على تحقيق نتائج أفضل.
-إذا سأل المستخدم سؤالًا لا يتعلق بمنصة أزا أو ريادة الأعمال أو الاستثمار أو الوظائف أو التدريب أو الشركات أو المؤسسات أو الخدمات الموجودة داخل المنصة، فقم بتوجيهه بلطف للمواضيع التي يتخصص بها مساعد أزا، واذكر أنك متخصص في خدمات المنصة وريادة الأعمال والاستثمار والفرص المهنية.
-حافظ دائمًا على أسلوب عربي احترافي وودود، وقدم إجابات قصيرة عندما يكون السؤال بسيطًا، وإجابات مفصلة عندما يطلب المستخدم شرحًا أو خطة أو تحليلًا. عند عدم توفر معلومات كافية، اطلب تفاصيل إضافية قبل الإجابة. عند عدم معرفة الإجابة أو عدم توفر البيانات، أخبر المستخدم بذلك بوضوح واقترح عليه مراجعة مركز المساعدة أو التواصل مع الدعم. هدفك النهائي هو أن تكون المساعد الذكي الأول للمستخدمين داخل منصة أزا وأن تساعدهم على العثور على الفرص المناسبة، بناء المشاريع، جذب المستثمرين، تطوير أعمالهم، وتوسيع شبكاتهم المهنية داخل العالم العربي.`;
-
-  return `${AZA_IDENTITY}
-
-── سياق المستخدم الحالي ──
-دوره: ${meta.label}. اسمه: ${u?.name||'مستخدم'}.
-
-${PLATFORM_KNOWLEDGE}
-إذا سألك المستخدم عن المنصة نفسها، استخدم المعلومات أعلاه للإجابة بدقة.
-لو طلب سيرة ذاتية أو خطة إطلاق، اسأله الأسئلة اللازمة بالتسلسل (واحد بكل مرة) قبل كتابة المخرج النهائي.
-لا تخترع بيانات وهمية. أجب بشكل مباشر ومفيد، بدون مقدمات طويلة. ردودك هنا قصيرة نسبياً لأنها تظهر بنافذة منبثقة صغيرة.`;
-}
-
-/* قاعدة معرفة مختصرة عن المنصة — نسخة مصغّرة من agent.html لأن هذه نافذة سريعة */
-const PLATFORM_KNOWLEDGE=`معلومات عن منصة عزّة: app.html (الفيد)، explore.html (استكشاف: أشخاص/أفكار/وظائف/خريطة)، profile.html (ملفي)، investor.html (لوحة المستثمر)، messages.html (الرسائل)، settings.html (الإعدادات والمفتاح)، verification.html (شرح التوثيق)، success-stories.html (قصص نجاح). نظام التوثيق: درجة مصداقية من 100 (اكتمال الملف 30 + NDA 35 + نشاط 35)، التوثيق التلقائي عند 70+. أنواع المنشورات: فكرة، مشروع، وظيفة. البيانات تُخزَّن محلياً بالمتصفح حالياً.`;
-
-const SUPABASE_URL='https://iecniydswotsilaueogq.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
-
-async function agGetQueryEmbedding(text,geminiKey){
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiKey}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'models/gemini-embedding-001',content:{parts:[{text}]}}),
-  });
-  if(!res.ok)throw new Error(`Embedding error ${res.status}`);
-  const data=await res.json();
-  return data.embedding.values;
-}
-async function agBuildRagContext(userQuestion,geminiKey){
-  try{
-    const embedding=await agGetQueryEmbedding(userQuestion,geminiKey);
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_kb_chunks`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`},
-      body:JSON.stringify({query_embedding:embedding,match_count:3,similarity_threshold:0.4}),
-    });
-    if(!res.ok)return '';
-    const chunks=await res.json();
-    if(!chunks||chunks.length===0)return '';
-    return '\n\nمعلومات ذات صلة من قاعدة معرفة المنصة:\n'+chunks.map(c=>`- ${c.source_title}: ${c.content}`).join('\n');
-  }catch(e){return '';}
-}
-
-async function agCallRealAPI(messages,u){
-  const key=agGetApiKey();
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      systemInstruction:{parts:[{text:agSystemPrompt(u)}]},
-      contents:messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),
-      generationConfig:{maxOutputTokens:700}
-    }),
-  });
-  if(!res.ok){const errBody=await res.text().catch(()=>'');throw new Error(`API_ERROR_${res.status}: ${errBody.slice(0,200)}`);}
-  const data=await res.json();
-  const text=data?.candidates?.[0]?.content?.parts?.map(p=>p.text).join('\n').trim();
-  return text||'لم يصلني رد واضح، حاول مرة أخرى.';
-}
-
-async function agAsk({capId,freeText,history}){
-  if(!agHasRealKey()){
-    return{text:'⚠️ هذا المساعد يحتاج مفتاح Gemini API مجاني. احصل عليه من aistudio.google.com، ثم أدخله من الإعدادات.',mode:'no_key'};
-  }
-  try{
-    const key=agGetApiKey();
-    const userMsg=freeText||(agRoleCaps(user.type).concat(AG_SHARED).find(c=>c.id===capId)?.prompt)||freeText;
-    const ragContext=freeText?await agBuildRagContext(userMsg,key):'';
-    const msgs=[...(history||[]),{role:'user',content:userMsg+ragContext}];
-    const text=await agCallRealAPI(msgs,user);
-    return{text,mode:'real'};
-  }catch(e){
-    return{text:'⚠️ تعذّر الاتصال بالمساعد. تأكد من صحة المفتاح بالإعدادات.\n\n('+e.message+')',mode:'error'};
-  }
-}
-
-let agChatHistory=[];
-let agentPopupOpen=false;
-try{agChatHistory=JSON.parse(localStorage.getItem(AG_HIST_KEY)||'[]');}catch{agChatHistory=[];}
-function agSaveHist(){try{localStorage.setItem(AG_HIST_KEY,JSON.stringify(agChatHistory.slice(-20)));}catch{}}
-
-function agMsgHTML(m){
-  const isUser=m.role==='user';
-  const av=isUser?(user.photo?`<img src="${user.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(user.name)):'🤖';
-  let tag='';
-  if(!isUser&&m.mode){
-    if(m.mode==='real')tag=`<div style="font-size:9.5px;color:#9b7420;margin-top:5px">⚡ مولّد فعلياً</div>`;
-    else if(m.mode==='error')tag=`<div style="font-size:9.5px;color:var(--err);margin-top:5px">⚠️ تعذّر الاتصال</div>`;
-  }
-  return `<div class="agent-pop-msg ${isUser?'user':'agent'}"><div class="agent-pop-av ${isUser?'user':'agent'}">${av}</div><div class="agent-pop-bubble">${esc(m.content)}${tag}</div></div>`;
-}
-
-function agRenderPopupBody(){
-  const body=document.getElementById('agent-pop-body');
-  if(agChatHistory.length===0){
-    const meta=agRoleMeta(user.type);
-    const caps=agRoleCaps(user.type).concat(AG_SHARED);
-    body.innerHTML=`<div class="agent-pop-welcome">${meta.emoji} هلا فيك! أنا مساعدك المخصّص كـ${meta.label}.<br>كيف أقدر أساعدك؟</div>
-      <div class="agent-pop-caps">${caps.map(c=>`<button class="agent-pop-cap" onclick="agUseCap('${c.id}','${esc(c.label)}')"><span>${c.icon}</span><span>${esc(c.label)}</span></button>`).join('')}</div>
-      <div style="text-align:center;margin-top:6px"><a class="agent-pop-expand" href="agent.html">فتح بصفحة كاملة ↗</a></div>`;
-    return;
-  }
-  body.innerHTML=agChatHistory.map(agMsgHTML).join('')+`<div style="text-align:center;margin-top:2px"><a class="agent-pop-expand" href="agent.html">فتح بصفحة كاملة ↗</a></div>`;
-  body.scrollTop=body.scrollHeight;
-}
-
-function agRenderModePill(){
-  const pill=document.getElementById('agent-pop-mode');
-  if(agHasRealKey()){pill.className='agent-pop-mode real';pill.textContent='⚡ متصل';}
-  else{pill.className='agent-pop-mode demo';pill.textContent='🔑 بانتظار المفتاح';}
-}
-
-function agShowTyping(){
-  const body=document.getElementById('agent-pop-body');
-  const wrap=document.createElement('div');
-  wrap.className='agent-pop-msg agent';
-  wrap.id='agent-typing';
-  wrap.innerHTML=`<div class="agent-pop-av agent">🤖</div><div class="agent-pop-bubble" style="padding:0"><div class="agent-pop-typing"><span></span><span></span><span></span></div></div>`;
-  body.appendChild(wrap);
-  body.scrollTop=body.scrollHeight;
-}
-function agHideTyping(){document.getElementById('agent-typing')?.remove();}
-
-async function agUseCap(capId,label){
-  if(document.getElementById('agent-pop-send').disabled)return;
-  agChatHistory.push({role:'user',content:label});
-  agRenderPopupBody();agSaveHist();
-  await agGetResponse({capId});
-}
+function agSystemPrompt(u){ return ''; }
 async function sendAgentPopupMsg(){
   const input=document.getElementById('agent-pop-input');
   const text=input.value.trim();
@@ -1652,21 +1475,7 @@ async function sendAgentPopupMsg(){
   agRenderPopupBody();agSaveHist();
   await agGetResponse({freeText:text});
 }
-async function agGetResponse({capId,freeText}){
-  document.getElementById('agent-pop-send').disabled=true;
-  agShowTyping();
-  const apiHist=agChatHistory.filter(m=>m.role==='user'||m.role==='assistant').slice(-8).map(m=>({role:m.role,content:m.content}));
-  apiHist.pop();
-  const result=await agAsk({capId,freeText,history:apiHist});
-  agHideTyping();
-  agChatHistory.push({role:'assistant',content:result.text,mode:result.mode});
-  agRenderPopupBody();agSaveHist();
-  document.getElementById('agent-pop-send').disabled=false;
-  agRenderModePill();
-}
-function handleAgentKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAgentPopupMsg();}}
-function agentAutoGrow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,70)+'px';}
-
+/* agGetResponse removed */
 function toggleAgentPopup(){
   agentPopupOpen=!agentPopupOpen;
   document.getElementById('agent-popup').classList.toggle('open',agentPopupOpen);
@@ -1679,7 +1488,6 @@ function toggleAgentPopup(){
 }
 
 /* ── سحب زر الإيجنت لأي مكان بالشاشة، مع حفظ الموقع بـlocalStorage ── */
-const AG_POS_KEY='azza_agent_pos';
 function initAgentDraggable(){
   const wrap=document.getElementById('agent-fab-wrap');
   if(!wrap)return;
