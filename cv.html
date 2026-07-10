@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سيرتي الذاتية — AZZA</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{
+  --gold:#c69749;--olive:#1c5b38;--olive-d:#0e3622;
+  --cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;
+  --line:rgba(28,26,20,.1);--card:#fff;
+}
+.dark{--cream:#141410;--cream2:#1e1e16;--ink:#f0e8d0;--muted:#9a9080;--line:rgba(255,255,255,.07);--card:#1e1e16}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;min-height:100vh}
+
+.hdr{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.hdr-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--cream2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.hdr-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.hdr-title{flex:1;font-size:15px;font-weight:900;color:var(--olive)}
+.hdr-actions{display:flex;gap:8px}
+.btn{padding:9px 18px;border-radius:10px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-save{background:var(--olive);color:#fff}
+.btn-save:hover{background:var(--olive-d)}
+.btn-pdf{background:var(--gold);color:var(--olive-d)}
+.btn-pdf:hover{opacity:.9}
+
+.layout{display:grid;grid-template-columns:320px 1fr;gap:0;max-width:1100px;margin:0 auto;padding:24px 20px;gap:24px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+
+/* ── Editor Panel ── */
+.editor{display:flex;flex-direction:column;gap:16px}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.sec-hdr{padding:14px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:14px;font-weight:700;border-bottom:1px solid var(--line)}
+.sec-hdr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.sec-body{padding:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--cream2);outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--olive);background:var(--cream)}
+.field textarea{resize:vertical;min-height:70px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.add-btn{width:100%;padding:9px;border-radius:9px;border:1.5px dashed var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:.2s;margin-top:8px}
+.add-btn:hover{border-color:var(--olive);color:var(--olive)}
+.item-card{background:var(--cream2);border-radius:10px;padding:12px;margin-bottom:8px;position:relative}
+.item-rm{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:6px;border:none;background:rgba(192,57,43,.1);color:#c0392b;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.tag{padding:5px 12px;border-radius:99px;background:var(--olive);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.tag-rm{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:14px;padding:0;line-height:1}
+.tag-inp{flex:1;min-width:120px;height:32px;border:1.5px dashed var(--line);border-radius:99px;padding:0 12px;font-family:Tajawal,sans-serif;font-size:13px;background:none;color:var(--ink);outline:none}
+
+/* ── CV Preview ── */
+.preview{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;height:fit-content;position:sticky;top:80px}
+.preview-toolbar{padding:10px 14px;background:var(--cream2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.cv-page{padding:32px;font-family:Tajawal,sans-serif;direction:rtl;background:#fff;min-height:600px}
+
+/* CV styles */
+.cv-header{text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #1c5b38}
+.cv-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid #1c5b38}
+.cv-photo-placeholder{width:90px;height:90px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:0 auto 12px}
+.cv-name{font-size:22px;font-weight:900;color:#1c1a14;margin-bottom:4px}
+.cv-headline{font-size:14px;color:#6b6555;margin-bottom:8px}
+.cv-contacts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;font-size:12px;color:#6b6555}
+.cv-contact-item{display:flex;align-items:center;gap:4px}
+.cv-section{margin-bottom:20px}
+.cv-section-title{font-size:14px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:4px;border-bottom:1.5px solid #ece0c8}
+.cv-item{margin-bottom:12px}
+.cv-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
+.cv-item-title{font-size:14px;font-weight:700;color:#1c1a14}
+.cv-item-date{font-size:12px;color:#6b6555;flex-shrink:0}
+.cv-item-sub{font-size:13px;color:#6b6555;margin-bottom:4px}
+.cv-item-desc{font-size:13px;color:#1c1a14;line-height:1.6}
+.cv-skills-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.cv-skill{padding:4px 12px;border-radius:99px;background:#e8f4ed;color:#1c5b38;font-size:12px;font-weight:700}
+.cv-langs-wrap{display:flex;flex-wrap:wrap;gap:10px}
+.cv-lang{font-size:13px;color:#1c1a14;display:flex;align-items:center;gap:4px}
+.cv-lang::before{content:'';width:6px;height:6px;border-radius:50%;background:#1c5b38;display:block}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <button class="hdr-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="hdr-title">✦ سيرتي الذاتية</div>
+  <div class="hdr-actions">
+    <button class="btn btn-save" onclick="saveCV()">💾 حفظ</button>
+    <button class="btn btn-pdf" onclick="exportPDF()">📄 PDF</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Editor -->
+  <div class="editor">
+
+    <!-- المعلومات الأساسية -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        المعلومات الأساسية
+      </div>
+      <div class="sec-body">
+        <div class="field"><label>الاسم الكامل</label><input id="cv-name" placeholder="محمد بركة"></div>
+        <div class="field"><label>المسمى الوظيفي</label><input id="cv-headline" placeholder="مطور Full Stack | رائد أعمال"></div>
+        <div class="row2">
+          <div class="field"><label>البريد الإلكتروني</label><input id="cv-email" type="email" placeholder="name@email.com"></div>
+          <div class="field"><label>رقم الهاتف</label><input id="cv-phone" placeholder="+970 5X XXX XXXX"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>المدينة والدولة</label><input id="cv-location" placeholder="رام الله، فلسطين"></div>
+          <div class="field"><label>الموقع الإلكتروني</label><input id="cv-website" placeholder="azzaworld.com"></div>
+        </div>
+        <div class="field"><label>نبذة شخصية (Summary)</label><textarea id="cv-bio" placeholder="رائد أعمال شغوف بالتقنية..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- الخبرات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        الخبرات العملية
+      </div>
+      <div class="sec-body">
+        <div id="exp-list"></div>
+        <button class="add-btn" onclick="addExp()">+ إضافة خبرة</button>
+      </div>
+    </div>
+
+    <!-- التعليم -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        التعليم
+      </div>
+      <div class="sec-body">
+        <div id="edu-list"></div>
+        <button class="add-btn" onclick="addEdu()">+ إضافة مؤهل</button>
+      </div>
+    </div>
+
+    <!-- المهارات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        المهارات
+      </div>
+      <div class="sec-body">
+        <div class="tags-wrap" id="skills-tags"></div>
+        <input class="tag-inp" id="skill-inp" placeholder="أضف مهارة واضغط Enter" onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}">
+      </div>
+    </div>
+
+    <!-- الشهادات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        الشهادات والدورات
+      </div>
+      <div class="sec-body">
+        <div id="cert-list"></div>
+        <button class="add-btn" onclick="addCert()">+ إضافة شهادة</button>
+      </div>
+    </div>
+
+    <!-- اللغات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>
+        اللغات
+      </div>
+      <div class="sec-body">
+        <div class="tags-wrap" id="lang-tags"></div>
+        <input class="tag-inp" id="lang-inp" placeholder="أضف لغة واضغط Enter" onkeydown="if(event.key==='Enter'){addLang();event.preventDefault()}">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Preview -->
+  <div class="preview">
+    <div class="preview-toolbar">
+      👁️ معاينة السيرة الذاتية
+    </div>
+    <div class="cv-page" id="cv-preview"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db = supabase.createClient(SB_URL, SB_ANON);
+const me = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+
+const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':'#c0392b';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const v=id=>document.getElementById(id)?.value?.trim()||'';
+const upd=()=>{ buildPreview(); };
+const inp=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val||''; };
+
+/* ── State ── */
+let EXP=[], EDU=[], SKILLS=[], CERTS=[], LANGS=[];
+
+/* ── تحميل ── */
+async function loadCV(){
+  const {data:u} = await db.from('users').select('*').eq('id',me.id).single();
+  if(!u) return;
+  inp('cv-name', u.name);
+  inp('cv-headline', u.headline||'');
+  inp('cv-email', u.email||me.email||'');
+  inp('cv-phone', u.phone||'');
+  inp('cv-location', [u.city_name,u.country_name].filter(Boolean).join('، ')||'');
+  inp('cv-bio', u.bio||'');
+  inp('cv-website', u.social_links?.website||'');
+  EXP   = Array.isArray(u.experience)?u.experience:[];
+  EDU   = Array.isArray(u.education)?u.education:[];
+  SKILLS= Array.isArray(u.skills)?u.skills:[];
+  CERTS = Array.isArray(u.certifications)?u.certifications:[];
+  LANGS = Array.isArray(u.languages)?u.languages:[];
+  renderAll(); buildPreview();
+}
+
+/* ── حفظ ── */
+async function saveCV(){
+  const {error}=await db.from('users').update({
+    name:       v('cv-name'),
+    headline:   v('cv-headline'),
+    bio:        v('cv-bio'),
+    phone:      v('cv-phone'),
+    skills:     SKILLS,
+    experience: EXP,
+    education:  EDU,
+    certifications: CERTS,
+    languages:  LANGS,
+    social_links:{website:v('cv-website')},
+    updated_at: new Date().toISOString(),
+  }).eq('id',me.id);
+  if(error){ toast('تعذّر الحفظ','err'); return; }
+  const upd={...me,name:v('cv-name'),bio:v('cv-bio'),skills:SKILLS};
+  localStorage.setItem('azza_user',JSON.stringify(upd));
+  toast('تم حفظ السيرة الذاتية ✅');
+}
+
+/* ══ تصدير PDF ══ */
+function exportPDF(){
+  const cv = document.getElementById('cv-preview').innerHTML;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html dir="rtl"><head>
+    <meta charset="UTF-8">
+    <title>CV - ${v('cv-name')||me.name}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Tajawal,sans-serif;direction:rtl;padding:32px;max-width:800px;margin:0 auto;color:#1c1a14}
+      .cv-header{text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #1c5b38}
+      .cv-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid #1c5b38}
+      .cv-photo-placeholder{width:90px;height:90px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:0 auto 12px}
+      .cv-name{font-size:22px;font-weight:900;margin-bottom:4px}
+      .cv-headline{font-size:14px;color:#6b6555;margin-bottom:8px}
+      .cv-contacts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;font-size:12px;color:#6b6555}
+      .cv-section{margin-bottom:20px}
+      .cv-section-title{font-size:13px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:4px;border-bottom:1.5px solid #ece0c8}
+      .cv-item{margin-bottom:12px}
+      .cv-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
+      .cv-item-title{font-size:14px;font-weight:700}
+      .cv-item-date{font-size:12px;color:#6b6555}
+      .cv-item-sub{font-size:13px;color:#6b6555;margin-bottom:4px}
+      .cv-item-desc{font-size:13px;line-height:1.6}
+      .cv-skills-wrap{display:flex;flex-wrap:wrap;gap:6px}
+      .cv-skill{padding:4px 12px;border-radius:99px;background:#e8f4ed;color:#1c5b38;font-size:12px;font-weight:700}
+      .cv-langs-wrap{display:flex;flex-wrap:wrap;gap:10px}
+      .cv-lang{font-size:13px;display:flex;align-items:center;gap:4px}
+      .cv-lang::before{content:'';width:6px;height:6px;border-radius:50%;background:#1c5b38;display:block}
+      @media print{body{padding:16px}}
+    </style>
+  </head><body>${cv}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),500);
+}
+
+/* ══ بناء المعاينة ══ */
+function buildPreview(){
+  const name     = v('cv-name')||me.name||'—';
+  const headline = v('cv-headline');
+  const email    = v('cv-email')||me.email||'';
+  const phone    = v('cv-phone');
+  const location = v('cv-location');
+  const website  = v('cv-website');
+  const bio      = v('cv-bio');
+  const photo    = me.photo;
+
+  let h=`<div class="cv-header">
+    ${photo?`<img class="cv-photo" src="${esc(photo)}" alt="">`:`<div class="cv-photo-placeholder">${name[0]}</div>`}
+    <div class="cv-name">${esc(name)}</div>
+    ${headline?`<div class="cv-headline">${esc(headline)}</div>`:''}
+    <div class="cv-contacts">
+      ${email?`<span class="cv-contact-item">📧 ${esc(email)}</span>`:''}
+      ${phone?`<span class="cv-contact-item">📱 ${esc(phone)}</span>`:''}
+      ${location?`<span class="cv-contact-item">📍 ${esc(location)}</span>`:''}
+      ${website?`<span class="cv-contact-item">🌐 ${esc(website)}</span>`:''}
+    </div>
+  </div>`;
+
+  if(bio) h+=`<div class="cv-section"><div class="cv-section-title">نبذة شخصية</div><div class="cv-item-desc">${esc(bio)}</div></div>`;
+
+  if(EXP.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">الخبرات العملية</div>`;
+    EXP.forEach(e=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(e.title)}</span><span class="cv-item-date">${esc(e.from)} ${e.to?'← '+esc(e.to):'← الآن'}</span></div><div class="cv-item-sub">${esc(e.company)}</div>${e.desc?`<div class="cv-item-desc">${esc(e.desc)}</div>`:''}</div>`;
+    });
+    h+='</div>';
+  }
+
+  if(EDU.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">التعليم</div>`;
+    EDU.forEach(e=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(e.degree)}</span><span class="cv-item-date">${esc(e.from)} ${e.to?'← '+esc(e.to):''}</span></div><div class="cv-item-sub">${esc(e.school)}</div></div>`;
+    });
+    h+='</div>';
+  }
+
+  if(SKILLS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">المهارات</div><div class="cv-skills-wrap">${SKILLS.map(s=>`<span class="cv-skill">${esc(s)}</span>`).join('')}</div></div>`;
+  }
+
+  if(CERTS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">الشهادات والدورات</div>`;
+    CERTS.forEach(c=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(c.name)}</span><span class="cv-item-date">${esc(c.year||'')}</span></div><div class="cv-item-sub">${esc(c.issuer||'')}</div></div>`;
+    });
+    h+='</div>';
+  }
+
+  if(LANGS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">اللغات</div><div class="cv-langs-wrap">${LANGS.map(l=>`<span class="cv-lang">${esc(l)}</span>`).join('')}</div></div>`;
+  }
+
+  document.getElementById('cv-preview').innerHTML=h;
+}
+
+/* ══ الخبرات ══ */
+function renderExp(){
+  document.getElementById('exp-list').innerHTML=EXP.map((e,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="EXP.splice(${i},1);renderExp();buildPreview()">✕</button>
+      <div class="row2">
+        <div class="field"><label>المسمى الوظيفي</label><input value="${esc(e.title)}" oninput="EXP[${i}].title=this.value;buildPreview()"></div>
+        <div class="field"><label>الشركة</label><input value="${esc(e.company)}" oninput="EXP[${i}].company=this.value;buildPreview()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>من (السنة)</label><input value="${esc(e.from)}" placeholder="2022" oninput="EXP[${i}].from=this.value;buildPreview()"></div>
+        <div class="field"><label>إلى</label><input value="${esc(e.to)}" placeholder="2024 أو اتركه فارغاً للآن" oninput="EXP[${i}].to=this.value;buildPreview()"></div>
+      </div>
+      <div class="field"><label>وصف المهام (اختياري)</label><textarea oninput="EXP[${i}].desc=this.value;buildPreview()">${esc(e.desc||'')}</textarea></div>
+    </div>`).join('');
+}
+function addExp(){ EXP.push({title:'',company:'',from:'',to:'',desc:''}); renderExp(); buildPreview(); }
+
+/* ══ التعليم ══ */
+function renderEdu(){
+  document.getElementById('edu-list').innerHTML=EDU.map((e,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="EDU.splice(${i},1);renderEdu();buildPreview()">✕</button>
+      <div class="field"><label>الدرجة العلمية / التخصص</label><input value="${esc(e.degree)}" oninput="EDU[${i}].degree=this.value;buildPreview()"></div>
+      <div class="row2">
+        <div class="field"><label>الجامعة / المدرسة</label><input value="${esc(e.school)}" oninput="EDU[${i}].school=this.value;buildPreview()"></div>
+        <div class="field"><label>السنوات</label><input value="${esc(e.from+' - '+(e.to||''))}" placeholder="2020 - 2024" oninput="const p=this.value.split('-');EDU[${i}].from=(p[0]||'').trim();EDU[${i}].to=(p[1]||'').trim();buildPreview()"></div>
+      </div>
+    </div>`).join('');
+}
+function addEdu(){ EDU.push({degree:'',school:'',from:'',to:''}); renderEdu(); buildPreview(); }
+
+/* ══ الشهادات ══ */
+function renderCerts(){
+  document.getElementById('cert-list').innerHTML=CERTS.map((c,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="CERTS.splice(${i},1);renderCerts();buildPreview()">✕</button>
+      <div class="row2">
+        <div class="field"><label>اسم الشهادة</label><input value="${esc(c.name)}" oninput="CERTS[${i}].name=this.value;buildPreview()"></div>
+        <div class="field"><label>الجهة المانحة</label><input value="${esc(c.issuer||'')}" oninput="CERTS[${i}].issuer=this.value;buildPreview()"></div>
+      </div>
+      <div class="field"><label>السنة</label><input value="${esc(c.year||'')}" placeholder="2023" oninput="CERTS[${i}].year=this.value;buildPreview()"></div>
+    </div>`).join('');
+}
+function addCert(){ CERTS.push({name:'',issuer:'',year:''}); renderCerts(); buildPreview(); }
+
+/* ══ المهارات ══ */
+function renderSkills(){
+  document.getElementById('skills-tags').innerHTML=SKILLS.map((s,i)=>
+    `<div class="tag">${esc(s)}<button class="tag-rm" onclick="SKILLS.splice(${i},1);renderSkills();buildPreview()">✕</button></div>`
+  ).join('');
+}
+function addSkill(){
+  const inp=document.getElementById('skill-inp');
+  const v=inp.value.trim();
+  if(v&&!SKILLS.includes(v)){ SKILLS.push(v); renderSkills(); buildPreview(); }
+  inp.value='';
+}
+
+/* ══ اللغات ══ */
+function renderLangs(){
+  document.getElementById('lang-tags').innerHTML=LANGS.map((l,i)=>
+    `<div class="tag">${esc(l)}<button class="tag-rm" onclick="LANGS.splice(${i},1);renderLangs();buildPreview()">✕</button></div>`
+  ).join('');
+}
+function addLang(){
+  const inp=document.getElementById('lang-inp');
+  const v=inp.value.trim();
+  if(v&&!LANGS.includes(v)){ LANGS.push(v); renderLangs(); buildPreview(); }
+  inp.value='';
+}
+
+function renderAll(){ renderExp(); renderEdu(); renderCerts(); renderSkills(); renderLangs(); }
+
+/* تحديث المعاينة عند الكتابة */
+['cv-name','cv-headline','cv-email','cv-phone','cv-location','cv-bio','cv-website'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',buildPreview);
+});
+
+/* Themes */
+(()=>document.body.classList.toggle('dark',localStorage.getItem('azza_theme')==='dark'))();
+
+/* Init */
+loadCV();
+</script>
+</body>
+</html>
