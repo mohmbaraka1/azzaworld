@@ -112,6 +112,8 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
   <button class="sug-btn" onclick="ask('ما هو NDA؟')">🔒 ما هو NDA؟</button>
   <button class="sug-btn" onclick="ask('لماذا لا تصلني إشعارات؟')">🔔 مشكلة الإشعارات</button>
   <button class="sug-btn" onclick="ask('كيف أوثق حسابي؟')">✅ التوثيق</button>
+  <button class="sug-btn" onclick="ask('وضع ليلي')">🌙 الوضع الليلي</button>
+  <button class="sug-btn" onclick="startCV()" style="background:linear-gradient(135deg,#c69749,#e8b96a);color:#0e3622;border-color:transparent;font-weight:900">📄 ابن CV لي</button>
 </div>
 
 <!-- Chat -->
@@ -146,6 +148,33 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
 /* ── قاعدة المعرفة من Supabase ── */
 let KB = [];
 let KB_FAQS = [];
+
+/* خريطة الصفحات — كلمة مفتاحية → رابط */
+const PAGE_MAP = [
+  {keys:['وضع ليلي','dark mode','ليلي','مظلم','مظهر'],       url:'settings.html',  label:'الإعدادات → المظهر',        icon:'⚙️'},
+  {keys:['كلمة مرور','password','باسورد','سر'],               url:'settings.html',  label:'الإعدادات → الأمان',         icon:'🔒'},
+  {keys:['خصوصية','privacy','من يراسل','من يرى'],             url:'settings.html',  label:'الإعدادات → الخصوصية',      icon:'🔒'},
+  {keys:['الإعدادات','settings','اعدادات'],                   url:'settings.html',  label:'صفحة الإعدادات',             icon:'⚙️'},
+  {keys:['إشعار','اشعار','notification'],                     url:'notifications.html', label:'صفحة الإشعارات',          icon:'🔔'},
+  {keys:['رسالة','محادثة','مراسلة','messages'],               url:'messages.html',  label:'صفحة الرسائل',               icon:'💬'},
+  {keys:['ملف شخصي','profile','بروفايل'],                    url:'profile.html',   label:'ملفك الشخصي',                icon:'👤'},
+  {keys:['خريطة','map','موقع جغرافي'],                        url:'explore.html',   label:'صفحة الاستكشاف والخريطة',   icon:'🗺️'},
+  {keys:['توثيق','verification','شارة'],                      url:'verification.html', label:'صفحة التوثيق',            icon:'✅'},
+  {keys:['نشر فكرة','نشر مشروع','منشور جديد'],              url:'app.html',        label:'الفيد الرئيسي',              icon:'📝'},
+  {keys:['مستثمر','استثمار','investor'],                      url:'investor.html',  label:'لوحة المستثمر',              icon:'💰'},
+  {keys:['وظيفة','job','توظيف','عمل'],                        url:'app.html',       label:'الفيد — قسم الوظائف',        icon:'💼'},
+  {keys:['إحصاء','إحصائية','stats','تحليل'],                 url:'stats.html',     label:'صفحة الإحصاءات',             icon:'📊'},
+  {keys:['مساعد','agent','ai','ذكاء اصطناعي'],               url:'agent.html',     label:'المساعد الذكي',              icon:'🤖'},
+  {keys:['مركز مساعدة','help','مساعدة'],                     url:'help.html',      label:'مركز المساعدة',              icon:'📚'},
+];
+
+function findPageLink(text){
+  const q = text.toLowerCase();
+  for(const p of PAGE_MAP){
+    if(p.keys.some(k=>q.includes(k))) return p;
+  }
+  return null;
+}
 
 async function loadKB(){
   const [a,f] = await Promise.all([
@@ -188,11 +217,130 @@ function search(query){
   return scored.map(x=>x.item);
 }
 
-/* ── الوقت ── */
+/* ══════════════════════════════════════════════
+   CV Generator — مولّد السيرة الذاتية
+   ══════════════════════════════════════════════ */
+const CV_QUESTIONS = [
+  {key:'name',       q:'ما اسمك الكامل؟',                          ph:'محمد أحمد'},
+  {key:'title',      q:'ما مسماك الوظيفي أو مجال تخصصك؟',          ph:'مطور ويب / مصمم جرافيك / محاسب...'},
+  {key:'email',      q:'ما بريدك الإلكتروني؟',                      ph:'your@email.com'},
+  {key:'phone',      q:'ما رقم هاتفك؟',                             ph:'+970 59 000 0000'},
+  {key:'location',   q:'ما موقعك (المدينة والدولة)؟',              ph:'رام الله، فلسطين'},
+  {key:'summary',    q:'اكتب نبذة مختصرة عن نفسك (2-3 جمل):',     ph:'مطور شغوف بالتقنية...'},
+  {key:'skills',     q:'ما أبرز مهاراتك؟ (مفصولة بفاصلة)',          ph:'JavaScript, Python, تصميم, تسويق...'},
+  {key:'experience', q:'اذكر خبراتك العملية (الشركة، المنصب، السنوات):', ph:'شركة X — مطور — 2020-2023'},
+  {key:'education',  q:'ما مؤهلاتك الأكاديمية؟',                   ph:'بكالوريوس هندسة — جامعة Y — 2020'},
+  {key:'languages',  q:'ما اللغات التي تتقنها ومستواك فيها؟',      ph:'العربية (أصلية)، الإنجليزية (جيدة)'},
+  {key:'links',      q:'هل لديك روابط (GitHub, LinkedIn, Portfolio)؟', ph:'github.com/username'},
+];
+
+let cvData = {};
+let cvStep  = -1;
+
+function startCV(){
+  cvStep = 0;
+  cvData = {};
+  document.getElementById('suggestions').style.display='none';
+  addMsg('سأساعدك في بناء سيرة ذاتية احترافية! 🎉\nسأسألك بضعة أسئلة وأبني لك CV جاهز للتحميل.\n\nلنبدأ...');
+  setTimeout(()=>askCVQuestion(), 600);
+}
+
+function askCVQuestion(){
+  if(cvStep >= CV_QUESTIONS.length){
+    buildCV(); return;
+  }
+  const q = CV_QUESTIONS[cvStep];
+  addMsg(q.q + (q.ph ? `\n\n💡 مثال: ${q.ph}` : ''));
+}
+
+function handleCVInput(text){
+  if(cvStep < 0 || cvStep >= CV_QUESTIONS.length) return false;
+  const q = CV_QUESTIONS[cvStep];
+  cvData[q.key] = text.trim();
+  cvStep++;
+  if(cvStep < CV_QUESTIONS.length){
+    const remaining = CV_QUESTIONS.length - cvStep;
+    addMsg(`✅ تم! (${remaining} ${remaining===1?'سؤال':'أسئلة'} متبقية)`);
+    setTimeout(()=>askCVQuestion(), 400);
+  }else{
+    addMsg('ممتاز! جاري بناء CV احترافي... ⏳');
+    setTimeout(()=>buildCV(), 1000);
+  }
+  return true;
+}
+
+function buildCV(){
+  const cv = cvData;
+  const skills = (cv.skills||'').split(/[،,]/).map(s=>`<span style="display:inline-block;padding:4px 12px;background:#e8f5e9;color:#1c5b38;border-radius:99px;font-size:12px;margin:3px;font-weight:700">${s.trim()}</span>`).join('');
+  const langs  = (cv.languages||'').split(/[،,]/).map(l=>`<li style="margin-bottom:4px">${l.trim()}</li>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>CV — ${cv.name||'السيرة الذاتية'}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Tajawal,sans-serif;background:#f5f5f5;color:#1c1a14;direction:rtl;padding:30px}
+  .cv{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+  .cv-header{background:linear-gradient(135deg,#0e3622,#1c5b38);color:#fff;padding:36px 40px;display:flex;align-items:center;gap:24px}
+  .cv-av{width:80px;height:80px;border-radius:50%;background:#c69749;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#0e3622;flex-shrink:0}
+  .cv-name{font-size:26px;font-weight:900;margin-bottom:4px}
+  .cv-title{font-size:15px;opacity:.8;margin-bottom:12px}
+  .cv-contact{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;opacity:.9}
+  .cv-contact span{display:flex;align-items:center;gap:6px}
+  .cv-body{padding:32px 40px}
+  .section{margin-bottom:28px}
+  .section-title{font-size:16px;font-weight:900;color:#1c5b38;border-bottom:2.5px solid #c69749;padding-bottom:6px;margin-bottom:14px}
+  .summary{font-size:14px;line-height:1.8;color:#444}
+  .exp-item,.edu-item{margin-bottom:12px}
+  .exp-title{font-size:14px;font-weight:700}
+  .exp-meta{font-size:12px;color:#888;margin-top:2px}
+  ul{padding-right:18px;font-size:14px;line-height:1.9}
+  @media print{body{padding:0;background:#fff}.cv{box-shadow:none;border-radius:0}}
+</style>
+</head>
+<body>
+<div class="cv">
+  <div class="cv-header">
+    <div class="cv-av">${(cv.name||'م')[0]}</div>
+    <div>
+      <div class="cv-name">${cv.name||'—'}</div>
+      <div class="cv-title">${cv.title||'—'}</div>
+      <div class="cv-contact">
+        ${cv.email?`<span>📧 ${cv.email}</span>`:''}
+        ${cv.phone?`<span>📱 ${cv.phone}</span>`:''}
+        ${cv.location?`<span>📍 ${cv.location}</span>`:''}
+        ${cv.links?`<span>🔗 ${cv.links}</span>`:''}
+      </div>
+    </div>
+  </div>
+  <div class="cv-body">
+    ${cv.summary?`<div class="section"><div class="section-title">نبذة تعريفية</div><div class="summary">${cv.summary}</div></div>`:''}
+    ${cv.skills?`<div class="section"><div class="section-title">المهارات</div><div style="margin-top:4px">${skills}</div></div>`:''}
+    ${cv.experience?`<div class="section"><div class="section-title">الخبرات العملية</div><div class="exp-item"><div class="exp-title">${cv.experience}</div></div></div>`:''}
+    ${cv.education?`<div class="section"><div class="section-title">التعليم</div><div class="edu-item"><div class="exp-title">${cv.education}</div></div></div>`:''}
+    ${cv.languages?`<div class="section"><div class="section-title">اللغات</div><ul>${langs}</ul></div>`:''}
+  </div>
+</div>
+<div style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="padding:12px 32px;background:#1c5b38;color:#fff;border:none;border-radius:99px;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer">🖨️ طباعة / حفظ PDF</button>
+</div>
+</body></html>`;
+
+  /* فتح CV في نافذة جديدة */
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+
+  cvStep = -1;
+  addMsg('✅ تم بناء سيرتك الذاتية!\n\nفُتحت في نافذة جديدة — اضغط "طباعة / حفظ PDF" لحفظها.\n\n💡 يمكنك أيضاً نشرها على ملفك الشخصي في AZZA!');
+}
 const now = () => new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
 
 /* ── إضافة رسالة ── */
-function addMsg(text, role='bot', articles=[]){
+function addMsg(text, role='bot', articles=[], pageLink=null){
   const welcome = document.getElementById('welcome');
   if(welcome) welcome.remove();
 
@@ -218,9 +366,17 @@ function addMsg(text, role='bot', articles=[]){
     ? `<div class="more-link" onclick="location.href='help.html'">عرض كل المقالات ←</div>`
     : '';
 
+  const pageBtn = pageLink
+    ? `<div style="margin-top:10px">
+        <button onclick="location.href='${pageLink.url}'" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:linear-gradient(135deg,var(--olive),#0e3622);color:#fff;border:none;border-radius:99px;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+          ${pageLink.icon} اذهب إلى ${pageLink.label} ←
+        </button>
+      </div>`
+    : '';
+
   div.innerHTML = `${role==='bot'?av:''}
     <div style="flex:1;min-width:0">
-      <div class="msg-bubble">${html}${cards}${moreLink}</div>
+      <div class="msg-bubble">${html}${cards}${moreLink}${pageBtn}</div>
       <div class="msg-time">${now()}</div>
     </div>
     ${role==='user'?av:''}`;
@@ -261,14 +417,25 @@ async function sendMsg(){
   await new Promise(r=>setTimeout(r,600));
   hideTyping();
 
-  const results = search(text);
+  /* CV Mode */
+  if(cvStep >= 0 && handleCVInput(text)) return;
 
-  if(!results.length){
+  /* CV Generator */
+  if(text.match(/cv|سيرة ذاتية|سيرتي الذاتية|سيرة|resume/i)){
+    startCV(); return;
+  }
+
+  const results = search(text);
+  const pageLink = findPageLink(text);
+
+  if(!results.length && !pageLink){
     addMsg('لم أجد إجابة لسؤالك في قاعدة المعرفة 🙁\n\nجرّب:\n• إعادة صياغة السؤال\n• تصفح <span style="color:var(--olive);cursor:pointer;font-weight:700" onclick="location.href=\'help.html\'">مركز المساعدة</span>\n• التواصل مع فريق الدعم');
+  } else if(!results.length && pageLink) {
+    addMsg(`لم أجد مقالاً محدداً، لكن يمكنك الذهاب مباشرة إلى:`, 'bot', [], pageLink);
   } else {
     const best = results[0];
     const related = results.slice(1);
-    addMsg(best.answer, 'bot', related);
+    addMsg(best.answer, 'bot', related, pageLink);
   }
 }
 
