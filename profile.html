@@ -1189,7 +1189,7 @@ function renderContent(){
 function postCard(p,idx){
   const voted=(p.votes||[]).includes(user.id),sv=isSaved(p.id),mine=p.author_id===user.id;
   const voteN=(p.votes||[]).length;
-  const av=p.author_photo?`<img src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover">`:ini(p.author_name);
+  const av=p.author_photo?`<img loading="lazy" src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover">`:ini(p.author_name);
   const authorVType=p.author_type?verifyType({type:p.author_type}):verifyType(user);
   const vc=VERIFY[authorVType]||VERIFY.idea;
   let badges='';

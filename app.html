@@ -999,7 +999,10 @@ function _mapPost(row){
 }
 
 /* الجلب الشامل: منشورات + تعليقات + تفاعلات + مستخدمون — طلب واحد متوازٍ */
+let _loadingData=false;
 async function loadAllData(){
+  if(_loadingData) return;
+  _loadingData=true;
   try{
     const [postsRes,usersRes,cmtsRes,reactsRes]=await Promise.all([
       azzaDB.from('posts').select('*').order('created_at',{ascending:false}),
@@ -1041,9 +1044,11 @@ async function loadAllData(){
 
     /* حفظ بـlocalStorage كـcache احتياطي فقط */
     try{localStorage.setItem('azza_posts',JSON.stringify(_postsMem));}catch{}
+    _loadingData=false;
 
   }catch(e){
     console.error('loadAllData فشل، رجوع للـcache المحلي:',e.message);
+    _loadingData=false;
     if(_postsMem===null){
       try{_postsMem=JSON.parse(localStorage.getItem('azza_posts')||'[]');}
       catch{_postsMem=[];}
@@ -1153,7 +1158,7 @@ function runUnifiedSearch(q){
   if(matchedUsers.length){
     html+=`<div class="sr-group-lbl">أشخاص</div>`;
     html+=matchedUsers.map(u=>{
-      const av=u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(u.name);
+      const av=u.photo?`<img src="${u.photo}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:ini(u.name);
       const vc=VERIFY[vt(u)]||VERIFY.idea;
       return `<div class="sr-item" onclick="location.href='user.html?id=${u.id}'">
         <div class="sr-av">${av}</div>
