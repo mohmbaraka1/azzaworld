@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مركز المساعدة — AZZA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{
+  --gold:#c69749;--gold-s:#e8b96a;--olive:#1c5b38;--olive-d:#0e3622;
+  --cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;
+  --line:rgba(28,26,20,.1);--card:#fff;--r:14px;
+}
+.dark{--cream:#1a1a12;--cream2:#222218;--ink:#f0e8d0;--muted:#9a9080;--line:rgba(255,255,255,.08);--card:#242418}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;line-height:1.6}
+
+/* Header */
+.header{background:linear-gradient(135deg,var(--olive-d),var(--olive));padding:60px 20px 80px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.header-logo{font-size:28px;font-weight:900;color:var(--gold);margin-bottom:8px;position:relative}
+.header h1{font-size:clamp(22px,4vw,36px);font-weight:900;color:#fff;margin-bottom:12px;position:relative}
+.header p{font-size:16px;color:rgba(255,255,255,.75);margin-bottom:32px;position:relative}
+.search-wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.search-inp{width:100%;height:54px;border-radius:999px;border:none;padding:0 56px 0 20px;font-family:Tajawal,sans-serif;font-size:15px;color:var(--ink);background:#fff;outline:none;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-results{position:absolute;top:58px;right:0;left:0;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15);max-height:320px;overflow-y:auto;display:none;z-index:10}
+.search-results.open{display:block}
+.sr-item{padding:12px 18px;cursor:pointer;border-bottom:.5px solid var(--line);display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)}
+.sr-item:hover{background:var(--cream)}
+.sr-cat{font-size:11px;color:var(--muted);margin-top:2px}
+.sr-empty{padding:20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* Nav */
+.nav{background:var(--card);border-bottom:1px solid var(--line);padding:0 20px;display:flex;align-items:center;gap:16px;overflow-x:auto;position:sticky;top:0;z-index:100}
+.nav a{padding:14px 4px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s}
+.nav a:hover,.nav a.active{color:var(--olive);border-color:var(--olive)}
+.nav-home{font-weight:700;color:var(--olive)!important}
+
+/* Main Layout */
+.main{max-width:1100px;margin:0 auto;padding:40px 20px;display:grid;grid-template-columns:240px 1fr;gap:40px}
+@media(max-width:768px){.main{grid-template-columns:1fr;padding:20px}.sidebar{display:none}}
+
+/* Sidebar */
+.sidebar{position:sticky;top:64px;height:fit-content}
+.sidebar-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.sidebar ul{list-style:none}
+.sidebar li a{display:block;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none;transition:.15s}
+.sidebar li a:hover{background:var(--cream2);color:var(--olive)}
+.sidebar li a.active{background:rgba(28,91,56,.08);color:var(--olive);font-weight:700}
+.sidebar-sep{height:.5px;background:var(--line);margin:12px 0}
+
+/* Categories Grid */
+.cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:48px}
+.cat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:20px;cursor:pointer;transition:.2s;text-decoration:none;display:block}
+.cat-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.cat-icon{font-size:28px;margin-bottom:10px}
+.cat-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.cat-count{font-size:12px;color:var(--muted)}
+
+/* Article */
+.article{display:none}
+.article.active{display:block}
+.article-meta{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.article-tag{padding:3px 10px;border-radius:99px;background:rgba(28,91,56,.1);color:var(--olive);font-size:12px;font-weight:700}
+.article-time{font-size:12px;color:var(--muted)}
+.article h1{font-size:clamp(20px,3vw,28px);font-weight:900;margin-bottom:20px;line-height:1.3}
+.article h2{font-size:18px;font-weight:700;margin:28px 0 12px;color:var(--olive)}
+.article h3{font-size:15px;font-weight:700;margin:20px 0 8px}
+.article p{font-size:15px;color:var(--ink);margin-bottom:14px;line-height:1.8}
+.article ul,.article ol{margin:12px 0 16px 20px;font-size:15px}
+.article li{margin-bottom:8px;line-height:1.7}
+.article .tip{background:rgba(28,91,56,.06);border-right:4px solid var(--olive);padding:14px 16px;border-radius:8px;margin:16px 0;font-size:14px}
+.article .warn{background:rgba(198,151,73,.08);border-right:4px solid var(--gold);padding:14px 16px;border-radius:8px;margin:16px 0;font-size:14px}
+.article .step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.article-nav{display:flex;justify-content:space-between;margin-top:40px;padding-top:20px;border-top:1px solid var(--line);gap:12px}
+.art-nav-btn{padding:10px 18px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);transition:.2s;flex:1;text-align:center}
+.art-nav-btn:hover{border-color:var(--olive);color:var(--olive)}
+.feedback{margin-top:32px;padding:20px;background:var(--cream2);border-radius:12px;text-align:center}
+.feedback p{font-size:14px;color:var(--muted);margin-bottom:12px}
+.fb-btns{display:flex;justify-content:center;gap:10px}
+.fb-btn{padding:8px 24px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;transition:.2s}
+.fb-btn:hover{border-color:var(--olive);color:var(--olive)}
+.fb-btn.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+
+/* Home content */
+.home-section{margin-bottom:48px}
+.section-title{font-size:20px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.popular-list{display:flex;flex-direction:column;gap:8px}
+.popular-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:.15s;text-decoration:none;color:var(--ink)}
+.popular-item:hover{border-color:var(--gold);background:rgba(198,151,73,.04)}
+.popular-num{font-size:13px;font-weight:700;color:var(--muted);width:20px}
+.popular-text{flex:1;font-size:14px}
+.popular-cat{font-size:11px;color:var(--muted);background:var(--cream2);padding:2px 8px;border-radius:99px}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal,sans-serif}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">✦ AZZA</div>
+  <h1>كيف يمكننا مساعدتك؟</h1>
+  <p>ابحث في مقالات المساعدة أو تصفح الفئات أدناه</p>
+  <div class="search-wrap">
+    <input class="search-inp" id="search-inp" placeholder="ابحث عن أي موضوع..." oninput="doSearch(this.value)" onfocus="doSearch(this.value)">
+    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="search-results" id="search-results"></div>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <a href="#home" class="nav-home" onclick="showHome()">🏠 الرئيسية</a>
+  <a href="#start" onclick="showCat('start')">البداية</a>
+  <a href="#account" onclick="showCat('account')">الحساب</a>
+  <a href="#posts" onclick="showCat('posts')">المنشورات</a>
+  <a href="#messages" onclick="showCat('messages')">الرسائل</a>
+  <a href="#notifications" onclick="showCat('notifications')">الإشعارات</a>
+  <a href="#investors" onclick="showCat('investors')">المستثمرون</a>
+  <a href="#troubleshoot" onclick="showCat('troubleshoot')">حل المشاكل</a>
+</div>
+
+<div id="toast"></div>
+
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">الفئات</div>
+    <ul id="sidebar-links"></ul>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- Home -->
+    <div id="home-view">
+      <div class="home-section">
+        <div class="section-title">📚 تصفح حسب الفئة</div>
+        <div class="cats-grid" id="cats-grid"></div>
+      </div>
+      <div class="home-section">
+        <div class="section-title">🔥 المقالات الأكثر طلباً</div>
+        <div class="popular-list" id="popular-list"></div>
+      </div>
+    </div>
+
+    <!-- Articles -->
+    <div id="articles-view" style="display:none"></div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   AZZA Help Center — نظام مقالات المساعدة
+   ══════════════════════════════════════════════ */
+
+const CATS = [
+  {id:'start',      icon:'🚀', name:'البداية',          desc:'كيفية إنشاء حساب والبدء بالمنصة'},
+  {id:'account',    icon:'👤', name:'الحساب والملف الشخصي', desc:'إعدادات الحساب والخصوصية'},
+  {id:'posts',      icon:'📝', name:'المنشورات والتعليقات', desc:'نشر الأفكار والمشاريع'},
+  {id:'messages',   icon:'💬', name:'الرسائل',           desc:'التواصل مع المستخدمين'},
+  {id:'notifications',icon:'🔔',name:'الإشعارات',        desc:'إدارة الإشعارات'},
+  {id:'investors',  icon:'💰', name:'المستثمرون والفرص', desc:'الاستثمار وإبداء الاهتمام'},
+  {id:'map',        icon:'🗺️', name:'الخريطة التفاعلية', desc:'استكشاف المستخدمين جغرافياً'},
+  {id:'ai',         icon:'🤖', name:'المساعد الذكي',     desc:'استخدام الذكاء الاصطناعي'},
+  {id:'verification',icon:'✅',name:'التوثيق',           desc:'كيفية توثيق حسابك'},
+  {id:'security',   icon:'🔒', name:'الأمان والخصوصية', desc:'حماية حسابك ومعلوماتك'},
+  {id:'troubleshoot',icon:'🔧',name:'حل المشاكل',        desc:'حلول للمشاكل الشائعة'},
+  {id:'guidelines', icon:'📋', name:'سياسات الاستخدام',  desc:'قواعد المجتمع والشروط'},
+];
+
+const ARTICLES = [
+  /* ── البداية ── */
+  {id:'create-account', cat:'start', title:'كيف أنشئ حساباً على AZZA؟', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">البداية</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>كيف أنشئ حساباً على AZZA؟</h1>
+    <p>AZZA منصة تربط أصحاب الأفكار بالمستثمرين والخبراء. إنشاء حساب سهل ومجاني.</p>
+    <h2>الخطوات</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>افتح صفحة التسجيل</strong><br>روح <a href="login.html" style="color:var(--olive)">login.html</a> واضغط "إنشاء حساب جديد"</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>اختر نوع حسابك</strong><br>صاحب فكرة / خبير / مستثمر / شركة / مؤسسة</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>أدخل بياناتك</strong><br>الاسم، اسم المستخدم، البريد الإلكتروني، كلمة المرور</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>اختر موقعك</strong><br>الدولة والمدينة لتظهر على الخريطة التفاعلية</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-content"><strong>اضغط "إنشاء الحساب"</strong><br>ستنتقل تلقائياً للفيد الرئيسي</div></div>
+    <div class="tip">💡 يمكنك أيضاً التسجيل بحساب Google بضغطة واحدة أسرع وأسهل.</div>
+    <h2>أنواع الحسابات</h2>
+    <ul>
+      <li><strong>صاحب فكرة</strong> — تنشر أفكارك وتبحث عن تمويل ودعم</li>
+      <li><strong>خبير</strong> — تقدم خدماتك ومهاراتك للمشاريع</li>
+      <li><strong>مستثمر</strong> — تبحث عن فرص استثمار واعدة</li>
+      <li><strong>شركة / مؤسسة</strong> — تعلن عن فرص وشراكات</li>
+    </ul>
+   `},
+
+  {id:'first-post', cat:'start', title:'كيف أنشر أول فكرة أو مشروع؟', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">البداية</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>كيف أنشر أول فكرة أو مشروع؟</h1>
+    <p>نشر فكرتك على AZZA يجعلها مرئية للمستثمرين والخبراء.</p>
+    <div class="step"><div class="step-num">1</div><div class="step-content">افتح الفيد الرئيسي (<a href="app.html" style="color:var(--olive)">app.html</a>)</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط زر <strong>✦ نشر فكرة</strong> في أسفل الشاشة</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">اختر نوع المنشور: فكرة / مشروع / وظيفة</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content">اكتب العنوان والوصف والفئة</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-content">اضغط <strong>نشر</strong></div></div>
+    <div class="tip">💡 يمكنك إضافة صورة أو فيديو لزيادة جاذبية منشورك.</div>
+    <div class="warn">⚠️ إذا كانت فكرتك حساسة، فعّل خيار NDA لحمايتها قبل النشر.</div>
+   `},
+
+  /* ── الحساب ── */
+  {id:'edit-profile', cat:'account', title:'كيف أعدّل ملفي الشخصي؟',
+   content:`
+    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>كيف أعدّل ملفي الشخصي؟</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content">روح <a href="settings.html" style="color:var(--olive)">الإعدادات</a></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">عدّل الاسم أو البيو أو الصورة</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">اضغط <strong>حفظ التغييرات</strong></div></div>
+    <p>التغييرات تُحفظ فوراً في قاعدة البيانات وتظهر لجميع المستخدمين.</p>
+   `},
+
+  {id:'change-password', cat:'account', title:'كيف أغيّر كلمة المرور؟',
+   content:`
+    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>كيف أغيّر كلمة المرور؟</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content">روح <a href="settings.html" style="color:var(--olive)">الإعدادات</a> → الأمان</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">أدخل كلمة المرور الحالية والجديدة</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">اضغط <strong>تغيير كلمة المرور</strong></div></div>
+    <div class="tip">💡 استخدم كلمة مرور قوية (8 أحرف على الأقل مع أرقام ورموز).</div>
+   `},
+
+  {id:'privacy-settings', cat:'account', title:'إعدادات الخصوصية ومن يراسلك', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">الحساب</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>إعدادات الخصوصية ومن يراسلك</h1>
+    <p>تحكم بمن يستطيع التواصل معك على AZZA.</p>
+    <h2>خصوصية الرسائل</h2>
+    <ul>
+      <li><strong>الجميع</strong> — أي مستخدم يستطيع إرسال طلب مراسلة</li>
+      <li><strong>المتابعون فقط</strong> — فقط من تتابعهم يستطيعون مراسلتك</li>
+      <li><strong>لا أحد</strong> — أغلق باب المراسلة تماماً</li>
+    </ul>
+    <p>لتغيير هذا الإعداد: <a href="settings.html" style="color:var(--olive)">الإعدادات</a> → الخصوصية → من يستطيع مراسلتك</p>
+   `},
+
+  /* ── المنشورات ── */
+  {id:'nda', cat:'posts', title:'ما هو NDA وكيف أستخدمه؟',
+   content:`
+    <div class="article-meta"><span class="article-tag">المنشورات</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>ما هو NDA وكيف أستخدمه؟</h1>
+    <p>NDA (اتفاقية عدم الإفصاح) يحمي فكرتك من الاستخدام دون إذنك.</p>
+    <h2>كيف يعمل؟</h2>
+    <p>عند تفعيل NDA على منشور، يجب على أي مستخدم يريد إبداء اهتمامه التوقيع على الاتفاقية أولاً.</p>
+    <div class="step"><div class="step-num">1</div><div class="step-content">عند نشر فكرة، فعّل خيار <strong>🔒 حماية NDA</strong></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">المستثمرون سيرون "توقيع NDA وإبداء الاهتمام"</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">بعد التوقيع، يصلك إشعار باهتمامهم</div></div>
+    <div class="tip">💡 NDA مناسب للأفكار الحساسة التي لم تُطلق بعد.</div>
+   `},
+
+  {id:'delete-post', cat:'posts', title:'كيف أحذف منشوراً؟',
+   content:`
+    <div class="article-meta"><span class="article-tag">المنشورات</span><span class="article-time">⏱ 30 ثانية</span></div>
+    <h1>كيف أحذف منشوراً؟</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content">افتح تفاصيل المنشور</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط ⋮ (ثلاث نقاط) في أعلى المنشور</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">اختر <strong>حذف</strong> وأكّد</div></div>
+    <div class="warn">⚠️ الحذف نهائي ولا يمكن التراجع عنه.</div>
+   `},
+
+  /* ── الرسائل ── */
+  {id:'message-request', cat:'messages', title:'كيف أرسل رسالة لمستخدم آخر؟', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">الرسائل</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>كيف أرسل رسالة لمستخدم آخر؟</h1>
+    <p>AZZA تستخدم نظام طلبات المراسلة لحماية المستخدمين من الرسائل غير المرغوبة.</p>
+    <h2>الخطوات</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-content">افتح صفحة المستخدم الذي تريد مراسلته</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط <strong>💬 رسالة</strong></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">يُرسل طلب مراسلة للطرف الآخر</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content">عند القبول، تُفتح المحادثة تلقائياً</div></div>
+    <div class="tip">💡 إذا كان المستخدم يقبل رسائل من "الجميع"، يمكنك مراسلته مباشرة.</div>
+   `},
+
+  {id:'message-tips', cat:'messages', title:'مميزات نظام الرسائل',
+   content:`
+    <div class="article-meta"><span class="article-tag">الرسائل</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>مميزات نظام الرسائل في AZZA</h1>
+    <ul>
+      <li>📨 <strong>رسائل فورية</strong> — تصل في الحال بدون تحديث الصفحة</li>
+      <li>✓✓ <strong>حالة القراءة</strong> — تعرف متى قرأ الطرف الآخر رسالتك</li>
+      <li>⌨️ <strong>مؤشر الكتابة</strong> — يظهر "يكتب..." عند كتابة الطرف الآخر</li>
+      <li>📎 <strong>صور وملفات</strong> — أرسل صوراً وملفات PDF ووثائق</li>
+      <li>↩️ <strong>رد على رسالة</strong> — ردّ على رسالة محددة</li>
+      <li>✏️ <strong>تعديل الرسائل</strong> — كليك يمين أو ضغط طويل → تعديل</li>
+      <li>🗑️ <strong>حذف للجميع</strong> — احذف رسالتك من عند الجميع</li>
+      <li>↪️ <strong>توجيه الرسائل</strong> — أعد إرسال رسالة لمحادثة أخرى</li>
+    </ul>
+   `},
+
+  /* ── الإشعارات ── */
+  {id:'notif-types', cat:'notifications', title:'ما هي أنواع الإشعارات في AZZA؟',
+   content:`
+    <div class="article-meta"><span class="article-tag">الإشعارات</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>أنواع الإشعارات في AZZA</h1>
+    <ul>
+      <li>💬 <strong>تعليق</strong> — علّق أحد على منشورك</li>
+      <li>↩️ <strong>رد</strong> — ردّ أحد على تعليقك</li>
+      <li>▲ <strong>تصويت</strong> — صوّت أحد على منشورك</li>
+      <li>👤 <strong>متابعة</strong> — بدأ أحد متابعتك</li>
+      <li>✉️ <strong>رسالة</strong> — أرسل لك أحد رسالة</li>
+      <li>⭐ <strong>اهتمام</strong> — أبدى أحد اهتمامه بمشروعك</li>
+      <li>✅ <strong>توثيق</strong> — تم توثيق حسابك</li>
+    </ul>
+    <p>الإشعارات تصل فوراً بدون تحديث الصفحة، ويظهر عدادها 🔔 في الهيدر.</p>
+   `},
+
+  {id:'notif-missing', cat:'notifications', title:'لماذا لا تصلني الإشعارات؟', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">الإشعارات</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>لماذا لا تصلني الإشعارات؟</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>تأكد من تسجيل الدخول</strong><br>الإشعارات تتطلب جلسة نشطة</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>جرّب من متصفح آخر</strong><br>Edge وChrome يعملان بشكل أفضل</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>تحقق من اتصال الإنترنت</strong><br>الإشعارات تتطلب اتصالاً نشطاً</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>سجّل خروجاً ودخولاً من جديد</strong><br>يجدد الجلسة ويحل معظم المشاكل</div></div>
+    <div class="tip">💡 لو سجّلت دخولاً من متصفح جديد، تأكد من أن الجلسة نشطة (لا تغلق المتصفح مباشرة).</div>
+   `},
+
+  /* ── المستثمرون ── */
+  {id:'how-to-invest', cat:'investors', title:'كيف أجد فرص استثمار على AZZA؟', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">المستثمرون</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>كيف أجد فرص استثمار على AZZA؟</h1>
+    <p>AZZA تجمع بين أصحاب الأفكار والمستثمرين في مكان واحد.</p>
+    <h2>طرق إيجاد الفرص</h2>
+    <ul>
+      <li><strong>الفيد الرئيسي</strong> — فلتر "مشاريع" لرؤية الفرص</li>
+      <li><strong>لوحة المستثمر</strong> — صفحة مخصصة لعرض الفرص حسب القطاع</li>
+      <li><strong>البحث</strong> — ابحث بكلمات مفتاحية مثل "تقنية" أو "صحة"</li>
+      <li><strong>الخريطة</strong> — اكتشف الفرص حسب الموقع الجغرافي</li>
+    </ul>
+    <h2>كيف أبدي اهتمامي؟</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-content">افتح المنشور الذي يثير اهتمامك</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content">اضغط <strong>⭐ اهتمام</strong></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content">إذا كان المنشور محمياً بـNDA، وقّع الاتفاقية أولاً</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content">يصل إشعار لصاحب الفكرة بأنك مهتم</div></div>
+   `},
+
+  /* ── حل المشاكل ── */
+  {id:'login-issues', cat:'troubleshoot', title:'لا أستطيع تسجيل الدخول', popular:true,
+   content:`
+    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقتان</span></div>
+    <h1>لا أستطيع تسجيل الدخول</h1>
+    <h2>الأسباب الشائعة والحلول</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>كلمة مرور خاطئة</strong><br>اضغط "نسيت كلمة المرور" لإعادة تعيينها</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>البريد غير مسجّل</strong><br>تأكد من استخدام نفس البريد الذي سجّلت به</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>مشكلة في الكاش</strong><br>امسح كاش المتصفح أو جرّب نافذة خاصة (Incognito)</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>جرّب Google</strong><br>إذا سجّلت بـGoogle، استخدم نفس الطريقة للدخول</div></div>
+    <div class="warn">⚠️ إذا لم تنجح هذه الحلول، تواصل مع الدعم.</div>
+   `},
+
+  {id:'image-upload', cat:'troubleshoot', title:'الصور لا تُرفع أو لا تظهر',
+   content:`
+    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>الصور لا تُرفع أو لا تظهر</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>تحقق من حجم الصورة</strong><br>الحد الأقصى 20MB للرسائل، 3MB للصورة الشخصية</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>تحقق من نوع الملف</strong><br>مقبول: JPG, PNG, GIF, WebP</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>تحقق من الاتصال</strong><br>رفع الصور يتطلب اتصالاً قوياً</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>سجّل خروجاً ودخولاً</strong><br>يجدد صلاحيات الرفع</div></div>
+   `},
+
+  {id:'slow-perf', cat:'troubleshoot', title:'المنصة بطيئة أو لا تستجيب',
+   content:`
+    <div class="article-meta"><span class="article-tag">حل المشاكل</span><span class="article-time">⏱ دقيقة</span></div>
+    <h1>المنصة بطيئة أو لا تستجيب</h1>
+    <div class="step"><div class="step-num">1</div><div class="step-content"><strong>امسح الكاش</strong><br>Ctrl+Shift+R (Hard Refresh)</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><strong>أغلق التبويبات الأخرى</strong><br>AZZA يستخدم Realtime يحتاج ذاكرة</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><strong>جرّب متصفحاً آخر</strong><br>Chrome أو Edge يعملان بشكل مثالي</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><strong>تحقق من الإنترنت</strong><br>جرّب تشغيل موقع آخر للتأكد</div></div>
+   `},
+];
+
+/* ── بناء الصفحة ── */
+let currentView = 'home';
+
+function buildHome(){
+  const grid = document.getElementById('cats-grid');
+  grid.innerHTML = CATS.map(c=>`
+    <a class="cat-card" onclick="showCat('${c.id}')" href="javascript:void(0)">
+      <div class="cat-icon">${c.icon}</div>
+      <div class="cat-name">${c.name}</div>
+      <div class="cat-count">${ARTICLES.filter(a=>a.cat===c.id).length} مقال</div>
+    </a>`).join('');
+
+  const popular = document.getElementById('popular-list');
+  const pop = ARTICLES.filter(a=>a.popular);
+  popular.innerHTML = pop.map((a,i)=>`
+    <a class="popular-item" onclick="showArticle('${a.id}')" href="javascript:void(0)">
+      <span class="popular-num">${i+1}</span>
+      <span class="popular-text">${a.title}</span>
+      <span class="popular-cat">${CATS.find(c=>c.id===a.cat)?.icon} ${CATS.find(c=>c.id===a.cat)?.name}</span>
+    </a>`).join('');
+}
+
+function buildSidebar(catId){
+  const arts = ARTICLES.filter(a=>a.cat===catId);
+  const cat  = CATS.find(c=>c.id===catId);
+  const links = document.getElementById('sidebar-links');
+  links.innerHTML = `<li><a href="javascript:void(0)" onclick="showHome()" style="color:var(--muted)">← الرئيسية</a></li>
+    <li style="padding:8px 12px;font-size:13px;font-weight:700;color:var(--olive)">${cat?.icon} ${cat?.name}</li>` +
+    arts.map(a=>`<li><a href="javascript:void(0)" id="sl-${a.id}" onclick="showArticle('${a.id}')">${a.title}</a></li>`).join('') +
+    `<div class="sidebar-sep"></div><li><a href="javascript:void(0)" onclick="showCat('troubleshoot')">🔧 حل المشاكل</a></li>`;
+}
+
+function showHome(){
+  currentView='home';
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('articles-view').style.display='none';
+  document.getElementById('sidebar-links').innerHTML='';
+  window.scrollTo(0,0);
+}
+
+function showCat(catId){
+  const arts = ARTICLES.filter(a=>a.cat===catId);
+  if(!arts.length) return;
+  buildSidebar(catId);
+  document.getElementById('home-view').style.display='none';
+  const av = document.getElementById('articles-view');
+  av.style.display='block';
+  const cat = CATS.find(c=>c.id===catId);
+  av.innerHTML=`
+    <h2 style="font-size:22px;font-weight:900;margin-bottom:20px">${cat?.icon} ${cat?.name}</h2>
+    <div class="popular-list">
+      ${arts.map(a=>`<a class="popular-item" onclick="showArticle('${a.id}')" href="javascript:void(0)">
+        <span class="popular-text">${a.title}</span>
+      </a>`).join('')}
+    </div>`;
+  window.scrollTo(0,0);
+}
+
+function showArticle(id){
+  const art = ARTICLES.find(a=>a.id===id);
+  if(!art) return;
+  buildSidebar(art.cat);
+  document.getElementById('home-view').style.display='none';
+  const av = document.getElementById('articles-view');
+  av.style.display='block';
+  /* ترتيب المقالات في نفس الفئة */
+  const catArts = ARTICLES.filter(a=>a.cat===art.cat);
+  const idx = catArts.findIndex(a=>a.id===id);
+  const prev = catArts[idx-1];
+  const next = catArts[idx+1];
+
+  av.innerHTML=`
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
+      <a href="javascript:void(0)" onclick="showHome()" style="color:var(--muted);text-decoration:none">الرئيسية</a> ›
+      <a href="javascript:void(0)" onclick="showCat('${art.cat}')" style="color:var(--muted);text-decoration:none">${CATS.find(c=>c.id===art.cat)?.name}</a> ›
+      ${art.title}
+    </div>
+    ${art.content}
+    <div class="article-nav">
+      ${prev?`<button class="art-nav-btn" onclick="showArticle('${prev.id}')">← ${prev.title}</button>`:'<div></div>'}
+      ${next?`<button class="art-nav-btn" onclick="showArticle('${next.id}')">${next.title} →</button>`:'<div></div>'}
+    </div>
+    <div class="feedback">
+      <p>هل كان هذا المقال مفيداً؟</p>
+      <div class="fb-btns">
+        <button class="fb-btn" onclick="feedback(this,'yes')">👍 نعم</button>
+        <button class="fb-btn" onclick="feedback(this,'no')">👎 لا</button>
+      </div>
+    </div>`;
+
+  /* تعليم النشط بالـsidebar */
+  document.querySelectorAll('[id^="sl-"]').forEach(l=>l.classList.remove('active'));
+  const sl = document.getElementById('sl-'+id);
+  if(sl) sl.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function feedback(btn, type){
+  btn.parentElement.querySelectorAll('.fb-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const fb = btn.closest('.feedback');
+  fb.innerHTML=type==='yes'
+    ?'<p style="color:var(--olive);font-weight:700">✅ شكراً! سعداء بمساعدتك.</p>'
+    :'<p style="color:var(--muted)">شكراً على ملاحظتك — سنحسّن هذا المقال.</p>';
+}
+
+/* ── بحث ── */
+function doSearch(q){
+  const res = document.getElementById('search-results');
+  q = q.trim();
+  if(!q){ res.classList.remove('open'); return; }
+  const found = ARTICLES.filter(a=>
+    a.title.includes(q) ||
+    a.content.replace(/<[^>]+>/g,'').includes(q) ||
+    CATS.find(c=>c.id===a.cat)?.name.includes(q)
+  ).slice(0,6);
+  if(!found.length){
+    res.innerHTML='<div class="sr-empty">لا نتائج — جرّب كلمة أخرى</div>';
+  }else{
+    res.innerHTML=found.map(a=>`
+      <div class="sr-item" onclick="showArticle('${a.id}');document.getElementById('search-inp').value='';document.getElementById('search-results').classList.remove('open')">
+        <div>
+          <div>${a.title}</div>
+          <div class="sr-cat">${CATS.find(c=>c.id===a.cat)?.icon} ${CATS.find(c=>c.id===a.cat)?.name}</div>
+        </div>
+      </div>`).join('');
+  }
+  res.classList.add('open');
+}
+
+document.addEventListener('click',e=>{
+  if(!document.getElementById('search-results').contains(e.target)&&
+     e.target!==document.getElementById('search-inp'))
+    document.getElementById('search-results').classList.remove('open');
+});
+
+/* ── التشغيل ── */
+buildHome();
+</script>
+</body>
+</html>
