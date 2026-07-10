@@ -490,7 +490,12 @@ const timeAgo  = iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m
 const isSameDay= iso=>(Date.now()-new Date(iso))<48*3600000;
 
 let user = getUser();
-if(!user){ location.href='login.html'; }
+if(!user){ location.href='login.html'
+/* فحص جلسة Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){localStorage.removeItem('azza_user');location.href='login.html';}
+})();; }
 
 const CAT_L={tech:'💻 تقنية',health:'🩺 صحة',education:'📚 تعليم',environment:'🌿 بيئة',business:'💼 أعمال',design:'🎨 تصميم'};
 const CAT_CLR={tech:'#185FA5',health:'#D85A30',education:'#854F0B',environment:'#0F6E56',business:'#3B6D11',design:'#534AB7'};

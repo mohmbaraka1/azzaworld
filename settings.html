@@ -707,6 +707,11 @@ const getPostsPage=()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.p
 
 let user = getUser();
 if(!user){ location.href='login.html'; }
+/* فحص جلسة Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){localStorage.removeItem('azza_user');location.href='login.html';}
+})();
 
 /* ══ نواة الإيجنت — إدارة المفتاح فقط (settings.html لا تحتاج كامل القوالب) ══ */
 const AC_KEY_API = 'azza_agent_api_key';

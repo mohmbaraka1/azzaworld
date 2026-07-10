@@ -331,8 +331,8 @@ body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);dir
   <button class="ctx-item" onclick="ctxAction('copy')">📋 نسخ</button>
   <button class="ctx-item" onclick="ctxAction('forward')">↪️ توجيه</button>
   <button class="ctx-item" id="ctx-edit" onclick="ctxAction('edit')">✏️ تعديل</button>
-  <div class="ctx-sep"></div>
-  <button class="ctx-item danger" onclick="ctxAction('delete')">🗑️ حذف للجميع</button>
+  <div class="ctx-sep" id="ctx-sep"></div>
+  <button class="ctx-item danger" id="ctx-delete" onclick="ctxAction('delete')">🗑️ حذف للجميع</button>
 </div>
 
 <!-- Forward Modal -->
@@ -909,11 +909,14 @@ async function declineRequest(reqId){
    قراءة الرسائل
    ══════════════════════════════════════════════ */
 async function markConvRead(conv){
-  const unread=conv.messages.filter(m=>m.sender_id!==me.id&&!m.read);
+  const unread=conv.messages.filter(m=>m.sender_id!==me.id&&!m.read&&typeof m.id==='number');
   if(!unread.length) return;
   const ids=unread.map(m=>m.id);
-  await db.from('messages').update({read:true,status:'read'}).in('id',ids);
-  unread.forEach(m=>{ m.read=true; m.status='read'; });
+  const {error}=await db.from('messages').update({read:true,status:'read'}).in('id',ids);
+  if(!error){
+    unread.forEach(m=>{ m.read=true; m.status='read'; });
+    renderMsgs(); /* تحديث فوري للواجهة */
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -941,13 +944,20 @@ let _typingChannel=null;
 function subscribeTyping(convId){
   if(_typingChannel) db.removeChannel(_typingChannel);
   _typingChannel=db.channel('typing_'+convId)
-    .on('postgres_changes',{event:'*',schema:'public',table:'typing_indicators',filter:`conversation_id=eq.${convId}`},
+    .on('postgres_changes',{event:'*',schema:'public',table:'typing_indicators',
+      filter:`conversation_id=eq.${convId}`},
       payload=>{
-        const isOther = payload.new?.user_id!==me.id || payload.eventType==='DELETE'&&payload.old?.user_id!==me.id;
-        if(isOther){
+        const userId = payload.new?.user_id || payload.old?.user_id;
+        if(userId && userId !== me.id){
           const area=document.getElementById('typing-area');
-          area.style.display=payload.eventType==='DELETE'?'none':'block';
-          if(payload.eventType!=='DELETE') setTimeout(()=>area.style.display='none',3000);
+          if(payload.eventType==='DELETE'){
+            area.style.display='none';
+          }else{
+            area.style.display='block';
+            scrollToBottom();
+            clearTimeout(area._t);
+            area._t=setTimeout(()=>area.style.display='none',4000);
+          }
         }
       })
     .subscribe();

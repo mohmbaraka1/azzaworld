@@ -400,6 +400,11 @@ const timeAgo  = iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m
 
 const me = getMe();
 if(!me){ location.href='login.html'; }
+/* فحص جلسة Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){localStorage.removeItem('azza_user');location.href='login.html';}
+})();
 
 const VERIFY={
   idea:       {label:'صاحب فكرة', color:'#1c5b38', bg:'rgba(28,91,56,.1)'},

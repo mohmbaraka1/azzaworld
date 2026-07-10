@@ -311,7 +311,12 @@ const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&g
 const timeAgo=iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+'د';const h=Math.floor(m/60);if(h<24)return h+'س';return Math.floor(h/24)+' يوم';};
 
 const user=getMe();
-if(!user){location.href='login.html';}
+if(!user){location.href='login.html'
+/* فحص جلسة Auth */
+(async()=>{
+  const {data}=await azzaDB.auth.getSession();
+  if(!data?.session){localStorage.removeItem('azza_user');location.href='login.html';}
+})();;}
 
 /* ── بناء ── */
 function build(){
