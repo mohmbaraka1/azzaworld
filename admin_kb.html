@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة إدارة قاعدة المعرفة — AZZA</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--olive-d:#0e3622;--cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;--line:rgba(28,26,20,.1);--card:#fff;--red:#c0392b}
+.dark{--cream:#1a1a12;--cream2:#222218;--ink:#f0e8d0;--muted:#9a9080;--line:rgba(255,255,255,.08);--card:#242418}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;min-height:100vh}
+.topbar{background:var(--olive-d);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.topbar-title{font-size:16px;font-weight:900;flex:1}
+.topbar a{color:rgba(255,255,255,.7);font-size:13px;text-decoration:none}
+.topbar a:hover{color:#fff}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 48px)}
+.sidebar{background:var(--card);border-left:1px solid var(--line);padding:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--muted);transition:.15s;margin-bottom:4px}
+.nav-item:hover,.nav-item.active{background:rgba(28,91,56,.08);color:var(--olive);font-weight:700}
+.nav-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.content{padding:24px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:32px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+.stat-num{font-size:32px;font-weight:900;color:var(--olive)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px}
+/* Table */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tbl-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.tbl-search{flex:1;height:36px;border:1.5px solid var(--line);border-radius:8px;padding:0 12px;font-family:Tajawal,sans-serif;font-size:13px;background:var(--cream2);color:var(--ink);outline:none}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-primary{background:var(--olive);color:#fff}
+.btn-primary:hover{background:var(--olive-d)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;text-align:right;font-size:12px;color:var(--muted);font-weight:700;border-bottom:1px solid var(--line);background:var(--cream2)}
+td{padding:12px 14px;font-size:13px;border-bottom:.5px solid var(--line);vertical-align:middle}
+tr:hover td{background:rgba(28,91,56,.02)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(28,91,56,.1);color:var(--olive)}
+.badge-gray{background:var(--cream2);color:var(--muted)}
+.badge-red{background:rgba(192,57,43,.1);color:var(--red)}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}
+.form-group{margin-bottom:16px}
+.form-label{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
+.form-inp,.form-ta,.form-sel{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--cream2);outline:none;transition:.2s}
+.form-inp:focus,.form-ta:focus,.form-sel:focus{border-color:var(--olive);background:var(--cream)}
+.form-ta{min-height:180px;resize:vertical;line-height:1.7}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+/* Analytics */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.ana-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.ana-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ana-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--line);font-size:13px}
+.ana-item:last-child{border:none}
+.ana-num{font-size:13px;font-weight:700;color:var(--olive);margin-right:auto}
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none}
+@media(max-width:768px){.layout{grid-template-columns:1fr}.sidebar{display:none}.analytics-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-title">✦ AZZA — لوحة إدارة قاعدة المعرفة</span>
+  <a href="help.html">مركز المساعدة</a>
+  <a href="app.html">المنصة</a>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="nav-item active" onclick="showPage('overview')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      نظرة عامة
+    </div>
+    <div class="nav-item" onclick="showPage('articles')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      المقالات
+    </div>
+    <div class="nav-item" onclick="showPage('faqs')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      الأسئلة الشائعة
+    </div>
+    <div class="nav-item" onclick="showPage('analytics')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      التحليلات
+    </div>
+    <div class="nav-item" onclick="showPage('failed')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      بحث فاشل
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Overview -->
+    <div class="page active" id="page-overview">
+      <div class="page-title">📊 نظرة عامة</div>
+      <div class="stats" id="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="st-arts">—</div><div class="stat-label">مقال</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-faqs">—</div><div class="stat-label">سؤال شائع</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-cats">—</div><div class="stat-label">فئة</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-views">—</div><div class="stat-label">مشاهدة</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-helpful">—</div><div class="stat-label">مفيد 👍</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-failed">—</div><div class="stat-label">بحث فاشل</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('articles');openModal()">+ مقال جديد</button>
+        <button class="btn btn-primary" onclick="showPage('faqs');openFaqModal()">+ سؤال شائع</button>
+      </div>
+    </div>
+
+    <!-- Articles -->
+    <div class="page" id="page-articles">
+      <div class="page-title">📄 المقالات
+        <button class="btn btn-primary btn-sm" onclick="openModal()">+ جديد</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head">
+          <input class="tbl-search" placeholder="ابحث في المقالات..." oninput="filterArts(this.value)">
+        </div>
+        <table>
+          <thead><tr><th>العنوان</th><th>الفئة</th><th>الحالة</th><th>مشاهدات</th><th>إجراءات</th></tr></thead>
+          <tbody id="arts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FAQs -->
+    <div class="page" id="page-faqs">
+      <div class="page-title">❓ الأسئلة الشائعة
+        <button class="btn btn-primary btn-sm" onclick="openFaqModal()">+ جديد</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>السؤال</th><th>الفئة</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+          <tbody id="faqs-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="page" id="page-analytics">
+      <div class="page-title">📈 التحليلات</div>
+      <div class="analytics-grid">
+        <div class="ana-card">
+          <div class="ana-title">🔥 الأكثر مشاهدة</div>
+          <div id="top-viewed"></div>
+        </div>
+        <div class="ana-card">
+          <div class="ana-title">👍 أفضل تقييماً</div>
+          <div id="top-rated"></div>
+        </div>
+        <div class="ana-card">
+          <div class="ana-title">👎 أقل إفادة</div>
+          <div id="low-rated"></div>
+        </div>
+        <div class="ana-card">
+          <div class="ana-title">📊 إجمالي الفئات</div>
+          <div id="cat-stats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Failed Searches -->
+    <div class="page" id="page-failed">
+      <div class="page-title">🔍 البحث الفاشل
+        <button class="btn btn-danger btn-sm" onclick="clearFailed()">مسح الكل</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>الاستعلام</th><th>التاريخ</th><th>الإجراء</th></tr></thead>
+          <tbody id="failed-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Article Modal -->
+<div class="modal-overlay" id="art-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-title-text">مقال جديد</span>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <input type="hidden" id="art-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">الفئة</label>
+        <select class="form-sel" id="art-cat"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">وقت القراءة</label>
+        <input class="form-inp" id="art-time" value="دقيقة">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">العنوان *</label>
+      <input class="form-inp" id="art-title" placeholder="عنوان المقال">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ملخص</label>
+      <input class="form-inp" id="art-summary" placeholder="ملخص قصير">
+    </div>
+    <div class="form-group">
+      <label class="form-label">المحتوى * (Markdown مدعوم)</label>
+      <textarea class="form-ta" id="art-body" placeholder="## العنوان&#10;&#10;المحتوى هنا...&#10;&#10;1. خطوة أولى&#10;2. خطوة ثانية"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">الكلمات المفتاحية (مفصولة بفاصلة)</label>
+        <input class="form-inp" id="art-keywords" placeholder="تسجيل، حساب، انضمام">
+      </div>
+      <div class="form-group">
+        <label class="form-label">أسئلة بديلة (مفصولة بفاصلة)</label>
+        <input class="form-inp" id="art-alt" placeholder="كيف أسجل، طريقة التسجيل">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">مشهور؟</label>
+        <select class="form-sel" id="art-popular">
+          <option value="false">لا</option>
+          <option value="true">نعم</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">منشور؟</label>
+        <select class="form-sel" id="art-published">
+          <option value="true">نعم</option>
+          <option value="false">لا (مسودة)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()" style="border:1.5px solid var(--line);background:none;color:var(--ink)">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveArt()">💾 حفظ المقال</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ Modal -->
+<div class="modal-overlay" id="faq-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="faq-modal-title">سؤال شائع جديد</span>
+      <button class="close-btn" onclick="closeFaqModal()">✕</button>
+    </div>
+    <input type="hidden" id="faq-id">
+    <div class="form-group">
+      <label class="form-label">السؤال *</label>
+      <input class="form-inp" id="faq-q" placeholder="هل AZZA مجاني؟">
+    </div>
+    <div class="form-group">
+      <label class="form-label">الجواب *</label>
+      <textarea class="form-ta" id="faq-a" placeholder="نعم، التسجيل والاستخدام الأساسي مجاني تماماً." style="min-height:100px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">الفئة</label>
+        <input class="form-inp" id="faq-cat" placeholder="عام">
+      </div>
+      <div class="form-group">
+        <label class="form-label">الترتيب</label>
+        <input class="form-inp" id="faq-order" type="number" value="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeFaqModal()" style="border:1.5px solid var(--line);background:none;color:var(--ink)">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveFaq()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db = supabase.createClient(SB_URL, SB_ANON);
+
+let ARTS=[], FAQS=[], CATS=[], FAILED=[];
+
+const toast=(msg,t='ok')=>{
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.background=t==='ok'?'#1c5b38':'#c0392b';
+  el.style.opacity='1';
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.style.opacity='0',2500);
+};
+
+/* ── تحميل ── */
+async function load(){
+  const [a,f,c,fs]=await Promise.all([
+    db.from('help_articles').select('*').order('id',{ascending:false}),
+    db.from('help_faqs').select('*').order('sort_order'),
+    db.from('help_categories').select('*').order('sort_order'),
+    db.from('help_failed_searches').select('*').order('created_at',{ascending:false}).limit(50),
+  ]);
+  ARTS=a.data||[]; FAQS=f.data||[]; CATS=c.data||[]; FAILED=fs.data||[];
+
+  /* stats */
+  document.getElementById('st-arts').textContent=ARTS.length;
+  document.getElementById('st-faqs').textContent=FAQS.length;
+  document.getElementById('st-cats').textContent=CATS.length;
+  document.getElementById('st-views').textContent=ARTS.reduce((s,a)=>s+(a.views||0),0);
+  document.getElementById('st-helpful').textContent=ARTS.reduce((s,a)=>s+(a.helpful_yes||0),0);
+  document.getElementById('st-failed').textContent=FAILED.length;
+
+  /* فئات Select */
+  const sel=document.getElementById('art-cat');
+  sel.innerHTML=CATS.map(c=>`<option value="${c.slug}">${c.icon} ${c.name_ar}</option>`).join('');
+
+  renderArts(ARTS);
+  renderFaqs(FAQS);
+  renderAnalytics();
+  renderFailed();
+}
+
+/* ── عرض المقالات ── */
+function renderArts(list){
+  document.getElementById('arts-tbody').innerHTML=list.map(a=>{
+    const cat=CATS.find(c=>c.slug===a.category_slug);
+    return`<tr>
+      <td><strong>${a.title}</strong>${a.is_popular?'<span class="badge badge-green" style="margin-right:6px">🔥</span>':''}</td>
+      <td>${cat?.icon||''} ${cat?.name_ar||a.category_slug}</td>
+      <td><span class="badge ${a.is_published?'badge-green':'badge-gray'}">${a.is_published?'منشور':'مسودة'}</span></td>
+      <td>${a.views||0}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-primary" onclick="editArt(${a.id})">تعديل</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteArt(${a.id})">حذف</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterArts(q){
+  const list=q?ARTS.filter(a=>a.title.includes(q)||a.category_slug.includes(q)):ARTS;
+  renderArts(list);
+}
+
+/* ── عرض FAQ ── */
+function renderFaqs(list){
+  document.getElementById('faqs-tbody').innerHTML=list.map(f=>`<tr>
+    <td>${f.question}</td>
+    <td>${f.category||'—'}</td>
+    <td>${f.sort_order}</td>
+    <td style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-primary" onclick="editFaq(${f.id})">تعديل</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteFaq(${f.id})">حذف</button>
+    </td>
+  </tr>`).join('');
+}
+
+/* ── Analytics ── */
+function renderAnalytics(){
+  const topV=[...ARTS].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);
+  document.getElementById('top-viewed').innerHTML=topV.map(a=>`
+    <div class="ana-item"><span>${a.title.substring(0,30)}...</span><span class="ana-num">${a.views||0} 👁️</span></div>`).join('');
+
+  const topR=[...ARTS].sort((a,b)=>(b.helpful_yes||0)-(a.helpful_yes||0)).slice(0,5);
+  document.getElementById('top-rated').innerHTML=topR.map(a=>`
+    <div class="ana-item"><span>${a.title.substring(0,30)}...</span><span class="ana-num">${a.helpful_yes||0} 👍</span></div>`).join('');
+
+  const lowR=[...ARTS].filter(a=>(a.helpful_no||0)>0).sort((a,b)=>(b.helpful_no||0)-(a.helpful_no||0)).slice(0,5);
+  document.getElementById('low-rated').innerHTML=lowR.length?lowR.map(a=>`
+    <div class="ana-item"><span>${a.title.substring(0,30)}...</span><span class="ana-num">${a.helpful_no||0} 👎</span></div>`).join(''):'<div class="ana-item">لا توجد تقييمات سلبية 🎉</div>';
+
+  document.getElementById('cat-stats').innerHTML=CATS.map(c=>{
+    const count=ARTS.filter(a=>a.category_slug===c.slug).length;
+    return`<div class="ana-item"><span>${c.icon} ${c.name_ar}</span><span class="ana-num">${count}</span></div>`;
+  }).join('');
+}
+
+/* ── Failed ── */
+function renderFailed(){
+  document.getElementById('failed-tbody').innerHTML=FAILED.map(f=>`<tr>
+    <td><strong>${f.query}</strong></td>
+    <td style="color:var(--muted);font-size:12px">${new Date(f.created_at).toLocaleDateString('ar')}</td>
+    <td><button class="btn btn-sm btn-primary" onclick="createFromFailed('${f.query.replace(/'/g,"\\'")}')">+ إنشاء مقال</button></td>
+  </tr>`).join('');
+}
+
+async function clearFailed(){
+  if(!confirm('مسح كل سجلات البحث الفاشل؟')) return;
+  await db.from('help_failed_searches').delete().neq('id',0);
+  FAILED=[];
+  renderFailed();
+  toast('تم المسح');
+}
+
+function createFromFailed(q){
+  openModal();
+  document.getElementById('art-title').value=q;
+}
+
+/* ── Modal ── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const navItems=document.querySelectorAll('.nav-item');
+  const pages=['overview','articles','faqs','analytics','failed'];
+  navItems[pages.indexOf(id)]?.classList.add('active');
+}
+
+function openModal(art=null){
+  document.getElementById('art-modal').classList.add('open');
+  document.getElementById('modal-title-text').textContent=art?'تعديل مقال':'مقال جديد';
+  document.getElementById('art-id').value=art?.id||'';
+  document.getElementById('art-title').value=art?.title||'';
+  document.getElementById('art-summary').value=art?.summary||'';
+  document.getElementById('art-body').value=art?.body||'';
+  document.getElementById('art-keywords').value=(art?.keywords||[]).join('، ');
+  document.getElementById('art-alt').value=(art?.alt_questions||[]).join('، ');
+  document.getElementById('art-time').value=art?.reading_time||'دقيقة';
+  document.getElementById('art-popular').value=art?.is_popular?'true':'false';
+  document.getElementById('art-published').value=art?.is_published===false?'false':'true';
+  if(art?.category_slug) document.getElementById('art-cat').value=art.category_slug;
+}
+function closeModal(){ document.getElementById('art-modal').classList.remove('open'); }
+
+function editArt(id){ openModal(ARTS.find(a=>a.id===id)); }
+
+async function saveArt(){
+  const id=document.getElementById('art-id').value;
+  const title=document.getElementById('art-title').value.trim();
+  const body=document.getElementById('art-body').value.trim();
+  if(!title||!body){ toast('العنوان والمحتوى مطلوبان','err'); return; }
+
+  const data={
+    category_slug:document.getElementById('art-cat').value,
+    title, summary:document.getElementById('art-summary').value,
+    body, reading_time:document.getElementById('art-time').value,
+    is_popular:document.getElementById('art-popular').value==='true',
+    is_published:document.getElementById('art-published').value==='true',
+    keywords:document.getElementById('art-keywords').value.split(/[،,]/).map(s=>s.trim()).filter(Boolean),
+    alt_questions:document.getElementById('art-alt').value.split(/[،,]/).map(s=>s.trim()).filter(Boolean),
+    updated_at:new Date().toISOString(),
+  };
+
+  if(id){
+    await db.from('help_articles').update(data).eq('id',parseInt(id));
+    toast('تم تحديث المقال ✅');
+  }else{
+    await db.from('help_articles').insert(data);
+    toast('تم إنشاء المقال ✅');
+  }
+  closeModal(); await load();
+}
+
+async function deleteArt(id){
+  if(!confirm('حذف هذا المقال؟')) return;
+  await db.from('help_articles').delete().eq('id',id);
+  toast('تم الحذف','err'); await load();
+}
+
+/* ── FAQ Modal ── */
+function openFaqModal(faq=null){
+  document.getElementById('faq-modal').classList.add('open');
+  document.getElementById('faq-modal-title').textContent=faq?'تعديل سؤال':'سؤال شائع جديد';
+  document.getElementById('faq-id').value=faq?.id||'';
+  document.getElementById('faq-q').value=faq?.question||'';
+  document.getElementById('faq-a').value=faq?.answer||'';
+  document.getElementById('faq-cat').value=faq?.category||'';
+  document.getElementById('faq-order').value=faq?.sort_order||0;
+}
+function closeFaqModal(){ document.getElementById('faq-modal').classList.remove('open'); }
+function editFaq(id){ openFaqModal(FAQS.find(f=>f.id===id)); }
+
+async function saveFaq(){
+  const id=document.getElementById('faq-id').value;
+  const q=document.getElementById('faq-q').value.trim();
+  const a=document.getElementById('faq-a').value.trim();
+  if(!q||!a){ toast('السؤال والجواب مطلوبان','err'); return; }
+  const data={question:q,answer:a,category:document.getElementById('faq-cat').value,sort_order:parseInt(document.getElementById('faq-order').value)||0};
+  if(id) await db.from('help_faqs').update(data).eq('id',parseInt(id));
+  else   await db.from('help_faqs').insert(data);
+  toast(id?'تم التحديث':'تم الإنشاء'); closeFaqModal(); await load();
+}
+
+async function deleteFaq(id){
+  if(!confirm('حذف هذا السؤال؟')) return;
+  await db.from('help_faqs').delete().eq('id',id);
+  toast('تم الحذف','err'); await load();
+}
+
+/* ── Themes ── */
+(()=>document.body.classList.toggle('dark',localStorage.getItem('azza_theme')==='dark'))();
+
+/* ── Init ── */
+load();
+</script>
+</body>
+</html>
