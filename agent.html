@@ -6,690 +6,488 @@
 <title>مساعد AZZA</title>
 <script src="supabase.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;900&display=swap');
 :root{
-  --gold:#c69749;--olive:#1c5b38;--olive-d:#0e3622;--olive-l:#e8f4ed;
-  --cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;
-  --card:#fff;--line:rgba(28,26,20,.08);
-  --user-bg:linear-gradient(135deg,#1c5b38,#0e3622);
-  --bot-bg:#fff;
+  --g:#c69749;--o:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ede5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;
+  --line:rgba(0,0,0,.07);--r:18px;
 }
-.dark{
-  --cream:#141410;--cream2:#1e1e16;--ink:#f0e8d0;--muted:#9a9080;
-  --card:#1e1e16;--line:rgba(255,255,255,.06);--bot-bg:#252520;--olive-l:rgba(28,91,56,.15);
-}
+.dk{--bg:#141210;--bg2:#1c1a16;--card:#222018;--ink:#f0e8d0;--sub:#9a9080;--line:rgba(255,255,255,.07)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
-body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;display:flex;flex-direction:column}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;display:flex;flex-direction:column}
 
-/* ── Header ── */
-.hdr{height:56px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;position:relative}
-.hdr-av{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--olive),var(--olive-d));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+/* Header */
+.hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
+.hdr-back{width:36px;height:36px;border-radius:12px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.hdr-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.hdr-av{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--o),var(--od));display:flex;align-items:center;justify-content:center;font-size:20px}
 .hdr-info{flex:1}
-.hdr-name{font-size:15px;font-weight:900;color:var(--ink)}
-.hdr-status{font-size:11px;color:var(--olive);display:flex;align-items:center;gap:4px}
-.hdr-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block}
-.hdr-btn{width:34px;height:34px;border-radius:10px;background:none;border:none;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:.15s}
-.hdr-btn:hover{background:var(--cream2);color:var(--olive)}
-.hdr-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-name{font-size:15px;font-weight:900}
+.hdr-dot{font-size:11px;color:#22c55e;display:flex;align-items:center;gap:4px}
+.hdr-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:block}
+.hdr-act{width:36px;height:36px;border-radius:12px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:16px}
 
-/* ── Chat ── */
-.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+/* Chat */
+.chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
 .chat::-webkit-scrollbar{width:0}
 
-/* ── Messages ── */
-.msg{display:flex;gap:10px;max-width:100%;animation:pop .2s cubic-bezier(.34,1.56,.64,1)}
-@keyframes pop{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.msg.bot{align-items:flex-end}
-.msg.user{align-items:flex-end;flex-direction:row-reverse}
-.msg-av{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
-.msg.bot .msg-av{background:linear-gradient(135deg,var(--olive),var(--olive-d))}
-.msg.user .msg-av{background:linear-gradient(135deg,var(--gold),#e8b96a);color:var(--olive-d);font-weight:700;font-size:13px}
-.bubble{max-width:78%;padding:11px 15px;font-size:14px;line-height:1.75}
-.msg.bot  .bubble{background:var(--bot-bg);border:1px solid var(--line);border-radius:16px 16px 16px 4px;color:var(--ink)}
-.msg.user .bubble{background:var(--user-bg);border-radius:16px 16px 4px 16px;color:#fff}
-.bubble strong{font-weight:700}
-.bubble ul{margin:8px 0 4px 16px}
-.bubble li{margin-bottom:6px}
-.bubble .step{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start}
-.bubble .sn{width:22px;height:22px;border-radius:50%;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
-.bubble .sn-u{background:rgba(255,255,255,.25)}
-.tip-box{background:var(--olive-l);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--olive)}
-.dark .tip-box{color:#7dffcc}
-.msg-time{font-size:10px;opacity:.45;margin-top:4px;text-align:right}
-.msg.user .msg-time{text-align:left}
+/* Bot msg */
+.bot-row{display:flex;gap:8px;align-items:flex-end}
+.bot-av{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--o),var(--od));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.bot-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:12px 15px;max-width:82%;font-size:14px;line-height:1.75;color:var(--ink)}
+.bot-bbl b{font-weight:700}
+.bot-bbl ul{margin:8px 0 2px 18px}
+.bot-bbl li{margin-bottom:5px}
 
-/* ── Options ── */
-.opts{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0 0 42px;animation:pop .25s ease}
-.opt{padding:9px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.2s;text-align:right}
-.opt:hover{border-color:var(--olive);background:var(--olive-l);color:var(--olive)}
-.opt.other{border-style:dashed;color:var(--muted)}
-.opt.other:hover{border-color:var(--gold);background:rgba(198,151,73,.06);color:var(--gold)}
+/* User msg */
+.user-row{display:flex;justify-content:flex-start;flex-direction:row-reverse;gap:8px;align-items:flex-end}
+.user-av{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--g),#e8b96a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--od);flex-shrink:0}
+.user-bbl{background:linear-gradient(135deg,var(--o),var(--od));border-radius:var(--r) var(--r) 4px var(--r);padding:12px 15px;max-width:82%;font-size:14px;line-height:1.75;color:#fff}
 
-/* ── Typing ── */
-.typing-row{display:flex;gap:10px;align-items:flex-end}
-.typing-bbl{background:var(--bot-bg);border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:13px 16px;display:flex;gap:4px;align-items:center}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:bounce .9s infinite}
+/* Step pills */
+.steps{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.step{display:flex;gap:8px;align-items:flex-start}
+.step-n{min-width:22px;height:22px;border-radius:8px;background:var(--o);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-t{font-size:13.5px;line-height:1.6}
+.note{background:var(--ol);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px;color:var(--o)}
+.dk .note{color:#7dffcc;background:rgba(28,91,56,.2)}
+.warn-note{background:rgba(198,151,73,.1);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px;color:#7a4f00}
+.dk .warn-note{color:#ffd78a;background:rgba(198,151,73,.15)}
+
+/* Category Grid */
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.cat-card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.2s;text-align:center}
+.cat-card:hover{border-color:var(--g);background:rgba(198,151,73,.05);transform:translateY(-2px)}
+.cat-card:active{transform:scale(.96)}
+.cat-em{font-size:26px;line-height:1}
+.cat-lbl{font-size:12px;font-weight:700;color:var(--ink)}
+
+/* Choice chips */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.chip{padding:9px 15px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--o);background:var(--ol);color:var(--o)}
+.chip:active{transform:scale(.95)}
+.chip.other{border-style:dashed;color:var(--sub)}
+.chip.other:hover{border-color:var(--g);color:var(--g)}
+.chip-em{font-size:15px;line-height:1}
+
+/* Suggest */
+.suggest-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sug{padding:7px 13px;border-radius:10px;background:var(--bg2);border:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:.2s}
+.sug:hover{background:var(--ol);color:var(--o)}
+
+/* Typing */
+.typing-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:13px 16px;display:flex;gap:4px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:b .9s infinite}
 .dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
-@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+@keyframes b{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
-/* ── Input ── */
-.inp-bar{padding:10px 14px;background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
-.inp-wrap{flex:1;background:var(--cream2);border:1.5px solid var(--line);border-radius:16px;display:flex;align-items:flex-end;padding:8px 10px;gap:6px;transition:.2s}
-.inp-wrap:focus-within{border-color:var(--olive)}
-.inp-ta{flex:1;background:none;border:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none;resize:none;min-height:22px;max-height:100px;line-height:1.5}
-.inp-ta::placeholder{color:var(--muted)}
-.send{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--olive),var(--olive-d));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(14,54,34,.2);transition:.2s}
-.send:disabled{background:var(--cream2);box-shadow:none;cursor:not-allowed}
-.send svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Input */
+.inp-bar{padding:10px 12px;background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.inp-wrap{flex:1;background:var(--bg2);border:1.5px solid var(--line);border-radius:16px;padding:8px 12px;display:flex;align-items:flex-end;gap:6px;transition:.2s}
+.inp-wrap:focus-within{border-color:var(--o)}
+.inp-ta{flex:1;background:none;border:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none;resize:none;min-height:22px;max-height:90px;line-height:1.5}
+.inp-ta::placeholder{color:var(--sub)}
+.send-btn{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--o),var(--od));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(14,54,34,.2);flex-shrink:0}
+.send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 
-/* ── Welcome ── */
-.welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:32px 20px}
-.welcome-em{font-size:52px;margin-bottom:4px}
-.welcome-t{font-size:20px;font-weight:900;color:var(--olive)}
-.welcome-s{font-size:14px;color:var(--muted);max-width:340px;line-height:1.7}
+/* Pop animation */
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.pop{animation:pop .2s cubic-bezier(.34,1.3,.64,1)}
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="hdr">
-  <button class="hdr-btn" onclick="history.back()">
+  <button class="hdr-back" onclick="history.length>1?history.back():location.href='app.html'">
     <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
   </button>
   <div class="hdr-av">🤖</div>
   <div class="hdr-info">
     <div class="hdr-name">مساعد AZZA</div>
-    <div class="hdr-status">متاح دائماً</div>
+    <div class="hdr-dot">متاح دائماً</div>
   </div>
-  <button class="hdr-btn" onclick="resetChat()" title="محادثة جديدة">
-    <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.61"/></svg>
-  </button>
-  <button class="hdr-btn" onclick="location.href='help.html'" title="مركز المساعدة">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  </button>
+  <button class="hdr-act" onclick="resetChat()" title="محادثة جديدة">🔄</button>
+  <button class="hdr-act" onclick="location.href='help.html'" title="مركز المساعدة">📖</button>
 </div>
 
-<!-- Chat -->
-<div class="chat" id="chat">
-  <div class="welcome" id="welcome">
-    <div class="welcome-em">🤖</div>
-    <div class="welcome-t">مرحباً! أنا مساعد AZZA</div>
-    <div class="welcome-s">أنا متخصص في منصة AZZA — اسألني أي شيء أو اختر موضوعاً من الأسفل</div>
-  </div>
-</div>
+<div class="chat" id="chat"></div>
 
-<!-- Input -->
 <div class="inp-bar">
   <div class="inp-wrap">
-    <textarea class="inp-ta" id="inp" placeholder="اكتب سؤالك..." rows="1"
-      oninput="autoR(this)"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+    <textarea class="inp-ta" id="inp" placeholder="اكتب سؤالك هنا..." rows="1"
+      oninput="ar(this)"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFree()}"></textarea>
   </div>
-  <button class="send" id="send-btn" onclick="send()">
+  <button class="send-btn" onclick="sendFree()">
     <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
   </button>
 </div>
 
 <script>
-/* ══════════════════════════════════════════════
-   AZZA Assistant v3 — Guided + Free Text
-   ══════════════════════════════════════════════ */
-
 const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
 const db = supabase.createClient(SB_URL, SB_ANON);
-
 const me = JSON.parse(localStorage.getItem('azza_user')||'null');
 if(!me) location.href='login.html';
-const myIni = (me?.name||'م')[0].toUpperCase();
-const now = ()=>new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
-let KB=[], KB_FAQS=[], isTyping=false;
 
-/* ── تحميل قاعدة المعرفة ── */
+let KB=[], KB_FAQS=[];
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const chat  = document.getElementById('chat');
+const now   = () => new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+const myIni = (me?.name||'م')[0];
+const esc   = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ══ تحميل KB ══ */
 async function loadKB(){
-  const [a,f]=await Promise.all([
+  const [a,f] = await Promise.all([
     db.from('help_articles').select('id,title,summary,body,keywords,alt_questions,category_slug').eq('is_published',true),
     db.from('help_faqs').select('question,answer,keywords').eq('is_published',true),
   ]);
-  KB      = (a.data||[]).map(r=>({
-    id:r.id, cat:r.category_slug||'', title:r.title,
+  KB = (a.data||[]).map(r=>({
+    title:r.title, cat:r.category_slug,
     tags:[...(r.keywords||[]),...(r.alt_questions||[])],
-    answer:cleanMd(r.body||r.summary||''),
+    ans:((r.body||r.summary||'').replace(/##\s/g,'').replace(/\*\*/g,'').trim()),
   }));
-  KB_FAQS = (f.data||[]).map(r=>({title:r.question,tags:r.keywords||[],answer:r.answer,cat:'faq'}));
+  KB_FAQS = (f.data||[]).map(r=>({
+    title:r.question, cat:'faq',
+    tags:r.keywords||[], ans:r.answer,
+  }));
 }
 
-function cleanMd(t){
-  return t.replace(/##\s/g,'').replace(/\*\*/g,'').replace(/\n{3,}/g,'\n\n').trim();
-}
-
-/* ══════════════════════════════════════════════
-   شجرة المحادثة الموجّهة
-   ══════════════════════════════════════════════ */
-const TREE = {
-
-  /* ── الجذر ── */
-  root:{
-    msg:'مرحباً، شو بدك تعرف؟',
-    opts:[
-      {label:'🚀 البداية والتسجيل', next:'start'},
-      {label:'👤 الحساب والملف الشخصي', next:'account'},
-      {label:'📝 المنشورات والأفكار', next:'posts'},
-      {label:'💬 الرسائل', next:'messages'},
-      {label:'💰 الاستثمار والفرص', next:'invest'},
-      {label:'💼 الوظائف والمسار المهني', next:'jobs'},
-      {label:'🎓 الطلاب والتدريب', next:'students'},
-      {label:'🔧 مشكلة تقنية', next:'trouble'},
-      {label:'✏️ اكتب سؤالك...', next:'free', other:true},
-    ]
-  },
-
-  /* ── البداية ── */
-  start:{
-    msg:'ما الذي تريد معرفته عن البداية؟',
-    opts:[
-      {label:'كيف أنشئ حساباً؟',        ans:'create-account'},
-      {label:'كيف أسجّل بـGoogle؟',      ans:'google-login'},
-      {label:'نسيت كلمة المرور',         ans:'forgot-pass'},
-      {label:'ما هي أنواع الحسابات؟',   ans:'account-types'},
-      {label:'كيف أكمل ملفي بعد التسجيل؟', ans:'complete-profile'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── الحساب ── */
-  account:{
-    msg:'ما الذي تريد تعديله أو معرفته عن حسابك؟',
-    opts:[
-      {label:'تغيير الصورة الشخصية',     ans:'change-photo'},
-      {label:'تغيير الاسم أو البريد',    ans:'change-name'},
-      {label:'تغيير كلمة المرور',        ans:'change-pass'},
-      {label:'حذف الحساب',              ans:'delete-account'},
-      {label:'ما هو Trust Score؟',       ans:'trust-score'},
-      {label:'إعدادات الخصوصية',        ans:'privacy-settings'},
-      {label:'متابعة مستخدمين',         ans:'follow-users'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── المنشورات ── */
-  posts:{
-    msg:'ما الذي تريد فعله؟',
-    opts:[
-      {label:'نشر فكرة أو مشروع',       ans:'publish-post'},
-      {label:'ما هو NDA؟',              ans:'nda'},
-      {label:'تعديل أو حذف منشور',      ans:'edit-post'},
-      {label:'حفظ منشور',               ans:'save-post'},
-      {label:'الإبلاغ عن محتوى مسيء',  ans:'report-post'},
-      {label:'كيف تعمل التفاعلات؟',    ans:'reactions'},
-      {label:'إضافة تعليق أو رد',       ans:'add-comment'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── الرسائل ── */
-  messages:{
-    msg:'ماذا تريد معرفته عن الرسائل؟',
-    opts:[
-      {label:'كيف أرسل رسالة؟',                    ans:'send-message'},
-      {label:'قبول أو رفض طلب مراسلة',             ans:'accept-request'},
-      {label:'إرسال صورة أو ملف',                  ans:'send-media'},
-      {label:'تعديل أو حذف رسالة',                 ans:'edit-message'},
-      {label:'ماذا تعني ✓ و✓✓؟',                  ans:'read-receipt'},
-      {label:'من يستطيع مراسلتي؟',                 ans:'message-privacy'},
-      {label:'حذف محادثة كاملة',                    ans:'delete-conv'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── الاستثمار ── */
-  invest:{
-    msg:'ما الذي يهمك في الاستثمار؟',
-    opts:[
-      {label:'كيف أجد فرص استثمار؟',    ans:'find-invest'},
-      {label:'كيف أتواصل مع صاحب مشروع؟', ans:'contact-founder'},
-      {label:'كيف أحفظ فرصة لاحقاً؟',  ans:'save-invest'},
-      {label:'كيف أنشر مشروعي للمستثمرين؟', ans:'publish-post'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── الوظائف ── */
-  jobs:{
-    msg:'ما مجال الوظيفة التي تبحث عنها أو تريد نشرها؟',
-    opts:[
-      {label:'تقنية المعلومات / برمجة',  ans:'job-search', meta:'تقنية'},
-      {label:'تصميم / إبداع',            ans:'job-search', meta:'تصميم'},
-      {label:'مبيعات / تسويق',           ans:'job-search', meta:'مبيعات'},
-      {label:'محاسبة / مالية',           ans:'job-search', meta:'محاسبة'},
-      {label:'هندسة',                    ans:'job-search', meta:'هندسة'},
-      {label:'طب / صحة',                 ans:'job-search', meta:'طب'},
-      {label:'تعليم / تدريب',            ans:'job-search', meta:'تعليم'},
-      {label:'إدارة / أعمال',            ans:'job-search', meta:'إدارة'},
-      {label:'قانون / محاماة',           ans:'job-search', meta:'قانون'},
-      {label:'موارد بشرية',              ans:'job-search', meta:'HR'},
-      {label:'أريد نشر وظيفة',          ans:'post-job'},
-      {label:'مجال آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── الطلاب ── */
-  students:{
-    msg:'كيف يمكن مساعدتك؟',
-    opts:[
-      {label:'نشر مشروع تخرج',          ans:'grad-project'},
-      {label:'إيجاد فرصة تدريب',        ans:'find-internship'},
-      {label:'بناء CV قوي',             ans:'build-cv'},
-      {label:'التقديم لمنح دراسية',     ans:'scholarships'},
-      {label:'التقديم لمسابقات',        ans:'competitions'},
-      {label:'موضوع آخر...', next:'free', other:true},
-    ]
-  },
-
-  /* ── المشاكل ── */
-  trouble:{
-    msg:'ما المشكلة التي تواجهها؟',
-    opts:[
-      {label:'لا أستطيع تسجيل الدخول',  ans:'login-issues'},
-      {label:'الصور لا تُرفع',          ans:'image-upload'},
-      {label:'المنصة بطيئة أو تتجمد',  ans:'slow-perf'},
-      {label:'الصفحة لا تتحدث',        ans:'realtime-issue'},
-      {label:'لا تصلني إشعارات',       ans:'notif-missing'},
-      {label:'لا أستطيع إرسال رسائل',  ans:'cant-message'},
-      {label:'حسابي تعرّض للاختراق',   ans:'account-hacked'},
-      {label:'مشكلة أخرى...', next:'free', other:true},
-    ]
-  },
-
-  free:{ msg:'تفضّل، اكتب سؤالك وسأبحث لك عن الإجابة 👇', opts:[] }
-};
-
-/* ══════════════════════════════════════════════
-   قاعدة الإجابات المدمجة
-   ══════════════════════════════════════════════ */
-const ANSWERS = {
-  'create-account':{
-    title:'كيف أنشئ حساباً على AZZA؟',
-    steps:['افتح صفحة التسجيل','اختر نوع حسابك (صاحب فكرة / خبير / مستثمر / شركة)','أدخل اسمك والبريد وكلمة المرور','اختر بلدك ومدينتك','اضغط "إنشاء الحساب"'],
-    tip:'يمكنك التسجيل بـGoogle بضغطة واحدة — أسرع وأأمن!',
-    back:true
-  },
-  'google-login':{
-    title:'تسجيل الدخول بـGoogle',
-    steps:['افتح صفحة تسجيل الدخول','اضغط "تسجيل الدخول بـGoogle"','اختر حسابك','ستنتقل للمنصة تلقائياً'],
-    tip:'أسرع وأأمن من كلمة المرور!',back:true
-  },
-  'forgot-pass':{
-    title:'استعادة كلمة المرور',
-    steps:['افتح صفحة تسجيل الدخول','اضغط "نسيت كلمة المرور؟"','أدخل بريدك الإلكتروني','افتح رسالة الاستعادة من بريدك','اضغط الرابط وأدخل كلمة مرور جديدة'],
-    warn:'الرابط صالح لساعة واحدة فقط.',back:true
-  },
-  'account-types':{
-    title:'أنواع الحسابات على AZZA',
-    list:['👤 صاحب فكرة — ينشر أفكاره ويبحث عن تمويل','🧠 خبير — يقدم خدماته ومهاراته','💰 مستثمر — يبحث عن فرص استثمار','🏢 شركة — تعلن عن فرص وشراكات','🎓 طالب — يبحث عن فرص وتدريب'],
-    tip:'يمكنك تغيير نوع حسابك لاحقاً من الإعدادات.',back:true
-  },
-  'complete-profile':{
-    title:'استكمال الملف الشخصي',
-    steps:['افتح الإعدادات','أضف صورتك الشخصية','اكتب نبذة قصيرة عنك','أضف مهاراتك وخبراتك','حدد موقعك الجغرافي'],
-    tip:'الملف الشخصي المكتمل يجذب 3x مزيداً من الاهتمام!',back:true
-  },
-  'change-photo':{
-    title:'تغيير الصورة الشخصية',
-    steps:['افتح الإعدادات','اضغط على الصورة الحالية','اختر صورة من جهازك (حد أقصى 3MB)','اضغط حفظ'],
-    tip:'الصور المقبولة: JPG, PNG, WebP',back:true
-  },
-  'change-name':{
-    title:'تغيير الاسم أو البريد',
-    steps:['الإعدادات → معلومات الحساب','عدّل الاسم أو البريد','اضغط حفظ التغييرات'],
-    warn:'تغيير البريد قد يتطلب تأكيداً.',back:true
-  },
-  'change-pass':{
-    title:'تغيير كلمة المرور',
-    steps:['الإعدادات → الأمان','أدخل كلمة المرور الحالية','أدخل كلمة المرور الجديدة','أكّد كلمة المرور الجديدة','اضغط تغيير'],
-    tip:'استخدم 8 أحرف على الأقل مع أرقام ورموز.',back:true
-  },
-  'delete-account':{
-    title:'حذف الحساب',
-    steps:['الإعدادات → الحساب','اضغط "حذف الحساب"','أكّد بكلمة المرور','اضغط تأكيد'],
-    warn:'الحذف نهائي ولا يمكن التراجع عنه.',back:true
-  },
-  'trust-score':{
-    title:'ما هو Trust Score؟',
-    body:'رقم من 0-100 يعكس مصداقيتك على المنصة.\n\nكيف ترفعه:',
-    list:['أكمل ملفك الشخصي 100%','احصل على توثيق ✅','تفاعل مع المجتمع','احصل على متابعين','انشر أفكاراً ومشاريع'],
-    tip:'Trust Score مرتفع يزيد ظهورك للمستثمرين.',back:true
-  },
-  'privacy-settings':{
-    title:'إعدادات الخصوصية',
-    body:'من الإعدادات → الخصوصية، يمكنك التحكم بـ:',
-    list:['من يستطيع مراسلتك (الجميع / المتابعون / لا أحد)','من يرى ملفك الشخصي','إظهار أو إخفاء بريدك وهاتفك'],
-    back:true
-  },
-  'follow-users':{
-    title:'متابعة مستخدم',
-    steps:['افتح صفحة المستخدم','اضغط زر "+" أو "متابعة"'],
-    tip:'يمكن إلغاء المتابعة في أي وقت من نفس الزر.',back:true
-  },
-  'publish-post':{
-    title:'نشر فكرة أو مشروع',
-    steps:['من الفيد، اضغط "✦ نشر فكرة"','اختر النوع: فكرة / مشروع / وظيفة','اكتب العنوان والوصف','اختر الفئة المناسبة','أضف صورة (اختياري)','اضغط نشر'],
-    warn:'لحماية فكرتك من التقليد، فعّل خيار NDA.',back:true
-  },
-  'nda':{
-    title:'ما هو NDA؟',
-    body:'NDA (اتفاقية عدم الإفصاح) يحمي فكرتك — المستثمر يوقّع قبل رؤية التفاصيل.',
-    steps:['عند نشر فكرة، فعّل خيار 🔒 حماية NDA','المستثمرون سيرون "توقيع NDA وإبداء الاهتمام"','بعد التوقيع يصلك إشعار باهتمامهم'],
-    tip:'مناسب للأفكار التي لم تُطلق بعد.',back:true
-  },
-  'edit-post':{
-    title:'تعديل أو حذف منشور',
-    steps:['افتح تفاصيل المنشور','اضغط ⋮ (ثلاث نقاط)','اختر "تعديل" أو "حذف"','أكّد العملية'],
-    warn:'الحذف نهائي ولا يمكن التراجع عنه.',back:true
-  },
-  'save-post':{
-    title:'حفظ منشور',
-    body:'اضغط أيقونة 🔖 في أي منشور لحفظه.',
-    tip:'يمكن الوصول للمحفوظات من ملفك الشخصي → المحفوظات.',back:true
-  },
-  'report-post':{
-    title:'الإبلاغ عن منشور',
-    steps:['افتح المنشور','اضغط ⋮','اختر "إبلاغ"','اختر سبب البلاغ','اضغط إرسال'],
-    tip:'سيراجع الفريق البلاغ خلال 24 ساعة.',back:true
-  },
-  'reactions':{
-    title:'التفاعلات على المنشورات',
-    list:['▲ تصويت — دعم الفكرة','💡 ثاقب — الفكرة مبتكرة','🤝 تعاون — ترغب بالتعاون','⭐ اهتمام — اهتمام استثماري'],
-    tip:'كل تفاعل يُرسل إشعاراً لصاحب المنشور.',back:true
-  },
-  'add-comment':{
-    title:'إضافة تعليق أو رد',
-    steps:['افتح المنشور','اكتب في حقل "أضف تعليقاً"','اضغط إرسال'],
-    body:'للرد على تعليق: اضغط "↩ رد" تحت أي تعليق.',back:true
-  },
-  'send-message':{
-    title:'إرسال رسالة',
-    steps:['افتح صفحة المستخدم','اضغط "💬 رسالة"','يُرسل طلب مراسلة','عند القبول تُفتح المحادثة'],
-    tip:'بعض المستخدمين يقبلون رسائل المتابعين فقط.',back:true
-  },
-  'accept-request':{
-    title:'قبول أو رفض طلب مراسلة',
-    body:'افتح الرسائل → تبويب "الطلبات"',
-    list:['✓ قبول — لفتح المحادثة','✗ رفض — لرفض الطلب'],
-    back:true
-  },
-  'send-media':{
-    title:'إرسال صورة أو ملف',
-    steps:['اضغط أيقونة 📎 في شريط الكتابة','اختر الصورة أو الملف','سيُرفع ويُرسل تلقائياً'],
-    tip:'الحد الأقصى 20MB للملفات و20MB للصور.',back:true
-  },
-  'edit-message':{
-    title:'تعديل أو حذف رسالة',
-    body:'كليك يمين (كمبيوتر) أو ضغط طويل (جوال) على الرسالة، ثم:',
-    list:['✏️ تعديل — لتغيير النص','🗑️ حذف للجميع — يحذفها من الطرفين','📋 نسخ — لنسخ النص','↪️ توجيه — لإرسالها لمحادثة أخرى'],
-    back:true
-  },
-  'read-receipt':{
-    title:'معنى ✓ و✓✓ في الرسائل',
-    list:['✓ — تم الإرسال','✓✓ (رمادي) — تم التسليم','✓✓ (أخضر) — تمت القراءة'],
-    tip:'"يكتب..." يظهر عندما يكتب الطرف الآخر.',back:true
-  },
-  'message-privacy':{
-    title:'من يستطيع مراسلتك؟',
-    body:'الإعدادات → الخصوصية → من يستطيع مراسلتك:',
-    list:['الجميع — أي مستخدم','المتابعون فقط','لا أحد — أغلق المراسلة'],
-    back:true
-  },
-  'delete-conv':{
-    title:'حذف محادثة',
-    steps:['افتح المحادثة','اضغط أيقونة 🗑️ في الأعلى','أكّد الحذف'],
-    warn:'الحذف نهائي ولا يمكن استعادة المحادثة.',back:true
-  },
-  'find-invest':{
-    title:'إيجاد فرص الاستثمار',
-    list:['الفيد الرئيسي — فلتر "مشاريع"','لوحة المستثمر — صفحة مخصصة','البحث بكلمات مثل "تقنية" أو "صحة"','الخريطة التفاعلية — فرص حسب الموقع'],
-    body:'لإبداء الاهتمام: افتح المشروع واضغط ⭐ اهتمام',back:true
-  },
-  'contact-founder':{
-    title:'التواصل مع صاحب مشروع',
-    steps:['افتح المشروع','اضغط ⭐ اهتمام','أو افتح ملف صاحب المشروع','اضغط "💬 رسالة"','أرسل طلب مراسلة'],
-    tip:'سيصله إشعار باهتمامك فوراً.',back:true
-  },
-  'save-invest':{
-    title:'حفظ فرصة استثمارية',
-    body:'اضغط 🔖 في أي منشور لحفظه.',
-    tip:'المحفوظات في ملفك الشخصي.',back:true
-  },
-  'job-search':{
-    title:'البحث عن وظيفة',
-    steps:['استخدم شريط البحث وابحث بالمسمى أو القطاع','أو فلتر المنشورات بنوع "وظيفة"','استخدم الخريطة للبحث بالموقع','تواصل مع الشركة مباشرة عبر الرسائل'],
-    tip:'أكمل ملفك الشخصي وأضف CV قوي لزيادة فرص القبول.',back:true
-  },
-  'post-job':{
-    title:'نشر وظيفة',
-    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر نوع "وظيفة"','أدخل تفاصيل الوظيفة والمتطلبات','حدد الراتب والموقع','اضغط نشر'],
-    tip:'وظائفك ستظهر في قسم الوظائف وفيد المستخدمين.',back:true
-  },
-  'grad-project':{
-    title:'نشر مشروع التخرج',
-    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر نوع "مشروع"','اكتب اسم المشروع والتقنيات المستخدمة','أضف صوراً أو فيديو توضيحياً','اضغط نشر'],
-    tip:'مشاريع التخرج تجذب انتباه الشركات والمستثمرين!',back:true
-  },
-  'find-internship':{
-    title:'إيجاد فرصة تدريب',
-    steps:['ابحث عن "تدريب" أو "internship"','أو فلتر المنشورات بنوع "وظيفة"','تواصل مع الشركات مباشرة'],
-    tip:'أكمل ملفك الشخصي أولاً لزيادة فرص القبول.',back:true
-  },
-  'build-cv':{
-    title:'بناء CV قوي على AZZA',
-    list:['📸 صورة احترافية في ملفك','📝 نبذة قصيرة تعكس هدفك','🛠️ المهارات بالتفصيل','🗂️ المشاريع مع روابط وصور','🎓 التعليم والشهادات','💼 الخبرات السابقة'],
-    tip:'الملف المكتمل يحصل على 3x مشاهدات أكثر!',back:true
-  },
-  'scholarships':{
-    title:'المنح الدراسية على AZZA',
-    body:'ابحث في المنصة عن "منحة" أو "scholarship". يمكنك أيضاً متابعة الجامعات والمؤسسات التعليمية لتصلك إشعارات المنح.',
-    back:true
-  },
-  'competitions':{
-    title:'المسابقات على AZZA',
-    body:'ابحث في المنصة عن "مسابقة" أو "competition". المؤسسات والشركات تنشر المسابقات كمنشورات عادية.',
-    back:true
-  },
-  'login-issues':{
-    title:'لا أستطيع تسجيل الدخول',
-    list:['كلمة مرور خاطئة → اضغط "نسيت كلمة المرور"','بريد غير مسجّل → تأكد من البريد الصحيح','سجّلت بـGoogle → استخدم نفس الطريقة','مشكلة كاش → Ctrl+Shift+R','متصفح قديم → جرّب Chrome أو Edge'],
-    back:true
-  },
-  'image-upload':{
-    title:'الصور لا تُرفع',
-    list:['الحجم كبير → الحد الأقصى 20MB (رسائل) / 3MB (صورة شخصية)','نوع غير مدعوم → استخدم JPG/PNG/WebP/GIF','إنترنت ضعيف → تحقق من الاتصال','سجّل خروجاً ودخولاً لتجديد الصلاحيات'],
-    back:true
-  },
-  'slow-perf':{
-    title:'المنصة بطيئة',
-    list:['Ctrl+Shift+R (Hard Refresh)','أغلق التبويبات الأخرى','جرّب Chrome أو Edge','تحقق من سرعة الإنترنت','امسح بيانات المتصفح'],
-    back:true
-  },
-  'realtime-issue':{
-    title:'الصفحة لا تتحدث تلقائياً',
-    list:['تحقق من الإنترنت','أعد تحميل الصفحة (F5)','سجّل خروجاً ودخولاً','جرّب متصفحاً آخر'],
-    back:true
-  },
-  'notif-missing':{
-    title:'لا تصلني إشعارات',
-    list:['تأكد من تسجيل الدخول','جرّب Chrome أو Edge','تحقق من الإنترنت','سجّل خروجاً ودخولاً (Ctrl+Shift+R)'],
-    back:true
-  },
-  'cant-message':{
-    title:'لا أستطيع إرسال رسائل',
-    list:['لم يُقبل طلب المراسلة → انتظر القبول','المستخدم يقبل المتابعين فقط → اتبعه أولاً','المستخدم أغلق الرسائل → لا يمكن التواصل','مشكلة اتصال → تحقق من الإنترنت'],
-    back:true
-  },
-  'account-hacked':{
-    title:'حسابي تعرّض للاختراق — خطوات عاجلة',
-    steps:['غيّر كلمة المرور فوراً من الإعدادات','تحقق من بريدك للرسائل المشبوهة','سجّل الخروج من جميع الأجهزة','راسل الدعم على support@azzaworld.com'],
-    warn:'لا تشارك كلمة مرورك مع أحد أبداً.',back:true
-  },
-};
-
-/* ══════════════════════════════════════════════
-   محرك عرض الرسائل
-   ══════════════════════════════════════════════ */
-const chat = document.getElementById('chat');
-
-function rmWelcome(){ document.getElementById('welcome')?.remove(); }
-
-function addBot(html, time=true){
-  rmWelcome();
-  const d=document.createElement('div');
-  d.className='msg bot';
-  d.innerHTML=`<div class="msg-av">🤖</div>
-    <div><div class="bubble">${html}</div>${time?`<div class="msg-time">${now()}</div>`:''}</div>`;
-  chat.appendChild(d);
-  scroll();
+/* ══ إضافة رسائل ══ */
+function addBot(html, delay=0){
+  return new Promise(async res=>{
+    if(delay) await sleep(delay);
+    const d=document.createElement('div');
+    d.className='bot-row pop';
+    d.innerHTML=`<div class="bot-av">🤖</div><div class="bot-bbl">${html}</div>`;
+    chat.appendChild(d); scroll(); res();
+  });
 }
 
 function addUser(text){
-  rmWelcome();
   const d=document.createElement('div');
-  d.className='msg user';
-  d.innerHTML=`<div class="msg-av">${myIni}</div>
-    <div><div class="bubble">${esc(text)}</div><div class="msg-time">${now()}</div></div>`;
-  chat.appendChild(d);
-  scroll();
-}
-
-function addOpts(opts){
-  const d=document.createElement('div');
-  d.className='opts';
-  d.innerHTML=opts.map(o=>`<button class="opt${o.other?' other':''}" onclick="handleOpt(${JSON.stringify(o).replace(/"/g,'&quot;')})">${o.label}</button>`).join('');
-  chat.appendChild(d);
-  scroll();
-}
-
-function removeOpts(){ chat.querySelectorAll('.opts').forEach(o=>o.remove()); }
-
-function scroll(){ setTimeout(()=>chat.scrollTop=chat.scrollHeight,50); }
-
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function showTyping(){
-  const d=document.createElement('div');
-  d.className='typing-row'; d.id='typing';
-  d.innerHTML=`<div class="msg-av" style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#1c5b38,#0e3622);display:flex;align-items:center;justify-content:center;font-size:14px">🤖</div>
-    <div class="typing-bbl"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  d.className='user-row pop';
+  d.innerHTML=`<div class="user-av">${myIni}</div><div class="user-bbl">${esc(text)}</div>`;
   chat.appendChild(d); scroll();
 }
-function hideTyping(){ document.getElementById('typing')?.remove(); }
 
-/* ── بناء HTML للإجابة ── */
-function buildAnswer(ans){
-  let h=`<strong>${ans.title}</strong>`;
-  if(ans.body) h+=`<br><br>${ans.body.replace(/\n/g,'<br>')}`;
-  if(ans.steps){
-    h+=ans.body?'<br>':'<br><br>';
-    h+=ans.steps.map((s,i)=>`<div class="step"><div class="sn">${i+1}</div><div>${s}</div></div>`).join('');
+function addEl(el){ chat.appendChild(el); scroll(); }
+
+function typing(){ const d=document.createElement('div'); d.className='bot-row pop'; d.id='typing'; d.innerHTML=`<div class="bot-av">🤖</div><div class="typing-bbl"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`; chat.appendChild(d); scroll(); }
+function rmTyping(){ document.getElementById('typing')?.remove(); }
+function rmInteractive(){ chat.querySelectorAll('.cat-grid,.chips,.suggest-row').forEach(e=>e.remove()); }
+function scroll(){ setTimeout(()=>chat.scrollTop=chat.scrollHeight,40); }
+function ar(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+
+/* ══ القائمة الرئيسية ══ */
+const CATS = [
+  {em:'🚀',lbl:'البداية',id:'start'},
+  {em:'👤',lbl:'الحساب',id:'account'},
+  {em:'📝',lbl:'المنشورات',id:'posts'},
+  {em:'💬',lbl:'الرسائل',id:'messages'},
+  {em:'💰',lbl:'الاستثمار',id:'invest'},
+  {em:'💼',lbl:'الوظائف',id:'jobs'},
+  {em:'🎓',lbl:'الطلاب',id:'students'},
+  {em:'🔧',lbl:'مشكلة',id:'trouble'},
+  {em:'✅',lbl:'التوثيق',id:'verify'},
+  {em:'⚙️',lbl:'الإعدادات',id:'settings'},
+  {em:'🗺️',lbl:'الخريطة',id:'map'},
+  {em:'🤖',lbl:'المساعد',id:'assistant'},
+];
+
+async function showHome(){
+  await addBot(`أهلاً ${me.name||''}! 👋<br>بأي موضوع تريد مساعدة اليوم؟`);
+  const g=document.createElement('div');
+  g.className='cat-grid pop';
+  g.innerHTML=CATS.map(c=>`<div class="cat-card" onclick="pickCat('${c.id}','${c.em} ${c.lbl}')"><div class="cat-em">${c.em}</div><div class="cat-lbl">${c.lbl}</div></div>`).join('');
+  addEl(g);
+}
+
+/* ══ اختيار فئة ══ */
+const CAT_Q = {
+  start:    {q:'ما الذي تريد معرفته عن البداية؟', chips:['كيف أنشئ حساباً؟','كيف أسجل بـGoogle؟','نسيت كلمة المرور','ما أنواع الحسابات؟','كيف أكمل ملفي؟']},
+  account:  {q:'ماذا تريد بخصوص حسابك؟', chips:['تغيير الصورة','تغيير كلمة المرور','حذف الحساب','ما هو Trust Score؟','الخصوصية','متابعة أشخاص']},
+  posts:    {q:'ماذا تريد فعله بالمنشورات؟', chips:['نشر فكرة أو مشروع','ما هو NDA؟','تعديل أو حذف منشور','الإبلاغ عن محتوى','التفاعلات','التعليقات']},
+  messages: {q:'ماذا تريد معرفته عن الرسائل؟', chips:['كيف أرسل رسالة؟','قبول طلب مراسلة','إرسال صورة أو ملف','تعديل أو حذف رسالة','معنى ✓ و✓✓','من يراسلني؟','حذف محادثة']},
+  invest:   {q:'ماذا يهمك في الاستثمار؟', chips:['إيجاد فرص استثمار','التواصل مع صاحب مشروع','حفظ فرصة','نشر مشروعي للمستثمرين']},
+  jobs:     {q:'ما مجال الوظيفة؟', chips:['💻 تقنية / برمجة','🎨 تصميم / إبداع','📊 مبيعات / تسويق','💰 محاسبة / مالية','⚙️ هندسة','🏥 طب / صحة','📚 تعليم / تدريب','🏢 إدارة / أعمال','⚖️ قانون','👥 موارد بشرية','📢 أنشر وظيفة']},
+  students: {q:'كيف أساعدك؟', chips:['نشر مشروع تخرج','إيجاد فرصة تدريب','بناء CV قوي','التقدم لمنح','المسابقات']},
+  trouble:  {q:'ما المشكلة التي تواجهها؟', chips:['لا أستطيع تسجيل الدخول','الصور لا تُرفع','المنصة بطيئة','لا تصلني إشعارات','لا أستطيع إرسال رسائل','الصفحة لا تتحدث','حسابي اختُرق']},
+  verify:   {q:'ماذا تريد معرفته عن التوثيق؟', chips:['كيف أوثّق حسابي؟','متطلبات التوثيق','كم تستغرق المراجعة؟']},
+  settings: {q:'ما الذي تريد تغييره؟', chips:['الوضع الليلي','إعدادات الإشعارات','إعدادات الخصوصية','تغيير اللغة']},
+  map:      {q:'ماذا تريد من الخريطة؟', chips:['كيف أستخدم الخريطة؟','كيف يظهر موقعي؟','البحث بالموقع']},
+  assistant:{q:'كيف أساعدك بخصوص المساعد؟', chips:['كيف أستخدم المساعد؟','ما هي قدرات المساعد؟']},
+};
+
+async function pickCat(id, label){
+  rmInteractive();
+  addUser(label);
+  typing(); await sleep(500); rmTyping();
+  const cq = CAT_Q[id];
+  if(!cq){ await addBot('سأبحث لك فوراً...'); return; }
+  await addBot(cq.q);
+  const c=document.createElement('div');
+  c.className='chips pop';
+  c.innerHTML=cq.chips.map(ch=>`<div class="chip" onclick="pickChip(this,'${esc(ch)}')">${ch}</div>`).join('');
+  c.innerHTML+=`<div class="chip other" onclick="this.closest('.chips').remove();document.getElementById('inp').focus()">✏️ غير ذلك...</div>`;
+  addEl(c);
+}
+
+/* ══ اختيار خيار ══ */
+async function pickChip(el, text){
+  rmInteractive();
+  addUser(text);
+  typing(); await sleep(600); rmTyping();
+  await answerQ(text);
+}
+
+/* ══ قاموس الإجابات ══ */
+const QA = {
+  'كيف أنشئ حساباً؟':{
+    steps:['افتح صفحة التسجيل','اختر نوع حسابك (صاحب فكرة / خبير / مستثمر / شركة)','أدخل اسمك والبريد وكلمة المرور','اختر بلدك ومدينتك لتظهر على الخريطة','اضغط إنشاء الحساب'],
+    note:'يمكنك التسجيل بـGoogle بضغطة واحدة — أسرع وأأمن!',
+    sugs:['كيف أكمل ملفي؟','كيف أنشر فكرة؟'],
+  },
+  'كيف أسجل بـGoogle؟':{
+    steps:['افتح صفحة تسجيل الدخول','اضغط "تسجيل الدخول بـGoogle"','اختر حسابك من القائمة','ستنتقل للمنصة تلقائياً'],
+    note:'أسرع وأأمن من كلمة المرور!',
+    sugs:['كيف أكمل ملفي؟'],
+  },
+  'نسيت كلمة المرور':{
+    steps:['افتح صفحة تسجيل الدخول','اضغط "نسيت كلمة المرور؟"','أدخل بريدك الإلكتروني','افتح رسالة الاستعادة من بريدك','اضغط الرابط وأدخل كلمة مرور جديدة'],
+    warn:'الرابط صالح لساعة واحدة فقط',
+    sugs:['لا أستطيع تسجيل الدخول'],
+  },
+  'ما أنواع الحسابات؟':{
+    list:['🚀 صاحب فكرة — ينشر أفكاره ويبحث عن تمويل','🧠 خبير — يقدم خدماته ومهاراته','💰 مستثمر — يبحث عن فرص استثمار','🏢 شركة — تعلن عن فرص وشراكات','🎓 طالب — يبحث عن تدريب وفرص'],
+    note:'يمكنك تغيير نوع حسابك من الإعدادات.',
+    sugs:['كيف أنشئ حساباً؟','كيف أكمل ملفي؟'],
+  },
+  'كيف أكمل ملفي؟':{
+    steps:['افتح الإعدادات من القائمة','أضف صورتك الشخصية','اكتب نبذة قصيرة عنك','أضف مهاراتك وخبراتك','حدد موقعك الجغرافي'],
+    note:'الملف المكتمل يجذب 3x مزيداً من الاهتمام!',
+    sugs:['تغيير الصورة','كيف أنشر فكرة؟'],
+  },
+  'تغيير الصورة':{
+    steps:['افتح الإعدادات','اضغط على الصورة الحالية','اختر صورة من جهازك','اضغط حفظ'],
+    note:'الصور المقبولة: JPG, PNG, WebP — الحد الأقصى 3MB',
+    sugs:['كيف أكمل ملفي؟'],
+  },
+  'تغيير كلمة المرور':{
+    steps:['الإعدادات → الأمان','أدخل كلمة المرور الحالية','أدخل كلمة المرور الجديدة وأكّدها','اضغط تغيير'],
+    note:'استخدم 8 أحرف على الأقل مع أرقام ورموز',
+    sugs:['إعدادات الخصوصية'],
+  },
+  'حذف الحساب':{
+    steps:['الإعدادات → الحساب','اضغط "حذف الحساب"','أكّد بكلمة المرور','اضغط تأكيد'],
+    warn:'الحذف نهائي — كل بياناتك ستُحذف ولا يمكن التراجع',
+    sugs:[],
+  },
+  'ما هو Trust Score؟':{
+    text:'<b>Trust Score</b> رقم من 0-100 يعكس مصداقيتك على المنصة.',
+    list:['أكمل ملفك 100%','احصل على توثيق ✅','تفاعل مع المجتمع','احصل على متابعين','انشر أفكاراً ومشاريع'],
+    note:'Trust Score مرتفع يزيد ظهورك للمستثمرين',
+    sugs:['كيف أوثّق حسابي؟','كيف أكمل ملفي؟'],
+  },
+  'الخصوصية':{
+    text:'من <b>الإعدادات → الخصوصية</b>:',
+    list:['من يستطيع مراسلتك (الجميع / المتابعون / لا أحد)','من يرى ملفك الشخصي','إظهار أو إخفاء البريد والهاتف'],
+    sugs:['إعدادات الإشعارات'],
+  },
+  'متابعة أشخاص':{
+    steps:['افتح صفحة المستخدم','اضغط زر "+" أو "متابعة"'],
+    note:'يمكن إلغاء المتابعة بنفس الزر في أي وقت',
+    sugs:['كيف أرسل رسالة؟'],
+  },
+  'نشر فكرة أو مشروع':{
+    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر النوع: فكرة / مشروع / وظيفة','اكتب العنوان والوصف واختر الفئة','أضف صورة أو فيديو (اختياري)','اضغط نشر'],
+    warn:'إذا كانت فكرتك حساسة، فعّل خيار NDA لحمايتها',
+    sugs:['ما هو NDA؟','كيف أجد مستثمرين؟'],
+  },
+  'ما هو NDA؟':{
+    text:'<b>NDA</b> (اتفاقية عدم الإفصاح) يحمي فكرتك — المستثمر يوقّع قبل رؤية التفاصيل.',
+    steps:['عند نشر فكرة، فعّل خيار 🔒 حماية NDA','المستثمر يرى "توقيع NDA وإبداء الاهتمام"','بعد التوقيع يصلك إشعار باهتمامه'],
+    note:'مناسب للأفكار التي لم تُطلق بعد',
+    sugs:['نشر فكرة أو مشروع'],
+  },
+  'تعديل أو حذف منشور':{
+    steps:['افتح تفاصيل المنشور','اضغط ⋮ (ثلاث نقاط)','اختر تعديل أو حذف','أكّد العملية'],
+    warn:'الحذف نهائي ولا يمكن التراجع',
+    sugs:['نشر فكرة أو مشروع'],
+  },
+  'الإبلاغ عن محتوى':{
+    steps:['افتح المنشور','اضغط ⋮','اختر "إبلاغ"','اختر السبب وأرسل'],
+    note:'يراجع الفريق البلاغ خلال 24 ساعة',
+    sugs:[],
+  },
+  'التفاعلات':{
+    list:['▲ تصويت — دعم الفكرة','💡 ثاقب — الفكرة مبتكرة ومفيدة','🤝 تعاون — ترغب بالتعاون','⭐ اهتمام — اهتمام استثماري'],
+    note:'كل تفاعل يُرسل إشعاراً فورياً لصاحب المنشور',
+    sugs:['التعليقات'],
+  },
+  'التعليقات':{
+    steps:['افتح المنشور','اكتب في حقل التعليق','اضغط إرسال'],
+    text:'للرد على تعليق اضغط ↩ رد تحت أي تعليق',
+    sugs:['التفاعلات'],
+  },
+  'كيف أرسل رسالة؟':{
+    steps:['افتح صفحة المستخدم','اضغط "💬 رسالة"','يُرسل طلب مراسلة','عند القبول تُفتح المحادثة'],
+    note:'بعض المستخدمين يقبلون رسائل المتابعين فقط',
+    sugs:['قبول طلب مراسلة','من يراسلني؟'],
+  },
+  'قبول طلب مراسلة':{
+    text:'افتح <b>الرسائل → تبويب "الطلبات"</b>',
+    list:['✓ قبول — لفتح المحادثة','✗ رفض — لرفض الطلب نهائياً'],
+    sugs:['كيف أرسل رسالة؟'],
+  },
+  'إرسال صورة أو ملف':{
+    steps:['اضغط أيقونة 📎 في شريط الكتابة','اختر الصورة أو الملف','سيُرفع ويُرسل تلقائياً'],
+    note:'الحد الأقصى 20MB للملفات',
+    sugs:['تعديل أو حذف رسالة'],
+  },
+  'تعديل أو حذف رسالة':{
+    text:'<b>كليك يمين</b> (كمبيوتر) أو <b>ضغط طويل</b> (جوال) على الرسالة:',
+    list:['✏️ تعديل — لتغيير النص','🗑️ حذف للجميع — يحذفها من الطرفين','📋 نسخ النص','↪️ توجيه لمحادثة أخرى'],
+    sugs:['معنى ✓ و✓✓'],
+  },
+  'معنى ✓ و✓✓':{
+    list:['✓ — تم الإرسال','✓✓ (رمادي) — تم التسليم','✓✓ (أخضر) — تمت القراءة'],
+    note:'"يكتب..." يظهر عندما يكتب الطرف الآخر',
+    sugs:['كيف أرسل رسالة؟'],
+  },
+  'من يراسلني؟':{
+    text:'<b>الإعدادات → الخصوصية → من يستطيع مراسلتك:</b>',
+    list:['الجميع — أي مستخدم','المتابعون فقط','لا أحد — أغلق الرسائل'],
+    sugs:[],
+  },
+  'حذف محادثة':{
+    steps:['افتح المحادثة','اضغط أيقونة 🗑️ في الأعلى','أكّد الحذف'],
+    warn:'الحذف نهائي ولا يمكن استعادة المحادثة',
+    sugs:[],
+  },
+  'إيجاد فرص استثمار':{
+    list:['الفيد الرئيسي — فلتر "مشاريع"','لوحة المستثمر — صفحة مخصصة للفرص','البحث بكلمات مثل "تقنية" أو "صحة"','الخريطة التفاعلية — فرص حسب الموقع'],
+    text:'لإبداء الاهتمام: افتح المشروع واضغط <b>⭐ اهتمام</b>',
+    sugs:['التواصل مع صاحب مشروع','حفظ فرصة'],
+  },
+  'التواصل مع صاحب مشروع':{
+    steps:['افتح صفحة صاحب المشروع','اضغط "💬 رسالة"','أرسل طلب مراسلة'],
+    note:'سيصله إشعار باهتمامك فوراً',
+    sugs:['إيجاد فرص استثمار'],
+  },
+  'حفظ فرصة':{
+    text:'اضغط <b>🔖</b> في أي منشور لحفظه. المحفوظات في ملفك الشخصي.',
+    sugs:['إيجاد فرص استثمار'],
+  },
+  'نشر مشروعي للمستثمرين':{
+    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر "مشروع"','اكتب التفاصيل والمتطلبات والمبلغ المطلوب','فعّل NDA إذا أردت حمايته','اضغط نشر'],
+    note:'أضف صوراً وفيديو لزيادة جاذبية مشروعك',
+    sugs:['ما هو NDA؟','إيجاد فرص استثمار'],
+  },
+  'نشر وظيفة':{ /* alias */ text:'', steps:['من الفيد اضغط "✦ نشر فكرة"','اختر نوع "وظيفة"','أدخل تفاصيل الوظيفة والمتطلبات','حدد الراتب والموقع','اضغط نشر'], note:'وظيفتك ستظهر في قسم الوظائف وفيد المستخدمين', sugs:['إيجاد فرص استثمار'] },
+  'نشر مشروع تخرج':{
+    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر "مشروع"','اكتب اسم المشروع والتقنيات المستخدمة','أضف صوراً أو فيديو توضيحياً','اضغط نشر'],
+    note:'مشاريع التخرج تجذب الشركات والمستثمرين!',
+    sugs:['بناء CV قوي','إيجاد فرصة تدريب'],
+  },
+  'إيجاد فرصة تدريب':{
+    steps:['ابحث عن "تدريب" أو "internship"','أو فلتر المنشورات بنوع "وظيفة"','تواصل مع الشركات مباشرة عبر الرسائل'],
+    note:'أكمل ملفك أولاً لزيادة فرص القبول',
+    sugs:['بناء CV قوي'],
+  },
+  'بناء CV قوي':{
+    list:['📸 صورة احترافية في ملفك','📝 نبذة تعكس هدفك المهني','🛠️ المهارات بالتفصيل','🗂️ المشاريع مع روابط وصور','🎓 التعليم والشهادات','💼 الخبرات السابقة'],
+    note:'الملف المكتمل يحصل على 3x مشاهدات أكثر!',
+    sugs:['إيجاد فرصة تدريب','نشر مشروع تخرج'],
+  },
+  'التقدم لمنح':{
+    text:'ابحث في المنصة عن "منحة" أو "scholarship"، وتابع الجامعات والمؤسسات التعليمية لتصلك إشعارات المنح.',
+    sugs:['المسابقات'],
+  },
+  'المسابقات':{
+    text:'ابحث عن "مسابقة" أو "competition". المؤسسات تنشر المسابقات كمنشورات عادية.',
+    sugs:['التقدم لمنح'],
+  },
+  'لا أستطيع تسجيل الدخول':{
+    list:['كلمة مرور خاطئة → اضغط "نسيت كلمة المرور"','بريد غير مسجّل → تأكد من البريد الصحيح','سجّلت بـGoogle → استخدم نفس الطريقة','مشكلة كاش → Ctrl+Shift+R','جرّب Chrome أو Edge'],
+    sugs:['نسيت كلمة المرور'],
+  },
+  'الصور لا تُرفع':{
+    list:['الحجم كبير جداً → الحد 20MB (رسائل) / 3MB (ملف شخصي)','نوع غير مدعوم → استخدم JPG/PNG/WebP/GIF','إنترنت ضعيف → تحقق من الاتصال','سجّل خروجاً ودخولاً لتجديد الصلاحيات'],
+    sugs:['المنصة بطيئة'],
+  },
+  'المنصة بطيئة':{
+    list:['Ctrl+Shift+R (Hard Refresh)','أغلق التبويبات الأخرى','جرّب Chrome أو Edge','تحقق من سرعة الإنترنت','امسح بيانات المتصفح'],
+    sugs:[],
+  },
+  'لا تصلني إشعارات':{
+    list:['تأكد من تسجيل الدخول','جرّب Chrome أو Edge','تحقق من الإنترنت','سجّل خروجاً ودخولاً (Ctrl+Shift+R)'],
+    sugs:['الصفحة لا تتحدث'],
+  },
+  'لا أستطيع إرسال رسائل':{
+    list:['لم يُقبل طلب المراسلة بعد → انتظر','المستخدم يقبل المتابعين فقط → اتبعه أولاً','المستخدم أغلق الرسائل → لا يمكن التواصل','مشكلة اتصال → تحقق من الإنترنت'],
+    sugs:['من يراسلني؟'],
+  },
+  'الصفحة لا تتحدث':{
+    list:['تحقق من الإنترنت','أعد تحميل الصفحة (F5)','سجّل خروجاً ودخولاً','جرّب متصفحاً آخر'],
+    sugs:['المنصة بطيئة'],
+  },
+  'حسابي اختُرق':{
+    steps:['غيّر كلمة المرور فوراً من الإعدادات','تحقق من بريدك للرسائل المشبوهة','سجّل الخروج من جميع الأجهزة','راسل الدعم: support@azzaworld.com'],
+    warn:'لا تشارك كلمة مرورك مع أحد أبداً!',
+    sugs:['تغيير كلمة المرور'],
+  },
+  'كيف أوثّق حسابي؟':{
+    steps:['افتح صفحة التوثيق','أكمل بيانات حسابك 100%','ارفع وثيقة هوية رسمية','انتظر المراجعة (1-3 أيام)'],
+    note:'بعد التوثيق تظهر شارة ✅ وتزيد مصداقيتك',
+    sugs:['ما هو Trust Score؟','كيف أكمل ملفي؟'],
+  },
+  'متطلبات التوثيق':{
+    list:['📸 صورة شخصية واضحة','📝 ملف شخصي مكتمل 100%','📄 وثيقة هوية رسمية (للأفراد)','📋 سجل تجاري (للشركات)'],
+    sugs:['كيف أوثّق حسابي؟'],
+  },
+  'كم تستغرق المراجعة؟':{ text:'عادةً <b>1 إلى 3 أيام عمل</b> بعد تقديم الطلب.', sugs:['كيف أوثّق حسابي؟'] },
+  'الوضع الليلي':{ text:'اضغط على أيقونة ☀️/🌙 في أعلى الصفحة، أو من <b>الإعدادات → المظهر</b>.', note:'يُحفظ تلقائياً ويطبّق على جميع الصفحات', sugs:[] },
+  'إعدادات الإشعارات':{ text:'من <b>الإعدادات → الإشعارات</b> يمكنك تفعيل/إيقاف:\nإشعارات التعليقات، المتابعين، الرسائل، التفاعلات.', sugs:['الخصوصية'] },
+  'إعدادات الخصوصية':{ text:'من <b>الإعدادات → الخصوصية</b>:\nمن يراك، من يراسلك، إظهار/إخفاء معلومات الاتصال.', sugs:['إعدادات الإشعارات'] },
+  'تغيير اللغة':{ text:'المنصة حالياً باللغة العربية. سيتم إضافة خيار اللغات الأخرى قريباً.', sugs:[] },
+  'كيف أستخدم الخريطة؟':{
+    steps:['افتح صفحة الاستكشاف','انقر على أي دولة أو مدينة','شاهد المستخدمين والمشاريع في تلك المنطقة','استخدم الفلاتر لتضييق النتائج'],
+    note:'موقعك يظهر بناءً على بيانات التسجيل',
+    sugs:['كيف يظهر موقعي؟'],
+  },
+  'كيف يظهر موقعي؟':{ text:'موقعك يُحدَّد من البيانات التي أدخلتها عند التسجيل.\n\nلتغييره: <b>الإعدادات → الحساب → الموقع</b>', sugs:['كيف أستخدم الخريطة؟'] },
+  'البحث بالموقع':{ text:'من الخريطة التفاعلية: انقر على البلد أو المدينة لرؤية المستخدمين والمشاريع فيها.', sugs:['كيف أستخدم الخريطة؟'] },
+  'كيف أستخدم المساعد؟':{ text:'أنا هنا! اسألني أي شيء عن المنصة واختر من القوائم، أو اكتب سؤالك مباشرة.', sugs:['نشر فكرة أو مشروع','كيف أنشئ حساباً؟'] },
+  'ما هي قدرات المساعد؟':{ text:'أستطيع مساعدتك في:\n<ul><li>كيفية استخدام كل ميزة في AZZA</li><li>حل المشاكل التقنية</li><li>البحث عن الفرص والوظائف</li><li>نصائح لتطوير ملفك الشخصي</li></ul>', sugs:[] },
+};
+
+/* ══ بناء HTML للإجابة ══ */
+function buildHTML(qa){
+  let h='';
+  if(qa.text) h+=`<span>${qa.text.replace(/\n/g,'<br>')}</span>`;
+  if(qa.steps){
+    h+='<div class="steps">';
+    h+=qa.steps.map((s,i)=>`<div class="step"><div class="step-n">${i+1}</div><div class="step-t">${s}</div></div>`).join('');
+    h+='</div>';
   }
-  if(ans.list){
-    h+=`<ul style="margin-top:8px">${ans.list.map(l=>`<li>${l}</li>`).join('')}</ul>`;
-  }
-  if(ans.tip)  h+=`<div class="tip-box">💡 ${ans.tip}</div>`;
-  if(ans.warn) h+=`<div class="tip-box" style="background:rgba(198,151,73,.1);color:#854F0B">⚠️ ${ans.warn}</div>`;
+  if(qa.list) h+=`<ul>${qa.list.map(l=>`<li>${l}</li>`).join('')}</ul>`;
+  if(qa.note) h+=`<div class="note">💡 ${qa.note}</div>`;
+  if(qa.warn) h+=`<div class="warn-note">⚠️ ${qa.warn}</div>`;
   return h;
 }
 
-/* ══════════════════════════════════════════════
-   منطق المحادثة
-   ══════════════════════════════════════════════ */
-async function handleOpt(opt){
-  removeOpts();
-  addUser(opt.label.replace(/[🚀👤📝💬💰💼🎓🔧✏️]/g,'').trim());
-  await sleep(400);
-
-  if(opt.ans){
-    /* إجابة مباشرة */
-    const ans = ANSWERS[opt.ans];
-    if(ans){
-      /* لو فيه meta (مثل نوع الوظيفة) */
-      if(opt.meta){
-        const modAns={...ans,title:`البحث عن وظائف ${opt.meta}`};
-        showTyping(); await sleep(600); hideTyping();
-        addBot(buildAnswer(modAns));
-      }else{
-        showTyping(); await sleep(600); hideTyping();
-        addBot(buildAnswer(ans));
-      }
-      /* اعرض Supabase نتائج ذات صلة */
-      const kbRes = searchKB(ans.title);
-      if(kbRes.length>1){
-        await sleep(300);
-        addBot(`<strong>مقالات ذات صلة:</strong><ul style="margin-top:8px">${kbRes.slice(1,4).map(r=>`<li>${r.title}</li>`).join('')}</ul>`);
-      }
-      if(ans.back){
-        await sleep(400);
-        addBot('هل تريد مساعدة في شيء آخر؟');
-        addOpts([{label:'نعم، موضوع آخر',next:'root'},{label:'لا، شكراً 😊',ans:'done'}]);
-      }
-    }
-  }else if(opt.next==='free'){
-    showTyping(); await sleep(400); hideTyping();
-    addBot('تفضّل، اكتب سؤالك وسأبحث لك عن الإجابة 👇');
-  }else if(opt.next==='root'||!opt.next){
-    await goRoot();
-  }else if(opt.next){
-    const node=TREE[opt.next];
-    if(node){
-      showTyping(); await sleep(400); hideTyping();
-      addBot(node.msg);
-      if(node.opts.length) addOpts(node.opts);
-    }
-  }else if(opt.ans==='done'){
-    addBot('أتمنى لك تجربة رائعة على AZZA! 🌟');
-  }
-}
-
-async function goRoot(){
-  showTyping(); await sleep(400); hideTyping();
-  const node=TREE.root;
-  addBot(node.msg);
-  addOpts(node.opts);
-}
-
-/* ── بحث في KB ── */
-function searchKB(q){
-  q=q.toLowerCase().trim();
-  if(!q) return[];
-  const all=[...KB,...KB_FAQS];
-  const w=q.split(/\s+/);
-  return all.map(item=>{
-    let s=0;
-    const h=(item.title+' '+(item.tags||[]).join(' ')+' '+(item.answer||'')).toLowerCase();
-    if(h.includes(q)) s+=10;
-    w.forEach(ww=>{ if(ww.length>1){if(item.title.toLowerCase().includes(ww))s+=5;if((item.tags||[]).some(t=>t.includes(ww)))s+=3;if((item.answer||'').toLowerCase().includes(ww))s+=1;} });
-    return{item,s};
-  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.item);
-}
-
-/* ── إرسال نص حر ── */
-async function send(){
-  const ta=document.getElementById('inp');
-  const text=ta.value.trim();
-  if(!text) return;
-  ta.value=''; ta.style.height='auto';
-  removeOpts();
-  addUser(text);
-  showTyping();
-  await sleep(700);
-  hideTyping();
-
-  /* بحث في ANSWERS أولاً */
-  const matchKey=Object.keys(ANSWERS).find(k=>ANSWERS[k].title.includes(text)||text.includes(ANSWERS[k].title));
-  if(matchKey){
-    addBot(buildAnswer(ANSWERS[matchKey]));
-    await sleep(400);
-    addBot('هل تريد مساعدة في شيء آخر؟');
-    addOpts([{label:'نعم',next:'root'},{label:'لا، شكراً 😊',ans:'done'}]);
+async function answerQ(text){
+  /* بحث في QA المدمج */
+  const key = Object.keys(QA).find(k=>text.includes(k)||k.includes(text))||
+               Object.keys(QA).find(k=>k.split(' ').some(w=>w.length>2&&text.includes(w)));
+  if(key){
+    const qa=QA[key];
+    await addBot(buildHTML(qa));
+    await showSugs(qa.sugs||[]);
     return;
   }
 
@@ -697,46 +495,75 @@ async function send(){
   const res=searchKB(text);
   if(res.length){
     const best=res[0];
-    let h=`<strong>${best.title}</strong><br><br>${(best.answer||'').replace(/\n/g,'<br>').substring(0,400)}`;
-    if((best.answer||'').length>400) h+='...';
-    addBot(h);
+    let h=`<b>${best.title}</b><br><br>${(best.ans||'').substring(0,350).replace(/\n/g,'<br>')}`;
+    if((best.ans||'').length>350) h+='...';
+    await addBot(h);
     if(res.length>1){
       await sleep(300);
-      addBot(`<strong>مقالات ذات صلة:</strong><ul style="margin-top:8px">${res.slice(1,4).map(r=>`<li>${r.title}</li>`).join('')}</ul>`);
+      await addBot(`<b>مقالات ذات صلة:</b><ul>${res.slice(1,4).map(r=>`<li>${r.title}</li>`).join('')}</ul>`);
     }
-    await sleep(400);
-    addBot('هل أجبت على سؤالك؟');
-    addOpts([{label:'نعم، شكراً 😊',ans:'done'},{label:'لا، أريد المزيد',next:'root'}]);
-    /* تسجيل البحث */
-    db.from('help_failed_searches').insert({query:text}).then(()=>{});
   }else{
-    /* لم يُعثر */
-    addBot(`لم أجد إجابة لـ "<strong>${esc(text)}</strong>" في قاعدة المعرفة حالياً 🙁<br><br>يمكنك:<br>• تصفح <a href="help.html" style="color:var(--olive);font-weight:700">مركز المساعدة</a><br>• التواصل مع الدعم: support@azzaworld.com`);
+    await addBot(`لم أجد إجابة لسؤالك في قاعدة المعرفة 🙁<br><br>يمكنك:<br>• تصفح <a href="help.html" style="color:var(--o);font-weight:700">مركز المساعدة</a><br>• التواصل مع الدعم: support@azzaworld.com`);
     db.from('help_failed_searches').insert({query:text}).then(()=>{});
-    await sleep(400);
-    addOpts([{label:'العودة للقائمة الرئيسية',next:'root'}]);
   }
+  await sleep(400);
+  await showSugs(['نشر فكرة أو مشروع','كيف أنشئ حساباً؟','إيجاد فرص استثمار']);
 }
 
-function resetChat(){
-  chat.innerHTML=''; isTyping=false;
-  goRoot();
+async function showSugs(sugs){
+  if(!sugs.length) sugs=['العودة للقائمة الرئيسية'];
+  await sleep(200);
+  const d=document.createElement('div');
+  d.className='suggest-row pop';
+  d.innerHTML=['🏠 القائمة الرئيسية',...sugs].map(s=>
+    `<button class="sug" onclick="handleSug(this,'${esc(s)}')">${s}</button>`
+  ).join('');
+  addEl(d);
 }
 
-function autoR(el){
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,100)+'px';
+async function handleSug(btn, text){
+  if(text==='🏠 القائمة الرئيسية'){ rmInteractive(); await goHome(); return; }
+  rmInteractive();
+  addUser(text);
+  typing(); await sleep(600); rmTyping();
+  await answerQ(text);
 }
 
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function searchKB(q){
+  const all=[...KB,...KB_FAQS];
+  const w=q.toLowerCase().split(/\s+/);
+  return all.map(item=>{
+    let s=0;
+    const h=(item.title+' '+(item.tags||[]).join(' ')+' '+(item.ans||'')).toLowerCase();
+    if(h.includes(q.toLowerCase())) s+=10;
+    w.forEach(ww=>{ if(ww.length>1){ if(item.title.toLowerCase().includes(ww))s+=5; if((item.tags||[]).some(t=>t.includes(ww)))s+=3; if((item.ans||'').toLowerCase().includes(ww))s+=1; } });
+    return{item,s};
+  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.item);
+}
 
-/* ── Themes ── */
-(()=>document.body.classList.toggle('dark',localStorage.getItem('azza_theme')==='dark'))();
+async function sendFree(){
+  const ta=document.getElementById('inp');
+  const text=ta.value.trim();
+  if(!text) return;
+  ta.value=''; ta.style.height='auto';
+  rmInteractive();
+  addUser(text);
+  typing(); await sleep(700); rmTyping();
+  await answerQ(text);
+}
 
-/* ── Init ── */
+async function goHome(){ await showHome(); }
+
+async function resetChat(){
+  chat.innerHTML='';
+  await showHome();
+}
+
+(()=>document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark'))();
+
 (async()=>{
   await loadKB();
-  await goRoot();
+  await showHome();
 })();
 </script>
 </body>
