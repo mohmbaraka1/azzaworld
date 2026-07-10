@@ -2,128 +2,196 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>مساعد AZZA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سيرتي الذاتية — AZZA</title>
 <script src="supabase.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
 :root{
-  --g:#c69749;--o:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
-  --bg:#f5f0e8;--bg2:#ede5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;
-  --line:rgba(0,0,0,.07);--r:18px;
+  --gold:#c69749;--olive:#1c5b38;--olive-d:#0e3622;
+  --cream:#f7f1e3;--cream2:#ece0c8;--ink:#1c1a14;--muted:#6b6555;
+  --line:rgba(28,26,20,.1);--card:#fff;
 }
-.dk{--bg:#141210;--bg2:#1c1a16;--card:#222018;--ink:#f0e8d0;--sub:#9a9080;--line:rgba(255,255,255,.07)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
-body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;display:flex;flex-direction:column}
+.dark{--cream:#141410;--cream2:#1e1e16;--ink:#f0e8d0;--muted:#9a9080;--line:rgba(255,255,255,.07);--card:#1e1e16}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--cream);color:var(--ink);direction:rtl;min-height:100vh}
 
-/* Header */
-.hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
-.hdr-back{width:36px;height:36px;border-radius:12px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub)}
-.hdr-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.hdr-av{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--o),var(--od));display:flex;align-items:center;justify-content:center;font-size:20px}
-.hdr-info{flex:1}
-.hdr-name{font-size:15px;font-weight:900}
-.hdr-dot{font-size:11px;color:#22c55e;display:flex;align-items:center;gap:4px}
-.hdr-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:block}
-.hdr-act{width:36px;height:36px;border-radius:12px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:16px}
+.hdr{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.hdr-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--cream2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.hdr-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.hdr-title{flex:1;font-size:15px;font-weight:900;color:var(--olive)}
+.hdr-actions{display:flex;gap:8px}
+.btn{padding:9px 18px;border-radius:10px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-save{background:var(--olive);color:#fff}
+.btn-save:hover{background:var(--olive-d)}
+.btn-pdf{background:var(--gold);color:var(--olive-d)}
+.btn-pdf:hover{opacity:.9}
 
-/* Chat */
-.chat{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
-.chat::-webkit-scrollbar{width:0}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:0;max-width:1100px;margin:0 auto;padding:24px 20px;gap:24px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
 
-/* Bot msg */
-.bot-row{display:flex;gap:8px;align-items:flex-end}
-.bot-av{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--o),var(--od));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.bot-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:12px 15px;max-width:82%;font-size:14px;line-height:1.75;color:var(--ink)}
-.bot-bbl b{font-weight:700}
-.bot-bbl ul{margin:8px 0 2px 18px}
-.bot-bbl li{margin-bottom:5px}
+/* ── Editor Panel ── */
+.editor{display:flex;flex-direction:column;gap:16px}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.sec-hdr{padding:14px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:14px;font-weight:700;border-bottom:1px solid var(--line)}
+.sec-hdr svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.sec-body{padding:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--cream2);outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--olive);background:var(--cream)}
+.field textarea{resize:vertical;min-height:70px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.add-btn{width:100%;padding:9px;border-radius:9px;border:1.5px dashed var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:.2s;margin-top:8px}
+.add-btn:hover{border-color:var(--olive);color:var(--olive)}
+.item-card{background:var(--cream2);border-radius:10px;padding:12px;margin-bottom:8px;position:relative}
+.item-rm{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:6px;border:none;background:rgba(192,57,43,.1);color:#c0392b;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.tag{padding:5px 12px;border-radius:99px;background:var(--olive);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
+.tag-rm{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:14px;padding:0;line-height:1}
+.tag-inp{flex:1;min-width:120px;height:32px;border:1.5px dashed var(--line);border-radius:99px;padding:0 12px;font-family:Tajawal,sans-serif;font-size:13px;background:none;color:var(--ink);outline:none}
 
-/* User msg */
-.user-row{display:flex;justify-content:flex-start;flex-direction:row-reverse;gap:8px;align-items:flex-end}
-.user-av{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--g),#e8b96a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--od);flex-shrink:0}
-.user-bbl{background:linear-gradient(135deg,var(--o),var(--od));border-radius:var(--r) var(--r) 4px var(--r);padding:12px 15px;max-width:82%;font-size:14px;line-height:1.75;color:#fff}
+/* ── CV Preview ── */
+.preview{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;height:fit-content;position:sticky;top:80px}
+.preview-toolbar{padding:10px 14px;background:var(--cream2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.cv-page{padding:32px;font-family:Tajawal,sans-serif;direction:rtl;background:#fff;min-height:600px}
 
-/* Step pills */
-.steps{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.step{display:flex;gap:8px;align-items:flex-start}
-.step-n{min-width:22px;height:22px;border-radius:8px;background:var(--o);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
-.step-t{font-size:13.5px;line-height:1.6}
-.note{background:var(--ol);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px;color:var(--o)}
-.dk .note{color:#7dffcc;background:rgba(28,91,56,.2)}
-.warn-note{background:rgba(198,151,73,.1);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:13px;color:#7a4f00}
-.dk .warn-note{color:#ffd78a;background:rgba(198,151,73,.15)}
+/* CV styles */
+.cv-header{text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #1c5b38}
+.cv-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid #1c5b38}
+.cv-photo-placeholder{width:90px;height:90px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:0 auto 12px}
+.cv-name{font-size:22px;font-weight:900;color:#1c1a14;margin-bottom:4px}
+.cv-headline{font-size:14px;color:#6b6555;margin-bottom:8px}
+.cv-contacts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;font-size:12px;color:#6b6555}
+.cv-contact-item{display:flex;align-items:center;gap:4px}
+.cv-section{margin-bottom:20px}
+.cv-section-title{font-size:14px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:4px;border-bottom:1.5px solid #ece0c8}
+.cv-item{margin-bottom:12px}
+.cv-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
+.cv-item-title{font-size:14px;font-weight:700;color:#1c1a14}
+.cv-item-date{font-size:12px;color:#6b6555;flex-shrink:0}
+.cv-item-sub{font-size:13px;color:#6b6555;margin-bottom:4px}
+.cv-item-desc{font-size:13px;color:#1c1a14;line-height:1.6}
+.cv-skills-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.cv-skill{padding:4px 12px;border-radius:99px;background:#e8f4ed;color:#1c5b38;font-size:12px;font-weight:700}
+.cv-langs-wrap{display:flex;flex-wrap:wrap;gap:10px}
+.cv-lang{font-size:13px;color:#1c1a14;display:flex;align-items:center;gap:4px}
+.cv-lang::before{content:'';width:6px;height:6px;border-radius:50%;background:#1c5b38;display:block}
 
-/* Category Grid */
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
-.cat-card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:.2s;text-align:center}
-.cat-card:hover{border-color:var(--g);background:rgba(198,151,73,.05);transform:translateY(-2px)}
-.cat-card:active{transform:scale(.96)}
-.cat-em{font-size:26px;line-height:1}
-.cat-lbl{font-size:12px;font-weight:700;color:var(--ink)}
-
-/* Choice chips */
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
-.chip{padding:9px 15px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:6px}
-.chip:hover{border-color:var(--o);background:var(--ol);color:var(--o)}
-.chip:active{transform:scale(.95)}
-.chip.other{border-style:dashed;color:var(--sub)}
-.chip.other:hover{border-color:var(--g);color:var(--g)}
-.chip-em{font-size:15px;line-height:1}
-
-/* Suggest */
-.suggest-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.sug{padding:7px 13px;border-radius:10px;background:var(--bg2);border:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:600;color:var(--sub);cursor:pointer;transition:.2s}
-.sug:hover{background:var(--ol);color:var(--o)}
-
-/* Typing */
-.typing-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:13px 16px;display:flex;gap:4px;align-items:center}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:b .9s infinite}
-.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
-@keyframes b{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-
-/* Input */
-.inp-bar{padding:10px 12px;background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
-.inp-wrap{flex:1;background:var(--bg2);border:1.5px solid var(--line);border-radius:16px;padding:8px 12px;display:flex;align-items:flex-end;gap:6px;transition:.2s}
-.inp-wrap:focus-within{border-color:var(--o)}
-.inp-ta{flex:1;background:none;border:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none;resize:none;min-height:22px;max-height:90px;line-height:1.5}
-.inp-ta::placeholder{color:var(--sub)}
-.send-btn{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--o),var(--od));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(14,54,34,.2);flex-shrink:0}
-.send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-
-/* Pop animation */
-@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.pop{animation:pop .2s cubic-bezier(.34,1.3,.64,1)}
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <button class="hdr-back" onclick="history.length>1?history.back():location.href='app.html'">
+  <button class="hdr-back" onclick="history.back()">
     <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
   </button>
-  <div class="hdr-av">🤖</div>
-  <div class="hdr-info">
-    <div class="hdr-name">مساعد AZZA</div>
-    <div class="hdr-dot">متاح دائماً</div>
+  <div class="hdr-title">✦ سيرتي الذاتية</div>
+  <div class="hdr-actions">
+    <button class="btn btn-save" onclick="saveCV()">💾 حفظ</button>
+    <button class="btn btn-pdf" onclick="exportPDF()">📄 PDF</button>
   </div>
-  <button class="hdr-act" onclick="resetChat()" title="محادثة جديدة">🔄</button>
-  <button class="hdr-act" onclick="location.href='help.html'" title="مركز المساعدة">📖</button>
 </div>
 
-<div class="chat" id="chat"></div>
+<div class="layout">
+  <!-- Editor -->
+  <div class="editor">
 
-<div class="inp-bar">
-  <div class="inp-wrap">
-    <textarea class="inp-ta" id="inp" placeholder="اكتب سؤالك هنا..." rows="1"
-      oninput="ar(this)"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFree()}"></textarea>
+    <!-- المعلومات الأساسية -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        المعلومات الأساسية
+      </div>
+      <div class="sec-body">
+        <div class="field"><label>الاسم الكامل</label><input id="cv-name" placeholder="محمد بركة"></div>
+        <div class="field"><label>المسمى الوظيفي</label><input id="cv-headline" placeholder="مطور Full Stack | رائد أعمال"></div>
+        <div class="row2">
+          <div class="field"><label>البريد الإلكتروني</label><input id="cv-email" type="email" placeholder="name@email.com"></div>
+          <div class="field"><label>رقم الهاتف</label><input id="cv-phone" placeholder="+970 5X XXX XXXX"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>المدينة والدولة</label><input id="cv-location" placeholder="رام الله، فلسطين"></div>
+          <div class="field"><label>الموقع الإلكتروني</label><input id="cv-website" placeholder="azzaworld.com"></div>
+        </div>
+        <div class="field"><label>نبذة شخصية (Summary)</label><textarea id="cv-bio" placeholder="رائد أعمال شغوف بالتقنية..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- الخبرات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        الخبرات العملية
+      </div>
+      <div class="sec-body">
+        <div id="exp-list"></div>
+        <button class="add-btn" onclick="addExp()">+ إضافة خبرة</button>
+      </div>
+    </div>
+
+    <!-- التعليم -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        التعليم
+      </div>
+      <div class="sec-body">
+        <div id="edu-list"></div>
+        <button class="add-btn" onclick="addEdu()">+ إضافة مؤهل</button>
+      </div>
+    </div>
+
+    <!-- المهارات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        المهارات
+      </div>
+      <div class="sec-body">
+        <div class="tags-wrap" id="skills-tags"></div>
+        <input class="tag-inp" id="skill-inp" placeholder="أضف مهارة واضغط Enter" onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}">
+      </div>
+    </div>
+
+    <!-- الشهادات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        الشهادات والدورات
+      </div>
+      <div class="sec-body">
+        <div id="cert-list"></div>
+        <button class="add-btn" onclick="addCert()">+ إضافة شهادة</button>
+      </div>
+    </div>
+
+    <!-- اللغات -->
+    <div class="sec">
+      <div class="sec-hdr">
+        <svg viewBox="0 0 24 24"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>
+        اللغات
+      </div>
+      <div class="sec-body">
+        <div class="tags-wrap" id="lang-tags"></div>
+        <input class="tag-inp" id="lang-inp" placeholder="أضف لغة واضغط Enter" onkeydown="if(event.key==='Enter'){addLang();event.preventDefault()}">
+      </div>
+    </div>
+
   </div>
-  <button class="send-btn" onclick="sendFree()">
-    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-  </button>
+
+  <!-- Preview -->
+  <div class="preview">
+    <div class="preview-toolbar">
+      👁️ معاينة السيرة الذاتية
+    </div>
+    <div class="cv-page" id="cv-preview"></div>
+  </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
 const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
@@ -132,439 +200,236 @@ const db = supabase.createClient(SB_URL, SB_ANON);
 const me = JSON.parse(localStorage.getItem('azza_user')||'null');
 if(!me) location.href='login.html';
 
-let KB=[], KB_FAQS=[];
-const sleep = ms => new Promise(r=>setTimeout(r,ms));
-const chat  = document.getElementById('chat');
-const now   = () => new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
-const myIni = (me?.name||'م')[0];
-const esc   = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':'#c0392b';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const v=id=>document.getElementById(id)?.value?.trim()||'';
+const upd=()=>{ buildPreview(); };
+const inp=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val||''; };
 
-/* ══ تحميل KB ══ */
-async function loadKB(){
-  const [a,f] = await Promise.all([
-    db.from('help_articles').select('id,title,summary,body,keywords,alt_questions,category_slug').eq('is_published',true),
-    db.from('help_faqs').select('question,answer,keywords').eq('is_published',true),
-  ]);
-  KB = (a.data||[]).map(r=>({
-    title:r.title, cat:r.category_slug,
-    tags:[...(r.keywords||[]),...(r.alt_questions||[])],
-    ans:((r.body||r.summary||'').replace(/##\s/g,'').replace(/\*\*/g,'').trim()),
-  }));
-  KB_FAQS = (f.data||[]).map(r=>({
-    title:r.question, cat:'faq',
-    tags:r.keywords||[], ans:r.answer,
-  }));
+/* ── State ── */
+let EXP=[], EDU=[], SKILLS=[], CERTS=[], LANGS=[];
+
+/* ── تحميل ── */
+async function loadCV(){
+  const {data:u} = await db.from('users').select('*').eq('id',me.id).single();
+  if(!u) return;
+  inp('cv-name', u.name);
+  inp('cv-headline', u.headline||'');
+  inp('cv-email', u.email||me.email||'');
+  inp('cv-phone', u.phone||'');
+  inp('cv-location', [u.city_name,u.country_name].filter(Boolean).join('، ')||'');
+  inp('cv-bio', u.bio||'');
+  inp('cv-website', u.social_links?.website||'');
+  EXP   = Array.isArray(u.experience)?u.experience:[];
+  EDU   = Array.isArray(u.education)?u.education:[];
+  SKILLS= Array.isArray(u.skills)?u.skills:[];
+  CERTS = Array.isArray(u.certifications)?u.certifications:[];
+  LANGS = Array.isArray(u.languages)?u.languages:[];
+  renderAll(); buildPreview();
 }
 
-/* ══ إضافة رسائل ══ */
-function addBot(html, delay=0){
-  return new Promise(async res=>{
-    if(delay) await sleep(delay);
-    const d=document.createElement('div');
-    d.className='bot-row pop';
-    d.innerHTML=`<div class="bot-av">🤖</div><div class="bot-bbl">${html}</div>`;
-    chat.appendChild(d); scroll(); res();
-  });
+/* ── حفظ ── */
+async function saveCV(){
+  const {error}=await db.from('users').update({
+    name:       v('cv-name'),
+    headline:   v('cv-headline'),
+    bio:        v('cv-bio'),
+    phone:      v('cv-phone'),
+    skills:     SKILLS,
+    experience: EXP,
+    education:  EDU,
+    certifications: CERTS,
+    languages:  LANGS,
+    social_links:{website:v('cv-website')},
+    updated_at: new Date().toISOString(),
+  }).eq('id',me.id);
+  if(error){ toast('تعذّر الحفظ','err'); return; }
+  const upd={...me,name:v('cv-name'),bio:v('cv-bio'),skills:SKILLS};
+  localStorage.setItem('azza_user',JSON.stringify(upd));
+  toast('تم حفظ السيرة الذاتية ✅');
 }
 
-function addUser(text){
-  const d=document.createElement('div');
-  d.className='user-row pop';
-  d.innerHTML=`<div class="user-av">${myIni}</div><div class="user-bbl">${esc(text)}</div>`;
-  chat.appendChild(d); scroll();
+/* ══ تصدير PDF ══ */
+function exportPDF(){
+  const cv = document.getElementById('cv-preview').innerHTML;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html dir="rtl"><head>
+    <meta charset="UTF-8">
+    <title>CV - ${v('cv-name')||me.name}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Tajawal,sans-serif;direction:rtl;padding:32px;max-width:800px;margin:0 auto;color:#1c1a14}
+      .cv-header{text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #1c5b38}
+      .cv-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid #1c5b38}
+      .cv-photo-placeholder{width:90px;height:90px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:0 auto 12px}
+      .cv-name{font-size:22px;font-weight:900;margin-bottom:4px}
+      .cv-headline{font-size:14px;color:#6b6555;margin-bottom:8px}
+      .cv-contacts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;font-size:12px;color:#6b6555}
+      .cv-section{margin-bottom:20px}
+      .cv-section-title{font-size:13px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:4px;border-bottom:1.5px solid #ece0c8}
+      .cv-item{margin-bottom:12px}
+      .cv-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px}
+      .cv-item-title{font-size:14px;font-weight:700}
+      .cv-item-date{font-size:12px;color:#6b6555}
+      .cv-item-sub{font-size:13px;color:#6b6555;margin-bottom:4px}
+      .cv-item-desc{font-size:13px;line-height:1.6}
+      .cv-skills-wrap{display:flex;flex-wrap:wrap;gap:6px}
+      .cv-skill{padding:4px 12px;border-radius:99px;background:#e8f4ed;color:#1c5b38;font-size:12px;font-weight:700}
+      .cv-langs-wrap{display:flex;flex-wrap:wrap;gap:10px}
+      .cv-lang{font-size:13px;display:flex;align-items:center;gap:4px}
+      .cv-lang::before{content:'';width:6px;height:6px;border-radius:50%;background:#1c5b38;display:block}
+      @media print{body{padding:16px}}
+    </style>
+  </head><body>${cv}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),500);
 }
 
-function addEl(el){ chat.appendChild(el); scroll(); }
+/* ══ بناء المعاينة ══ */
+function buildPreview(){
+  const name     = v('cv-name')||me.name||'—';
+  const headline = v('cv-headline');
+  const email    = v('cv-email')||me.email||'';
+  const phone    = v('cv-phone');
+  const location = v('cv-location');
+  const website  = v('cv-website');
+  const bio      = v('cv-bio');
+  const photo    = me.photo;
 
-function typing(){ const d=document.createElement('div'); d.className='bot-row pop'; d.id='typing'; d.innerHTML=`<div class="bot-av">🤖</div><div class="typing-bbl"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`; chat.appendChild(d); scroll(); }
-function rmTyping(){ document.getElementById('typing')?.remove(); }
-function rmInteractive(){ chat.querySelectorAll('.cat-grid,.chips,.suggest-row').forEach(e=>e.remove()); }
-function scroll(){ setTimeout(()=>chat.scrollTop=chat.scrollHeight,40); }
-function ar(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+  let h=`<div class="cv-header">
+    ${photo?`<img class="cv-photo" src="${esc(photo)}" alt="">`:`<div class="cv-photo-placeholder">${name[0]}</div>`}
+    <div class="cv-name">${esc(name)}</div>
+    ${headline?`<div class="cv-headline">${esc(headline)}</div>`:''}
+    <div class="cv-contacts">
+      ${email?`<span class="cv-contact-item">📧 ${esc(email)}</span>`:''}
+      ${phone?`<span class="cv-contact-item">📱 ${esc(phone)}</span>`:''}
+      ${location?`<span class="cv-contact-item">📍 ${esc(location)}</span>`:''}
+      ${website?`<span class="cv-contact-item">🌐 ${esc(website)}</span>`:''}
+    </div>
+  </div>`;
 
-/* ══ القائمة الرئيسية ══ */
-const CATS = [
-  {em:'🚀',lbl:'البداية',id:'start'},
-  {em:'👤',lbl:'الحساب',id:'account'},
-  {em:'📝',lbl:'المنشورات',id:'posts'},
-  {em:'💬',lbl:'الرسائل',id:'messages'},
-  {em:'💰',lbl:'الاستثمار',id:'invest'},
-  {em:'💼',lbl:'الوظائف',id:'jobs'},
-  {em:'🎓',lbl:'الطلاب',id:'students'},
-  {em:'🔧',lbl:'مشكلة',id:'trouble'},
-  {em:'✅',lbl:'التوثيق',id:'verify'},
-  {em:'⚙️',lbl:'الإعدادات',id:'settings'},
-  {em:'🗺️',lbl:'الخريطة',id:'map'},
-  {em:'🤖',lbl:'المساعد',id:'assistant'},
-];
+  if(bio) h+=`<div class="cv-section"><div class="cv-section-title">نبذة شخصية</div><div class="cv-item-desc">${esc(bio)}</div></div>`;
 
-async function showHome(){
-  await addBot(`أهلاً ${me.name||''}! 👋<br>بأي موضوع تريد مساعدة اليوم؟`);
-  const g=document.createElement('div');
-  g.className='cat-grid pop';
-  g.innerHTML=CATS.map(c=>`<div class="cat-card" onclick="pickCat('${c.id}','${c.em} ${c.lbl}')"><div class="cat-em">${c.em}</div><div class="cat-lbl">${c.lbl}</div></div>`).join('');
-  addEl(g);
-}
-
-/* ══ اختيار فئة ══ */
-const CAT_Q = {
-  start:    {q:'ما الذي تريد معرفته عن البداية؟', chips:['كيف أنشئ حساباً؟','كيف أسجل بـGoogle؟','نسيت كلمة المرور','ما أنواع الحسابات؟','كيف أكمل ملفي؟']},
-  account:  {q:'ماذا تريد بخصوص حسابك؟', chips:['تغيير الصورة','تغيير كلمة المرور','حذف الحساب','ما هو Trust Score؟','الخصوصية','متابعة أشخاص']},
-  posts:    {q:'ماذا تريد فعله بالمنشورات؟', chips:['نشر فكرة أو مشروع','ما هو NDA؟','تعديل أو حذف منشور','الإبلاغ عن محتوى','التفاعلات','التعليقات']},
-  messages: {q:'ماذا تريد معرفته عن الرسائل؟', chips:['كيف أرسل رسالة؟','قبول طلب مراسلة','إرسال صورة أو ملف','تعديل أو حذف رسالة','معنى ✓ و✓✓','من يراسلني؟','حذف محادثة']},
-  invest:   {q:'ماذا يهمك في الاستثمار؟', chips:['إيجاد فرص استثمار','التواصل مع صاحب مشروع','حفظ فرصة','نشر مشروعي للمستثمرين']},
-  jobs:     {q:'ما مجال الوظيفة؟', chips:['💻 تقنية / برمجة','🎨 تصميم / إبداع','📊 مبيعات / تسويق','💰 محاسبة / مالية','⚙️ هندسة','🏥 طب / صحة','📚 تعليم / تدريب','🏢 إدارة / أعمال','⚖️ قانون','👥 موارد بشرية','📢 أنشر وظيفة']},
-  students: {q:'كيف أساعدك؟', chips:['نشر مشروع تخرج','إيجاد فرصة تدريب','بناء CV قوي','التقدم لمنح','المسابقات']},
-  trouble:  {q:'ما المشكلة التي تواجهها؟', chips:['لا أستطيع تسجيل الدخول','الصور لا تُرفع','المنصة بطيئة','لا تصلني إشعارات','لا أستطيع إرسال رسائل','الصفحة لا تتحدث','حسابي اختُرق']},
-  verify:   {q:'ماذا تريد معرفته عن التوثيق؟', chips:['كيف أوثّق حسابي؟','متطلبات التوثيق','كم تستغرق المراجعة؟']},
-  settings: {q:'ما الذي تريد تغييره؟', chips:['الوضع الليلي','إعدادات الإشعارات','إعدادات الخصوصية','تغيير اللغة']},
-  map:      {q:'ماذا تريد من الخريطة؟', chips:['كيف أستخدم الخريطة؟','كيف يظهر موقعي؟','البحث بالموقع']},
-  assistant:{q:'كيف أساعدك بخصوص المساعد؟', chips:['كيف أستخدم المساعد؟','ما هي قدرات المساعد؟']},
-};
-
-async function pickCat(id, label){
-  rmInteractive();
-  addUser(label);
-  typing(); await sleep(500); rmTyping();
-  const cq = CAT_Q[id];
-  if(!cq){ await addBot('سأبحث لك فوراً...'); return; }
-  await addBot(cq.q);
-  const c=document.createElement('div');
-  c.className='chips pop';
-  c.innerHTML=cq.chips.map(ch=>`<div class="chip" onclick="pickChip(this,'${esc(ch)}')">${ch}</div>`).join('');
-  c.innerHTML+=`<div class="chip other" onclick="this.closest('.chips').remove();document.getElementById('inp').focus()">✏️ غير ذلك...</div>`;
-  addEl(c);
-}
-
-/* ══ اختيار خيار ══ */
-async function pickChip(el, text){
-  rmInteractive();
-  addUser(text);
-  typing(); await sleep(600); rmTyping();
-  await answerQ(text);
-}
-
-/* ══ قاموس الإجابات ══ */
-const QA = {
-  'كيف أنشئ حساباً؟':{
-    steps:['افتح صفحة التسجيل','اختر نوع حسابك (صاحب فكرة / خبير / مستثمر / شركة)','أدخل اسمك والبريد وكلمة المرور','اختر بلدك ومدينتك لتظهر على الخريطة','اضغط إنشاء الحساب'],
-    note:'يمكنك التسجيل بـGoogle بضغطة واحدة — أسرع وأأمن!',
-    sugs:['كيف أكمل ملفي؟','كيف أنشر فكرة؟'],
-  },
-  'كيف أسجل بـGoogle؟':{
-    steps:['افتح صفحة تسجيل الدخول','اضغط "تسجيل الدخول بـGoogle"','اختر حسابك من القائمة','ستنتقل للمنصة تلقائياً'],
-    note:'أسرع وأأمن من كلمة المرور!',
-    sugs:['كيف أكمل ملفي؟'],
-  },
-  'نسيت كلمة المرور':{
-    steps:['افتح صفحة تسجيل الدخول','اضغط "نسيت كلمة المرور؟"','أدخل بريدك الإلكتروني','افتح رسالة الاستعادة من بريدك','اضغط الرابط وأدخل كلمة مرور جديدة'],
-    warn:'الرابط صالح لساعة واحدة فقط',
-    sugs:['لا أستطيع تسجيل الدخول'],
-  },
-  'ما أنواع الحسابات؟':{
-    list:['🚀 صاحب فكرة — ينشر أفكاره ويبحث عن تمويل','🧠 خبير — يقدم خدماته ومهاراته','💰 مستثمر — يبحث عن فرص استثمار','🏢 شركة — تعلن عن فرص وشراكات','🎓 طالب — يبحث عن تدريب وفرص'],
-    note:'يمكنك تغيير نوع حسابك من الإعدادات.',
-    sugs:['كيف أنشئ حساباً؟','كيف أكمل ملفي؟'],
-  },
-  'كيف أكمل ملفي؟':{
-    steps:['افتح الإعدادات من القائمة','أضف صورتك الشخصية','اكتب نبذة قصيرة عنك','أضف مهاراتك وخبراتك','حدد موقعك الجغرافي'],
-    note:'الملف المكتمل يجذب 3x مزيداً من الاهتمام!',
-    sugs:['تغيير الصورة','كيف أنشر فكرة؟'],
-  },
-  'تغيير الصورة':{
-    steps:['افتح الإعدادات','اضغط على الصورة الحالية','اختر صورة من جهازك','اضغط حفظ'],
-    note:'الصور المقبولة: JPG, PNG, WebP — الحد الأقصى 3MB',
-    sugs:['كيف أكمل ملفي؟'],
-  },
-  'تغيير كلمة المرور':{
-    steps:['الإعدادات → الأمان','أدخل كلمة المرور الحالية','أدخل كلمة المرور الجديدة وأكّدها','اضغط تغيير'],
-    note:'استخدم 8 أحرف على الأقل مع أرقام ورموز',
-    sugs:['إعدادات الخصوصية'],
-  },
-  'حذف الحساب':{
-    steps:['الإعدادات → الحساب','اضغط "حذف الحساب"','أكّد بكلمة المرور','اضغط تأكيد'],
-    warn:'الحذف نهائي — كل بياناتك ستُحذف ولا يمكن التراجع',
-    sugs:[],
-  },
-  'ما هو Trust Score؟':{
-    text:'<b>Trust Score</b> رقم من 0-100 يعكس مصداقيتك على المنصة.',
-    list:['أكمل ملفك 100%','احصل على توثيق ✅','تفاعل مع المجتمع','احصل على متابعين','انشر أفكاراً ومشاريع'],
-    note:'Trust Score مرتفع يزيد ظهورك للمستثمرين',
-    sugs:['كيف أوثّق حسابي؟','كيف أكمل ملفي؟'],
-  },
-  'الخصوصية':{
-    text:'من <b>الإعدادات → الخصوصية</b>:',
-    list:['من يستطيع مراسلتك (الجميع / المتابعون / لا أحد)','من يرى ملفك الشخصي','إظهار أو إخفاء البريد والهاتف'],
-    sugs:['إعدادات الإشعارات'],
-  },
-  'متابعة أشخاص':{
-    steps:['افتح صفحة المستخدم','اضغط زر "+" أو "متابعة"'],
-    note:'يمكن إلغاء المتابعة بنفس الزر في أي وقت',
-    sugs:['كيف أرسل رسالة؟'],
-  },
-  'نشر فكرة أو مشروع':{
-    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر النوع: فكرة / مشروع / وظيفة','اكتب العنوان والوصف واختر الفئة','أضف صورة أو فيديو (اختياري)','اضغط نشر'],
-    warn:'إذا كانت فكرتك حساسة، فعّل خيار NDA لحمايتها',
-    sugs:['ما هو NDA؟','كيف أجد مستثمرين؟'],
-  },
-  'ما هو NDA؟':{
-    text:'<b>NDA</b> (اتفاقية عدم الإفصاح) يحمي فكرتك — المستثمر يوقّع قبل رؤية التفاصيل.',
-    steps:['عند نشر فكرة، فعّل خيار 🔒 حماية NDA','المستثمر يرى "توقيع NDA وإبداء الاهتمام"','بعد التوقيع يصلك إشعار باهتمامه'],
-    note:'مناسب للأفكار التي لم تُطلق بعد',
-    sugs:['نشر فكرة أو مشروع'],
-  },
-  'تعديل أو حذف منشور':{
-    steps:['افتح تفاصيل المنشور','اضغط ⋮ (ثلاث نقاط)','اختر تعديل أو حذف','أكّد العملية'],
-    warn:'الحذف نهائي ولا يمكن التراجع',
-    sugs:['نشر فكرة أو مشروع'],
-  },
-  'الإبلاغ عن محتوى':{
-    steps:['افتح المنشور','اضغط ⋮','اختر "إبلاغ"','اختر السبب وأرسل'],
-    note:'يراجع الفريق البلاغ خلال 24 ساعة',
-    sugs:[],
-  },
-  'التفاعلات':{
-    list:['▲ تصويت — دعم الفكرة','💡 ثاقب — الفكرة مبتكرة ومفيدة','🤝 تعاون — ترغب بالتعاون','⭐ اهتمام — اهتمام استثماري'],
-    note:'كل تفاعل يُرسل إشعاراً فورياً لصاحب المنشور',
-    sugs:['التعليقات'],
-  },
-  'التعليقات':{
-    steps:['افتح المنشور','اكتب في حقل التعليق','اضغط إرسال'],
-    text:'للرد على تعليق اضغط ↩ رد تحت أي تعليق',
-    sugs:['التفاعلات'],
-  },
-  'كيف أرسل رسالة؟':{
-    steps:['افتح صفحة المستخدم','اضغط "💬 رسالة"','يُرسل طلب مراسلة','عند القبول تُفتح المحادثة'],
-    note:'بعض المستخدمين يقبلون رسائل المتابعين فقط',
-    sugs:['قبول طلب مراسلة','من يراسلني؟'],
-  },
-  'قبول طلب مراسلة':{
-    text:'افتح <b>الرسائل → تبويب "الطلبات"</b>',
-    list:['✓ قبول — لفتح المحادثة','✗ رفض — لرفض الطلب نهائياً'],
-    sugs:['كيف أرسل رسالة؟'],
-  },
-  'إرسال صورة أو ملف':{
-    steps:['اضغط أيقونة 📎 في شريط الكتابة','اختر الصورة أو الملف','سيُرفع ويُرسل تلقائياً'],
-    note:'الحد الأقصى 20MB للملفات',
-    sugs:['تعديل أو حذف رسالة'],
-  },
-  'تعديل أو حذف رسالة':{
-    text:'<b>كليك يمين</b> (كمبيوتر) أو <b>ضغط طويل</b> (جوال) على الرسالة:',
-    list:['✏️ تعديل — لتغيير النص','🗑️ حذف للجميع — يحذفها من الطرفين','📋 نسخ النص','↪️ توجيه لمحادثة أخرى'],
-    sugs:['معنى ✓ و✓✓'],
-  },
-  'معنى ✓ و✓✓':{
-    list:['✓ — تم الإرسال','✓✓ (رمادي) — تم التسليم','✓✓ (أخضر) — تمت القراءة'],
-    note:'"يكتب..." يظهر عندما يكتب الطرف الآخر',
-    sugs:['كيف أرسل رسالة؟'],
-  },
-  'من يراسلني؟':{
-    text:'<b>الإعدادات → الخصوصية → من يستطيع مراسلتك:</b>',
-    list:['الجميع — أي مستخدم','المتابعون فقط','لا أحد — أغلق الرسائل'],
-    sugs:[],
-  },
-  'حذف محادثة':{
-    steps:['افتح المحادثة','اضغط أيقونة 🗑️ في الأعلى','أكّد الحذف'],
-    warn:'الحذف نهائي ولا يمكن استعادة المحادثة',
-    sugs:[],
-  },
-  'إيجاد فرص استثمار':{
-    list:['الفيد الرئيسي — فلتر "مشاريع"','لوحة المستثمر — صفحة مخصصة للفرص','البحث بكلمات مثل "تقنية" أو "صحة"','الخريطة التفاعلية — فرص حسب الموقع'],
-    text:'لإبداء الاهتمام: افتح المشروع واضغط <b>⭐ اهتمام</b>',
-    sugs:['التواصل مع صاحب مشروع','حفظ فرصة'],
-  },
-  'التواصل مع صاحب مشروع':{
-    steps:['افتح صفحة صاحب المشروع','اضغط "💬 رسالة"','أرسل طلب مراسلة'],
-    note:'سيصله إشعار باهتمامك فوراً',
-    sugs:['إيجاد فرص استثمار'],
-  },
-  'حفظ فرصة':{
-    text:'اضغط <b>🔖</b> في أي منشور لحفظه. المحفوظات في ملفك الشخصي.',
-    sugs:['إيجاد فرص استثمار'],
-  },
-  'نشر مشروعي للمستثمرين':{
-    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر "مشروع"','اكتب التفاصيل والمتطلبات والمبلغ المطلوب','فعّل NDA إذا أردت حمايته','اضغط نشر'],
-    note:'أضف صوراً وفيديو لزيادة جاذبية مشروعك',
-    sugs:['ما هو NDA؟','إيجاد فرص استثمار'],
-  },
-  'نشر وظيفة':{ /* alias */ text:'', steps:['من الفيد اضغط "✦ نشر فكرة"','اختر نوع "وظيفة"','أدخل تفاصيل الوظيفة والمتطلبات','حدد الراتب والموقع','اضغط نشر'], note:'وظيفتك ستظهر في قسم الوظائف وفيد المستخدمين', sugs:['إيجاد فرص استثمار'] },
-  'نشر مشروع تخرج':{
-    steps:['من الفيد اضغط "✦ نشر فكرة"','اختر "مشروع"','اكتب اسم المشروع والتقنيات المستخدمة','أضف صوراً أو فيديو توضيحياً','اضغط نشر'],
-    note:'مشاريع التخرج تجذب الشركات والمستثمرين!',
-    sugs:['بناء CV قوي','إيجاد فرصة تدريب'],
-  },
-  'إيجاد فرصة تدريب':{
-    steps:['ابحث عن "تدريب" أو "internship"','أو فلتر المنشورات بنوع "وظيفة"','تواصل مع الشركات مباشرة عبر الرسائل'],
-    note:'أكمل ملفك أولاً لزيادة فرص القبول',
-    sugs:['بناء CV قوي'],
-  },
-  'بناء CV قوي':{
-    list:['📸 صورة احترافية في ملفك','📝 نبذة تعكس هدفك المهني','🛠️ المهارات بالتفصيل','🗂️ المشاريع مع روابط وصور','🎓 التعليم والشهادات','💼 الخبرات السابقة'],
-    note:'الملف المكتمل يحصل على 3x مشاهدات أكثر!',
-    sugs:['إيجاد فرصة تدريب','نشر مشروع تخرج'],
-  },
-  'التقدم لمنح':{
-    text:'ابحث في المنصة عن "منحة" أو "scholarship"، وتابع الجامعات والمؤسسات التعليمية لتصلك إشعارات المنح.',
-    sugs:['المسابقات'],
-  },
-  'المسابقات':{
-    text:'ابحث عن "مسابقة" أو "competition". المؤسسات تنشر المسابقات كمنشورات عادية.',
-    sugs:['التقدم لمنح'],
-  },
-  'لا أستطيع تسجيل الدخول':{
-    list:['كلمة مرور خاطئة → اضغط "نسيت كلمة المرور"','بريد غير مسجّل → تأكد من البريد الصحيح','سجّلت بـGoogle → استخدم نفس الطريقة','مشكلة كاش → Ctrl+Shift+R','جرّب Chrome أو Edge'],
-    sugs:['نسيت كلمة المرور'],
-  },
-  'الصور لا تُرفع':{
-    list:['الحجم كبير جداً → الحد 20MB (رسائل) / 3MB (ملف شخصي)','نوع غير مدعوم → استخدم JPG/PNG/WebP/GIF','إنترنت ضعيف → تحقق من الاتصال','سجّل خروجاً ودخولاً لتجديد الصلاحيات'],
-    sugs:['المنصة بطيئة'],
-  },
-  'المنصة بطيئة':{
-    list:['Ctrl+Shift+R (Hard Refresh)','أغلق التبويبات الأخرى','جرّب Chrome أو Edge','تحقق من سرعة الإنترنت','امسح بيانات المتصفح'],
-    sugs:[],
-  },
-  'لا تصلني إشعارات':{
-    list:['تأكد من تسجيل الدخول','جرّب Chrome أو Edge','تحقق من الإنترنت','سجّل خروجاً ودخولاً (Ctrl+Shift+R)'],
-    sugs:['الصفحة لا تتحدث'],
-  },
-  'لا أستطيع إرسال رسائل':{
-    list:['لم يُقبل طلب المراسلة بعد → انتظر','المستخدم يقبل المتابعين فقط → اتبعه أولاً','المستخدم أغلق الرسائل → لا يمكن التواصل','مشكلة اتصال → تحقق من الإنترنت'],
-    sugs:['من يراسلني؟'],
-  },
-  'الصفحة لا تتحدث':{
-    list:['تحقق من الإنترنت','أعد تحميل الصفحة (F5)','سجّل خروجاً ودخولاً','جرّب متصفحاً آخر'],
-    sugs:['المنصة بطيئة'],
-  },
-  'حسابي اختُرق':{
-    steps:['غيّر كلمة المرور فوراً من الإعدادات','تحقق من بريدك للرسائل المشبوهة','سجّل الخروج من جميع الأجهزة','راسل الدعم: support@azzaworld.com'],
-    warn:'لا تشارك كلمة مرورك مع أحد أبداً!',
-    sugs:['تغيير كلمة المرور'],
-  },
-  'كيف أوثّق حسابي؟':{
-    steps:['افتح صفحة التوثيق','أكمل بيانات حسابك 100%','ارفع وثيقة هوية رسمية','انتظر المراجعة (1-3 أيام)'],
-    note:'بعد التوثيق تظهر شارة ✅ وتزيد مصداقيتك',
-    sugs:['ما هو Trust Score؟','كيف أكمل ملفي؟'],
-  },
-  'متطلبات التوثيق':{
-    list:['📸 صورة شخصية واضحة','📝 ملف شخصي مكتمل 100%','📄 وثيقة هوية رسمية (للأفراد)','📋 سجل تجاري (للشركات)'],
-    sugs:['كيف أوثّق حسابي؟'],
-  },
-  'كم تستغرق المراجعة؟':{ text:'عادةً <b>1 إلى 3 أيام عمل</b> بعد تقديم الطلب.', sugs:['كيف أوثّق حسابي؟'] },
-  'الوضع الليلي':{ text:'اضغط على أيقونة ☀️/🌙 في أعلى الصفحة، أو من <b>الإعدادات → المظهر</b>.', note:'يُحفظ تلقائياً ويطبّق على جميع الصفحات', sugs:[] },
-  'إعدادات الإشعارات':{ text:'من <b>الإعدادات → الإشعارات</b> يمكنك تفعيل/إيقاف:\nإشعارات التعليقات، المتابعين، الرسائل، التفاعلات.', sugs:['الخصوصية'] },
-  'إعدادات الخصوصية':{ text:'من <b>الإعدادات → الخصوصية</b>:\nمن يراك، من يراسلك، إظهار/إخفاء معلومات الاتصال.', sugs:['إعدادات الإشعارات'] },
-  'تغيير اللغة':{ text:'المنصة حالياً باللغة العربية. سيتم إضافة خيار اللغات الأخرى قريباً.', sugs:[] },
-  'كيف أستخدم الخريطة؟':{
-    steps:['افتح صفحة الاستكشاف','انقر على أي دولة أو مدينة','شاهد المستخدمين والمشاريع في تلك المنطقة','استخدم الفلاتر لتضييق النتائج'],
-    note:'موقعك يظهر بناءً على بيانات التسجيل',
-    sugs:['كيف يظهر موقعي؟'],
-  },
-  'كيف يظهر موقعي؟':{ text:'موقعك يُحدَّد من البيانات التي أدخلتها عند التسجيل.\n\nلتغييره: <b>الإعدادات → الحساب → الموقع</b>', sugs:['كيف أستخدم الخريطة؟'] },
-  'البحث بالموقع':{ text:'من الخريطة التفاعلية: انقر على البلد أو المدينة لرؤية المستخدمين والمشاريع فيها.', sugs:['كيف أستخدم الخريطة؟'] },
-  'كيف أستخدم المساعد؟':{ text:'أنا هنا! اسألني أي شيء عن المنصة واختر من القوائم، أو اكتب سؤالك مباشرة.', sugs:['نشر فكرة أو مشروع','كيف أنشئ حساباً؟'] },
-  'ما هي قدرات المساعد؟':{ text:'أستطيع مساعدتك في:\n<ul><li>كيفية استخدام كل ميزة في AZZA</li><li>حل المشاكل التقنية</li><li>البحث عن الفرص والوظائف</li><li>نصائح لتطوير ملفك الشخصي</li></ul>', sugs:[] },
-};
-
-/* ══ بناء HTML للإجابة ══ */
-function buildHTML(qa){
-  let h='';
-  if(qa.text) h+=`<span>${qa.text.replace(/\n/g,'<br>')}</span>`;
-  if(qa.steps){
-    h+='<div class="steps">';
-    h+=qa.steps.map((s,i)=>`<div class="step"><div class="step-n">${i+1}</div><div class="step-t">${s}</div></div>`).join('');
+  if(EXP.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">الخبرات العملية</div>`;
+    EXP.forEach(e=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(e.title)}</span><span class="cv-item-date">${esc(e.from)} ${e.to?'← '+esc(e.to):'← الآن'}</span></div><div class="cv-item-sub">${esc(e.company)}</div>${e.desc?`<div class="cv-item-desc">${esc(e.desc)}</div>`:''}</div>`;
+    });
     h+='</div>';
   }
-  if(qa.list) h+=`<ul>${qa.list.map(l=>`<li>${l}</li>`).join('')}</ul>`;
-  if(qa.note) h+=`<div class="note">💡 ${qa.note}</div>`;
-  if(qa.warn) h+=`<div class="warn-note">⚠️ ${qa.warn}</div>`;
-  return h;
-}
 
-async function answerQ(text){
-  /* بحث في QA المدمج */
-  const key = Object.keys(QA).find(k=>text.includes(k)||k.includes(text))||
-               Object.keys(QA).find(k=>k.split(' ').some(w=>w.length>2&&text.includes(w)));
-  if(key){
-    const qa=QA[key];
-    await addBot(buildHTML(qa));
-    await showSugs(qa.sugs||[]);
-    return;
+  if(EDU.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">التعليم</div>`;
+    EDU.forEach(e=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(e.degree)}</span><span class="cv-item-date">${esc(e.from)} ${e.to?'← '+esc(e.to):''}</span></div><div class="cv-item-sub">${esc(e.school)}</div></div>`;
+    });
+    h+='</div>';
   }
 
-  /* بحث في Supabase KB */
-  const res=searchKB(text);
-  if(res.length){
-    const best=res[0];
-    let h=`<b>${best.title}</b><br><br>${(best.ans||'').substring(0,350).replace(/\n/g,'<br>')}`;
-    if((best.ans||'').length>350) h+='...';
-    await addBot(h);
-    if(res.length>1){
-      await sleep(300);
-      await addBot(`<b>مقالات ذات صلة:</b><ul>${res.slice(1,4).map(r=>`<li>${r.title}</li>`).join('')}</ul>`);
-    }
-  }else{
-    await addBot(`لم أجد إجابة لسؤالك في قاعدة المعرفة 🙁<br><br>يمكنك:<br>• تصفح <a href="help.html" style="color:var(--o);font-weight:700">مركز المساعدة</a><br>• التواصل مع الدعم: support@azzaworld.com`);
-    db.from('help_failed_searches').insert({query:text}).then(()=>{});
+  if(SKILLS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">المهارات</div><div class="cv-skills-wrap">${SKILLS.map(s=>`<span class="cv-skill">${esc(s)}</span>`).join('')}</div></div>`;
   }
-  await sleep(400);
-  await showSugs(['نشر فكرة أو مشروع','كيف أنشئ حساباً؟','إيجاد فرص استثمار']);
+
+  if(CERTS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">الشهادات والدورات</div>`;
+    CERTS.forEach(c=>{
+      h+=`<div class="cv-item"><div class="cv-item-header"><span class="cv-item-title">${esc(c.name)}</span><span class="cv-item-date">${esc(c.year||'')}</span></div><div class="cv-item-sub">${esc(c.issuer||'')}</div></div>`;
+    });
+    h+='</div>';
+  }
+
+  if(LANGS.length){
+    h+=`<div class="cv-section"><div class="cv-section-title">اللغات</div><div class="cv-langs-wrap">${LANGS.map(l=>`<span class="cv-lang">${esc(l)}</span>`).join('')}</div></div>`;
+  }
+
+  document.getElementById('cv-preview').innerHTML=h;
 }
 
-async function showSugs(sugs){
-  if(!sugs.length) sugs=['العودة للقائمة الرئيسية'];
-  await sleep(200);
-  const d=document.createElement('div');
-  d.className='suggest-row pop';
-  d.innerHTML=['🏠 القائمة الرئيسية',...sugs].map(s=>
-    `<button class="sug" onclick="handleSug(this,'${esc(s)}')">${s}</button>`
+/* ══ الخبرات ══ */
+function renderExp(){
+  document.getElementById('exp-list').innerHTML=EXP.map((e,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="EXP.splice(${i},1);renderExp();buildPreview()">✕</button>
+      <div class="row2">
+        <div class="field"><label>المسمى الوظيفي</label><input value="${esc(e.title)}" oninput="EXP[${i}].title=this.value;buildPreview()"></div>
+        <div class="field"><label>الشركة</label><input value="${esc(e.company)}" oninput="EXP[${i}].company=this.value;buildPreview()"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>من (السنة)</label><input value="${esc(e.from)}" placeholder="2022" oninput="EXP[${i}].from=this.value;buildPreview()"></div>
+        <div class="field"><label>إلى</label><input value="${esc(e.to)}" placeholder="2024 أو اتركه فارغاً للآن" oninput="EXP[${i}].to=this.value;buildPreview()"></div>
+      </div>
+      <div class="field"><label>وصف المهام (اختياري)</label><textarea oninput="EXP[${i}].desc=this.value;buildPreview()">${esc(e.desc||'')}</textarea></div>
+    </div>`).join('');
+}
+function addExp(){ EXP.push({title:'',company:'',from:'',to:'',desc:''}); renderExp(); buildPreview(); }
+
+/* ══ التعليم ══ */
+function renderEdu(){
+  document.getElementById('edu-list').innerHTML=EDU.map((e,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="EDU.splice(${i},1);renderEdu();buildPreview()">✕</button>
+      <div class="field"><label>الدرجة العلمية / التخصص</label><input value="${esc(e.degree)}" oninput="EDU[${i}].degree=this.value;buildPreview()"></div>
+      <div class="row2">
+        <div class="field"><label>الجامعة / المدرسة</label><input value="${esc(e.school)}" oninput="EDU[${i}].school=this.value;buildPreview()"></div>
+        <div class="field"><label>السنوات</label><input value="${esc(e.from+' - '+(e.to||''))}" placeholder="2020 - 2024" oninput="const p=this.value.split('-');EDU[${i}].from=(p[0]||'').trim();EDU[${i}].to=(p[1]||'').trim();buildPreview()"></div>
+      </div>
+    </div>`).join('');
+}
+function addEdu(){ EDU.push({degree:'',school:'',from:'',to:''}); renderEdu(); buildPreview(); }
+
+/* ══ الشهادات ══ */
+function renderCerts(){
+  document.getElementById('cert-list').innerHTML=CERTS.map((c,i)=>`
+    <div class="item-card">
+      <button class="item-rm" onclick="CERTS.splice(${i},1);renderCerts();buildPreview()">✕</button>
+      <div class="row2">
+        <div class="field"><label>اسم الشهادة</label><input value="${esc(c.name)}" oninput="CERTS[${i}].name=this.value;buildPreview()"></div>
+        <div class="field"><label>الجهة المانحة</label><input value="${esc(c.issuer||'')}" oninput="CERTS[${i}].issuer=this.value;buildPreview()"></div>
+      </div>
+      <div class="field"><label>السنة</label><input value="${esc(c.year||'')}" placeholder="2023" oninput="CERTS[${i}].year=this.value;buildPreview()"></div>
+    </div>`).join('');
+}
+function addCert(){ CERTS.push({name:'',issuer:'',year:''}); renderCerts(); buildPreview(); }
+
+/* ══ المهارات ══ */
+function renderSkills(){
+  document.getElementById('skills-tags').innerHTML=SKILLS.map((s,i)=>
+    `<div class="tag">${esc(s)}<button class="tag-rm" onclick="SKILLS.splice(${i},1);renderSkills();buildPreview()">✕</button></div>`
   ).join('');
-  addEl(d);
+}
+function addSkill(){
+  const inp=document.getElementById('skill-inp');
+  const v=inp.value.trim();
+  if(v&&!SKILLS.includes(v)){ SKILLS.push(v); renderSkills(); buildPreview(); }
+  inp.value='';
 }
 
-async function handleSug(btn, text){
-  if(text==='🏠 القائمة الرئيسية'){ rmInteractive(); await goHome(); return; }
-  rmInteractive();
-  addUser(text);
-  typing(); await sleep(600); rmTyping();
-  await answerQ(text);
+/* ══ اللغات ══ */
+function renderLangs(){
+  document.getElementById('lang-tags').innerHTML=LANGS.map((l,i)=>
+    `<div class="tag">${esc(l)}<button class="tag-rm" onclick="LANGS.splice(${i},1);renderLangs();buildPreview()">✕</button></div>`
+  ).join('');
+}
+function addLang(){
+  const inp=document.getElementById('lang-inp');
+  const v=inp.value.trim();
+  if(v&&!LANGS.includes(v)){ LANGS.push(v); renderLangs(); buildPreview(); }
+  inp.value='';
 }
 
-function searchKB(q){
-  const all=[...KB,...KB_FAQS];
-  const w=q.toLowerCase().split(/\s+/);
-  return all.map(item=>{
-    let s=0;
-    const h=(item.title+' '+(item.tags||[]).join(' ')+' '+(item.ans||'')).toLowerCase();
-    if(h.includes(q.toLowerCase())) s+=10;
-    w.forEach(ww=>{ if(ww.length>1){ if(item.title.toLowerCase().includes(ww))s+=5; if((item.tags||[]).some(t=>t.includes(ww)))s+=3; if((item.ans||'').toLowerCase().includes(ww))s+=1; } });
-    return{item,s};
-  }).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.item);
-}
+function renderAll(){ renderExp(); renderEdu(); renderCerts(); renderSkills(); renderLangs(); }
 
-async function sendFree(){
-  const ta=document.getElementById('inp');
-  const text=ta.value.trim();
-  if(!text) return;
-  ta.value=''; ta.style.height='auto';
-  rmInteractive();
-  addUser(text);
-  typing(); await sleep(700); rmTyping();
-  await answerQ(text);
-}
+/* تحديث المعاينة عند الكتابة */
+['cv-name','cv-headline','cv-email','cv-phone','cv-location','cv-bio','cv-website'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',buildPreview);
+});
 
-async function goHome(){ await showHome(); }
+/* Themes */
+(()=>document.body.classList.toggle('dark',localStorage.getItem('azza_theme')==='dark'))();
 
-async function resetChat(){
-  chat.innerHTML='';
-  await showHome();
-}
-
-(()=>document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark'))();
-
-(async()=>{
-  await loadKB();
-  await showHome();
-})();
+/* Init */
+loadCV();
 </script>
 </body>
 </html>
