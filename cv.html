@@ -505,7 +505,7 @@ const ITEM_TEMPLATES={
           <button class="item-card-rm" onclick="removeItem('exp',${i})">✕</button>
         </div>
         <div class="row2">
-          <div class="field"><label>المسمى الوظيفي</label><input value="${esc(item.title)}" oninput="EXP[${i}].title=this.value;renderItems('exp');liveUpdate()"></div>
+          <div class="field"><label>المسمى الوظيفي</label><input value="${esc(item.title)}" oninput="EXP[${i}].title=this.value;liveUpdate()"></div>
           <div class="field"><label>الشركة / المؤسسة</label><input value="${esc(item.company)}" oninput="EXP[${i}].company=this.value;liveUpdate()"></div>
         </div>
         <div class="row3">
@@ -525,7 +525,7 @@ const ITEM_TEMPLATES={
           <button class="item-card-rm" onclick="removeItem('edu',${i})">✕</button>
         </div>
         <div class="row2">
-          <div class="field"><label>الدرجة / التخصص</label><input value="${esc(item.degree)}" placeholder="بكالوريوس هندسة برمجيات" oninput="EDU[${i}].degree=this.value;renderItems('edu');liveUpdate()"></div>
+          <div class="field"><label>الدرجة / التخصص</label><input value="${esc(item.degree)}" placeholder="بكالوريوس هندسة برمجيات" oninput="EDU[${i}].degree=this.value;liveUpdate()"></div>
           <div class="field"><label>الجامعة / المعهد</label><input value="${esc(item.school)}" oninput="EDU[${i}].school=this.value;liveUpdate()"></div>
         </div>
         <div class="row2">
@@ -544,7 +544,7 @@ const ITEM_TEMPLATES={
           <button class="item-card-rm" onclick="removeItem('cert',${i})">✕</button>
         </div>
         <div class="row2">
-          <div class="field"><label>اسم الشهادة / الدورة</label><input value="${esc(item.name)}" oninput="CERT[${i}].name=this.value;renderItems('cert');liveUpdate()"></div>
+          <div class="field"><label>اسم الشهادة / الدورة</label><input value="${esc(item.name)}" oninput="CERT[${i}].name=this.value;liveUpdate()"></div>
           <div class="field"><label>الجهة المانحة</label><input value="${esc(item.issuer||'')}" oninput="CERT[${i}].issuer=this.value;liveUpdate()"></div>
         </div>
         <div class="row2">
@@ -562,7 +562,7 @@ const ITEM_TEMPLATES={
           <button class="item-card-rm" onclick="removeItem('proj',${i})">✕</button>
         </div>
         <div class="row2">
-          <div class="field"><label>اسم المشروع</label><input value="${esc(item.name)}" oninput="PROJ[${i}].name=this.value;renderItems('proj');liveUpdate()"></div>
+          <div class="field"><label>اسم المشروع</label><input value="${esc(item.name)}" oninput="PROJ[${i}].name=this.value;liveUpdate()"></div>
           <div class="field"><label>رابط المشروع</label><input value="${esc(item.url||'')}" placeholder="github.com/..." oninput="PROJ[${i}].url=this.value;liveUpdate()"></div>
         </div>
         <div class="field"><label>الوصف والتقنيات المستخدمة</label><textarea oninput="PROJ[${i}].desc=this.value;liveUpdate()" placeholder="منصة AZZA للتواصل بين رواد الأعمال والمستثمرين، بُنيت بـ HTML/JS + Supabase">${esc(item.desc||'')}</textarea></div>
@@ -577,7 +577,7 @@ const ITEM_TEMPLATES={
           <button class="item-card-rm" onclick="removeItem('award',${i})">✕</button>
         </div>
         <div class="row2">
-          <div class="field"><label>اسم الجائزة / الإنجاز</label><input value="${esc(item.name)}" oninput="AWARD[${i}].name=this.value;renderItems('award');liveUpdate()"></div>
+          <div class="field"><label>اسم الجائزة / الإنجاز</label><input value="${esc(item.name)}" oninput="AWARD[${i}].name=this.value;liveUpdate()"></div>
           <div class="field"><label>السنة</label><input value="${esc(item.year||'')}" placeholder="2023" oninput="AWARD[${i}].year=this.value;liveUpdate()"></div>
         </div>
         <div class="field"><label>الوصف (اختياري)</label><input value="${esc(item.desc||'')}" placeholder="حصلت على المركز الأول في..." oninput="AWARD[${i}].desc=this.value;liveUpdate()"></div>
@@ -727,7 +727,7 @@ async function runGapAnalysis(){
 let _previewTimer=null;
 function liveUpdate(){
   clearTimeout(_previewTimer);
-  _previewTimer=setTimeout(()=>{buildPreview();analyzeATS();},300);
+  _previewTimer=setTimeout(()=>{buildPreview();analyzeATS();},800);
   /* Auto-save */
   clearTimeout(autoSaveTimer);
   autoSaveTimer=setTimeout(saveCV,4000);
@@ -900,20 +900,37 @@ function buildMinimal(name,hl,email,phone,loc,li,bio,photo,interests){
 
 /* ══ Save & Load ══ */
 async function saveCV(){
-  const data={
-    name:v('f-name'), headline:v('f-headline'), bio:v('f-bio'),
-    phone:v('f-phone'), email:v('f-email'),
-    social_links:{linkedin:v('f-linkedin'),website:v('f-linkedin')},
-    skills:[...TECH,...SOFT], experience:EXP, education:EDU,
-    certifications:CERT, languages:LANG,
-    cv_data:{proj:PROJ,award:AWARD,soft:SOFT,tech:TECH,interests:v('f-interests')},
+  /* أولاً: حفظ الحقول الأساسية الموجودة دائماً */
+  const base={
+    name:v('f-name')||me.name,
+    bio:v('f-bio'),
     updated_at:new Date().toISOString(),
   };
-  const {error}=await db.from('users').update(data).eq('id',me.id);
-  if(error){toast('تعذّر الحفظ','err');return;}
-  const updated={...me,...data};
+  const {error:e0}=await db.from('users').update(base).eq('id',me.id);
+  if(e0){toast('تعذّر الحفظ: '+e0.message,'err');console.error(e0);return;}
+
+  /* ثانياً: محاولة حفظ حقول CV (قد لا تكون موجودة بعد) */
+  const cvData={
+    headline:v('f-headline'),
+    phone:v('f-phone'),
+    social_links:{linkedin:v('f-linkedin'),website:v('f-linkedin')},
+    skills:[...TECH,...SOFT],
+    experience:EXP,
+    education:EDU,
+    certifications:CERT,
+    languages:LANG,
+    cv_data:{proj:PROJ,award:AWARD,soft:SOFT,tech:TECH,interests:v('f-interests')},
+  };
+  const {error:e1}=await db.from('users').update(cvData).eq('id',me.id);
+  if(e1){
+    console.warn('حقول CV غير موجودة — شغّل cv_schema.sql أولاً:', e1.message);
+    toast('⚠️ شغّل cv_schema.sql بـSupabase أولاً!','warn');
+    return;
+  }
+
+  const updated={...me,...base,...cvData};
   localStorage.setItem('azza_user',JSON.stringify(updated));
-  toast('تم الحفظ تلقائياً ✅');
+  toast('تم الحفظ ✅');
 }
 
 async function loadCV(){
