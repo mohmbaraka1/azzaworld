@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>السيرة الذاتية</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:#888;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.toolbar{background:rgba(0,0,0,.4);padding:10px 20px;border-radius:12px;margin-bottom:16px;display:flex;align-items:center;gap:12px;color:#fff;font-size:13px;width:100%;max-width:800px}
+.toolbar a{color:rgba(255,255,255,.8);text-decoration:none}
+.toolbar a:hover{color:#fff}
+.tb-btn{padding:7px 14px;border-radius:8px;border:none;background:rgba(255,255,255,.15);color:#fff;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.tb-btn:hover{background:rgba(255,255,255,.25)}
+.a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.4);padding:28px 32px;font-family:Tajawal,sans-serif;direction:rtl}
+.cv-name{font-size:24px;font-weight:900;color:#1c5b38;margin-bottom:4px}
+.cv-hl{font-size:14px;color:#c69749;font-weight:700;margin-bottom:10px}
+.cv-contacts{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#666;margin-bottom:20px}
+.cv-sec{margin-bottom:18px}
+.cv-sec-title{font-size:12px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid #1c5b38;padding-bottom:3px;margin-bottom:10px}
+.cv-item{margin-bottom:10px}
+.cv-item-h{display:flex;justify-content:space-between;align-items:flex-start}
+.cv-item-title{font-size:13px;font-weight:700}
+.cv-item-date{font-size:11px;color:#888}
+.cv-item-sub{font-size:12px;color:#666;margin-bottom:3px}
+.cv-item-desc{font-size:12px;line-height:1.6;color:#333}
+.cv-skill{display:inline-block;padding:3px 10px;border-radius:5px;background:#e8f4ed;color:#1c5b38;font-size:11px;font-weight:700;margin:2px}
+.cv-bio{font-size:12px;color:#444;line-height:1.75;margin-bottom:14px}
+.loading{color:#fff;text-align:center;padding:40px;font-size:16px}
+@media(max-width:800px){.a4{width:100%;min-height:auto}}
+@media print{body{background:#fff;padding:0}.toolbar{display:none}.a4{box-shadow:none;width:100%}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <span style="flex:1">📄 السيرة الذاتية العامة</span>
+  <button class="tb-btn" onclick="window.print()">🖨️ طباعة</button>
+  <a href="app.html">✦ AZZA</a>
+</div>
+<div id="cv-out"><div class="loading">⏳ جاري تحميل السيرة الذاتية...</div></div>
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db=supabase.createClient(SB_URL,SB_ANON);
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+(async()=>{
+  const uid=new URLSearchParams(location.search).get('user');
+  if(!uid){document.getElementById('cv-out').innerHTML='<div class="loading">❌ رابط غير صحيح</div>';return;}
+
+  const {data:u}=await db.from('users').select('*')
+    .or(`id.eq.${uid},username.eq.${uid}`).single();
+
+  if(!u){document.getElementById('cv-out').innerHTML='<div class="loading">❌ لم يُعثر على هذا المستخدم</div>';return;}
+
+  document.title='CV — '+(u.name||'');
+  const EXP=Array.isArray(u.experience)?u.experience:[];
+  const EDU=Array.isArray(u.education)?u.education:[];
+  const CERT=Array.isArray(u.certifications)?u.certifications:[];
+  const cv=u.cv_data||{};
+  const TECH=Array.isArray(cv.tech)?cv.tech:Array.isArray(u.skills)?u.skills:[];
+  const SOFT=Array.isArray(cv.soft)?cv.soft:[];
+  const LANG=Array.isArray(u.languages)?u.languages:[];
+  const PROJ=Array.isArray(cv.proj)?cv.proj:[];
+
+  let h=`<div class="a4">`;
+  if(u.photo) h+=`<img src="${esc(u.photo)}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;float:left;margin:0 0 12px 16px;border:3px solid #1c5b38">`;
+  h+=`<div class="cv-name">${esc(u.name)}</div>`;
+  if(u.headline) h+=`<div class="cv-hl">${esc(u.headline)}</div>`;
+  h+=`<div class="cv-contacts">`;
+  if(u.email)  h+=`<span>📧 ${esc(u.email)}</span>`;
+  if(u.phone)  h+=`<span>📱 ${esc(u.phone)}</span>`;
+  if(u.city_name||u.country_name) h+=`<span>📍 ${esc([u.city_name,u.country_name].filter(Boolean).join('، '))}</span>`;
+  if(u.social_links?.linkedin) h+=`<span>🔗 ${esc(u.social_links.linkedin)}</span>`;
+  h+=`</div>`;
+
+  if(u.bio) h+=`<div class="cv-sec"><div class="cv-sec-title">الملخص المهني</div><div class="cv-bio">${esc(u.bio)}</div></div>`;
+
+  if(EXP.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الخبرات العملية</div>`;
+    EXP.forEach(e=>{if(e.title)h+=`<div class="cv-item"><div class="cv-item-h"><span class="cv-item-title">${esc(e.title)}</span><span class="cv-item-date">${esc(e.from||'')}${e.to?' — '+esc(e.to):' — الآن'}</span></div><div class="cv-item-sub">${esc(e.company||'')}</div>${e.desc?`<div class="cv-item-desc">${esc(e.desc).replace(/\n/g,'<br>')}</div>`:''}</div>`;});
+    h+=`</div>`;
+  }
+
+  if(EDU.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">التعليم</div>`;
+    EDU.forEach(e=>{if(e.degree)h+=`<div class="cv-item"><div class="cv-item-h"><span class="cv-item-title">${esc(e.degree)}</span><span class="cv-item-date">${esc(e.from||'')}${e.to?' — '+esc(e.to):''}</span></div><div class="cv-item-sub">${esc(e.school||'')}</div></div>`;});
+    h+=`</div>`;
+  }
+
+  if(TECH.length||SOFT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">المهارات</div><div>${[...TECH,...SOFT].map(s=>`<span class="cv-skill">${esc(s)}</span>`).join('')}</div></div>`;
+  }
+
+  if(LANG.length) h+=`<div class="cv-sec"><div class="cv-sec-title">اللغات</div><div>${LANG.map(l=>`<span class="cv-skill" style="background:#fff3cd;color:#856404">${esc(l)}</span>`).join('')}</div></div>`;
+
+  if(CERT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الشهادات</div>`;
+    CERT.forEach(c=>{if(c.name)h+=`<div class="cv-item"><div class="cv-item-h"><span class="cv-item-title">${esc(c.name)}</span><span class="cv-item-date">${esc(c.year||'')}</span></div><div class="cv-item-sub">${esc(c.issuer||'')}</div></div>`;});
+    h+=`</div>`;
+  }
+
+  if(PROJ.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">المشاريع</div>`;
+    PROJ.forEach(p=>{if(p.name)h+=`<div class="cv-item"><div class="cv-item-title">🚀 ${esc(p.name)}</div><div class="cv-item-desc">${esc(p.desc||'')}</div></div>`;});
+    h+=`</div>`;
+  }
+
+  h+=`</div>`;
+  document.getElementById('cv-out').innerHTML=h;
+})();
+</script>
+</body>
+</html>

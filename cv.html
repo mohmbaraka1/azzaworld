@@ -198,6 +198,62 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
 /* Toast */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
 
+/* ── Template: Executive ── */
+.tpl-executive .a4{font-family:Tajawal,sans-serif;direction:rtl}
+.tpl-executive .cv-top{padding:30px 36px;border-bottom:3px solid #1a1814;display:flex;align-items:center;gap:20px}
+.tpl-executive .cv-top-info{flex:1}
+.tpl-executive .cv-name{font-size:26px;font-weight:900;color:#1a1814;margin-bottom:3px}
+.tpl-executive .cv-hl{font-size:14px;color:#c69749;font-weight:700;margin-bottom:8px}
+.tpl-executive .cv-contacts{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#555}
+.tpl-executive .cv-body{padding:24px 36px}
+.tpl-executive .cv-sec{margin-bottom:20px}
+.tpl-executive .cv-sec-title{font-size:12px;font-weight:900;color:#1a1814;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.tpl-executive .cv-sec-title::after{content:'';flex:1;height:1px;background:#ddd}
+.tpl-executive .cv-item{margin-bottom:12px;padding-right:12px;border-right:3px solid #c69749}
+.tpl-executive .cv-item-title{font-size:13px;font-weight:700;color:#1a1814}
+.tpl-executive .cv-item-sub{font-size:12px;color:#888}
+.tpl-executive .cv-item-date{font-size:11px;color:#aaa}
+.tpl-executive .cv-item-desc{font-size:12px;line-height:1.7;color:#333;margin-top:4px}
+.tpl-executive .cv-skill-tag{display:inline-block;padding:3px 10px;border-radius:3px;background:#f5f0e8;color:#1a1814;font-size:11px;font-weight:700;margin:2px;border:1px solid #e0d5c0}
+.tpl-executive .cv-bio{font-size:12px;color:#333;line-height:1.8;margin-bottom:14px;font-style:italic}
+
+/* ── Template: Developer ── */
+.tpl-developer .a4{font-family:'Courier New',monospace;direction:rtl;background:#0d1117}
+.tpl-developer .cv-top{background:#161b22;padding:24px 28px;border-bottom:1px solid #30363d}
+.tpl-developer .cv-name{font-size:22px;font-weight:700;color:#58a6ff;margin-bottom:3px}
+.tpl-developer .cv-hl{font-size:13px;color:#3fb950;margin-bottom:8px}
+.tpl-developer .cv-contacts{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#8b949e}
+.tpl-developer .cv-body{padding:20px 28px}
+.tpl-developer .cv-sec{margin-bottom:18px}
+.tpl-developer .cv-sec-title{font-size:12px;font-weight:700;color:#f78166;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-family:'Courier New',monospace}
+.tpl-developer .cv-sec-title::before{content:'// ';color:#8b949e}
+.tpl-developer .cv-item{margin-bottom:10px;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px 12px}
+.tpl-developer .cv-item-title{font-size:13px;font-weight:700;color:#e6edf3}
+.tpl-developer .cv-item-sub{font-size:11px;color:#3fb950}
+.tpl-developer .cv-item-date{font-size:10px;color:#8b949e}
+.tpl-developer .cv-item-desc{font-size:11px;line-height:1.6;color:#adbac7;margin-top:4px}
+.tpl-developer .cv-skill-tag{display:inline-block;padding:2px 8px;border-radius:3px;background:#1c2128;color:#79c0ff;font-size:11px;font-weight:700;margin:2px;border:1px solid #388bfd40;font-family:'Courier New',monospace}
+.tpl-developer .cv-bio{font-size:11px;color:#adbac7;line-height:1.7;margin-bottom:12px}
+
+/* ── Template: NGO ── */
+.tpl-ngo .a4{font-family:Tajawal,sans-serif;direction:rtl}
+.tpl-ngo .cv-top{background:linear-gradient(135deg,#1c5b38,#2d7d52);padding:28px 32px;color:#fff;text-align:center}
+.tpl-ngo .cv-name{font-size:24px;font-weight:900;margin-bottom:3px}
+.tpl-ngo .cv-hl{font-size:13px;opacity:.85;margin-bottom:8px}
+.tpl-ngo .cv-contacts{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;font-size:11px;opacity:.8}
+.tpl-ngo .cv-body{display:grid;grid-template-columns:1fr 1.6fr;direction:rtl}
+.tpl-ngo .cv-side{background:#f0f7f3;padding:20px;border-left:none}
+.tpl-ngo .cv-main{padding:20px 24px}
+.tpl-ngo .cv-sec{margin-bottom:16px}
+.tpl-ngo .cv-sec-title{font-size:11px;font-weight:900;color:#1c5b38;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid #c69749;padding-bottom:3px;margin-bottom:8px}
+.tpl-ngo .cv-item{margin-bottom:10px}
+.tpl-ngo .cv-item-title{font-size:13px;font-weight:700;color:#1a1814}
+.tpl-ngo .cv-item-sub{font-size:12px;color:#555}
+.tpl-ngo .cv-item-date{font-size:11px;color:#888}
+.tpl-ngo .cv-item-desc{font-size:12px;line-height:1.6;color:#333;margin-top:3px}
+.tpl-ngo .cv-skill-tag{display:inline-block;padding:3px 9px;border-radius:99px;background:#e8f4ed;color:#1c5b38;font-size:11px;font-weight:700;margin:2px}
+.tpl-ngo .cv-bio{font-size:12px;color:#333;line-height:1.75;margin-bottom:12px}
+
 @media print{
   .topbar,.ats-bar,.preview-toolbar,.tpl-btns{display:none!important}
   .layout{display:block!important;height:auto!important}
@@ -216,8 +272,11 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
     <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
   </button>
   <div class="tb-title">📄 منشئ السيرة الذاتية ATS</div>
-  <div class="tb-acts">
+  <div class="tb-acts" style="flex-wrap:wrap">
+    <button class="btn btn-outline btn-sm" onclick="showResumes()">📋 سيرتي</button>
     <button class="btn btn-outline btn-sm" onclick="analyzeATS()">🎯 تحليل ATS</button>
+    <button class="btn btn-outline btn-sm" onclick="showPublicLink()">🔗 رابط عام</button>
+    <button class="btn btn-outline btn-sm" onclick="showQR()">📱 QR Code</button>
     <button class="btn btn-save btn-sm" onclick="saveCV()">💾 حفظ</button>
     <button class="btn btn-pdf btn-sm" onclick="exportPDF()">📄 PDF</button>
   </div>
@@ -431,11 +490,21 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
         <button class="tpl-btn active" onclick="setTpl('modern',this)">Modern</button>
         <button class="tpl-btn" onclick="setTpl('classic',this)">Classic</button>
         <button class="tpl-btn" onclick="setTpl('minimal',this)">Minimal</button>
+        <button class="tpl-btn" onclick="setTpl('executive',this)">Executive</button>
+        <button class="tpl-btn" onclick="setTpl('developer',this)">Developer</button>
+        <button class="tpl-btn" onclick="setTpl('ngo',this)">NGO</button>
       </div>
     </div>
     <div class="a4-scroll">
       <div class="a4" id="cv-preview"></div>
     </div>
+  </div>
+</div>
+
+<!-- Modal قائمة السير الذاتية -->
+<div id="modal-overlay" onclick="closeModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center">
+  <div id="modal-box" onclick="event.stopPropagation()" style="background:var(--card);border-radius:16px;padding:24px;width:90%;max-width:440px;max-height:80vh;overflow-y:auto;direction:rtl">
+    <div id="modal-content"></div>
   </div>
 </div>
 
@@ -468,13 +537,14 @@ function showStep(n){
   document.querySelectorAll('.step-btn').forEach((b,i)=>b.classList.toggle('active',i===n));
 }
 
-/* ══ Templates ══ */
 function setTpl(name,btn){
   TPL=name;
   document.getElementById('preview-panel').className='preview-panel tpl-'+name;
   document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.toggle('active',b===btn));
   buildPreview();
 }
+
+/* ══ Templates ══ */
 
 /* ══ Tags ══ */
 function renderTags(arr, containerId, type){
@@ -654,7 +724,251 @@ function analyzeATS(){
   toast(score>=70?'ATS Score ممتاز ✅':score>=40?'يمكن تحسين السيرة ⚠️':'أضف المزيد من التفاصيل ❌', score>=70?'ok':score>=40?'warn':'err');
 }
 
-/* ══ Job Match ══ */
+/* ══ Modal ══ */
+function openModal(html){ document.getElementById('modal-content').innerHTML=html; document.getElementById('modal-overlay').style.display='flex'; }
+function closeModal(){ document.getElementById('modal-overlay').style.display='none'; }
+
+/* ══ QR Code ══ */
+function showQR(){
+  const username = me.username||me.id;
+  const url = `https://mohmbaraka1.github.io/azzaworld/cv-public.html?user=${username}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+  openModal(`
+    <div style="text-align:center">
+      <div style="font-size:16px;font-weight:900;margin-bottom:16px">📱 QR Code للسيرة الذاتية</div>
+      <img src="${qrUrl}" style="width:200px;height:200px;border-radius:12px;border:3px solid var(--olive)" alt="QR Code">
+      <div style="margin-top:12px;font-size:12px;color:var(--sub)">امسح هذا الكود لفتح سيرتك الذاتية</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);word-break:break-all;background:var(--bg2);padding:8px;border-radius:8px">${url}</div>
+      <button onclick="navigator.clipboard?.writeText('${url}').then(()=>toast('تم النسخ 📋'))" 
+        style="margin-top:12px;padding:8px 20px;border-radius:8px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+        📋 نسخ الرابط
+      </button>
+    </div>`);
+}
+
+/* ══ رابط عام ══ */
+function showPublicLink(){
+  const username = me.username||me.id;
+  const url = `https://mohmbaraka1.github.io/azzaworld/cv-public.html?user=${username}`;
+  openModal(`
+    <div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:8px">🔗 رابط سيرتك الذاتية العام</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:16px">شارك هذا الرابط مع الشركات والمستثمرين</div>
+      <div style="background:var(--bg2);padding:12px;border-radius:10px;word-break:break-all;font-size:13px;margin-bottom:12px;border:1.5px solid var(--olive)">${url}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="navigator.clipboard?.writeText('${url}').then(()=>{toast('تم النسخ 📋');closeModal()})"
+          style="flex:1;padding:10px;border-radius:8px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+          📋 نسخ الرابط
+        </button>
+        <button onclick="window.open('${url}','_blank')"
+          style="flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--line);background:none;color:var(--ink);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+          👁️ عرض
+        </button>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--sub);background:var(--bg2);padding:10px;border-radius:8px">
+        💡 <b>فائدة:</b> الرابط العام يسمح لأي شركة أو مستثمر برؤية سيرتك دون الحاجة لتسجيل دخول
+      </div>
+    </div>`);
+}
+
+/* ══ Multiple Resumes ══ */
+const RESUMES_KEY = 'azza_resumes_'+me.id;
+function getResumes(){ try{ return JSON.parse(localStorage.getItem(RESUMES_KEY)||'[]'); }catch{ return []; } }
+function saveResumes(arr){ localStorage.setItem(RESUMES_KEY, JSON.stringify(arr)); }
+
+function showResumes(){
+  const list = getResumes();
+  const curName = v('f-headline')||v('f-name')||'سيرة ذاتية';
+  openModal(`
+    <div>
+      <div style="font-size:16px;font-weight:900;margin-bottom:16px">📋 سيرتي الذاتية</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:12px">احفظ نسخ متعددة — مثلاً "CV للتقنية" و"CV للإدارة"</div>
+      ${list.map((r,i)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:8px">
+          <span style="flex:1;font-size:13px;font-weight:700">📄 ${r.name}</span>
+          <span style="font-size:11px;color:var(--sub)">${new Date(r.savedAt).toLocaleDateString('ar')}</span>
+          <button onclick="loadResume(${i})" style="padding:5px 10px;border-radius:6px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:12px;cursor:pointer">تحميل</button>
+          <button onclick="deleteResume(${i})" style="padding:5px 8px;border-radius:6px;border:none;background:rgba(239,68,68,.1);color:#ef4444;font-family:Tajawal,sans-serif;font-size:12px;cursor:pointer">✕</button>
+        </div>`).join('')}
+      ${!list.length?'<div style="text-align:center;padding:16px;color:var(--sub)">لا توجد نسخ محفوظة بعد</div>':''}
+      <button onclick="saveAsNew()" style="width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--olive);background:none;color:var(--olive);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">
+        + حفظ النسخة الحالية باسم جديد
+      </button>
+    </div>`);
+}
+
+function saveAsNew(){
+  const name = prompt('اسم هذه السيرة الذاتية:', v('f-headline')||v('f-name')||'CV جديد');
+  if(!name) return;
+  const snap = {
+    name, savedAt:new Date().toISOString(), tpl:TPL,
+    fields:{name:v('f-name'),headline:v('f-headline'),email:v('f-email'),phone:v('f-phone'),location:v('f-location'),linkedin:v('f-linkedin'),bio:v('f-bio'),interests:v('f-interests')},
+    EXP:[...EXP], EDU:[...EDU], CERT:[...CERT], PROJ:[...PROJ], AWARD:[...AWARD],
+    TECH:[...TECH], SOFT:[...SOFT], LANG:[...LANG],
+  };
+  const list = getResumes();
+  list.unshift(snap);
+  saveResumes(list.slice(0,10)); // احفظ أحدث 10
+  closeModal();
+  toast('تم الحفظ كنسخة جديدة ✅');
+}
+
+function loadResume(i){
+  const r = getResumes()[i];
+  if(!r) return;
+  Object.entries(r.fields||{}).forEach(([k,v2])=>{ const el=document.getElementById('f-'+k); if(el) el.value=v2||''; });
+  EXP=[...r.EXP||[]]; EDU=[...r.EDU||[]]; CERT=[...r.CERT||[]]; PROJ=[...r.PROJ||[]]; AWARD=[...r.AWARD||[]];
+  TECH=[...r.TECH||[]]; SOFT=[...r.SOFT||[]]; LANG=[...r.LANG||[]];
+  if(r.tpl){ TPL=r.tpl; document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase()===r.tpl)); document.getElementById('preview-panel').className='preview-panel tpl-'+r.tpl; }
+  ['exp','edu','cert','proj','award'].forEach(renderItems);
+  renderTags(TECH,'tech-tags','tech'); renderTags(SOFT,'soft-tags','soft'); renderTags(LANG,'lang-tags','lang');
+  buildPreview(); analyzeATS(); closeModal();
+  toast('تم تحميل: '+r.name+' ✅');
+}
+
+function deleteResume(i){
+  if(!confirm('حذف هذه السيرة؟')) return;
+  const list = getResumes();
+  list.splice(i,1);
+  saveResumes(list);
+  showResumes();
+}
+
+/* ══ القوالب الجديدة ══ */
+function buildExecutive(name,hl,email,phone,loc,li,bio,photo,interests){
+  const p=document.getElementById('cv-preview');
+  let h=`<div class="cv-top">
+    ${photo?`<img style="width:80px;height:80px;border-radius:8px;object-fit:cover;border:2px solid #c69749" src="${esc(photo)}">`:`<div style="width:80px;height:80px;border-radius:8px;background:#1a1814;color:#c69749;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900">${(name||'م')[0]}</div>`}
+    <div class="cv-top-info">
+      <div class="cv-name">${esc(name)}</div>
+      ${hl?`<div class="cv-hl">${esc(hl)}</div>`:''}
+      <div class="cv-contacts">
+        ${email?`<span>📧 ${esc(email)}</span>`:''}${phone?`<span>📱 ${esc(phone)}</span>`:''}${loc?`<span>📍 ${esc(loc)}</span>`:''}${li?`<span>🔗 ${esc(li)}</span>`:''}
+      </div>
+    </div>
+  </div>
+  <div class="cv-body">`;
+
+  if(bio) h+=`<div class="cv-sec"><div class="cv-sec-title">الملف التنفيذي</div><div class="cv-bio">${esc(bio)}</div></div>`;
+
+  if(EXP.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">القيادة والخبرة</div>`;
+    EXP.forEach(e=>{ if(e.title||e.company) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.title)}</div><div class="cv-item-sub">${esc(e.company)}</div><div class="cv-item-date">${esc(e.from)}${e.to?' — '+esc(e.to):' — الآن'}</div>${e.desc?`<div class="cv-item-desc">${esc(e.desc).replace(/\n/g,'<br>')}</div>`:''}</div>`; });
+    h+='</div>';
+  }
+
+  if(EDU.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">المؤهلات الأكاديمية</div>`;
+    EDU.forEach(e=>{ if(e.degree) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.degree)}</div><div class="cv-item-sub">${esc(e.school)}</div><div class="cv-item-date">${esc(e.from)}${e.to?' — '+esc(e.to):''}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(TECH.length||SOFT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الكفاءات الأساسية</div><div>${[...TECH,...SOFT].map(s=>`<span class="cv-skill-tag">${esc(s)}</span>`).join('')}</div></div>`;
+  }
+
+  if(CERT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الشهادات والاعتمادات</div>`;
+    CERT.forEach(c=>{ if(c.name) h+=`<div class="cv-item"><div class="cv-item-title">${esc(c.name)}</div><div class="cv-item-sub">${esc(c.issuer||'')} ${c.year?'('+esc(c.year)+')':''}</div></div>`; });
+    h+='</div>';
+  }
+
+  h+=`</div>`; p.innerHTML=h;
+}
+
+function buildDeveloper(name,hl,email,phone,loc,li,bio,photo,interests){
+  const p=document.getElementById('cv-preview');
+  let h=`<div class="cv-top">
+    <div class="cv-name">$ whoami → ${esc(name)}</div>
+    ${hl?`<div class="cv-hl">// ${esc(hl)}</div>`:''}
+    <div class="cv-contacts">
+      ${email?`<span>✉ ${esc(email)}</span>`:''}${phone?`<span>☎ ${esc(phone)}</span>`:''}${loc?`<span>⌖ ${esc(loc)}</span>`:''}${li?`<span>⎔ ${esc(li)}</span>`:''}
+    </div>
+  </div>
+  <div class="cv-body">`;
+
+  if(bio) h+=`<div class="cv-sec"><div class="cv-sec-title">about</div><div class="cv-bio">${esc(bio)}</div></div>`;
+
+  if(TECH.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">skills</div><div>${TECH.map(s=>`<span class="cv-skill-tag">${esc(s)}</span>`).join('')}</div>`;
+    if(SOFT.length) h+=`<div style="margin-top:6px">${SOFT.map(s=>`<span class="cv-skill-tag" style="background:#1c2128;color:#79c0ff;border-color:#388bfd40">${esc(s)}</span>`).join('')}</div>`;
+    h+='</div>';
+  }
+
+  if(PROJ.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">projects</div>`;
+    PROJ.forEach(pr=>{ if(pr.name) h+=`<div class="cv-item"><div class="cv-item-title">📁 ${esc(pr.name)}</div>${pr.url?`<div class="cv-item-sub">${esc(pr.url)}</div>`:''}<div class="cv-item-desc">${esc(pr.desc||'')}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(EXP.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">experience</div>`;
+    EXP.forEach(e=>{ if(e.title||e.company) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.title)} @ ${esc(e.company)}</div><div class="cv-item-date">${esc(e.from)}${e.to?' → '+esc(e.to):' → present'}</div><div class="cv-item-desc">${esc(e.desc||'').replace(/\n/g,'<br>')}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(EDU.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">education</div>`;
+    EDU.forEach(e=>{ if(e.degree) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.degree)}</div><div class="cv-item-sub">${esc(e.school)} ${e.from?'('+esc(e.from)+(e.to?' – '+esc(e.to):'')+')'  :''}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(LANG.length) h+=`<div class="cv-sec"><div class="cv-sec-title">languages</div><div>${LANG.map(l=>`<span class="cv-skill-tag">${esc(l)}</span>`).join('')}</div></div>`;
+
+  h+=`</div>`; p.innerHTML=h;
+}
+
+function buildNGO(name,hl,email,phone,loc,li,bio,photo,interests){
+  const p=document.getElementById('cv-preview');
+  let h=`<div class="cv-top">
+    ${photo?`<img style="width:70px;height:70px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid rgba(255,255,255,.3)" src="${esc(photo)}">`:`<div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;margin:0 auto 10px">${(name||'م')[0]}</div>`}
+    <div class="cv-name">${esc(name)}</div>
+    ${hl?`<div class="cv-hl">${esc(hl)}</div>`:''}
+    <div class="cv-contacts">
+      ${email?`<span>📧 ${esc(email)}</span>`:''}${phone?`<span>📱 ${esc(phone)}</span>`:''}${loc?`<span>📍 ${esc(loc)}</span>`:''}
+    </div>
+  </div>
+  <div class="cv-body">
+  <div class="cv-side">`;
+
+  if(TECH.length||SOFT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">المهارات</div><div>${[...TECH,...SOFT].map(s=>`<span class="cv-skill-tag">${esc(s)}</span>`).join('')}</div></div>`;
+  }
+
+  if(LANG.length) h+=`<div class="cv-sec"><div class="cv-sec-title">اللغات</div><div>${LANG.map(l=>`<span class="cv-skill-tag">${esc(l)}</span>`).join('')}</div></div>`;
+
+  if(CERT.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">شهادات</div>`;
+    CERT.forEach(c=>{ if(c.name) h+=`<div class="cv-item"><div class="cv-item-title" style="font-size:12px">${esc(c.name)}</div><div class="cv-item-sub">${esc(c.issuer||'')} ${c.year?'('+esc(c.year)+')':''}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(interests) h+=`<div class="cv-sec"><div class="cv-sec-title">اهتمامات</div><div style="font-size:12px;color:#333;line-height:1.7">${esc(interests)}</div></div>`;
+
+  h+=`</div><div class="cv-main">`;
+
+  if(bio) h+=`<div class="cv-sec"><div class="cv-sec-title">البيان الشخصي</div><div class="cv-bio">${esc(bio)}</div></div>`;
+
+  if(EXP.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الخبرات والتطوع</div>`;
+    EXP.forEach(e=>{ if(e.title||e.company) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.title)}</div><div class="cv-item-sub">${esc(e.company)}</div><div class="cv-item-date">${esc(e.from)}${e.to?' — '+esc(e.to):' — الآن'}</div>${e.desc?`<div class="cv-item-desc">${esc(e.desc).replace(/\n/g,'<br>')}</div>`:''}</div>`; });
+    h+='</div>';
+  }
+
+  if(EDU.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">التعليم</div>`;
+    EDU.forEach(e=>{ if(e.degree) h+=`<div class="cv-item"><div class="cv-item-title">${esc(e.degree)}</div><div class="cv-item-sub">${esc(e.school)}</div><div class="cv-item-date">${esc(e.from)}${e.to?' — '+esc(e.to):''}</div></div>`; });
+    h+='</div>';
+  }
+
+  if(AWARD.length){
+    h+=`<div class="cv-sec"><div class="cv-sec-title">الجوائز والإنجازات</div>`;
+    AWARD.forEach(a=>{ if(a.name) h+=`<div class="cv-item"><div class="cv-item-title">🏆 ${esc(a.name)}</div>${a.year?`<div class="cv-item-date">${esc(a.year)}</div>`:''}</div>`; });
+    h+='</div>';
+  }
+
+  h+=`</div></div>`; p.innerHTML=h;
+}
 async function runJobMatch(){
   const body=document.getElementById('job-match-body');
   body.innerHTML='<div style="text-align:center;padding:20px;color:var(--sub)">⏳ جاري تحليل وظائف المنصة...</div>';
@@ -744,8 +1058,11 @@ function buildPreview(){
   const interests=v('f-interests');
   const photo=me.photo;
 
-  if(TPL==='modern') buildModern(name,hl,email,phone,loc,li,bio,photo,interests);
-  else if(TPL==='classic') buildClassic(name,hl,email,phone,loc,li,bio,photo,interests);
+  if(TPL==='modern')    buildModern(name,hl,email,phone,loc,li,bio,photo,interests);
+  else if(TPL==='classic')   buildClassic(name,hl,email,phone,loc,li,bio,photo,interests);
+  else if(TPL==='executive') buildExecutive(name,hl,email,phone,loc,li,bio,photo,interests);
+  else if(TPL==='developer') buildDeveloper(name,hl,email,phone,loc,li,bio,photo,interests);
+  else if(TPL==='ngo')       buildNGO(name,hl,email,phone,loc,li,bio,photo,interests);
   else buildMinimal(name,hl,email,phone,loc,li,bio,photo,interests);
 }
 
