@@ -366,6 +366,22 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
   .trust-bars,.trust-bar-row{min-width:0}
   .trust-bar-row{flex-wrap:wrap}
 }
+.cv-section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.cv-sec-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.cv-sec-title a{font-size:12px;color:var(--olive);text-decoration:none;font-weight:700;letter-spacing:0;text-transform:none}
+.cv-item-row{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:.5px solid var(--line)}
+.cv-item-row:last-child{border:none;padding-bottom:0}
+.cv-item-icon{width:36px;height:36px;border-radius:10px;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cv-item-info{flex:1;min-width:0}
+.cv-item-title{font-size:14px;font-weight:700}
+.cv-item-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.cv-item-date{font-size:11px;color:var(--muted);margin-top:2px}
+.cv-item-desc{font-size:12px;color:var(--ink);margin-top:4px;line-height:1.6;opacity:.8}
+.cv-empty{font-size:13px;color:var(--muted);text-align:center;padding:16px 0}
+.bio-inline{display:block;width:100%;min-height:32px}
+.inline-edit{cursor:text;border-radius:6px;padding:2px 6px;transition:.15s}
+.inline-edit:hover{background:var(--cream2)}
+.inline-edit:focus{background:var(--cream2);outline:1.5px solid var(--olive);outline-offset:1px}
 </style>
 <script src="supabase.js"></script>
 <script src="notifications.js"></script>
@@ -564,6 +580,24 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
       </div>
       <!-- اقتراحات سريعة -->
       <div class="skill-suggestions" id="skill-sugs"></div>
+    </div>
+
+    <!-- CV: الخبرات -->
+    <div class="cv-section" id="cv-exp-section">
+      <div class="cv-sec-title">
+        💼 الخبرات العملية
+        <a href="cv.html">تعديل ←</a>
+      </div>
+      <div id="cv-exp-list"><div class="cv-empty">لم تُضف خبرات بعد — <a href="cv.html" style="color:var(--olive)">أضفها الآن</a></div></div>
+    </div>
+
+    <!-- CV: التعليم -->
+    <div class="cv-section" id="cv-edu-section">
+      <div class="cv-sec-title">
+        🎓 التعليم
+        <a href="cv.html">تعديل ←</a>
+      </div>
+      <div id="cv-edu-list"><div class="cv-empty">لم تُضف مؤهلات بعد — <a href="cv.html" style="color:var(--olive)">أضفها الآن</a></div></div>
     </div>
 
     <!-- التبويبات -->
@@ -1008,7 +1042,86 @@ function saveEdit(){
   }
   localStorage.setItem('azza_user',JSON.stringify(upd));
   try{const us=JSON.parse(localStorage.getItem('azza_users')||'[]');const i=us.findIndex(u=>u.id===user.id);if(i!==-1){us[i]=upd;localStorage.setItem('azza_users',JSON.stringify(us));}}catch(e){}
+  /* حفظ بـSupabase */
+  azzaDB.from('users').update({
+    name:upd.name, bio:upd.bio, phone:upd.phone,
+    contact_email:upd.contact_email,
+    linkedin:upd.linkedin, twitter:upd.twitter,
+    instagram:upd.instagram, whatsapp:upd.whatsapp,
+    website:upd.website, updated_at:new Date().toISOString(),
+  }).eq('id',user.id).then(({error})=>{
+    if(error) console.warn('Supabase save:', error.message);
+  });
   user=upd;closeEdit();buildProfile();showToast('تم الحفظ ✅');
+}
+
+/* ══ أقسام CV ══ */
+async function loadCVSections(){
+  const {data:u}=await azzaDB.from('users').select('experience,education,cv_data,skills').eq('id',user.id).single();
+  if(!u) return;
+
+  /* الخبرات */
+  const exp=Array.isArray(u.experience)?u.experience:[];
+  const expEl=document.getElementById('cv-exp-list');
+  if(exp.length){
+    expEl.innerHTML=exp.map(e=>`
+      <div class="cv-item-row">
+        <div class="cv-item-icon">🏢</div>
+        <div class="cv-item-info">
+          <div class="cv-item-title">${escCV(e.title||'')}</div>
+          <div class="cv-item-sub">${escCV(e.company||'')}</div>
+          <div class="cv-item-date">${escCV(e.from||'')}${e.to?' — '+esc(e.to):' — الآن'}</div>
+          ${e.desc?`<div class="cv-item-desc">${escCV(e.desc).replace(/\n/g,'<br>').substring(0,120)}${e.desc.length>120?'...':''}</div>`:''}
+        </div>
+      </div>`).join('');
+  }
+
+  /* التعليم */
+  const edu=Array.isArray(u.education)?u.education:[];
+  const eduEl=document.getElementById('cv-edu-list');
+  if(edu.length){
+    eduEl.innerHTML=edu.map(e=>`
+      <div class="cv-item-row">
+        <div class="cv-item-icon">🎓</div>
+        <div class="cv-item-info">
+          <div class="cv-item-title">${escCV(e.degree||'')}</div>
+          <div class="cv-item-sub">${escCV(e.school||'')}</div>
+          <div class="cv-item-date">${escCV(e.from||'')}${e.to?' — '+esc(e.to):''}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  /* المهارات من Supabase */
+  const skills=[...new Set([
+    ...(Array.isArray(u.skills)?u.skills:[]),
+    ...(Array.isArray(u.cv_data?.tech)?u.cv_data.tech:[]),
+  ])];
+  if(skills.length && !getSkills().length){
+    user.skills=skills;
+    localStorage.setItem('azza_user',JSON.stringify(user));
+    renderSkills();
+  }
+}
+
+function escCV(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* تعديل البيو مباشرةً */
+function initInlineEdit(){
+  const bioEl=document.getElementById('prof-bio');
+  if(!bioEl||!bioEl.classList.contains('own-profile')) return;
+  bioEl.contentEditable='true';
+  bioEl.spellcheck=false;
+  bioEl.title='اضغط للتعديل المباشر';
+  bioEl.classList.add('bio-inline','inline-edit');
+  bioEl.addEventListener('blur',async()=>{
+    const newBio=bioEl.innerText.trim();
+    if(newBio===user.bio) return;
+    user.bio=newBio;
+    localStorage.setItem('azza_user',JSON.stringify(user));
+    await azzaDB.from('users').update({bio:newBio}).eq('id',user.id);
+    showToast('تم حفظ البيو ✅');
+  });
+  bioEl.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); bioEl.blur(); } });
 }
 
 /* تفاعلات المنشورات */
@@ -1064,6 +1177,8 @@ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.tar
 
 /* بناء الملف */
 function buildProfile(){
+  /* تحميل بيانات CV من Supabase */
+  loadCVSections();
   const posts=getPosts(); const myPosts=posts.filter(p=>p.author_id===user.id); const pts=user.points||0;
   /* تطبيق لون الدور */
   const t2=user.subtype==='institution'?'institution':(user.type||'idea');
@@ -1112,7 +1227,10 @@ function buildProfile(){
   /* النبذة */
   const bio=document.getElementById('prof-bio');
   if(user.bio){bio.textContent=user.bio;bio.classList.remove('empty');}
-  else{bio.textContent='أضف نبذة عن نفسك...';bio.classList.add('empty');}
+  else{bio.textContent='اضغط لإضافة نبذة عن نفسك...';bio.classList.add('empty');}
+  /* تفعيل التعديل المباشر */
+  bio.classList.add('own-profile');
+  setTimeout(initInlineEdit, 100);
 
   /* روابط التواصل */
   const cr=document.getElementById('contact-row');
