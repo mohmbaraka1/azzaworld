@@ -229,6 +229,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
 
     <!-- ── الحساب ── -->
     <div class="settings-section active" id="sec-account">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--line)">
+        <button onclick="location.href='cv.html'" style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--olive);background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer">
+          📄 فتح منشئ السيرة الذاتية (CV)
+        </button>
+      </div>
       <!-- الصورة الشخصية -->
       <div class="avatar-section">
         <div class="av-big" id="settings-av">م</div>
@@ -853,6 +858,8 @@ function updateBioCount(){
   el.style.color = len>200?'var(--red)':len>160?'var(--gold)':'';
 }
 
+/* زر فتح منشئ CV */
+function openCV(){ location.href='cv.html'; }
 async function saveAccount(){
   const name = document.getElementById('s-name').value.trim();
   if(!name){ showToast('الاسم مطلوب','err'); return; }
