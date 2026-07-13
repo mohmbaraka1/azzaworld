@@ -741,7 +741,7 @@ function buildCoursesHTML(){
     <div class="sec-row"><div class="sec-title">📚 جميع الكورسات</div></div>
     <div class="courses-grid">
       ${COURSES_DATA.map(c=>`
-        <div class="course-card" onclick="openArt('${c.id}')">
+        <div class="course-card" onclick="openCourse('${c.id}','${c.body_id||c.id}')">
           <div class="cc-thumb" style="background:linear-gradient(135deg,${c.color}22,${c.color}10)">
             <span>${c.em}</span>
             <div class="cc-badge ${c.isFree?'badge-free':'badge-new'}">${c.isFree?'🆓 مجاني':'✨ جديد'}</div>
@@ -935,7 +935,7 @@ function filterByCat(cat){
     </div>
     <div class="courses-grid">
       ${COURSES_DATA.filter(c=>c.cat===cat).map(c=>`
-        <div class="course-card" onclick="openArt('${c.id}')">
+        <div class="course-card" onclick="openCourse('${c.id}','${c.body_id||c.id}')">
           <div class="cc-thumb" style="background:linear-gradient(135deg,${c.color}22,${c.color}10)">
             <span>${c.em}</span>
             <div class="cc-badge badge-free">🆓</div>
@@ -947,6 +947,12 @@ function filterByCat(cat){
           </div>
         </div>`).join('')||`<p style="color:var(--sub);grid-column:1/-1;text-align:center;padding:40px">جاري إضافة محتوى لهذا القسم...</p>`}
     </div>`;
+}
+
+function openCourse(id, bodyId){
+  /* إذا في data من الـCMS، افتح الدرس مباشرة */
+  const courseIds={'local-1':'local-1','local-2':'local-2','local-3':'local-3'};
+  location.href='course.html?id='+(courseIds[id]||id);
 }
 
 function doSearch(q){

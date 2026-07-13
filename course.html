@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الكورس — AZZA Academy</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;--line:rgba(0,0,0,.08);--r:14px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl}
+
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:1fr 340px;max-width:1100px;margin:0 auto;padding:28px 20px;gap:24px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* Course Header */
+.course-hero{background:linear-gradient(135deg,var(--od),var(--olive));border-radius:var(--r);padding:32px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.course-hero::after{content:'';position:absolute;bottom:-40px;left:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.ch-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:rgba(198,151,73,.2);color:var(--gold);font-size:12px;font-weight:700;margin-bottom:12px;border:1px solid rgba(198,151,73,.3)}
+.ch-title{font-size:clamp(22px,4vw,32px);font-weight:900;margin-bottom:8px;line-height:1.3}
+.ch-sub{font-size:15px;opacity:.8;margin-bottom:20px;line-height:1.6}
+.ch-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;opacity:.8;margin-bottom:20px}
+.ch-meta span{display:flex;align-items:center;gap:5px}
+.ch-stats{display:flex;gap:20px;flex-wrap:wrap}
+.ch-stat{text-align:center}
+.ch-stat strong{display:block;font-size:20px;font-weight:900}
+.ch-stat span{font-size:11px;opacity:.65}
+
+/* Progress */
+.progress-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px;position:sticky;top:72px}
+.pg-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.pg-ring-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.pg-ring{width:70px;height:70px;position:relative;flex-shrink:0}
+.pg-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pg-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--olive)}
+.pg-info{flex:1}
+.pg-label{font-size:13px;font-weight:700;margin-bottom:4px}
+.pg-sub{font-size:12px;color:var(--sub)}
+.pg-bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-bottom:12px}
+.pg-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--olive),var(--gold));transition:.5s}
+.enroll-btn{width:100%;padding:13px;border-radius:12px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:.2s;margin-bottom:8px}
+.enroll-btn:hover{background:var(--od)}
+.enroll-btn.enrolled{background:var(--bg2);color:var(--ink);border:1.5px solid var(--line)}
+.free-badge{text-align:center;font-size:12px;color:var(--sub)}
+
+/* Lessons */
+.lessons-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.lessons-hdr{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.lessons-hdr-title{font-size:15px;font-weight:700}
+.lesson-item{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:.5px solid var(--line);cursor:pointer;transition:.2s}
+.lesson-item:last-child{border:none}
+.lesson-item:hover{background:var(--bg)}
+.lesson-item.active{background:var(--ol)}
+.lesson-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:.2s}
+.lesson-check.done{background:var(--olive);border-color:var(--olive);color:#fff}
+.lesson-info{flex:1;min-width:0}
+.lesson-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson-meta{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:8px}
+.lesson-play{width:30px;height:30px;border-radius:50%;background:var(--ol);display:flex;align-items:center;justify-content:center;color:var(--olive);font-size:12px;flex-shrink:0}
+
+/* Lesson Viewer */
+.lesson-viewer{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:20px;display:none}
+.lesson-viewer.open{display:block}
+.lv-header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.lv-title{font-size:15px;font-weight:700;flex:1}
+.lv-done-btn{padding:8px 16px;border-radius:99px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.lv-video{position:relative;padding-bottom:56.25%;height:0;background:#000}
+.lv-video iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.lv-body{padding:20px;font-size:15px;line-height:1.85}
+.lv-body h2{font-size:18px;font-weight:700;color:var(--olive);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.lv-body h2::before{content:'';display:block;width:3px;height:20px;background:var(--olive);border-radius:2px}
+.lv-body p{margin-bottom:14px}
+.lv-body ul{margin:10px 0 14px 20px}
+.lv-body li{margin-bottom:8px;line-height:1.7}
+.lv-tip{background:var(--ol);border-right:4px solid var(--olive);border-radius:0 10px 10px 0;padding:12px 16px;margin:16px 0;font-size:14px}
+.lv-nav{display:flex;gap:10px;padding:16px 18px;border-top:1px solid var(--line)}
+.nav-btn{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.2s}
+.nav-btn:hover{border-color:var(--olive);color:var(--olive)}
+.nav-btn.primary{background:var(--olive);color:#fff;border-color:var(--olive)}
+
+/* Outcomes */
+.outcomes-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.oc-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.oc-item{display:flex;gap:10px;margin-bottom:8px;font-size:13px}
+.oc-check{color:var(--olive);flex-shrink:0;margin-top:2px}
+
+/* Rating */
+.stars-input{display:flex;gap:4px;margin-bottom:12px}
+.star-btn{font-size:24px;cursor:pointer;color:var(--bg2);transition:.15s;border:none;background:none}
+.star-btn.on{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="font-size:15px;font-weight:700;color:var(--olive);flex:1" id="page-title">تحميل...</span>
+  <button onclick="location.href='academy.html'" style="padding:7px 14px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink)">← الأكاديمية</button>
+</div>
+
+<div style="max-width:1100px;margin:0 auto;padding:20px" id="course-hero-wrap"></div>
+
+<div class="layout" id="layout">
+  <!-- Main -->
+  <div id="main-col">
+    <div id="lesson-viewer" class="lesson-viewer"></div>
+    <div id="lessons-wrap"></div>
+    <div id="outcomes-wrap"></div>
+  </div>
+  <!-- Sidebar -->
+  <div id="sidebar-col">
+    <div class="progress-card" id="progress-card"></div>
+  </div>
+</div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+const esc = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* State */
+let COURSE=null, LESSONS=[], PROGRESS={}, enrolled=false, curLesson=null;
+
+/* Course ID من URL */
+const courseId = new URLSearchParams(location.search).get('id');
+
+/* بيانات محلية (fallback) */
+const LOCAL_COURSES = [
+  {id:'local-1', title:'ريادة الأعمال من الصفر', subtitle:'من الفكرة إلى الشركة الحقيقية', category:'biz', level:'مبتدئ', is_free:true, enrolled:124, rating:4.9, outcomes:['توليد أفكار مشاريع','بناء Pitch Deck','جذب المستثمرين','حماية الفكرة'],
+   lessons:[
+    {id:'l1',title:'كيف تفكر كرائد أعمال؟',duration_min:8,video_url:'UF8uR6Z6KLc',body:`<h2>الفرق الجوهري</h2><p>رائد الأعمال لا يختلف في الذكاء — يختلف في <strong>طريقة النظر للمشاكل</strong>.</p><ul><li>الموظف يرى مشكلة → يبحث عن حل</li><li>رائد الأعمال يرى مشكلة → يرى فرصة</li></ul><div class="lv-tip">💡 ابدأ بسؤال "لماذا لا؟" بدل "لا أستطيع"</div>`},
+    {id:'l2',title:'كيف تجد فكرة مشروع مربحة؟',duration_min:10,video_url:'uvw-u3FY2nQ',body:`<h2>المعادلة البسيطة</h2><p><strong>مشكلة حقيقية + جمهور محدد + حل ممكن = فكرة مشروع</strong></p><ul><li>تتبع إزعاجك اليومي</li><li>ابحث عن التذمر على الإنترنت</li><li>انظر لما نجح في بلد آخر</li></ul>`},
+    {id:'l3',title:'كيف تحمي فكرتك؟ (NDA)',duration_min:9,body:`<h2>أدوات الحماية</h2><p>NDA يحمي فكرتك — يجب على أي شخص يريد التفاصيل التوقيع أولاً.</p><div class="lv-tip">💡 على AZZA: فعّل خيار NDA عند نشر مشروعك</div>`},
+    {id:'l4',title:'كيف تجد مستثمراً؟',duration_min:10,video_url:'5GMPjZXSKSo',body:`<h2>أنواع المستثمرين</h2><ul><li>Angel Investors — أفراد أثرياء</li><li>Venture Capital — صناديق استثمار</li><li>Crowdfunding — جمع من الجمهور</li></ul>`},
+    {id:'l5',title:'Pitch Deck — الـ10 شرائح الذهبية',duration_min:12,video_url:'Nj6mx9lJ9vk',body:`<h2>الشرائح الـ10</h2><ul><li>المشكلة</li><li>الحل</li><li>حجم السوق</li><li>المنتج</li><li>نموذج العمل</li><li>Traction</li><li>المنافسة</li><li>الفريق</li><li>الخطة المالية</li><li>The Ask</li></ul>`},
+    {id:'l6',title:'بناء الفريق والشركة',duration_min:8,body:`<h2>الشريك vs الموظف</h2><p>في المراحل الأولى أنت تحتاج شركاء يؤمنون بالفكرة لا موظفين يعملون مقابل راتب.</p>`},
+    {id:'l7',title:'بناء شبكة علاقات فعّالة',duration_min:7,video_url:'8KkKuTCFvzI',body:`<h2>قاعدة "أعطِ أولاً"</h2><p>معظم الناس يدخلون إلى شبكة العلاقات يسألون "ماذا سأحصل؟" الأذكياء يسألون "ماذا أعطي؟"</p>`},
+    {id:'l8',title:'التعامل مع الفشل والرفض',duration_min:6,video_url:'w-HYZv6HzAs',body:`<h2>الفشل ليس نهاية</h2><p>Walt Disney رُفض من 300 بنك. Steve Jobs طُرد من Apple. الناجحون <strong>استخدموا فشلهم أذكى.</strong></p>`},
+  ]},
+  {id:'local-2', title:'كيف تبني CV يُبهر أصحاب العمل', subtitle:'CV + LinkedIn + مقابلات العمل', category:'career', level:'مبتدئ', is_free:true, enrolled:89, rating:4.8, outcomes:['بناء CV احترافي','تحسين LinkedIn','النجاح في المقابلات'],
+   lessons:[
+    {id:'l9',title:'عناصر CV قوي',duration_min:8,body:`<h2>6 عناصر أساسية</h2><ul><li>📸 صورة احترافية</li><li>📝 نبذة تعكس هدفك</li><li>🛠️ المهارات بالتفصيل</li><li>🗂️ المشاريع</li><li>🎓 التعليم</li><li>💼 الخبرات</li></ul>`},
+    {id:'l10',title:'ATS — كيف تجتاز الفلتر الآلي',duration_min:7,body:`<h2>ما هو ATS؟</h2><p>نظام تتبع المتقدمين — يفلتر 70% من السير قبل أن يراها الموارد البشرية.</p><div class="lv-tip">💡 استخدم الكلمات المفتاحية من إعلان الوظيفة بالضبط</div>`},
+    {id:'l11',title:'LinkedIn — حضور احترافي',duration_min:9,body:`<h2>استراتيجية LinkedIn</h2><ul><li>صورة + عنوان مهني واضح</li><li>نبذة تُحكي قصتك</li><li>انشر بانتظام — مرة أسبوعياً</li></ul>`},
+    {id:'l12',title:'أسرار مقابلة العمل الناجحة',duration_min:10,body:`<h2>قبل المقابلة</h2><ul><li>ابحث عن الشركة جيداً</li><li>جهّز إجابات STAR</li><li>اسأل أسئلة ذكية</li></ul>`},
+    {id:'l13',title:'التفاوض على الراتب',duration_min:6,body:`<h2>لا تقبل أول عرض</h2><p>ابحث عن متوسط السوق واسأل بثقة. 85% من الشركات تتوقع التفاوض.</p>`},
+  ]},
+];
+
+/* ── Init ── */
+(function(){
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  loadCourse();
+})();
+
+async function loadCourse(){
+  /* جرب Supabase أولاً */
+  if(courseId&&courseId.length>10){
+    try{
+      const [{data:c},{data:l}] = await Promise.all([
+        db.from('academy_courses').select('*').eq('id',courseId).single(),
+        db.from('academy_lessons').select('*').eq('course_id',courseId).order('sort_order'),
+      ]);
+      if(c){ COURSE=c; LESSONS=l||[]; }
+    }catch(e){}
+  }
+  /* Fallback للبيانات المحلية */
+  if(!COURSE){
+    const local=LOCAL_COURSES.find(c=>c.id===courseId)||LOCAL_COURSES[0];
+    COURSE=local; LESSONS=local.lessons||[];
+  }
+  /* تقدم المستخدم */
+  const savedProg=JSON.parse(localStorage.getItem('azza_progress_'+COURSE.id)||'{}');
+  PROGRESS=savedProg;
+  enrolled=localStorage.getItem('azza_enrolled_'+COURSE.id)==='1';
+  render();
+}
+
+function render(){
+  document.getElementById('page-title').textContent=COURSE.title;
+  document.title=COURSE.title+' — AZZA Academy';
+  renderHero();
+  renderProgress();
+  renderLessons();
+  renderOutcomes();
+}
+
+function renderHero(){
+  const done=LESSONS.filter(l=>PROGRESS[l.id]).length;
+  document.getElementById('course-hero-wrap').innerHTML=`
+    <div class="course-hero">
+      <div class="ch-badge">🎓 ${catLbl(COURSE.category)}</div>
+      <div class="ch-title">${esc(COURSE.title)}</div>
+      <div class="ch-sub">${esc(COURSE.subtitle||'')}</div>
+      <div class="ch-meta">
+        <span>📊 ${COURSE.level==='beginner'?'مبتدئ':COURSE.level==='intermediate'?'متوسط':'متقدم'}</span>
+        <span>📚 ${LESSONS.length} درس</span>
+        <span>👥 ${COURSE.enrolled||0} طالب</span>
+        <span>⭐ ${COURSE.rating||4.8}</span>
+        ${COURSE.is_free?'<span>🆓 مجاني</span>':''}
+      </div>
+      <div class="ch-stats">
+        <div class="ch-stat"><strong>${LESSONS.length}</strong><span>درس</span></div>
+        <div class="ch-stat"><strong>${LESSONS.reduce((s,l)=>s+(l.duration_min||0),0)}</strong><span>دقيقة</span></div>
+        <div class="ch-stat"><strong>${done}</strong><span>مكتمل</span></div>
+        <div class="ch-stat"><strong>${COURSE.is_free?'مجاني':'مدفوع'}</strong><span>السعر</span></div>
+      </div>
+    </div>`;
+}
+
+function renderProgress(){
+  const done=LESSONS.filter(l=>PROGRESS[l.id]).length;
+  const pct=LESSONS.length?Math.round((done/LESSONS.length)*100):0;
+  const circ=2*Math.PI*28;
+  document.getElementById('progress-card').innerHTML=`
+    <div class="pg-title">📈 تقدمك في الكورس</div>
+    <div class="pg-ring-wrap">
+      <div class="pg-ring">
+        <svg viewBox="0 0 70 70">
+          <circle cx="35" cy="35" r="28" fill="none" stroke="var(--bg2)" stroke-width="6"/>
+          <circle cx="35" cy="35" r="28" fill="none" stroke="var(--olive)" stroke-width="6"
+            stroke-dasharray="${circ}" stroke-dashoffset="${circ-(circ*pct/100)}" stroke-linecap="round"/>
+        </svg>
+        <div class="pg-ring-num">${pct}%</div>
+      </div>
+      <div class="pg-info">
+        <div class="pg-label">${done} من ${LESSONS.length} دروس</div>
+        <div class="pg-sub">${pct===100?'أكملت الكورس 🎉':pct>0?'استمر في التعلم 💪':'ابدأ أول درس'}</div>
+      </div>
+    </div>
+    <div class="pg-bar"><div class="pg-fill" style="width:${pct}%"></div></div>
+    <button class="enroll-btn ${enrolled?'enrolled':''}" onclick="${enrolled?'':' enroll()'}">${enrolled?'✓ مسجّل في الكورس':'سجّل الآن — مجاناً'}</button>
+    <div class="free-badge">🆓 الوصول الكامل مجاناً</div>
+    ${pct===100?`<button onclick="location.href='certificates.html?course='+encodeURIComponent(COURSE.title)" style="width:100%;margin-top:8px;padding:10px;border-radius:10px;border:none;background:var(--gold);color:var(--od);font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer">🏆 احصل على شهادتك</button>`:''}`;
+}
+
+function renderLessons(){
+  const done=LESSONS.filter(l=>PROGRESS[l.id]).length;
+  document.getElementById('lessons-wrap').innerHTML=`
+    <div class="lessons-wrap">
+      <div class="lessons-hdr">
+        <div class="lessons-hdr-title">📋 محتوى الكورس</div>
+        <span style="font-size:12px;color:var(--muted)">${done}/${LESSONS.length} مكتمل</span>
+      </div>
+      ${LESSONS.map((l,i)=>`
+        <div class="lesson-item${curLesson===l.id?' active':''}" onclick="openLesson('${l.id}')">
+          <div class="lesson-check${PROGRESS[l.id]?' done':''}">${PROGRESS[l.id]?'✓':i+1}</div>
+          <div class="lesson-info">
+            <div class="lesson-title">${esc(l.title)}</div>
+            <div class="lesson-meta">
+              ${l.video_url?'<span>▶ فيديو</span>':'<span>📄 مقال</span>'}
+              <span>⏱ ${l.duration_min||5} دق</span>
+            </div>
+          </div>
+          <div class="lesson-play">▶</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderOutcomes(){
+  if(!COURSE.outcomes?.length) return;
+  document.getElementById('outcomes-wrap').innerHTML=`
+    <div class="outcomes-card">
+      <div class="oc-title">🎯 ماذا ستتعلم؟</div>
+      ${COURSE.outcomes.map(o=>`
+        <div class="oc-item">
+          <span class="oc-check">✓</span>
+          <span>${esc(o)}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ── فتح درس ── */
+function openLesson(id){
+  const lesson=LESSONS.find(l=>l.id===id);
+  if(!lesson) return;
+  curLesson=id;
+  const idx=LESSONS.findIndex(l=>l.id===id);
+  const prev=LESSONS[idx-1];
+  const next=LESSONS[idx+1];
+  const viewer=document.getElementById('lesson-viewer');
+  viewer.className='lesson-viewer open';
+  viewer.innerHTML=`
+    <div class="lv-header">
+      <div class="lv-title">${idx+1}. ${esc(lesson.title)}</div>
+      ${!PROGRESS[id]?`<button class="lv-done-btn" onclick="markDone('${id}')">✓ مكتمل</button>`:'<span style="color:var(--olive);font-weight:700;font-size:13px">✓ مكتمل</span>'}
+    </div>
+    ${lesson.video_url?`
+      <div class="lv-video" onclick="playVid(this,'${lesson.video_url}')">
+        <img src="https://img.youtube.com/vi/${lesson.video_url}/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;cursor:pointer;opacity:.85">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(255,0,0,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><polygon points="5 3 19 12 5 21"/></svg>
+        </div>
+      </div>`:''}
+    <div class="lv-body">${lesson.body||'<p style="color:var(--sub)">المحتوى قيد الإعداد</p>'}</div>
+    <div class="lv-nav">
+      ${prev?`<button class="nav-btn" onclick="openLesson('${prev.id}')">← ${esc(prev.title)}</button>`:'<div></div>'}
+      ${next?`<button class="nav-btn primary" onclick="openLesson('${next.id}')">${esc(next.title)} →</button>`:`<button class="nav-btn primary" onclick="celebrateFinish()">🎉 أنهيت الكورس</button>`}
+    </div>`;
+  renderLessons();
+  viewer.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function playVid(wrap,id){
+  wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" style="position:absolute;inset:0;width:100%;height:100%;border:none" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+}
+
+function markDone(id){
+  PROGRESS[id]=true;
+  localStorage.setItem('azza_progress_'+COURSE.id,JSON.stringify(PROGRESS));
+  if(!enrolled) enroll();
+  /* حفظ بـSupabase */
+  if(me) db.from('academy_progress').upsert({user_id:me.id,lesson_id:id,course_id:COURSE.id,completed:true,completed_at:new Date().toISOString()},{onConflict:'user_id,lesson_id'}).then(()=>{});
+  const done=LESSONS.filter(l=>PROGRESS[l.id]).length;
+  if(done===LESSONS.length) celebrateFinish();
+  else{ openLesson(id); renderProgress(); }
+}
+
+function enroll(){
+  enrolled=true;
+  localStorage.setItem('azza_enrolled_'+COURSE.id,'1');
+  if(me) db.from('academy_enrollments').upsert({user_id:me.id,course_id:COURSE.id},{onConflict:'user_id,course_id'}).then(()=>{});
+  renderProgress();
+}
+
+function celebrateFinish(){
+  document.getElementById('lesson-viewer').innerHTML=`
+    <div style="text-align:center;padding:48px 24px">
+      <div style="font-size:64px;margin-bottom:16px">🎉</div>
+      <div style="font-size:24px;font-weight:900;margin-bottom:8px;color:var(--olive)">أنهيت الكورس!</div>
+      <div style="font-size:15px;color:var(--sub);margin-bottom:24px">أحسنت! لقد أكملت "${COURSE.title}" بنجاح</div>
+      <button onclick="location.href='certificates.html?course='+encodeURIComponent(COURSE.title||'')" style="padding:12px 28px;border-radius:12px;border:none;background:var(--gold);color:var(--od);font-family:Tajawal,sans-serif;font-size:15px;font-weight:900;cursor:pointer">
+        🏆 احصل على شهادتك
+      </button>
+    </div>`;
+  renderProgress();
+}
+
+function catLbl(c){ return{biz:'ريادة الأعمال',prog:'برمجة',ai:'ذكاء اصطناعي',design:'تصميم',career:'مسار مهني',ip:'حماية الفكرة'}[c]||c||'عام'; }
+</script>
+</body>
+</html>
