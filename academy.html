@@ -525,11 +525,62 @@ let curArt=null;
 const read=new Set(JSON.parse(localStorage.getItem('azza_academy_read')||'[]'));
 const liked=new Set(JSON.parse(localStorage.getItem('azza_academy_liked')||'[]'));
 
+/* ── جلب المحتوى من CMS ── */
+function loadCMSContent(){
+  /* أولاً: localStorage */
+  const cms=JSON.parse(localStorage.getItem('azza_cms_content')||'[]');
+  const published=cms.filter(c=>c.status==='published');
+  mergeCMSItems(published);
+
+  /* ثانياً: Supabase (إذا كانت الجداول موجودة) */
+  try{
+    const SB_URL='https://iecniydswotsilaueogq.supabase.co';
+    const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+    const db=supabase.createClient(SB_URL,SB_ANON);
+    db.from('cms_content').select('*').eq('status','published').order('created_at',{ascending:false}).limit(50)
+      .then(({data,error})=>{
+        if(error||!data?.length) return;
+        mergeCMSItems(data);
+        renderHome(); // إعادة رسم بعد جلب Supabase
+      });
+  }catch(e){}
+}
+
+function mergeCMSItems(items){
+  items.forEach(item=>{
+    const mapped={
+      id:'cms_'+item.id,
+      em:({course:'📚',lesson:'🎬',scholarship:'🏅',announcement:'📢'}[item.type])||'📝',
+      cat:catName(item.category),
+      title:item.title,
+      desc:item.subtitle||item.body?.replace(/<[^>]+>/g,'').substring(0,80)+'...'||'',
+      time:(item.reading_time||5)+' دق',
+      bg:catColor(item.category),
+      body_direct:item.body||'',
+      video:item.video||'',
+      isNew:true,
+      fromCMS:true,
+      author:item.author_name||'فريق AZZA',
+    };
+    if(!ARTICLES_DATA.find(a=>a.id===mapped.id)) ARTICLES_DATA.unshift(mapped);
+    if(!COURSES_DATA.find(a=>a.id===mapped.id))  COURSES_DATA.unshift(mapped);
+  });
+  document.getElementById('count-courses').textContent=(ARTICLES_DATA.length+COURSES_DATA.length)/2+'+'||'16+';
+}
+
+function catName(cat){
+  return{biz:'ريادة الأعمال',prog:'برمجة',ai:'ذكاء اصطناعي',design:'تصميم',career:'مسار مهني',ip:'حماية الفكرة',innov:'الابتكار',scholar:'منح دراسية'}[cat]||cat||'عام';
+}
+function catColor(cat){
+  return{biz:'#1c5b3818',prog:'#2563eb18',ai:'#7c3aed18',design:'#db277718',career:'#c6974918',ip:'#dc262618',innov:'#dc262618',scholar:'#0891b218'}[cat]||'#1c5b3818';
+}
+
 /* ── Init ── */
 (function(){
   document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
   document.getElementById('theme-btn').textContent=localStorage.getItem('azza_theme')==='dark'?'☀️':'🌙';
   document.getElementById('count-read').textContent=read.size;
+  loadCMSContent();  /* ← جلب محتوى CMS */
   buildHeroCards();
   renderHome();
   window.addEventListener('scroll',updateReadBar);
@@ -787,7 +838,7 @@ function openArt(id){
   localStorage.setItem('azza_academy_read',JSON.stringify([...read]));
   document.getElementById('count-read').textContent=read.size;
 
-  const body=BODIES[art.body_id||id]||'<p style="color:var(--sub)">المحتوى قيد الإعداد...</p>';
+  const body=art.body_direct||BODIES[art.body_id||id]||'<p style="color:var(--sub)">المحتوى قيد الإعداد...</p>';
   const cat=CATS_DATA.find(c=>c.id===art.cat);
   const related=ARTICLES_DATA.filter(a=>a.cat===art.cat&&a.id!==id).slice(0,3);
 
