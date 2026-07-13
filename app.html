@@ -741,6 +741,8 @@ html,body{ height:100%; overflow:hidden }
         <div class="compose-actions">
           <button class="compose-qbtn" onclick="pickTypeAndOpen('idea')" title="فكرة">💡 فكرة</button>
           <button class="compose-qbtn" onclick="pickTypeAndOpen('project')" title="مشروع">🚀 مشروع</button>
+          <button class="compose-qbtn" onclick="pickTypeAndOpen('article')" title="مقال">📝 مقال</button>
+          <button class="compose-qbtn" onclick="pickTypeAndOpen('video')" title="فيديو">🎬 فيديو</button>
         </div>
       </div>
 
@@ -816,6 +818,8 @@ html,body{ height:100%; overflow:hidden }
 <div class="fab-wrap" id="fab-wrap">
   <div class="fab-menu" id="fab-menu">
     <button class="fab-item" onclick="pickTypeAndOpen('project');closeFab()"><span>🚀</span>مشروع</button>
+    <button class="fab-item" onclick="pickTypeAndOpen('article');closeFab()"><span>📝</span>مقال</button>
+    <button class="fab-item" onclick="pickTypeAndOpen('video');closeFab()"><span>🎬</span>فيديو</button>
     <button class="fab-item" onclick="pickTypeAndOpen('idea');closeFab()"><span>💡</span>فكرة</button>
     <button class="fab-item" onclick="pickTypeAndOpen('post');closeFab()"><span>💬</span>منشور</button>
   </div>
@@ -848,6 +852,8 @@ html,body{ height:100%; overflow:hidden }
         <button class="type-btn"    data-t="idea"    onclick="pickType(this)">💡 فكرة</button>
         <button class="type-btn"    data-t="project" onclick="pickType(this)">🚀 مشروع</button>
         <button class="type-btn"    data-t="job"      onclick="pickType(this)">📋 وظيفة</button>
+        <button class="type-btn"    data-t="article"  onclick="pickType(this)">📝 مقال</button>
+        <button class="type-btn"    data-t="video"    onclick="pickType(this)">🎬 فيديو</button>
       </div>
       <div id="idea-extra" style="display:none">
         <div class="mfield"><input id="idea-title" placeholder="عنوان الفكرة"></div>
@@ -1673,6 +1679,8 @@ function render(){
   else if(curF==='idea')    posts=posts.filter(p=>p.type==='idea');
   else if(curF==='project') posts=posts.filter(p=>p.type==='project');
   else if(curF==='job')     posts=posts.filter(p=>p.type==='job');
+  else if(curF==='article') posts=posts.filter(p=>p.type==='article');
+  else if(curF==='video')   posts=posts.filter(p=>p.type==='video');
   else if(curF==='trending')posts=posts.filter(p=>(p.votes?.length||0)>=3);
   if(curCat!=='all')posts=posts.filter(p=>p.category===curCat);
   if(searchQ){const q=searchQ.toLowerCase();posts=posts.filter(p=>(p.title||p.text||'').toLowerCase().includes(q)||(p.author_name||'').toLowerCase().includes(q));}
@@ -1696,10 +1704,18 @@ function card(p){
   const isHot=vn>=3;
 
   /* badges */
+  /* استخراج فيديو YouTube إن وُجد */
+  let ytId='';
+  if(p.type==='video'&&p.text){
+    const ym=p.text.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    if(ym) ytId=ym[1];
+  }
   let badges='';
   if(p.type==='idea')    badges+=`<span class="p-badge badge-idea">💡 فكرة</span>`;
   if(p.type==='project') badges+=`<span class="p-badge badge-proj">🚀 مشروع</span>`;
-  if(p.type==='job')      badges+=`<span class="p-badge badge-job">📋 وظيفة</span>`;
+  if(p.type==='job')     badges+=`<span class="p-badge badge-job">📋 وظيفة</span>`;
+  if(p.type==='article') badges+=`<span class="p-badge" style="background:rgba(59,130,246,.1);color:#1d4ed8">📝 مقال</span>`;
+  if(p.type==='video')   badges+=`<span class="p-badge" style="background:rgba(239,68,68,.1);color:#dc2626">🎬 فيديو</span>`;
   if(p.category&&CAT_L[p.category])badges+=`<span class="p-badge badge-cat">${CAT_L[p.category]}</span>`;
   if(p.nda)  badges+=`<span class="p-badge badge-nda">🔒 NDA</span>`;
   if(isHot)  badges+=`<span class="p-badge badge-hot">🔥 ترند</span>`;
@@ -1953,14 +1969,17 @@ function openLB(src){document.getElementById('lb-img').src=src;document.getEleme
 
 /* مودال النشر */
 function openCompose(){document.getElementById('compose-ol').classList.add('open');}
-function pickTypeAndOpen(t){openCompose();setTimeout(()=>{curType=t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));document.getElementById('idea-extra').style.display=t==='idea'?'block':'none';document.getElementById('proj-extra').style.display=t==='project'?'block':'none';document.getElementById('job-extra').style.display=t==='job'?'block':'none';},50);}
+function pickTypeAndOpen(t){openCompose();setTimeout(()=>{curType=t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t));document.getElementById('idea-extra').style.display=t==='idea'?'block':'none';document.getElementById('proj-extra').style.display=t==='project'?'block':'none';document.getElementById('job-extra').style.display=t==='job'?'block':'none';const af2=document.getElementById('article-fields');const vf2=document.getElementById('video-fields');if(af2)af2.style.display=t==='article'?'block':'none';if(vf2)vf2.style.display=t==='video'?'block':'none';},50);}
 function closeCompose(){document.getElementById('compose-ol').classList.remove('open');}
-function pickType(btn){curType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===curType));document.getElementById('idea-extra').style.display=curType==='idea'?'block':'none';document.getElementById('proj-extra').style.display=curType==='project'?'block':'none';document.getElementById('job-extra').style.display=curType==='job'?'block':'none';}
+function pickType(btn){curType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===curType));document.getElementById('idea-extra').style.display=curType==='idea'?'block':'none';document.getElementById('proj-extra').style.display=curType==='project'?'block':'none';document.getElementById('job-extra').style.display=curType==='job'?'block':'none';const af=document.getElementById('article-fields');const vf=document.getElementById('video-fields');if(af)af.style.display=curType==='article'?'block':'none';if(vf)vf.style.display=curType==='video'?'block':'none';const ta=document.getElementById('compose-text');if(ta){const ph={post:'ما الذي يدور في ذهنك؟',idea:'اشرح فكرتك...',project:'صف مشروعك...',job:'تفاصيل الوظيفة...',article:'عنوان مقالك...',video:'عنوان الفيديو...'};ta.placeholder=ph[curType]||'اكتب هنا...';} }
 async function publish(){
   const text=document.getElementById('compose-txt').value.trim();
+  const articleBody=(document.getElementById('article-body')?.value||'').trim();
+  const videoUrl=(document.getElementById('video-url')?.value||'').trim();
+  const fullText=curType==='article'&&articleBody?(text?text+'\n\n'+articleBody:articleBody):curType==='video'&&videoUrl?(text?text+'\n\n'+videoUrl:videoUrl):text;
   const cat=document.getElementById('cat-sel').value;
   if(!text&&curType==='post'){toast('اكتب شيئاً أولاً','err');return;}
-  const p={id:id(),author_id:user.id,author_name:user.name,author_username:user.username||'',author_type:user.type,author_photo:user.photo||null,type:curType,text,category:cat||null,image:mediaData?.type==='image'?mediaData.data:null,video:mediaData?.type==='video'?mediaData.data:null,votes:[],r_insightful:[],r_collab:[],comments:[],views:0,created_at:new Date().toISOString()};
+  const p={id:id(),author_id:user.id,author_name:user.name,author_username:user.username||'',author_type:user.type,author_photo:user.photo||null,type:curType,text:fullText||text,category:cat||null,image:mediaData?.type==='image'?mediaData.data:null,video:mediaData?.type==='video'?mediaData.data:null,votes:[],r_insightful:[],r_collab:[],comments:[],views:0,created_at:new Date().toISOString()};
   if(curType==='idea'){p.title=document.getElementById('idea-title').value.trim();p.pitch=document.getElementById('idea-pitch').value.trim();p.nda=document.getElementById('nda-pub').checked;}
   if(curType==='project'){p.title=document.getElementById('proj-title').value.trim();p.funding_goal=parseInt(document.getElementById('fund-goal').value)||0;p.funding_stage=document.getElementById('fund-stage').value;}
   if(curType==='job'){p.title=document.getElementById('job-title').value.trim();p.job_location=document.getElementById('job-location').value.trim();p.job_salary=document.getElementById('job-salary').value.trim();p.job_type=document.getElementById('job-type').value;}
@@ -1971,7 +1990,7 @@ async function publish(){
   ['compose-txt','idea-title','idea-pitch','proj-title','fund-goal'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
   document.getElementById('nda-pub').checked=false;document.getElementById('fund-stage').value='';document.getElementById('cat-sel').value='';
   curType='post';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('on',b.dataset.t==='post'));
-  document.getElementById('idea-extra').style.display='none';document.getElementById('proj-extra').style.display='none';document.getElementById('job-extra').style.display='none';
+  document.getElementById('idea-extra').style.display='none';document.getElementById('proj-extra').style.display='none';document.getElementById('job-extra').style.display='none';const af3=document.getElementById('article-fields');const vf3=document.getElementById('video-fields');if(af3){af3.style.display='none';const ab=document.getElementById('article-body');if(ab)ab.value='';}if(vf3){vf3.style.display='none';const vu=document.getElementById('video-url');if(vu)vu.value='';}
   curF='all';document.querySelectorAll('.f-btn').forEach(b=>b.classList.toggle('on',b.dataset.f==='all'));
   render();buildStats();toast('تم النشر ✅');
 
