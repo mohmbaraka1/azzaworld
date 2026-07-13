@@ -124,6 +124,15 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
 .related-card:hover{background:var(--ol)}
 .related-cat{font-size:11px;color:var(--olive);font-weight:700;margin-bottom:4px}
 .related-title{font-size:13px;font-weight:700}
+.yt-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:20px 0;background:#000}
+.yt-wrap iframe{position:absolute;top:0;right:0;width:100%;height:100%;border:none;border-radius:12px}
+.yt-thumb{position:absolute;inset:0;cursor:pointer;background:#000;border-radius:12px;overflow:hidden}
+.yt-thumb img{width:100%;height:100%;object-fit:cover;opacity:.85;transition:.2s}
+.yt-thumb:hover img{opacity:.7}
+.yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s;pointer-events:none}
+.yt-thumb:hover .yt-play{transform:translate(-50%,-50%) scale(1.1)}
+.yt-play svg{width:24px;height:24px;fill:#fff;margin-right:-3px}
+.yt-label{position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.7);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;font-family:Tajawal,sans-serif}
 .progress-bar{height:3px;background:var(--bg2);position:fixed;top:0;right:0;left:0;z-index:200}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));width:0%;transition:.1s}
 </style>
@@ -202,6 +211,21 @@ const CATS = [
   {id:'external',  icon:'🌐', name:'موارد خارجية',        color:'#6b7280'},
 ];
 
+/* ── YouTube Embed Helper ── */
+function yt(id, title=''){
+  return `<div class="yt-wrap">
+    <div class="yt-thumb" onclick="loadYT(this,'${id}')">
+      <img src="https://img.youtube.com/vi/${id}/maxresdefault.jpg" alt="${title}" onerror="this.src='https://img.youtube.com/vi/${id}/hqdefault.jpg'">
+      <div class="yt-play"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21"/></svg></div>
+      ${title?`<div class="yt-label">▶ ${title}</div>`:''}
+    </div>
+  </div>`;
+}
+function loadYT(thumb, id){
+  const wrap=thumb.parentElement;
+  wrap.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
+}
+
 const COURSES = [
   /* ══ كيف تفكر؟ ══ */
   {
@@ -255,7 +279,8 @@ const COURSES = [
 <h2>الخلاصة</h2>
 <p>ريادة الأعمال ليست موهبة تولد معك — هي <strong>مهارة تبنيها بالتدريب</strong>. ابدأ بتغيير طريقة سؤالك عن الأشياء.</p>`,
     tags:['تفكير','عقلية','مبتدئ','ريادة'],
-    related:['think-2','ideas-1','mindset-1']
+    related:['think-2','ideas-1','mindset-1'],
+    video:'UF8uR6Z6KLc', videoTitle:'Steve Jobs — Stay Hungry Stay Foolish'
   },
   {
     id:'think-2', cat:'think', title:'قرار بناءً على بيانات لا مشاعر', emoji:'📊',
@@ -327,7 +352,8 @@ const COURSES = [
 <strong>💡 اختبار الفكرة السريع:</strong> اسأل نفسك — هل يوجد شخص الآن يعاني من هذه المشكلة ويبحث عن حل؟ إذا الجواب نعم، لديك بداية فكرة.
 </div>`,
     tags:['أفكار','مشروع','ابتكار','بداية'],
-    related:['ideas-2','protect-1','pitch-1']
+    related:['ideas-2','protect-1','pitch-1'],
+    video:'uvw-u3FY2nQ', videoTitle:'Y Combinator — How to Get Startup Ideas'
   },
   {
     id:'ideas-2', cat:'ideas', title:'اختبر فكرتك قبل أن تبنيها', emoji:'🧪',
@@ -447,7 +473,8 @@ const COURSES = [
 <strong>💡 على AZZA:</strong> أنشر مشروعك بتفاصيل واضحة، فعّل NDA، وانتظر — المستثمرون المناسبون سيُبدون اهتمامهم. جبل الجمهور يجيء للنبي.
 </div>`,
     tags:['مستثمر','تمويل','استثمار','مشروع'],
-    related:['pitch-1','protect-1','investors-2']
+    related:['pitch-1','protect-1','investors-2'],
+    video:'5GMPjZXSKSo', videoTitle:'How to Pitch to Investors — Y Combinator'
   },
   {
     id:'investors-2', cat:'investors', title:'ما الذي يبحث عنه المستثمر؟', emoji:'🔍',
@@ -504,7 +531,8 @@ const COURSES = [
 <strong>💡 سر الـPitch الجيد:</strong> روّج لحلم، لا لمنتج. المستثمر يريد أن يشعر أنه جزء من مستقبل أفضل.
 </div>`,
     tags:['pitch deck','عرض','مستثمر','شرائح'],
-    related:['pitch-2','investors-1']
+    related:['pitch-2','investors-1'],
+    video:'Nj6mx9lJ9vk', videoTitle:'The Perfect Pitch Deck — Y Combinator'
   },
   {
     id:'pitch-2', cat:'pitch', title:'كيف تقدّم نفسك في 60 ثانية؟ (Elevator Pitch)', emoji:'⏱️',
@@ -624,7 +652,8 @@ const COURSES = [
 <strong>💡 على AZZA:</strong> ملفك الشخصي المكتمل + نشاطك في التعليقات والتفاعلات هو شبكة علاقات تبنيها تلقائياً.
 </div>`,
     tags:['شبكة','علاقات','networking','تواصل'],
-    related:['network-2','investors-1']
+    related:['network-2','investors-1'],
+    video:'8KkKuTCFvzI', videoTitle:'How to Build Your Network — Simon Sinek'
   },
   {
     id:'network-2', cat:'network', title:'LinkedIn و AZZA: كيف تستخدمهما معاً؟', emoji:'🔗',
@@ -674,7 +703,8 @@ const COURSES = [
 <strong>💡 تذكر:</strong> المستثمرون يُفضّلون رائد أعمال فشل وتعلّم على رائد أعمال لم يجرب قط.
 </div>`,
     tags:['فشل','رفض','عقلية','قوة'],
-    related:['mindset-2','think-1']
+    related:['mindset-2','think-1'],
+    video:'w-HYZv6HzAs', videoTitle:'The Power of Believing You Can Improve — TED'
   },
   {
     id:'mindset-2', cat:'mindset', title:'إدارة الوقت لرائد الأعمال', emoji:'⏰',
@@ -896,6 +926,12 @@ function openArt(id){
         ${read.has(id)?'<span style="color:#22c55e;font-weight:700">✓ قرأته</span>':''}
       </div>
     </div>
+    ${art.video?`
+    <div style="margin-bottom:4px;font-size:13px;font-weight:700;color:var(--sub);display:flex;align-items:center;gap:6px">
+      <span style="width:20px;height:20px;background:#ff0000;border-radius:5px;display:inline-flex;align-items:center;justify-content:center">▶</span>
+      فيديو تعليمي
+    </div>
+    ${yt(art.video, art.videoTitle)}`:''}
     <div class="art-body">${art.body}</div>
     <div class="art-footer">
       <div class="art-tags">${(art.tags||[]).map(t=>`<span class="art-tag" onclick="doSearch('${t}')">#${t}</span>`).join('')}</div>
