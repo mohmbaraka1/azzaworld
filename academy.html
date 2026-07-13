@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZZA Academy — تعلّم، فكّر، انطلق</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{
+  --gold:#c69749;--gs:#e8b96a;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;
+  --line:rgba(0,0,0,.08);--r:16px;
+}
+.dk{--bg:#141210;--bg2:#1e1c18;--card:#201e1a;--ink:#f0e8d0;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
+
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.tb-title{font-size:15px;font-weight:900;color:var(--olive);flex:1}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,var(--od) 0%,var(--olive) 60%,#2d7a4f 100%);padding:48px 20px 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20.5V18H0v5h5v5H0v5h20v-9.5zm-2 4.5h-1v-1h1v1zm0-3h-1v-1h1v1zm2 3h-1v-1h1v1zm0-3h-1v-1h1v1z'/%3E%3C/g%3E%3C/svg%3E")}
+.hero-badge{display:inline-block;padding:5px 14px;border-radius:99px;background:rgba(198,151,73,.2);color:var(--gold);font-size:12px;font-weight:700;margin-bottom:14px;border:1px solid rgba(198,151,73,.3)}
+.hero h1{font-size:clamp(24px,5vw,38px);font-weight:900;color:#fff;margin-bottom:10px;line-height:1.2}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:15px;color:rgba(255,255,255,.75);margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat strong{display:block;font-size:24px;font-weight:900;color:#fff}
+.hero-stat span{font-size:12px;color:rgba(255,255,255,.6)}
+
+/* Search */
+.search-section{background:var(--card);border-bottom:1px solid var(--line);padding:16px 20px}
+.search-wrap{max-width:600px;margin:0 auto;position:relative}
+.search-inp{width:100%;height:46px;border-radius:12px;border:1.5px solid var(--line);padding:0 48px 0 16px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--bg2);outline:none;transition:.2s}
+.search-inp:focus{border-color:var(--olive);background:var(--card)}
+.search-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub)}
+.search-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* Main Layout */
+.main{max-width:1100px;margin:0 auto;padding:28px 20px;display:grid;grid-template-columns:240px 1fr;gap:28px}
+@media(max-width:768px){.main{grid-template-columns:1fr}}
+
+/* Sidebar */
+.sidebar{position:sticky;top:70px;height:fit-content}
+.sidebar-title{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.cat-list{list-style:none}
+.cat-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--sub);transition:.15s;margin-bottom:2px}
+.cat-item:hover,.cat-item.active{background:var(--ol);color:var(--olive);font-weight:700}
+.cat-item-ic{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.cat-count{margin-right:auto;font-size:11px;background:var(--bg2);padding:2px 7px;border-radius:99px}
+.sidebar-sep{height:.5px;background:var(--line);margin:12px 0}
+
+/* Content */
+.content-area{}
+
+/* Featured */
+.featured-card{background:linear-gradient(135deg,var(--olive),var(--od));border-radius:var(--r);padding:24px;color:#fff;margin-bottom:24px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.featured-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04)}
+.featured-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(14,54,34,.3)}
+.feat-badge{display:inline-block;padding:4px 12px;border-radius:99px;background:rgba(198,151,73,.25);color:var(--gold);font-size:12px;font-weight:700;margin-bottom:12px;border:1px solid rgba(198,151,73,.3)}
+.feat-title{font-size:22px;font-weight:900;margin-bottom:8px;line-height:1.3}
+.feat-desc{font-size:14px;opacity:.8;margin-bottom:16px;line-height:1.6}
+.feat-meta{display:flex;align-items:center;gap:14px;font-size:12px;opacity:.7}
+
+/* Section */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}
+.sec-more{font-size:13px;color:var(--olive);cursor:pointer;font-weight:700}
+
+/* Course Grid */
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:32px}
+.course-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column}
+.course-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.course-thumb{height:120px;display:flex;align-items:center;justify-content:center;font-size:48px;flex-shrink:0}
+.course-body{padding:14px;flex:1;display:flex;flex-direction:column}
+.course-cat{font-size:11px;font-weight:700;color:var(--olive);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.course-title{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:6px;flex:1}
+.course-desc{font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:10px}
+.course-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--sub);flex-wrap:wrap}
+.course-badge{padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-free{background:rgba(34,197,94,.1);color:#16a34a}
+.badge-ext{background:rgba(59,130,246,.1);color:#2563eb}
+.badge-new{background:rgba(198,151,73,.1);color:#854F0B}
+
+/* Article View */
+.article-view{display:none}
+.article-view.open{display:block}
+.home-view{}
+.art-back{display:flex;align-items:center;gap:8px;color:var(--sub);cursor:pointer;font-size:14px;font-weight:700;margin-bottom:20px;background:none;border:none;font-family:Tajawal,sans-serif}
+.art-back:hover{color:var(--olive)}
+.art-header{margin-bottom:24px}
+.art-cat-tag{display:inline-block;padding:4px 12px;border-radius:99px;background:var(--ol);color:var(--olive);font-size:12px;font-weight:700;margin-bottom:12px}
+.art-title{font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.3;margin-bottom:12px}
+.art-meta{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--sub);flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.art-body{font-size:15px;line-height:1.9;color:var(--ink)}
+.art-body h2{font-size:20px;font-weight:900;color:var(--olive);margin:32px 0 12px}
+.art-body h3{font-size:17px;font-weight:700;margin:24px 0 10px}
+.art-body p{margin-bottom:16px}
+.art-body ul,.art-body ol{margin:12px 0 16px 24px}
+.art-body li{margin-bottom:10px;line-height:1.7}
+.art-body strong{font-weight:700;color:var(--ink)}
+.art-body em{color:var(--olive);font-style:normal;font-weight:700}
+.tip-box{background:var(--ol);border-right:4px solid var(--olive);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;line-height:1.7}
+.tip-box strong{color:var(--olive)}
+.warn-box{background:rgba(198,151,73,.08);border-right:4px solid var(--gold);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:14px;line-height:1.7}
+.quote-box{background:var(--bg2);border-right:4px solid var(--sub);padding:14px 18px;border-radius:0 10px 10px 0;margin:20px 0;font-size:15px;line-height:1.7;font-style:italic;color:var(--ink)}
+.steps-box{counter-reset:steps;margin:20px 0}
+.step-item{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.step-num{width:32px;height:32px;border-radius:10px;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-content strong{display:block;font-size:15px;font-weight:700;margin-bottom:4px}
+.step-content p{font-size:14px;color:var(--sub);margin:0}
+.art-footer{margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+.art-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.art-tag{padding:5px 12px;border-radius:99px;background:var(--bg2);font-size:12px;color:var(--sub);cursor:pointer}
+.art-tag:hover{background:var(--ol);color:var(--olive)}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.related-card{background:var(--bg2);border-radius:10px;padding:14px;cursor:pointer;transition:.15s}
+.related-card:hover{background:var(--ol)}
+.related-cat{font-size:11px;color:var(--olive);font-weight:700;margin-bottom:4px}
+.related-title{font-size:13px;font-weight:700}
+.progress-bar{height:3px;background:var(--bg2);position:fixed;top:0;right:0;left:0;z-index:200}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));width:0%;transition:.1s}
+</style>
+</head>
+<body>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="tb-title">✦ AZZA Academy</div>
+  <div style="font-size:12px;color:var(--sub)" id="read-count">0 مقال مقروء</div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">🎓 AZZA Academy</div>
+  <h1>تعلّم كيف تفكر<br><span>كرائد أعمال حقيقي</span></h1>
+  <p>دروس مكثفة في ريادة الأعمال والابتكار وجذب الاستثمار — مكتوبة خصيصاً لمجتمع AZZA</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong id="total-courses">0</strong><span>مقال ودرس</span></div>
+    <div class="hero-stat"><strong>6</strong><span>مسار تعليمي</span></div>
+    <div class="hero-stat"><strong>100%</strong><span>مجاني</span></div>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="search-section">
+  <div class="search-wrap">
+    <input class="search-inp" id="srch" placeholder="ابحث: استثمار، أفكار، حماية، Pitch Deck..." oninput="doSearch(this.value)">
+    <div class="search-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">المسارات التعليمية</div>
+    <ul class="cat-list" id="cat-list"></ul>
+    <div class="sidebar-sep"></div>
+    <div class="sidebar-title">آخر مقروء</div>
+    <div id="last-read" style="font-size:13px;color:var(--sub)">لم تقرأ شيئاً بعد</div>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area">
+    <!-- Home View -->
+    <div class="home-view" id="home-view">
+      <div id="featured-wrap"></div>
+      <div id="all-sections"></div>
+    </div>
+    <!-- Article View -->
+    <div class="article-view" id="art-view">
+      <button class="art-back" onclick="closeArt()">← العودة للأكاديمية</button>
+      <div id="art-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   AZZA Academy — قاعدة المعرفة الكاملة
+   ══════════════════════════════════════════════ */
+
+const CATS = [
+  {id:'think',     icon:'🧠', name:'كيف تفكر؟',          color:'#7c3aed'},
+  {id:'ideas',     icon:'💡', name:'توليد الأفكار',        color:'#0891b2'},
+  {id:'protect',   icon:'🔒', name:'حماية الفكرة',        color:'#dc2626'},
+  {id:'investors', icon:'💰', name:'جذب المستثمرين',      color:'#1c5b38'},
+  {id:'pitch',     icon:'🎯', name:'تقديم المشروع',        color:'#b45309'},
+  {id:'build',     icon:'🚀', name:'بناء الشركة',          color:'#0369a1'},
+  {id:'network',   icon:'🤝', name:'بناء العلاقات',        color:'#be185d'},
+  {id:'mindset',   icon:'⚡', name:'عقلية رائد الأعمال',  color:'#065f46'},
+  {id:'external',  icon:'🌐', name:'موارد خارجية',        color:'#6b7280'},
+];
+
+const COURSES = [
+  /* ══ كيف تفكر؟ ══ */
+  {
+    id:'think-1', cat:'think', title:'كيف تفكر كرائد أعمال؟', emoji:'🧠',
+    desc:'الفرق بين عقلية الموظف وعقلية رائد الأعمال — وكيف تنتقل بينهما.',
+    time:'8 دقائق', level:'مبتدئ', isNew:true,
+    body:`
+<h2>الفرق الجوهري في طريقة التفكير</h2>
+<p>رائد الأعمال لا يختلف عن الموظف في الذكاء أو القدرة — يختلف في <strong>طريقة النظر للمشاكل</strong>.</p>
+
+<div class="quote-box">
+"المشكلة ليست أنك لا ترى الفرصة. المشكلة أنك تراها مشكلة."
+</div>
+
+<h2>العقلية الوظيفية vs عقلية ريادة الأعمال</h2>
+<ul>
+<li><strong>الموظف يرى:</strong> مشكلة → يبحث عن حل → ينفّذ الحل<br><strong>رائد الأعمال يرى:</strong> مشكلة → يرى فرصة → يبني منتجاً</li>
+<li><strong>الموظف يتجنب الفشل</strong><br><strong>رائد الأعمال يستخدم الفشل معلومةً</strong></li>
+<li><strong>الموظف ينتظر الإذن</strong><br><strong>رائد الأعمال يطلب المسامحة لاحقاً لا الإذن مسبقاً</strong></li>
+</ul>
+
+<h2>3 عادات ذهنية تبدأ بها اليوم</h2>
+<div class="steps-box">
+<div class="step-item">
+<div class="step-num">1</div>
+<div class="step-content">
+<strong>اسأل "لماذا لا؟" بدل "لا أستطيع"</strong>
+<p>كل مرة تقول "لا يمكن"، اجعلها "لماذا لا يمكن؟" — غالباً ستجد أن القيد في رأسك لا في الواقع.</p>
+</div>
+</div>
+<div class="step-item">
+<div class="step-num">2</div>
+<div class="step-content">
+<strong>تعلّم ترى المشاكل بعيون العميل</strong>
+<p>اقضِ يوماً كاملاً وأنت تلاحظ ما يُزعج الناس من حولك — كل إزعاج هو فكرة مشروع محتملة.</p>
+</div>
+</div>
+<div class="step-item">
+<div class="step-num">3</div>
+<div class="step-content">
+<strong>فرّق بين الحقيقة والافتراض</strong>
+<p>"لا أحد سيشتري هذا" — هل هذه حقيقة أم افتراض؟ اختبر قبل أن تحكم.</p>
+</div>
+</div>
+</div>
+
+<div class="tip-box">
+<strong>💡 تمرين عملي:</strong> خذ ورقة وقسّمها لعمودين. اكتب في العمود الأول 5 مشاكل واجهتها هذا الأسبوع. في العمود الثاني اكتب كيف يمكن لمنتج أو خدمة أن تحلها. هذا هو بالضبط كيف بدأت أكبر الشركات.
+</div>
+
+<h2>الخلاصة</h2>
+<p>ريادة الأعمال ليست موهبة تولد معك — هي <strong>مهارة تبنيها بالتدريب</strong>. ابدأ بتغيير طريقة سؤالك عن الأشياء.</p>`,
+    tags:['تفكير','عقلية','مبتدئ','ريادة'],
+    related:['think-2','ideas-1','mindset-1']
+  },
+  {
+    id:'think-2', cat:'think', title:'قرار بناءً على بيانات لا مشاعر', emoji:'📊',
+    desc:'كيف تأخذ قرارات ذكية بدل الاعتماد على الحدس والعاطفة.',
+    time:'6 دقائق', level:'مبتدئ',
+    body:`
+<h2>لماذا يخطئ رواد الأعمال في القرارات؟</h2>
+<p>أغلب الأخطاء المكلفة لا تأتي من نقص المعلومات — تأتي من <strong>تفسير المعلومات بعاطفة</strong>.</p>
+
+<div class="warn-box">
+⚠️ "أنا متأكد أن المنتج سيُباع" ليست بيانات. إنها حدس. والحدس يكذب كثيراً.
+</div>
+
+<h2>إطار اتخاذ القرار الذكي</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>حدّد السؤال بدقة</strong><p>بدل "هل مشروعي سينجح؟" اسأل "هل 10% من ناسي المستهدفين سيدفعون X ريال مقابل هذا؟"</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>حدّد أصغر تجربة تجيب على السؤال</strong><p>لا تبني المنتج كاملاً. ابن النسخة الأصغر الممكنة وأجر التجربة.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>حدّد قبل التجربة ما الذي سيغير رأيك</strong><p>"إذا باعت 5 أشخاص من أصل 20 تكلمتهم — سأكمل". هذا يمنعك من تأويل الفشل كنجاح.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 القاعدة الذهبية:</strong> لا تنفق وقتاً أو مالاً على شيء قبل أن تثبت أن شخصاً واحداً على الأقل يريده بشدة.
+</div>`,
+    tags:['قرار','بيانات','تفكير'],
+    related:['think-1','ideas-2']
+  },
+
+  /* ══ توليد الأفكار ══ */
+  {
+    id:'ideas-1', cat:'ideas', title:'كيف تجد فكرة مشروع مربحة؟', emoji:'💡',
+    desc:'الطرق العلمية لإيجاد أفكار مشاريع حقيقية — لا أفكار خيالية.',
+    time:'10 دقائق', level:'مبتدئ', isNew:true,
+    body:`
+<h2>الخطأ الأول: البحث عن "الفكرة الكبيرة"</h2>
+<p>معظم الناس ينتظرون لحظة إلهام تأتيهم بفكرة عبقرية. هذا لا يحدث. <strong>الأفكار الناجحة تُكتشف لا تُخترع.</strong></p>
+
+<div class="quote-box">
+"لا تبحث عن فكرة. ابحث عن مشكلة حقيقية يعاني منها ناس حقيقيون ويدفعون لحلها."
+</div>
+
+<h2>المعادلة البسيطة لفكرة ناجحة</h2>
+<p><em>مشكلة حقيقية + جمهور محدد + حل ممكن = فكرة مشروع</em></p>
+
+<h2>5 طرق عملية لإيجاد الأفكار</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content">
+<strong>تتبع إزعاجك اليومي</strong>
+<p>لمدة أسبوع، في كل مرة تقول "ليش ما في شيء يحل هذا؟" — اكتبها. هذه قائمة أفكارك.</p>
+</div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content">
+<strong>ابحث عن التذمر على الإنترنت</strong>
+<p>Reddit، Twitter، مجموعات Facebook — الناس تشكو بصدق. كل شكوى متكررة = فرصة.</p>
+</div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content">
+<strong>انظر لما نجح في بلد آخر</strong>
+<p>خذ نموذج عمل ناجح في أمريكا أو أوروبا وتساءل: لماذا لا يوجد نسخة عربية؟</p>
+</div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-content">
+<strong>تحدث مع 20 شخص من شريحتك المستهدفة</strong>
+<p>اسألهم: "ما أصعب شيء في [مجال معين]؟" — الإجابات المتكررة هي فرصك.</p>
+</div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-content">
+<strong>طوّر مهارتك الحالية</strong>
+<p>ما الذي يسألك الناس عنه مجاناً؟ يمكن أن يكون هذا مشروعاً مدفوعاً.</p>
+</div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 اختبار الفكرة السريع:</strong> اسأل نفسك — هل يوجد شخص الآن يعاني من هذه المشكلة ويبحث عن حل؟ إذا الجواب نعم، لديك بداية فكرة.
+</div>`,
+    tags:['أفكار','مشروع','ابتكار','بداية'],
+    related:['ideas-2','protect-1','pitch-1']
+  },
+  {
+    id:'ideas-2', cat:'ideas', title:'اختبر فكرتك قبل أن تبنيها', emoji:'🧪',
+    desc:'كيف تتحقق من جدية فكرتك بأقل وقت ومال ممكن.',
+    time:'7 دقائق', level:'متوسط',
+    body:`
+<h2>لماذا يفشل 90% من المشاريع؟</h2>
+<p>ليس لأن الفكرة سيئة. بل لأن صاحبها <strong>بنى منتجاً قبل أن يتأكد أن أحداً يريده</strong>.</p>
+
+<div class="warn-box">
+⚠️ لا تنفق 6 أشهر وكل مدخراتك على فكرة قبل أن تتحقق منها في 2 أسبوع.
+</div>
+
+<h2>مفهوم MVP — المنتج بحده الأدنى</h2>
+<p><strong>MVP (Minimum Viable Product)</strong> هو أبسط نسخة من فكرتك تكفي لاختبار افتراضك الأساسي.</p>
+<p>مثال: بدل بناء تطبيق توصيل كامل، أنشئ مجموعة واتساب وابدأ توصيل يدوي — هل الناس يدفعون؟</p>
+
+<h2>خطوات التحقق من الفكرة</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>حدّد افتراضك الأكبر</strong><p>ما الشيء الذي إذا كان خاطئاً سينهار كل شيء؟ ابدأ باختباره.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>اطلب الدفع المسبق</strong><p>أقوى دليل على أن الفكرة تنجح: شخص يدفع لك قبل أن تبني شيئاً. 10 مدفوعات مسبقة تساوي 1000 "يبدو رائعاً".</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>اختبر في أسبوعين</strong><p>إذا لم تستطع التحقق من الفكرة في أسبوعين — الفكرة معقدة جداً أو الجمهور غير محدد.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 القاعدة:</strong> "اسأل قبل أن تبني." الكود الأرخص في العالم هو الكود الذي لم تكتبه لأنك اكتشفت أن أحداً لا يريده.
+</div>`,
+    tags:['MVP','تحقق','اختبار','فكرة'],
+    related:['ideas-1','pitch-1','investors-1']
+  },
+
+  /* ══ حماية الفكرة ══ */
+  {
+    id:'protect-1', cat:'protect', title:'كيف تحمي فكرتك من السرقة؟', emoji:'🔒',
+    desc:'NDA، براءة الاختراع، والأسرار التجارية — دليل عملي لحماية أفكارك.',
+    time:'9 دقائق', level:'مبتدئ', isNew:true,
+    body:`
+<h2>الحقيقة المرّة أولاً</h2>
+<p><strong>الأفكار وحدها لا قيمة قانونية لها.</strong> لا يمكنك حماية فكرة "تطبيق توصيل" لأنها ليست ملكك. ما يمكنك حمايته هو التنفيذ، الكود، العلامة التجارية، والابتكار التقني.</p>
+
+<div class="warn-box">
+⚠️ لا تخف من مشاركة فكرتك للحصول على تغذية راجعة — الفكرة بدون تنفيذ لا تساوي شيئاً. التنفيذ هو قيمتك الحقيقية.
+</div>
+
+<h2>أدوات الحماية الفعلية</h2>
+<h3>1. NDA — اتفاقية عدم الإفصاح</h3>
+<p>وثيقة قانونية تمنع الطرف الآخر من مشاركة أو استخدام معلوماتك السرية. <strong>متى تستخدمها؟</strong> قبل مشاركة تفاصيل تقنية مع مطور أو شريك أو مستثمر.</p>
+<p>على AZZA يمكنك <em>تفعيل NDA على مشروعك مباشرة</em> — أي شخص يريد الاطلاع على التفاصيل يوقّع أولاً.</p>
+
+<h3>2. التوثيق بالتاريخ</h3>
+<p>أرسل وصف فكرتك لبريدك الإلكتروني أو انشرها على منصة موثوقة — يثبت أنك صاحب الفكرة من تاريخ معين.</p>
+
+<h3>3. براءة الاختراع</h3>
+<p>للابتكارات التقنية الحقيقية. مكلفة ومعقدة ولكنها تحمي لسنوات. اطلب استشارة محامٍ متخصص.</p>
+
+<h3>4. حقوق الملكية الفكرية</h3>
+<p>الكود، التصاميم، المحتوى — محمية تلقائياً بمجرد إنشائها. وثّقها وأضف علامة ©.</p>
+
+<div class="tip-box">
+<strong>💡 نصيحة ذهبية:</strong> أفضل حماية من سرقة فكرتك هي <strong>التنفيذ الأسرع</strong>. من يسرق فكرتك عليه أن يبني ما بنيته — وأنت بدأت قبله.
+</div>
+
+<h2>ماذا تفعل على AZZA؟</h2>
+<p>عند نشر مشروعك، فعّل خيار <em>🔒 حماية NDA</em>. هذا يضمن أن أي مستثمر أو خبير يريد التفاصيل يوقّع اتفاقية قانونية أولاً.</p>`,
+    tags:['NDA','حماية','قانون','فكرة'],
+    related:['protect-2','investors-1']
+  },
+  {
+    id:'protect-2', cat:'protect', title:'ما الذي يجب أن تكشفه وما الذي تُخفيه؟', emoji:'🎭',
+    desc:'توازن دقيق بين الشفافية مع المستثمرين وحماية أسرارك التجارية.',
+    time:'5 دقائق', level:'متوسط',
+    body:`
+<h2>المعضلة الكبيرة</h2>
+<p>إذا أخفيت كل شيء لن تحصل على مستثمر. إذا كشفت كل شيء قد تُسرق فكرتك. أين التوازن؟</p>
+
+<h2>قاعدة "الطبقات"</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>الطبقة العامة — اكشفها دائماً</strong><p>المشكلة التي تحلها، حجم السوق، لماذا أنت مؤهل لحلها.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>الطبقة المتوسطة — اكشفها بعد NDA</strong><p>الحل بالتفصيل، التقنية المستخدمة، نموذج الأعمال الكامل.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>الطبقة السرية — احتفظ بها</strong><p>الكود المصدري، قائمة العملاء، الخوارزميات الخاصة.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 القاعدة:</strong> اكشف ما يكفي لإقناع الشريك، واحتفظ بما يجعلك لا غنى عنه.
+</div>`,
+    tags:['شفافية','حماية','مستثمر','NDA'],
+    related:['protect-1','investors-1']
+  },
+
+  /* ══ جذب المستثمرين ══ */
+  {
+    id:'investors-1', cat:'investors', title:'كيف تجد مستثمراً يناسب مشروعك؟', emoji:'💰',
+    desc:'ليس كل مستثمر مناسب لكل مشروع. دليلك لإيجاد المستثمر الصح.',
+    time:'10 دقائق', level:'متوسط', isNew:true,
+    body:`
+<h2>الخطأ الأكثر شيوعاً</h2>
+<p>رواد الأعمال يتواصلون مع <strong>أي مستثمر</strong> بدل المستثمر <strong>الصح</strong>. هذا يضيع وقتهم ويضر بسمعتهم.</p>
+
+<h2>أنواع المستثمرين</h2>
+<ul>
+<li><strong>الأسرة والأصدقاء:</strong> للبداية الأولى — مبالغ صغيرة، ثقة عالية، توقعات منخفضة.</li>
+<li><strong>Angel Investors:</strong> أفراد أثرياء يستثمرون أموالهم الشخصية — مناسبون للمرحلة الأولى.</li>
+<li><strong>Venture Capital:</strong> صناديق استثمار — يبحثون عن شركات قابلة للتوسع السريع.</li>
+<li><strong>Crowdfunding:</strong> جمع تمويل من عامة الناس — مناسب للمنتجات الاستهلاكية.</li>
+<li><strong>Corporate Investment:</strong> شركات كبيرة تستثمر في مجالها — تفيدك بالشبكة والخبرة.</li>
+</ul>
+
+<h2>كيف تجد المستثمر الصح؟</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>حدّد مرحلتك</strong><p>هل أنت في مرحلة الفكرة؟ MVP؟ إيرادات؟ كل مرحلة لها نوع مستثمر مختلف.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>ابحث عمن استثمر في مجالك</strong><p>على AZZA يمكنك تصفح المستثمرين وإبداء الاهتمام بمشاريع مشابهة لمشروعك.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>ابنِ علاقة قبل أن تطلب المال</strong><p>المستثمر يستثمر في الشخص قبل الفكرة. أعطه قيمة قبل أن تطلب منه شيئاً.</p></div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-content"><strong>استخدم "الدائرة الدافئة"</strong><p>تواصل مع رواد أعمال آخرين استثمر فيهم المستثمر المستهدف. الإحالة أقوى بـ10x من البريد البارد.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 على AZZA:</strong> أنشر مشروعك بتفاصيل واضحة، فعّل NDA، وانتظر — المستثمرون المناسبون سيُبدون اهتمامهم. جبل الجمهور يجيء للنبي.
+</div>`,
+    tags:['مستثمر','تمويل','استثمار','مشروع'],
+    related:['pitch-1','protect-1','investors-2']
+  },
+  {
+    id:'investors-2', cat:'investors', title:'ما الذي يبحث عنه المستثمر؟', emoji:'🔍',
+    desc:'ادخل عقل المستثمر واعرف ما الذي يجعله يقول نعم.',
+    time:'8 دقائق', level:'متوسط',
+    body:`
+<h2>المستثمر ليس خيرياً</h2>
+<p>المستثمر يبحث عن عائد مالي. كل قراره يبدأ بسؤال: <strong>"هل سأحصل على أموالي + أرباح؟"</strong></p>
+
+<h2>المعايير الـ5 التي يقيّمها المستثمر</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>الفريق أولاً</strong><p>"A team with B idea beats B team with A idea." المستثمر يستثمر في الناس. هل أنتم قادرون على التنفيذ؟</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>حجم السوق</strong><p>هل السوق كبير بما يكفي؟ إذا قلت "سوقنا كل الناس" — هذا خطأ. كن دقيقاً.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>المشكلة والحل</strong><p>هل المشكلة حقيقية ومؤلمة؟ هل حلك أفضل مما هو موجود؟</p></div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-content"><strong>نموذج العمل</strong><p>كيف ستجني المال؟ هل النموذج قابل للتوسع؟</p></div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-content"><strong>Traction — الدليل الأولي</strong><p>حتى لو كانت 10 عملاء يدفعون — هذا دليل أقوى من 100 صفحة business plan.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 جملة تحفظها:</strong> "أعطيني المشكلة، السوق، الفريق، والخطوات القادمة — وسأعطيك قراراً."
+</div>`,
+    tags:['مستثمر','معايير','تقييم'],
+    related:['investors-1','pitch-1']
+  },
+
+  /* ══ تقديم المشروع ══ */
+  {
+    id:'pitch-1', cat:'pitch', title:'كيف تبني Pitch Deck يُبهر المستثمرين؟', emoji:'🎯',
+    desc:'الـ10 شرائح التي يريد كل مستثمر أن يراها — بالترتيب والمحتوى.',
+    time:'12 دقائق', level:'متوسط', isNew:true,
+    body:`
+<h2>الخطأ الأكثر شيوعاً</h2>
+<p>Pitch Deck ليس عرضاً تقديمياً — هو <strong>قصة تُقنع المستثمر أن يمنحك وقته أولاً، ثم ماله.</strong></p>
+
+<h2>الـ10 شرائح الذهبية</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>المشكلة</strong><p>جملة واحدة. المشكلة التي تحلها ولماذا مؤلمة. أرقام تثبت حجمها.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>الحل</strong><p>منتجك بكلمتين. كيف يحل المشكلة بشكل أفضل مما هو موجود.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>حجم السوق</strong><p>TAM SAM SOM. كم المال المتاح في هذا السوق؟</p></div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-content"><strong>المنتج</strong><p>صور أو فيديو أو demo. اجعله ملموساً.</p></div></div>
+<div class="step-item"><div class="step-num">5</div><div class="step-content"><strong>نموذج العمل</strong><p>كيف ستجني المال؟ من يدفع ولماذا؟</p></div></div>
+<div class="step-item"><div class="step-num">6</div><div class="step-content"><strong>Traction</strong><p>الأرقام الحالية. عملاء، إيرادات، نمو. حتى الصغيرة منها تفرق.</p></div></div>
+<div class="step-item"><div class="step-num">7</div><div class="step-content"><strong>المنافسة</strong><p>لا تقل "لا يوجد منافس". كل شيء له منافس. أظهر ميزتك التنافسية.</p></div></div>
+<div class="step-item"><div class="step-num">8</div><div class="step-content"><strong>الفريق</strong><p>من أنتم ولماذا أنتم من ستنجح؟ الخبرة ذات الصلة.</p></div></div>
+<div class="step-item"><div class="step-num">9</div><div class="step-content"><strong>الخطة المالية</strong><p>التوقعات للـ3 سنوات. كيف ستصرف الاستثمار؟</p></div></div>
+<div class="step-item"><div class="step-num">10</div><div class="step-content"><strong>الطلب (The Ask)</strong><p>كم تطلب؟ مقابل كم نسبة؟ ماذا ستفعل بالمال؟</p></div></div>
+</div>
+
+<div class="warn-box">
+⚠️ <strong>اجعله 15 دقيقة كحد أقصى.</strong> إذا احتجت أكثر، فكرتك غير واضحة.
+</div>
+
+<div class="tip-box">
+<strong>💡 سر الـPitch الجيد:</strong> روّج لحلم، لا لمنتج. المستثمر يريد أن يشعر أنه جزء من مستقبل أفضل.
+</div>`,
+    tags:['pitch deck','عرض','مستثمر','شرائح'],
+    related:['pitch-2','investors-1']
+  },
+  {
+    id:'pitch-2', cat:'pitch', title:'كيف تقدّم نفسك في 60 ثانية؟ (Elevator Pitch)', emoji:'⏱️',
+    desc:'العرض السريع الذي يفتح الأبواب — حتى في المصعد.',
+    time:'5 دقائق', level:'مبتدئ',
+    body:`
+<h2>لماذا 60 ثانية؟</h2>
+<p>لأن معظم فرص الشبكة غير مخططة. اجتماع عرضي، حفلة، مؤتمر. <strong>من ليس لديه Elevator Pitch يضيع الفرصة.</strong></p>
+
+<h2>القالب الذهبي</h2>
+<div class="tip-box">
+<strong>البنية:</strong><br>
+"نحن [اسم المشروع]، نساعد [الجمهور المستهدف] على [حل المشكلة] عبر [الطريقة الفريدة]، وقد حققنا [دليل] حتى الآن."
+</div>
+
+<h2>مثال حقيقي</h2>
+<div class="quote-box">
+"AZZA هي منصة عربية تربط أصحاب الأفكار بالمستثمرين والخبراء. حللنا مشكلة أن رائد الأعمال العربي لا يجد الدعم المناسب في مجتمعه. بنينا منصة فيها نظام NDA لحماية الأفكار، وCV Builder احترافي، ومركز تعليمي. حالياً لدينا [X] مستخدم نشط."
+</div>
+
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>اكتبه</strong><p>لا تقل "سأرتجل". اكتبه بالكامل أولاً.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>تدرّب حتى يصبح طبيعياً</strong><p>قله أمام المرآة، مع الأصدقاء، في أي فرصة.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>انتهِ بسؤال</strong><p>"هل تعرف أحداً يعاني من هذه المشكلة؟" أو "هل يمكننا نكمل الحديث؟"</p></div></div>
+</div>`,
+    tags:['elevator pitch','تقديم','شبكة','سريع'],
+    related:['pitch-1','network-1']
+  },
+
+  /* ══ بناء الشركة ══ */
+  {
+    id:'build-1', cat:'build', title:'كيف تبني فريقاً بدون راتب كبير؟', emoji:'👥',
+    desc:'بناء الفريق الأول هو أصعب قرار. كيف تجد شركاء لا موظفين.',
+    time:'8 دقائق', level:'متوسط',
+    body:`
+<h2>الفريق يصنع أو يكسر</h2>
+<p>70% من المشاريع الناشئة تفشل بسبب مشاكل الفريق. ليس بسبب الفكرة.</p>
+
+<h2>الشريك vs الموظف</h2>
+<p>في المراحل الأولى أنت لا تستطيع تحمّل موظفين. أنت تحتاج <strong>شركاء يؤمنون بالفكرة</strong>.</p>
+<ul>
+<li><strong>الشريك</strong>: يعمل مقابل حصة. يشارك في الخسارة والربح. يؤمن بالمشروع.</li>
+<li><strong>الموظف</strong>: يعمل مقابل راتب. لا يتأثر بنجاح أو فشل المشروع.</li>
+</ul>
+
+<h2>كيف تجد الشريك الصح؟</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>ابحث عن من يكمّلك لا يشبهك</strong><p>إذا أنت تقني، ابحث عن شريك تسويقي. إذا أنت مبدع، ابحث عن شريك تنفيذي.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>اختبر قبل التوقيع</strong><p>اعمل معه على مشروع صغير لمدة شهر. التوافق في العمل أهم من التوافق في الحديث.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>وضّح التوقعات كتابياً</strong><p>حصص، أدوار، قرارات، خروج — وثّق كل شيء حتى مع أعز الأصدقاء.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 على AZZA:</strong> استخدم منصتنا للتواصل مع الخبراء والمتخصصين الذين يمكن أن يصبحوا شركاء مستقبليين.
+</div>`,
+    tags:['فريق','شريك','بناء','شركة'],
+    related:['build-2','network-1']
+  },
+  {
+    id:'build-2', cat:'build', title:'خطة العمل: ما تحتاجه فعلاً', emoji:'📋',
+    desc:'لا أحد يقرأ الـ50 صفحة. ما هو Business Plan الذي يصنع فرقاً.',
+    time:'7 دقائق', level:'متوسط',
+    body:`
+<h2>حقيقة عن Business Plan</h2>
+<p>خطة العمل التقليدية ماتت. لا مستثمر ذكي يقرأ 50 صفحة بعد الآن. ما يريده هو:</p>
+<ul>
+<li>فهم المشكلة والسوق في دقيقتين</li>
+<li>أرقام واضحة وواقعية</li>
+<li>دليل على أنك جربت وتعلمت</li>
+</ul>
+
+<h2>الـOne-Page Business Plan</h2>
+<div class="tip-box">
+<strong>ضع هذه الأسئلة في صفحة واحدة:</strong><br>
+1. ما المشكلة؟<br>
+2. من يعاني منها وكم عددهم؟<br>
+3. ما حلّك؟<br>
+4. كيف ستكسب المال؟<br>
+5. من منافسيك وما ميزتك؟<br>
+6. ما خطتك للـ12 شهراً القادمة؟<br>
+7. كم تحتاج وكيف ستصرفه؟
+</div>
+
+<div class="warn-box">
+⚠️ الخطة المالية التي تقول "سنصل 10 مليون في السنة الأولى" تُفقدك مصداقيتك فوراً. كن واقعياً.
+</div>`,
+    tags:['خطة عمل','business plan','تخطيط'],
+    related:['pitch-1','investors-1']
+  },
+
+  /* ══ بناء العلاقات ══ */
+  {
+    id:'network-1', cat:'network', title:'كيف تبني شبكة علاقات فعّالة؟', emoji:'🤝',
+    desc:'الشبكة الصح تفتح أبواباً لا يفتحها المال. كيف تبنيها بذكاء.',
+    time:'8 دقائق', level:'مبتدئ',
+    body:`
+<h2>لماذا "Network = Net Worth"؟</h2>
+<p>90% من الصفقات، الوظائف، والفرص لا تُعلَن. تصل لأشخاص بعينهم عبر علاقات شخصية.</p>
+
+<div class="quote-box">
+"ليس الأمر ما تعرفه، بل من تعرفه — وأكثر من ذلك: من يعرفك."
+</div>
+
+<h2>قاعدة "أعطِ أولاً"</h2>
+<p>معظم الناس يدخلون إلى شبكة العلاقات وهم يفكرون: "ماذا سأحصل؟" الأذكياء يفكرون: "ماذا يمكن أن أُعطي؟"</p>
+<p>اسأل: كيف يمكنني أن أساعد هذا الشخص؟ إحالة، معلومة، وقت، اهتمام — أي شيء.</p>
+
+<h2>استراتيجية بناء الشبكة</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>حدّد الـ20 شخص الذين تريد التواصل معهم</strong><p>ليس 2000. عشرون شخصاً بعلاقات عميقة أقوى من آلاف بعلاقات سطحية.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>تواصل بدون سبب واضح</strong><p>"رأيت هذا المقال وفكرت بك" أقوى من "أحتاج مساعدة".</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>حضور الفعاليات بذكاء</strong><p>الهدف ليس توزيع بطاقات. الهدف إجراء 3 محادثات عميقة.</p></div></div>
+<div class="step-item"><div class="step-num">4</div><div class="step-content"><strong>المتابعة في 24 ساعة</strong><p>أرسل رسالة في اليوم التالي. 95% من الناس لا يفعلون هذا. هذا يميّزك.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 على AZZA:</strong> ملفك الشخصي المكتمل + نشاطك في التعليقات والتفاعلات هو شبكة علاقات تبنيها تلقائياً.
+</div>`,
+    tags:['شبكة','علاقات','networking','تواصل'],
+    related:['network-2','investors-1']
+  },
+  {
+    id:'network-2', cat:'network', title:'LinkedIn و AZZA: كيف تستخدمهما معاً؟', emoji:'🔗',
+    desc:'كيف تستخدم المنصات المهنية لبناء حضور قوي يجذب الفرص.',
+    time:'6 دقائق', level:'مبتدئ',
+    body:`
+<h2>المنصتان لغرضين مختلفين</h2>
+<p><strong>LinkedIn:</strong> حضور مهني عالمي، بحث عن وظائف، التواصل مع الشركات الدولية.</p>
+<p><strong>AZZA:</strong> بيئة عربية متخصصة، عرض أفكار مشاريع، التواصل مع المستثمرين العرب.</p>
+
+<h2>استراتيجية المنصتين</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>أكمل ملفك الشخصي 100%</strong><p>الصورة + العنوان المهني + النبذة + الخبرات + المهارات. كل نقص يكلفك فرصة.</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>انشر بانتظام</strong><p>ليس كل يوم. لكن مرة أسبوعياً على الأقل. انشر ما تعلمته أو ما تعمل عليه.</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>علّق بقيمة</strong><p>التعليق الذكي على منشور مشهور يجلب لك متابعين أكثر من منشور خاص بك.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 نصيحة:</strong> أضف رابط ملفك على AZZA في بيو LinkedIn الخاص بك — يُظهر للمستثمرين الدوليين حضورك في السوق العربي.
+</div>`,
+    tags:['linkedin','azza','حضور','منصة'],
+    related:['network-1']
+  },
+
+  /* ══ عقلية رائد الأعمال ══ */
+  {
+    id:'mindset-1', cat:'mindset', title:'كيف تتعامل مع الرفض والفشل؟', emoji:'💪',
+    desc:'كل رائد أعمال ناجح مرّ بالفشل. الفرق في كيف تتعامل معه.',
+    time:'7 دقائق', level:'مبتدئ',
+    body:`
+<h2>الفشل ليس نهاية — هو بيانات</h2>
+<p>Walt Disney رُفض من 300 بنك. Steve Jobs طُرد من Apple. Oprah Winfrey فُصلت من أول وظيفة لها.</p>
+<p>الناجحون لم يفشلوا أقل — <strong>استخدموا فشلهم أذكى.</strong></p>
+
+<div class="quote-box">
+"النجاح هو القدرة على التنقل من فشل إلى فشل دون أن تفقد حماسك." — ونستون تشرشل
+</div>
+
+<h2>إطار التعامل مع الفشل</h2>
+<div class="steps-box">
+<div class="step-item"><div class="step-num">1</div><div class="step-content"><strong>اعترف بالفشل دون إنكار</strong><p>لا تقل "هذا لم يكن فشلاً". اعترف: "هذا لم يسر كما خططت".</p></div></div>
+<div class="step-item"><div class="step-num">2</div><div class="step-content"><strong>استخرج الدرس المحدد</strong><p>ليس "فشلت" بل "اكتشفت أن العملاء لا يريدون X بل يريدون Y".</p></div></div>
+<div class="step-item"><div class="step-num">3</div><div class="step-content"><strong>طبّق الدرس في المحاولة التالية</strong><p>الفشل بدون تعلم هو مجرد خسارة. الفشل مع تعلم هو استثمار.</p></div></div>
+</div>
+
+<div class="tip-box">
+<strong>💡 تذكر:</strong> المستثمرون يُفضّلون رائد أعمال فشل وتعلّم على رائد أعمال لم يجرب قط.
+</div>`,
+    tags:['فشل','رفض','عقلية','قوة'],
+    related:['mindset-2','think-1']
+  },
+  {
+    id:'mindset-2', cat:'mindset', title:'إدارة الوقت لرائد الأعمال', emoji:'⏰',
+    desc:'أنت لا تملك مورد بشري. وقتك هو رأس مالك الأول.',
+    time:'6 دقائق', level:'مبتدئ',
+    body:`
+<h2>المشكلة الأكثر شيوعاً</h2>
+<p>رواد الأعمال دائماً مشغولون. لكن المشغول والمنتج شيئان مختلفان تماماً.</p>
+
+<div class="warn-box">
+⚠️ "أنا مشغول جداً" ليس نجاحاً. هو علامة على سوء التخطيط.
+</div>
+
+<h2>قاعدة الـ3 مهام اليومية</h2>
+<p>كل يوم، حدّد <strong>3 مهام فقط</strong> إذا أنجزتها يكون يومك ناجحاً. ليس 20 مهمة. 3.</p>
+<p>هذه المهام يجب أن تكون مرتبطة مباشرة بهدفك الأكبر للشهر.</p>
+
+<h2>إطار Eisenhower</h2>
+<ul>
+<li><strong>عاجل + مهم:</strong> افعله الآن</li>
+<li><strong>مهم + غير عاجل:</strong> جدوله — هذا حيث يعيش النجاح</li>
+<li><strong>عاجل + غير مهم:</strong> فوّضه لغيرك</li>
+<li><strong>غير عاجل + غير مهم:</strong> احذفه</li>
+</ul>
+
+<div class="tip-box">
+<strong>💡 سر رواد الأعمال الناجحين:</strong> يقضون 80% وقتهم في "مهم غير عاجل" — التخطيط، بناء العلاقات، التعلم. لا في الطوارئ.
+</div>`,
+    tags:['وقت','إنتاجية','تخطيط','عادات'],
+    related:['mindset-1','think-1']
+  },
+
+  /* ══ موارد خارجية ══ */
+  {
+    id:'ext-1', cat:'external', title:'أفضل كتب ريادة الأعمال العربية والعالمية', emoji:'📚',
+    desc:'قائمة منتقاة من أفضل الكتب التي يقرأها رواد الأعمال الناجحون.',
+    time:'4 دقائق', level:'مبتدئ', isFree:true,
+    body:`
+<h2>الكتب تختصر سنوات</h2>
+<p>قراءة كتاب واحد شهرياً تعادل دراسة تجارب عشرات الناس. هذه القائمة انتقتها خصيصاً لرائد الأعمال العربي:</p>
+
+<h2>للمبتدئين</h2>
+<ul>
+<li><strong>The Lean Startup — Eric Ries:</strong> كيف تبني شركة بأقل مخاطرة ممكنة</li>
+<li><strong>Zero to One — Peter Thiel:</strong> كيف تفكر في الفرص الحقيقية</li>
+<li><strong>The $100 Startup — Chris Guillebeau:</strong> ابدأ مشروعاً بأقل من 100 دولار</li>
+</ul>
+
+<h2>للمتوسط</h2>
+<ul>
+<li><strong>Good to Great — Jim Collins:</strong> لماذا بعض الشركات تبقى وأخرى تختفي</li>
+<li><strong>Crossing the Chasm — Geoffrey Moore:</strong> كيف تنتقل من المبكرين لسوق الأغلبية</li>
+<li><strong>Blitzscaling — Reid Hoffman:</strong> النمو السريع وتحدياته</li>
+</ul>
+
+<h2>باللغة العربية</h2>
+<ul>
+<li><strong>ثروتي في رأسي — دي جوس فانا:</strong> مترجم، عملي جداً</li>
+<li><strong>فن البداية — جاي كاواساكي:</strong> دليل عملي لرواد الأعمال</li>
+</ul>
+
+<div class="tip-box">
+<strong>💡 نصيحة:</strong> لا تقرأ لتقرأ. بعد كل فصل اسأل: "ما الذي سأطبقه هذا الأسبوع؟"
+</div>`,
+    tags:['كتب','قراءة','تعلم','ريادة'],
+    related:['ext-2','mindset-1']
+  },
+  {
+    id:'ext-2', cat:'external', title:'مصادر تعليمية مجانية عبر الإنترنت', emoji:'🌐',
+    desc:'أفضل المنصات والقنوات العربية والعالمية لتعلم ريادة الأعمال مجاناً.',
+    time:'4 دقائق', level:'مبتدئ', isFree:true,
+    body:`
+<h2>YouTube — المصدر الذهبي</h2>
+<ul>
+<li><strong>Y Combinator:</strong> أفضل برنامج ريادة أعمال في العالم — محاضراته مجانية</li>
+<li><strong>TED Talks Business:</strong> أفضل رواد الأعمال يشاركون قصصهم</li>
+<li><strong>GaryVee:</strong> تسويق وريادة أعمال بأسلوب مباشر</li>
+<li><strong>قناة بيزنس بالعربي:</strong> محتوى عربي متميز في ريادة الأعمال</li>
+</ul>
+
+<h2>Podcasts</h2>
+<ul>
+<li><strong>How I Built This (NPR):</strong> قصص رواد الأعمال الأكثر نجاحاً</li>
+<li><strong>The Tim Ferriss Show:</strong> مقابلات مع قمم العالم</li>
+<li><strong>بودكاست فنجان:</strong> عربي متميز جداً</li>
+</ul>
+
+<h2>مجتمعات مجانية</h2>
+<ul>
+<li><strong>Indie Hackers:</strong> مجتمع رواد الأعمال المستقلين</li>
+<li><strong>AZZA Community:</strong> مجتمعك على هذه المنصة 😊</li>
+</ul>
+
+<div class="tip-box">
+<strong>💡 التعلم بلا تطبيق = لا تعلم.</strong> اختر مصدراً واحداً، وطبّق ما تتعلمه فوراً.
+</div>`,
+    tags:['مجاني','يوتيوب','podcast','تعلم'],
+    related:['ext-1','learn-1']
+  },
+];
+
+/* ══ State ══ */
+let currentCat = 'all';
+let currentArt = null;
+const read = new Set(JSON.parse(localStorage.getItem('azza_academy_read')||'[]'));
+
+/* ══ بناء الصفحة ══ */
+(()=>{
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  document.getElementById('total-courses').textContent=COURSES.length;
+  buildSidebar();
+  buildHome();
+  updateReadCount();
+  window.addEventListener('scroll', updateProgress);
+})();
+
+function buildSidebar(){
+  const list=document.getElementById('cat-list');
+  const allCount=COURSES.length;
+  list.innerHTML=`<li class="cat-item active" onclick="filterCat('all',this)"><span class="cat-item-ic">📖</span>الكل<span class="cat-count">${allCount}</span></li>`;
+  CATS.forEach(c=>{
+    const count=COURSES.filter(x=>x.cat===c.id).length;
+    list.innerHTML+=`<li class="cat-item" onclick="filterCat('${c.id}',this)"><span class="cat-item-ic">${c.icon}</span>${c.name}<span class="cat-count">${count}</span></li>`;
+  });
+}
+
+function buildHome(){
+  /* Featured */
+  const featured=COURSES.filter(c=>c.isNew)[0];
+  if(featured){
+    document.getElementById('featured-wrap').innerHTML=`
+      <div class="featured-card" onclick="openArt('${featured.id}')">
+        <div class="feat-badge">✨ جديد</div>
+        <div class="feat-title">${featured.emoji} ${featured.title}</div>
+        <div class="feat-desc">${featured.desc}</div>
+        <div class="feat-meta">
+          <span>⏱ ${featured.time}</span>
+          <span>📊 ${featured.level}</span>
+          <span>🆓 مجاني</span>
+        </div>
+      </div>`;
+  }
+
+  /* All sections */
+  let html='';
+  CATS.forEach(c=>{
+    const courses=COURSES.filter(x=>x.cat===c.id);
+    if(!courses.length) return;
+    html+=`
+      <div class="sec-header">
+        <div class="sec-title">${c.icon} ${c.name}</div>
+        <span class="sec-more" onclick="filterCat('${c.id}',null)">عرض الكل ←</span>
+      </div>
+      <div class="courses-grid">
+        ${courses.slice(0,3).map(buildCard).join('')}
+      </div>`;
+  });
+  document.getElementById('all-sections').innerHTML=html;
+}
+
+function buildCard(course){
+  const isRead=read.has(course.id);
+  const cat=CATS.find(c=>c.id===course.cat);
+  return`<div class="course-card" onclick="openArt('${course.id}')">
+    <div class="course-thumb" style="background:${cat?.color||'#1c5b38'}18">${course.emoji}</div>
+    <div class="course-body">
+      <div class="course-cat">${cat?.icon} ${cat?.name}${isRead?' <span style="color:#22c55e">✓ مقروء</span>':''}</div>
+      <div class="course-title">${course.title}</div>
+      <div class="course-desc">${course.desc}</div>
+      <div class="course-meta">
+        <span class="course-badge badge-free">🆓 مجاني</span>
+        ${course.isNew?'<span class="course-badge badge-new">✨ جديد</span>':''}
+        <span>⏱ ${course.time}</span>
+        <span>📊 ${course.level}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function filterCat(cat, btn){
+  currentCat=cat;
+  if(btn){
+    document.querySelectorAll('.cat-item').forEach(i=>i.classList.toggle('active',i===btn));
+  }
+
+  const courses=cat==='all'?COURSES:COURSES.filter(c=>c.cat===cat);
+  const catObj=CATS.find(c=>c.id===cat);
+
+  document.getElementById('featured-wrap').innerHTML='';
+  document.getElementById('all-sections').innerHTML=`
+    <div class="sec-header">
+      <div class="sec-title">${catObj?catObj.icon+' '+catObj.name:'📖 جميع المقالات'}</div>
+    </div>
+    <div class="courses-grid">${courses.map(buildCard).join('')}</div>`;
+}
+
+function openArt(id){
+  currentArt=id;
+  const art=COURSES.find(c=>c.id===id);
+  if(!art) return;
+
+  /* علّم كمقروء */
+  read.add(id);
+  localStorage.setItem('azza_academy_read',JSON.stringify([...read]));
+  updateReadCount();
+  updateLastRead(art.title);
+
+  const cat=CATS.find(c=>c.cat===art.cat||c.id===art.cat);
+  const related=COURSES.filter(c=>art.related?.includes(c.id)).slice(0,3);
+
+  document.getElementById('art-content').innerHTML=`
+    <div class="art-header">
+      <span class="art-cat-tag">${cat?.icon||'📖'} ${cat?.name||'أكاديمية AZZA'}</span>
+      <h1 class="art-title">${art.emoji} ${art.title}</h1>
+      <div class="art-meta">
+        <span>⏱ ${art.time}</span>
+        <span>📊 ${art.level}</span>
+        <span>🆓 مجاني</span>
+        ${read.has(id)?'<span style="color:#22c55e;font-weight:700">✓ قرأته</span>':''}
+      </div>
+    </div>
+    <div class="art-body">${art.body}</div>
+    <div class="art-footer">
+      <div class="art-tags">${(art.tags||[]).map(t=>`<span class="art-tag" onclick="doSearch('${t}')">#${t}</span>`).join('')}</div>
+      ${related.length?`
+        <div style="font-size:15px;font-weight:900;margin-bottom:14px">📖 مقالات ذات صلة</div>
+        <div class="related-grid">
+          ${related.map(r=>`<div class="related-card" onclick="openArt('${r.id}')">
+            <div class="related-cat">${CATS.find(c=>c.id===r.cat)?.icon} ${CATS.find(c=>c.id===r.cat)?.name||''}</div>
+            <div class="related-title">${r.emoji} ${r.title}</div>
+          </div>`).join('')}
+        </div>`:''}
+      <div style="margin-top:28px;text-align:center">
+        <button onclick="shareArt('${art.title}')" style="padding:10px 24px;border-radius:99px;border:1.5px solid var(--olive);background:none;color:var(--olive);font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-left:8px">🔗 مشاركة</button>
+        <button onclick="closeArt()" style="padding:10px 24px;border-radius:99px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer">← العودة</button>
+      </div>
+    </div>`;
+
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('art-view').classList.add('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function closeArt(){
+  currentArt=null;
+  document.getElementById('art-view').classList.remove('open');
+  document.getElementById('home-view').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function doSearch(q){
+  q=q.toLowerCase().replace('#','');
+  document.getElementById('srch').value=q;
+  const results=COURSES.filter(c=>
+    c.title.toLowerCase().includes(q)||
+    c.desc.toLowerCase().includes(q)||
+    (c.tags||[]).some(t=>t.includes(q))
+  );
+  document.getElementById('featured-wrap').innerHTML='';
+  document.getElementById('all-sections').innerHTML=`
+    <div class="sec-header">
+      <div class="sec-title">🔍 نتائج "${q}" (${results.length})</div>
+    </div>
+    <div class="courses-grid">${results.length?results.map(buildCard).join(''):'<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--sub)">لا نتائج — جرّب كلمة أخرى</div>'}</div>`;
+  document.querySelectorAll('.cat-item').forEach(i=>i.classList.remove('active'));
+}
+
+function updateReadCount(){
+  document.getElementById('read-count').textContent=`${read.size} مقال مقروء`;
+}
+
+function updateLastRead(title){
+  document.getElementById('last-read').innerHTML=`<div style="cursor:pointer;color:var(--olive);font-weight:700" onclick="openArt('${currentArt}')">${title.substring(0,30)}${title.length>30?'...':''}</div>`;
+}
+
+function updateProgress(){
+  const el=document.getElementById('art-view');
+  if(!el.classList.contains('open')) return;
+  const scrollTop=window.scrollY;
+  const docH=document.body.scrollHeight-window.innerHeight;
+  const pct=Math.min((scrollTop/docH)*100,100);
+  document.getElementById('progress').style.width=pct+'%';
+}
+
+function shareArt(title){
+  const url=location.href+'#'+currentArt;
+  navigator.clipboard?.writeText(url).then(()=>alert('تم نسخ رابط المقال: '+url));
+}
+</script>
+</body>
+</html>
