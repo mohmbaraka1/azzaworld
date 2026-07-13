@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مسارات التعلم — AZZA</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);--bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--line:rgba(0,0,0,.08);--r:14px}
+.dk{--bg:#141210;--bg2:#1e1c18;--card:#201e1a;--ink:#f0e8d0;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.tb-title{font-size:15px;font-weight:900;color:var(--olive);flex:1}
+.hero{background:linear-gradient(135deg,var(--od),var(--olive));padding:32px 20px;text-align:center;color:#fff}
+.hero h1{font-size:clamp(20px,4vw,28px);font-weight:900;margin-bottom:8px}
+.hero p{font-size:14px;opacity:.8;margin-bottom:20px}
+.search-wrap{max-width:440px;margin:0 auto;position:relative}
+.search-inp{width:100%;height:46px;border-radius:99px;border:none;padding:0 48px 0 16px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.search-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);pointer-events:none}
+.search-ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.main{max-width:900px;margin:0 auto;padding:24px 20px}
+.skills-from-cv{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;margin-bottom:24px}
+.skills-from-cv h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.skill-chips{display:flex;flex-wrap:wrap;gap:8px}
+.skill-chip{padding:6px 14px;border-radius:99px;background:var(--bg2);border:1.5px solid var(--line);font-size:13px;font-weight:700;cursor:pointer;transition:.15s;color:var(--ink)}
+.skill-chip:hover,.skill-chip.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+.cat-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px}
+.cat-tab{padding:7px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s}
+.cat-tab:hover,.cat-tab.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+.sec-title{font-size:16px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.resources-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:32px}
+.res-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:.2s;display:flex;flex-direction:column}
+.res-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.res-top{padding:14px 16px;flex:1}
+.res-provider{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.res-provider-icon{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.res-title{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.4}
+.res-skill{font-size:12px;color:var(--olive);font-weight:700;margin-bottom:8px}
+.res-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.res-badge{padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-free{background:rgba(34,197,94,.1);color:#16a34a}
+.badge-paid{background:rgba(245,158,11,.1);color:#d97706}
+.badge-beg{background:rgba(28,91,56,.08);color:var(--olive)}
+.badge-mid{background:rgba(198,151,73,.1);color:#854F0B}
+.badge-adv{background:rgba(239,68,68,.1);color:#dc2626}
+.res-dur{font-size:11px;color:var(--sub)}
+.res-bottom{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
+.res-btn{flex:1;padding:8px;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;text-align:center;text-decoration:none;display:block}
+.res-btn-primary{background:var(--olive);color:#fff}.res-btn-primary:hover{background:var(--od)}
+.res-btn-outline{border:1.5px solid var(--line);background:none;color:var(--ink)}.res-btn-outline:hover{border-color:var(--olive);color:var(--olive)}
+.gap-section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:24px}
+.gap-title{font-size:15px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.gap-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.gap-skill-name{min-width:120px;font-size:13px;font-weight:700}
+.gap-bar-track{flex:1;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.gap-bar-fill{height:100%;border-radius:99px;transition:.5s}
+.gap-pct{font-size:12px;font-weight:700;min-width:35px;text-align:left}
+.empty{text-align:center;padding:40px;color:var(--sub);font-size:14px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="tb-title">📚 مسارات التعلم</div>
+  <button onclick="location.href='cv.html'" style="padding:7px 14px;border-radius:8px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+    📊 Skill Gap
+  </button>
+</div>
+
+<div class="hero">
+  <h1>🎓 تعلّم المهارات الناقصة</h1>
+  <p>مسارات تعلم مخصصة بناءً على سيرتك الذاتية وأهدافك المهنية</p>
+  <div class="search-wrap">
+    <input class="search-inp" id="srch" placeholder="ابحث عن مهارة أو كورس..." oninput="filterRes(this.value)">
+    <div class="search-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- مهاراتك من CV -->
+  <div class="skills-from-cv" id="my-skills-section" style="display:none">
+    <h3>⚡ مهاراتك الحالية — اضغط لفلترة الموارد</h3>
+    <div class="skill-chips" id="my-skill-chips"></div>
+  </div>
+
+  <!-- Gap Analysis سريع -->
+  <div class="gap-section" id="gap-section" style="display:none">
+    <div class="gap-title">📊 مهاراتك مقارنة بسوق العمل</div>
+    <div id="gap-rows"></div>
+  </div>
+
+  <!-- فلاتر الفئات -->
+  <div class="cat-tabs" id="cat-tabs"></div>
+
+  <!-- الموارد -->
+  <div class="sec-title" id="res-title">📚 جميع الموارد</div>
+  <div class="resources-grid" id="res-grid"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':'#c0392b';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
+
+let ALL=[], mySkills=[], activeCat='all', activeSkill='', srchQ='';
+
+const PROVIDER_ICONS={'YouTube':'🎬','Coursera':'🎓','freeCodeCamp':'💻','LinkedIn Learning':'💼','Microsoft':'🪟','Google':'🔍','Udemy':'📖','default':'📚'};
+const LEVEL_LABELS={'beginner':'مبتدئ','intermediate':'متوسط','advanced':'متقدم'};
+const LEVEL_COLORS={'beginner':'badge-beg','intermediate':'badge-mid','advanced':'badge-adv'};
+const MARKET={'برمجة':['JavaScript','Python','React','Node.js','SQL','Git','Docker','TypeScript'],'تصميم':['Figma','Adobe XD','UI/UX','CSS','Photoshop'],'إدارة':['Project Management','Excel','Leadership','Communication','Agile'],'تسويق':['Digital Marketing','SEO','Google Analytics','Social Media'],'ذكاء اصطناعي':['Machine Learning','Python','TensorFlow','Data Science']};
+
+async function load(){
+  /* تحميل الموارد */
+  const {data}=await db.from('learning_resources').select('*').order('is_free',{ascending:false});
+  ALL=data||[];
+
+  /* مهارات المستخدم من Supabase */
+  if(me){
+    const {data:u}=await db.from('users').select('skills,cv_data').eq('id',me.id).single();
+    mySkills=[...new Set([
+      ...(Array.isArray(u?.skills)?u.skills:[]),
+      ...(Array.isArray(u?.cv_data?.tech)?u.cv_data.tech:[]),
+    ])].filter(Boolean);
+  }
+
+  buildCatTabs();
+  renderMySkills();
+  renderGap();
+  render();
+}
+
+function buildCatTabs(){
+  const cats=['all',...new Set(ALL.map(r=>r.category).filter(Boolean))];
+  document.getElementById('cat-tabs').innerHTML=cats.map(c=>`
+    <button class="cat-tab${c==='all'?' active':''}" onclick="setCat('${c}',this)">
+      ${c==='all'?'🌐 الكل':c}
+    </button>`).join('');
+}
+
+function setCat(cat,btn){
+  activeCat=cat;
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.toggle('active',b===btn));
+  render();
+}
+
+function filterRes(q){
+  srchQ=q.trim().toLowerCase();
+  render();
+}
+
+function renderMySkills(){
+  if(!mySkills.length) return;
+  document.getElementById('my-skills-section').style.display='block';
+  document.getElementById('my-skill-chips').innerHTML=mySkills.map(s=>`
+    <div class="skill-chip${activeSkill===s?' active':''}" onclick="filterBySkill('${s.replace(/'/g,"\\'")}')">
+      ${s}
+    </div>`).join('');
+}
+
+function filterBySkill(skill){
+  activeSkill=activeSkill===skill?'':skill;
+  renderMySkills();
+  render();
+}
+
+function renderGap(){
+  if(!mySkills.length) return;
+  const myLow=mySkills.map(s=>s.toLowerCase());
+  const rows=Object.entries(MARKET).map(([cat,skills])=>{
+    const has=skills.filter(s=>myLow.some(m=>m.includes(s.toLowerCase())||s.toLowerCase().includes(m)));
+    const pct=Math.round((has.length/skills.length)*100);
+    const color=pct>=70?'#22c55e':pct>=40?'#f59e0b':'#ef4444';
+    return{cat,pct,color};
+  }).sort((a,b)=>a.pct-b.pct);
+
+  document.getElementById('gap-section').style.display='block';
+  document.getElementById('gap-rows').innerHTML=rows.map(r=>`
+    <div class="gap-row">
+      <span class="gap-skill-name">${r.cat}</span>
+      <div class="gap-bar-track"><div class="gap-bar-fill" style="width:${r.pct}%;background:${r.color}"></div></div>
+      <span class="gap-pct" style="color:${r.color}">${r.pct}%</span>
+    </div>`).join('');
+}
+
+function render(){
+  let list=ALL;
+  if(activeCat!=='all') list=list.filter(r=>r.category===activeCat);
+  if(activeSkill) list=list.filter(r=>r.skill.toLowerCase().includes(activeSkill.toLowerCase())||r.title.toLowerCase().includes(activeSkill.toLowerCase()));
+  if(srchQ) list=list.filter(r=>r.title.toLowerCase().includes(srchQ)||r.skill.toLowerCase().includes(srchQ)||r.provider?.toLowerCase().includes(srchQ));
+
+  /* إذا في مهارات ناقصة، رتّب الأولوية */
+  if(mySkills.length){
+    const myLow=mySkills.map(s=>s.toLowerCase());
+    const missing=list.filter(r=>!myLow.some(m=>m.includes(r.skill.toLowerCase())||r.skill.toLowerCase().includes(m)));
+    const owned=list.filter(r=>myLow.some(m=>m.includes(r.skill.toLowerCase())||r.skill.toLowerCase().includes(m)));
+    list=[...missing,...owned];
+  }
+
+  const title=document.getElementById('res-title');
+  title.textContent=`📚 ${srchQ?`نتائج "${srchQ}"`:activeSkill?`مهارة ${activeSkill}`:activeCat==='all'?'جميع الموارد':activeCat} (${list.length})`;
+
+  if(!list.length){
+    document.getElementById('res-grid').innerHTML='<div class="empty" style="grid-column:1/-1">🔍 لا توجد موارد — جرّب كلمة أخرى</div>';
+    return;
+  }
+
+  const myLow=mySkills.map(s=>s.toLowerCase());
+  document.getElementById('res-grid').innerHTML=list.map(r=>{
+    const hasSkill=myLow.some(m=>m.includes(r.skill.toLowerCase())||r.skill.toLowerCase().includes(m));
+    const missingBadge=(!hasSkill&&mySkills.length)?'<span style="margin-right:auto;font-size:10px;background:rgba(239,68,68,.1);color:#dc2626;padding:2px 6px;border-radius:99px">ناقصة ⬆️</span>':'';
+    const icon=PROVIDER_ICONS[r.provider]||PROVIDER_ICONS.default;
+    return`<div class="res-card">
+      <div class="res-top">
+        <div class="res-provider">
+          <span class="res-provider-icon">${icon}</span>
+          ${r.provider||'موارد تعليمية'}
+          ${missingBadge}
+        </div>
+        <div class="res-title">${r.title}</div>
+        <div class="res-skill">🎯 ${r.skill}</div>
+        <div class="res-meta">
+          <span class="res-badge ${r.is_free?'badge-free':'badge-paid'}">${r.is_free?'🆓 مجاني':'💰 مدفوع'}</span>
+          <span class="res-badge ${LEVEL_COLORS[r.level]||'badge-beg'}">${LEVEL_LABELS[r.level]||r.level}</span>
+          ${r.duration?`<span class="res-dur">⏱ ${r.duration}</span>`:''}
+        </div>
+      </div>
+      <div class="res-bottom">
+        <a href="${r.url||'#'}" target="_blank" class="res-btn res-btn-primary">ابدأ التعلم →</a>
+        <button class="res-btn res-btn-outline" onclick="saveRes('${r.title.replace(/'/g,"\\'")}')">🔖 حفظ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveRes(title){
+  const saved=JSON.parse(localStorage.getItem('azza_saved_learn')||'[]');
+  if(!saved.includes(title)){
+    saved.push(title);
+    localStorage.setItem('azza_saved_learn',JSON.stringify(saved));
+    toast('تم حفظ الكورس 🔖');
+  }else{
+    toast('محفوظ مسبقاً ✓');
+  }
+}
+
+(()=>document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark'))();
+load();
+</script>
+</body>
+</html>

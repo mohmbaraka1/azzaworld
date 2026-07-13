@@ -582,6 +582,15 @@ body.role-institution .cover-new{background:linear-gradient(145deg,#010e1f,#042C
       <div class="skill-suggestions" id="skill-sugs"></div>
     </div>
 
+    <!-- Skill Endorsements -->
+    <div class="cv-section" id="endorse-section" style="display:none">
+      <div class="cv-sec-title">
+        👍 تأييدات المهارات
+        <span id="endorse-count" style="font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0"></span>
+      </div>
+      <div id="endorse-list"></div>
+    </div>
+
     <!-- CV: الخبرات -->
     <div class="cv-section" id="cv-exp-section">
       <div class="cv-sec-title">
@@ -1055,6 +1064,49 @@ function saveEdit(){
   user=upd;closeEdit();buildProfile();showToast('تم الحفظ ✅');
 }
 
+/* ══ Skill Endorsements ══ */
+const SB_URL_P='https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON_P='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const dbP=supabase.createClient(SB_URL_P,SB_ANON_P);
+
+async function loadEndorsements(){
+  const skills=getSkills();
+  if(!skills.length) return;
+  const {data:endorsements}=await dbP.from('skill_endorsements')
+    .select('skill,from_user').eq('to_user',user.id);
+  if(!endorsements?.length) return;
+
+  const grouped={};
+  endorsements.forEach(e=>{
+    if(!grouped[e.skill]) grouped[e.skill]=[];
+    grouped[e.skill].push(e.from_user);
+  });
+
+  const sec=document.getElementById('endorse-section');
+  const list=document.getElementById('endorse-list');
+  sec.style.display='block';
+  document.getElementById('endorse-count').textContent=`${endorsements.length} تأييد`;
+
+  list.innerHTML=Object.entries(grouped)
+    .sort((a,b)=>b[1].length-a[1].length)
+    .map(([skill,endorsers])=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--line)">
+        <span style="flex:1;font-size:14px;font-weight:700">${escCV(skill)}</span>
+        <span style="font-size:12px;color:var(--muted)">${endorsers.length} تأييد</span>
+        <div style="display:flex;gap:4px">
+          ${endorsers.slice(0,3).map(()=>`<div style="width:24px;height:24px;border-radius:50%;background:var(--olive);opacity:.7"></div>`).join('')}
+        </div>
+      </div>`).join('');
+}
+
+async function endorseSkill(skill){
+  if(!user) return showToast('سجّل دخولاً أولاً','err');
+  const {error}=await dbP.from('skill_endorsements')
+    .insert({to_user:profileUserId||user.id,from_user:user.id,skill});
+  if(error?.code==='23505') showToast('أيّدت هذه المهارة مسبقاً','err');
+  else { showToast(`✅ تم تأييد مهارة "${skill}"`); loadEndorsements(); }
+}
+
 /* ══ أقسام CV ══ */
 async function loadCVSections(){
   const {data:u}=await azzaDB.from('users').select('experience,education,cv_data,skills').eq('id',user.id).single();
@@ -1179,6 +1231,7 @@ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.tar
 function buildProfile(){
   /* تحميل بيانات CV من Supabase */
   loadCVSections();
+  loadEndorsements();
   const posts=getPosts(); const myPosts=posts.filter(p=>p.author_id===user.id); const pts=user.points||0;
   /* تطبيق لون الدور */
   const t2=user.subtype==='institution'?'institution':(user.type||'idea');
