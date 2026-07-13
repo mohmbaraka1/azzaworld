@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZZA CMS — لوحة التحكم</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{
+  --gold:#c69749;--olive:#1c5b38;--od:#0e3622;
+  --bg:#f0ede8;--bg2:#e5e1da;--card:#fff;--ink:#18160f;--sub:#6b6555;--muted:#9a9080;
+  --line:rgba(0,0,0,.07);--r:12px;
+  --sidebar-w:240px;
+  --draft:#6b7280;--review:#2563eb;--approved:#7c3aed;--scheduled:#f59e0b;--published:#16a34a;--archived:#9a9080;
+}
+.dk{--bg:#111009;--bg2:#191710;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--muted:#6b6555;--line:rgba(255,255,255,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;height:100vh;display:flex;overflow:hidden}
+
+/* ══ Sidebar ══ */
+.sidebar{width:var(--sidebar-w);background:var(--od);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo-text{font-size:16px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px}
+.sb-logo-badge{font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(198,151,73,.25);color:var(--gold);font-weight:700}
+.sb-user{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sb-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--gold));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:10px;color:var(--gold);font-weight:700}
+.sb-nav{flex:1;padding:12px 8px}
+.sb-section{font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;padding:8px 8px 4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.65);transition:.15s;margin-bottom:1px}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.1);color:#fff;font-weight:700}
+.sb-item-ic{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-item-badge{margin-right:auto;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;background:rgba(198,151,73,.2);color:var(--gold)}
+.sb-footer{padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+.sb-footer a{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;transition:.15s}
+.sb-footer a:hover{color:rgba(255,255,255,.7)}
+
+/* ══ Main ══ */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.tb-title{font-size:15px;font-weight:900;flex:1}
+.tb-search{position:relative;width:260px}
+.tb-search input{width:100%;height:34px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg2);padding:0 34px 0 10px;font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none}
+.tb-search input:focus{border-color:var(--olive)}
+.tb-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.tb-btn{padding:7px 14px;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.btn-p{background:var(--olive);color:#fff}.btn-p:hover{background:var(--od)}
+.btn-o{border:1.5px solid var(--line);background:none;color:var(--ink)}.btn-o:hover{border-color:var(--olive);color:var(--olive)}
+.btn-d{background:rgba(220,38,38,.1);color:#dc2626;border:none}.btn-d:hover{background:rgba(220,38,38,.15)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.content-area{flex:1;overflow-y:auto;padding:24px}
+.content-area::-webkit-scrollbar{width:4px}
+.content-area::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
+
+/* ══ Stats ══ */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:center}
+.stat-num{font-size:30px;font-weight:900;color:var(--olive)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:3px}
+.stat-delta{font-size:11px;margin-top:4px}
+.delta-up{color:#16a34a}
+.delta-down{color:#dc2626}
+
+/* ══ Status Badges ══ */
+.status-badge{padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.st-draft{background:#6b728015;color:var(--draft)}
+.st-review{background:#2563eb15;color:var(--review)}
+.st-approved{background:#7c3aed15;color:var(--approved)}
+.st-scheduled{background:#f59e0b15;color:var(--scheduled)}
+.st-published{background:#16a34a15;color:var(--published)}
+.st-archived{background:#9a908015;color:var(--archived)}
+
+/* ══ Table ══ */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:24px}
+.tbl-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tbl-head-title{font-size:14px;font-weight:700;flex:1}
+.filter-btns{display:flex;gap:4px;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s}
+.filter-btn:hover,.filter-btn.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;text-align:right;font-size:11px;color:var(--muted);font-weight:700;background:var(--bg);border-bottom:1px solid var(--line)}
+td{padding:12px 14px;font-size:13px;border-bottom:.5px solid var(--line);vertical-align:middle}
+tr:last-child td{border:none}
+tr:hover td{background:rgba(28,91,56,.02)}
+.td-title{font-weight:700;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-actions{display:flex;gap:6px}
+.act-btn{padding:5px 10px;border-radius:7px;border:none;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
+.act-edit{background:rgba(37,99,235,.08);color:#2563eb}.act-edit:hover{background:#2563eb;color:#fff}
+.act-pub{background:rgba(22,163,74,.08);color:#16a34a}.act-pub:hover{background:#16a34a;color:#fff}
+.act-del{background:rgba(220,38,38,.08);color:#dc2626}.act-del:hover{background:#dc2626;color:#fff}
+.act-rev{background:rgba(124,58,237,.08);color:#7c3aed}.act-rev:hover{background:#7c3aed;color:#fff}
+
+/* ══ Modal / Editor ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:16px;width:100%;max-width:900px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-hdr{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.modal-title{font-size:16px;font-weight:900;flex:1}
+.modal-body{padding:20px;max-height:75vh;overflow-y:auto}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+
+/* ══ Editor ══ */
+.ed-field{margin-bottom:16px}
+.ed-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.ed-inp{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;transition:.2s}
+.ed-inp:focus{border-color:var(--olive);background:var(--card)}
+.ed-ta{min-height:300px;resize:vertical;line-height:1.75}
+.ed-select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;cursor:pointer}
+.ed-select:focus{border-color:var(--olive)}
+.ed-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ed-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.block-toolbar{display:flex;gap:6px;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:6px}
+.block-btn{padding:5px 10px;border-radius:6px;border:none;background:var(--card);font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--sub);transition:.15s}
+.block-btn:hover{background:var(--olive);color:#fff}
+.char-count{font-size:11px;color:var(--muted);font-weight:400}
+
+/* ══ Roles & Permissions ══ */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.role-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px;transition:.2s}
+.role-card:hover{border-color:var(--olive)}
+.role-card-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.role-card-label{font-size:12px;color:var(--sub);margin-bottom:12px}
+.role-level{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.level-bar{flex:1;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.level-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));border-radius:99px}
+.level-num{font-size:11px;color:var(--muted);font-weight:700}
+.perm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.perm-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.perm-name{flex:1;font-size:13px;font-weight:700}
+.perm-desc{font-size:11px;color:var(--muted)}
+.toggle-sw{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.sw-slider{position:absolute;inset:0;background:var(--bg2);border-radius:99px;cursor:pointer;transition:.2s}
+.sw-slider::before{content:'';position:absolute;width:18px;height:18px;right:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-sw input:checked+.sw-slider{background:var(--olive)}
+.toggle-sw input:checked+.sw-slider::before{right:calc(100% - 21px)}
+
+/* ══ Workflow ══ */
+.workflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 0;margin-bottom:20px}
+.wf-step{padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;border:2px solid var(--line);color:var(--muted)}
+.wf-step.active{color:#fff}
+.wf-arrow{color:var(--muted);font-size:14px}
+.wf-step.st-draft.active{background:var(--draft);border-color:var(--draft)}
+.wf-step.st-review.active{background:var(--review);border-color:var(--review)}
+.wf-step.st-approved.active{background:var(--approved);border-color:var(--approved)}
+.wf-step.st-scheduled.active{background:var(--scheduled);border-color:var(--scheduled)}
+.wf-step.st-published.active{background:var(--published);border-color:var(--published)}
+.wf-step.st-archived.active{background:var(--archived);border-color:var(--archived)}
+
+/* ══ User Perms Table ══ */
+.user-perm-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid var(--line)}
+.user-perm-av{width:36px;height:36px;border-radius:10px;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.user-perm-info{flex:1}
+.user-perm-name{font-size:13px;font-weight:700}
+.user-perm-email{font-size:11px;color:var(--muted)}
+.role-select{padding:5px 10px;border-radius:7px;border:1.5px solid var(--line);background:var(--bg2);font-family:Tajawal,sans-serif;font-size:12px;color:var(--ink);outline:none;cursor:pointer}
+.role-select:focus{border-color:var(--olive)}
+
+/* ══ Homepage Control ══ */
+.hp-section{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.hp-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.hp-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--line)}
+.hp-toggle:last-child{border:none}
+.hp-toggle-label{font-size:13px}
+.hp-toggle-desc{font-size:11px;color:var(--muted)}
+
+/* ══ Activity Log ══ */
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:.5px solid var(--line)}
+.log-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.log-body{flex:1}
+.log-text{font-size:13px;margin-bottom:2px}
+.log-time{font-size:11px;color:var(--muted)}
+
+/* ══ Toast ══ */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .ed-row2,.ed-row3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-text">✦ AZZA CMS <span class="sb-logo-badge">Super Admin</span></div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sb-av">م</div>
+    <div class="sb-user-info">
+      <div class="sb-user-name" id="sb-name">مدير المنصة</div>
+      <div class="sb-user-role">المشرف العام</div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">لوحة التحكم</div>
+    <div class="sb-item active" onclick="showPage('overview',this)"><span class="sb-item-ic">📊</span>نظرة عامة</div>
+    <div class="sb-item" onclick="showPage('activity',this)"><span class="sb-item-ic">🕐</span>سجل الأنشطة</div>
+
+    <div class="sb-section">المحتوى</div>
+    <div class="sb-item" onclick="showPage('articles',this)"><span class="sb-item-ic">📝</span>المقالات<span class="sb-item-badge" id="badge-articles">0</span></div>
+    <div class="sb-item" onclick="showPage('courses',this)"><span class="sb-item-ic">📚</span>الكورسات</div>
+    <div class="sb-item" onclick="showPage('media',this)"><span class="sb-item-ic">🖼️</span>مكتبة الوسائط</div>
+
+    <div class="sb-section">التحكم</div>
+    <div class="sb-item" onclick="showPage('homepage',this)"><span class="sb-item-ic">🏠</span>الصفحة الرئيسية</div>
+    <div class="sb-item" onclick="showPage('roles',this)"><span class="sb-item-ic">👥</span>الأدوار</div>
+    <div class="sb-item" onclick="showPage('permissions',this)"><span class="sb-item-ic">🔐</span>الصلاحيات</div>
+    <div class="sb-item" onclick="showPage('users',this)"><span class="sb-item-ic">👤</span>المستخدمون</div>
+
+    <div class="sb-section">الأكاديمية</div>
+    <div class="sb-item" onclick="location.href='academy.html'"><span class="sb-item-ic">🎓</span>AZZA Academy ↗</div>
+    <div class="sb-item" onclick="location.href='app.html'"><span class="sb-item-ic">✦</span>المنصة الرئيسية ↗</div>
+  </div>
+  <div class="sb-footer">
+    <a onclick="toggleTheme()">🌙 تغيير المظهر</a>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main-area">
+  <div class="topbar">
+    <div class="tb-title" id="page-title">نظرة عامة</div>
+    <div class="tb-search">
+      <input placeholder="بحث سريع..." oninput="quickSearch(this.value)">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <button class="tb-btn btn-p" onclick="openEditor()">✏️ مقال جديد</button>
+    <button class="tb-btn btn-o" onclick="location.href='academy.html'" title="معاينة الأكاديمية">👁️</button>
+  </div>
+
+  <div class="content-area" id="content-area">
+    <!-- يتم ملؤها بـJS -->
+  </div>
+</div>
+
+<!-- Editor Modal -->
+<div class="overlay" id="editor-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">✏️ <span id="editor-mode-title">مقال جديد</span></div>
+      <div class="workflow">
+        <span class="wf-step st-draft active" id="wf-draft">مسودة</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-step st-review" id="wf-review">مراجعة</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-step st-approved" id="wf-approved">موافقة</span>
+        <span class="wf-arrow">→</span>
+        <span class="wf-step st-published" id="wf-published">منشور</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ed-id">
+      <div class="ed-row2">
+        <div class="ed-field">
+          <div class="ed-label">نوع المحتوى</div>
+          <select class="ed-select" id="ed-type">
+            <option value="article">📝 مقال</option>
+            <option value="course">📚 كورس</option>
+            <option value="lesson">🎬 درس</option>
+            <option value="announcement">📢 إعلان</option>
+            <option value="scholarship">🏅 منحة دراسية</option>
+          </select>
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">الفئة</div>
+          <select class="ed-select" id="ed-cat">
+            <option value="biz">🚀 ريادة الأعمال</option>
+            <option value="prog">💻 برمجة</option>
+            <option value="ai">🤖 ذكاء اصطناعي</option>
+            <option value="design">🎨 تصميم</option>
+            <option value="career">💼 مسار مهني</option>
+            <option value="ip">🔒 حماية الفكرة</option>
+            <option value="innov">💡 الابتكار</option>
+            <option value="scholar">🏅 منح دراسية</option>
+          </select>
+        </div>
+      </div>
+      <div class="ed-field">
+        <div class="ed-label">العنوان الرئيسي <span class="char-count" id="title-count">0/100</span></div>
+        <input class="ed-inp" id="ed-title" placeholder="عنوان مميز يجذب القراء..." oninput="document.getElementById('title-count').textContent=this.value.length+'/100'">
+      </div>
+      <div class="ed-field">
+        <div class="ed-label">العنوان الفرعي / الملخص</div>
+        <input class="ed-inp" id="ed-subtitle" placeholder="وصف قصير يلخص المحتوى...">
+      </div>
+      <div class="ed-field">
+        <div class="ed-label">المحتوى الكامل</div>
+        <div class="block-toolbar">
+          <button class="block-btn" onclick="insertBlock('h2')">H2</button>
+          <button class="block-btn" onclick="insertBlock('h3')">H3</button>
+          <button class="block-btn" onclick="insertBlock('p')">فقرة</button>
+          <button class="block-btn" onclick="insertBlock('ul')">• قائمة</button>
+          <button class="block-btn" onclick="insertBlock('tip')">💡 تلميح</button>
+          <button class="block-btn" onclick="insertBlock('warn')">⚠️ تحذير</button>
+          <button class="block-btn" onclick="insertBlock('quote')">" اقتباس</button>
+          <button class="block-btn" onclick="insertBlock('step')">خطوات</button>
+          <button class="block-btn" onclick="insertBlock('yt')">▶ يوتيوب</button>
+          <button class="block-btn" onclick="insertBlock('bold')">B تعريف</button>
+        </div>
+        <textarea class="ed-inp ed-ta" id="ed-body" placeholder="اكتب محتوى المقال هنا...&#10;&#10;## عنوان فرعي&#10;&#10;فقرة من النص...&#10;&#10;💡 تلميح: ...&#10;&#10;⚠️ تحذير: ..." oninput="autoGrow(this)"></textarea>
+      </div>
+      <div class="ed-row3">
+        <div class="ed-field">
+          <div class="ed-label">وقت القراءة (دقائق)</div>
+          <input class="ed-inp" id="ed-time" type="number" value="5" min="1" max="60">
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">مستوى الصعوبة</div>
+          <select class="ed-select" id="ed-level">
+            <option value="beginner">مبتدئ</option>
+            <option value="intermediate">متوسط</option>
+            <option value="advanced">متقدم</option>
+          </select>
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">مجاني / مدفوع</div>
+          <select class="ed-select" id="ed-free">
+            <option value="true">🆓 مجاني</option>
+            <option value="false">💰 مدفوع</option>
+          </select>
+        </div>
+      </div>
+      <div class="ed-row2">
+        <div class="ed-field">
+          <div class="ed-label">رابط فيديو YouTube (اختياري)</div>
+          <input class="ed-inp" id="ed-video" placeholder="youtube.com/watch?v=...">
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">رابط صورة الغلاف (اختياري)</div>
+          <input class="ed-inp" id="ed-cover" placeholder="https://...">
+        </div>
+      </div>
+      <div class="ed-field">
+        <div class="ed-label">التاريخ</div>
+        <select class="ed-select" id="ed-publish-when">
+          <option value="now">نشر فوري</option>
+          <option value="schedule">جدولة</option>
+          <option value="draft">حفظ كمسودة</option>
+        </select>
+      </div>
+      <div class="ed-field" id="schedule-field" style="display:none">
+        <div class="ed-label">موعد النشر</div>
+        <input class="ed-inp" id="ed-schedule" type="datetime-local">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="tb-btn btn-o" onclick="closeEditor()">إلغاء</button>
+      <button class="tb-btn btn-o" onclick="saveContent('draft')">💾 مسودة</button>
+      <button class="tb-btn" style="background:#7c3aed;color:#fff" onclick="saveContent('review')">📋 للمراجعة</button>
+      <button class="tb-btn btn-p" onclick="saveContent('published')">🚀 نشر الآن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Permissions Modal -->
+<div class="overlay" id="perm-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">🔐 إدارة الصلاحيات</div>
+      <button class="tb-btn btn-o btn-sm" onclick="document.getElementById('perm-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="perm-modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me){ location.href='login.html'; }
+
+const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#7c3aed';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2800)};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtDate=d=>d?new Date(d).toLocaleDateString('ar',{year:'numeric',month:'short',day:'numeric'}):'—';
+
+/* Local content store (falls back if Supabase tables not created yet) */
+let LOCAL_CONTENT = JSON.parse(localStorage.getItem('azza_cms_content')||'[]');
+let LOCAL_USERS   = [];
+
+/* ══ Init ══ */
+(function(){
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  document.getElementById('sb-name').textContent=me.name||'المشرف';
+  document.getElementById('sb-av').textContent=(me.name||'م')[0];
+  document.getElementById('ed-publish-when').addEventListener('change',e=>{
+    document.getElementById('schedule-field').style.display=e.target.value==='schedule'?'block':'none';
+  });
+  showPage('overview');
+  loadUsers();
+})();
+
+function toggleTheme(){
+  const dk=document.documentElement.classList.toggle('dk');
+  localStorage.setItem('azza_theme',dk?'dark':'light');
+}
+
+/* ══ Navigation ══ */
+function showPage(page, btn){
+  if(btn){
+    document.querySelectorAll('.sb-item').forEach(i=>i.classList.toggle('active',i===btn));
+  }
+  const titles={overview:'نظرة عامة',articles:'المقالات',courses:'الكورسات',media:'مكتبة الوسائط',homepage:'التحكم بالصفحة الرئيسية',roles:'الأدوار والمستويات',permissions:'الصلاحيات',users:'إدارة المستخدمين',activity:'سجل الأنشطة'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  const ca=document.getElementById('content-area');
+  if(page==='overview')     renderOverview(ca);
+  else if(page==='articles')    renderContent(ca,'article');
+  else if(page==='courses')     renderContent(ca,'course');
+  else if(page==='media')       renderMedia(ca);
+  else if(page==='homepage')    renderHomepage(ca);
+  else if(page==='roles')       renderRoles(ca);
+  else if(page==='permissions') renderPermissions(ca);
+  else if(page==='users')       renderUsers(ca);
+  else if(page==='activity')    renderActivity(ca);
+}
+
+/* ══ Overview ══ */
+function renderOverview(el){
+  const all=LOCAL_CONTENT;
+  const pub=all.filter(c=>c.status==='published').length;
+  const draft=all.filter(c=>c.status==='draft').length;
+  const review=all.filter(c=>c.status==='review').length;
+  const total=all.length;
+  document.getElementById('badge-articles').textContent=draft+review;
+  el.innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">إجمالي المحتوى</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#16a34a">${pub}</div><div class="stat-label">منشور</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#6b7280">${draft}</div><div class="stat-label">مسودة</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#2563eb">${review}</div><div class="stat-label">بانتظار المراجعة</div></div>
+      <div class="stat-card"><div class="stat-num">${LOCAL_USERS.length}</div><div class="stat-label">مستخدم</div></div>
+      <div class="stat-card"><div class="stat-num">${all.reduce((s,c)=>s+(c.views||0),0)}</div><div class="stat-label">مشاهدة</div></div>
+    </div>
+    ${review>0?`
+    <div class="tbl-wrap" style="margin-bottom:20px">
+      <div class="tbl-head">
+        <div class="tbl-head-title" style="color:#2563eb">⏳ بانتظار المراجعة (${review})</div>
+      </div>
+      <table>
+        <thead><tr><th>العنوان</th><th>النوع</th><th>الكاتب</th><th>التاريخ</th><th>إجراء</th></tr></thead>
+        <tbody>
+          ${all.filter(c=>c.status==='review').map(c=>`<tr>
+            <td class="td-title">${esc(c.title)}</td>
+            <td>${typeLbl(c.type)}</td>
+            <td>${esc(c.author_name||'—')}</td>
+            <td>${fmtDate(c.created_at)}</td>
+            <td class="td-actions">
+              <button class="act-btn act-pub" onclick="quickPublish('${c.id}')">✓ نشر</button>
+              <button class="act-btn act-edit" onclick="editContent('${c.id}')">تعديل</button>
+              <button class="act-btn act-del" onclick="deleteContent('${c.id}')">حذف</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`:''}
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="tbl-head-title">📋 آخر المحتوى</div>
+        <button class="tb-btn btn-p btn-sm" onclick="openEditor()">+ جديد</button>
+      </div>
+      <table>
+        <thead><tr><th>العنوان</th><th>النوع</th><th>الحالة</th><th>مشاهدات</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${all.slice(0,10).map(c=>`<tr>
+            <td class="td-title">${esc(c.title)}</td>
+            <td>${typeLbl(c.type)}</td>
+            <td><span class="status-badge st-${c.status}">${statusLbl(c.status)}</span></td>
+            <td>${c.views||0}</td>
+            <td class="td-actions">
+              <button class="act-btn act-edit" onclick="editContent('${c.id}')">تعديل</button>
+              ${c.status!=='published'?`<button class="act-btn act-pub" onclick="quickPublish('${c.id}')">نشر</button>`:''}
+              <button class="act-btn act-del" onclick="deleteContent('${c.id}')">حذف</button>
+            </td>
+          </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted)">لا يوجد محتوى بعد — ابدأ بإنشاء مقالك الأول</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+/* ══ Content List ══ */
+function renderContent(el, type){
+  const items=LOCAL_CONTENT.filter(c=>!type||c.type===type);
+  let activeFilter='all';
+  const render=(f)=>{
+    const list=f==='all'?items:items.filter(c=>c.status===f);
+    return`<table>
+      <thead><tr><th>العنوان</th><th>الفئة</th><th>الحالة</th><th>مشاهدات</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+      <tbody>
+        ${list.map(c=>`<tr>
+          <td class="td-title">${esc(c.title)}</td>
+          <td>${esc(c.category||'—')}</td>
+          <td><span class="status-badge st-${c.status}">${statusLbl(c.status)}</span></td>
+          <td>${c.views||0}</td>
+          <td>${fmtDate(c.created_at)}</td>
+          <td class="td-actions">
+            <button class="act-btn act-edit" onclick="editContent('${c.id}')">تعديل</button>
+            ${c.status==='review'?`<button class="act-btn act-rev" onclick="quickPublish('${c.id}')">نشر</button>`:''}
+            ${c.status!=='published'&&c.status!=='review'?`<button class="act-btn act-pub" onclick="quickPublish('${c.id}')">نشر</button>`:''}
+            <button class="act-btn act-del" onclick="deleteContent('${c.id}')">حذف</button>
+          </td>
+        </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">لا يوجد محتوى</td></tr>`}
+      </tbody>
+    </table>`;
+  };
+  el.innerHTML=`
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="tbl-head-title">${type==='article'?'📝 المقالات':'📚 الكورسات'} (${items.length})</div>
+        <div class="filter-btns">
+          <button class="filter-btn active" onclick="filterContent(this,'all','${type}')">الكل</button>
+          <button class="filter-btn" onclick="filterContent(this,'draft','${type}')">مسودة</button>
+          <button class="filter-btn" onclick="filterContent(this,'review','${type}')">مراجعة</button>
+          <button class="filter-btn" onclick="filterContent(this,'published','${type}')">منشور</button>
+        </div>
+        <button class="tb-btn btn-p btn-sm" onclick="openEditor()">+ جديد</button>
+      </div>
+      <div id="content-tbl">${render('all')}</div>
+    </div>`;
+}
+
+function filterContent(btn,f,type){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  const items=LOCAL_CONTENT.filter(c=>!type||c.type===type);
+  const list=f==='all'?items:items.filter(c=>c.status===f);
+  document.getElementById('content-tbl').innerHTML=`<table>
+    <thead><tr><th>العنوان</th><th>الفئة</th><th>الحالة</th><th>مشاهدات</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+    <tbody>
+      ${list.map(c=>`<tr>
+        <td class="td-title">${esc(c.title)}</td>
+        <td>${esc(c.category||'—')}</td>
+        <td><span class="status-badge st-${c.status}">${statusLbl(c.status)}</span></td>
+        <td>${c.views||0}</td>
+        <td>${fmtDate(c.created_at)}</td>
+        <td class="td-actions">
+          <button class="act-btn act-edit" onclick="editContent('${c.id}')">تعديل</button>
+          <button class="act-btn act-pub" onclick="quickPublish('${c.id}')">نشر</button>
+          <button class="act-btn act-del" onclick="deleteContent('${c.id}')">حذف</button>
+        </td>
+      </tr>`).join('')||`<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">لا يوجد محتوى</td></tr>`}
+    </tbody>
+  </table>`;
+}
+
+/* ══ Media ══ */
+function renderMedia(el){
+  el.innerHTML=`
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="tbl-head-title">🖼️ مكتبة الوسائط</div>
+        <button class="tb-btn btn-p btn-sm">+ رفع ملف</button>
+      </div>
+      <div style="padding:60px;text-align:center;color:var(--muted)">
+        <div style="font-size:48px;margin-bottom:12px">📁</div>
+        <div style="font-size:14px">اربط Supabase Storage لرفع الصور والفيديوهات والمستندات</div>
+        <div style="font-size:12px;margin-top:6px">مكتبة الوسائط ستظهر هنا بعد تشغيل cms_schema.sql</div>
+      </div>
+    </div>`;
+}
+
+/* ══ Homepage Control ══ */
+function renderHomepage(el){
+  el.innerHTML=`
+    <div class="hp-section">
+      <div class="hp-title">🎯 Hero Banner</div>
+      <div class="ed-field"><div class="ed-label">عنوان Hero</div><input class="ed-inp" id="hp-title" value="تعلّم من أفضل الخبراء العرب" oninput="saveHPSetting('hero_title',this.value)"></div>
+      <div class="ed-field"><div class="ed-label">العنوان الفرعي</div><input class="ed-inp" id="hp-sub" value="أكاديمية AZZA — منصة تعليمية متكاملة" oninput="saveHPSetting('hero_subtitle',this.value)"></div>
+    </div>
+    <div class="hp-section">
+      <div class="hp-title">📊 أقسام الصفحة الرئيسية</div>
+      ${[
+        {key:'show_trending',label:'قسم الأكثر طلباً',desc:'يظهر أعلى الصفحة'},
+        {key:'show_paths',label:'مسارات التعلم',desc:'يظهر في منتصف الصفحة'},
+        {key:'show_instructors',label:'قسم المدرّسون',desc:'يظهر أسفل الصفحة'},
+        {key:'show_scholarships',label:'المنح الدراسية',desc:'يظهر في التبويبات'},
+      ].map(s=>`
+        <div class="hp-toggle">
+          <div><div class="hp-toggle-label">${s.label}</div><div class="hp-toggle-desc">${s.desc}</div></div>
+          <label class="toggle-sw">
+            <input type="checkbox" checked onchange="saveHPSetting('${s.key}',this.checked)">
+            <span class="sw-slider"></span>
+          </label>
+        </div>`).join('')}
+    </div>
+    <div class="hp-section">
+      <div class="hp-title">⭐ المحتوى المميز</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:12px">اختر المحتوى الذي يظهر في قسم "المحتوى المميز" بالصفحة الرئيسية</div>
+      ${LOCAL_CONTENT.filter(c=>c.status==='published').slice(0,5).map(c=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--line)">
+          <div style="flex:1;font-size:13px;font-weight:700">${esc(c.title)}</div>
+          <label class="toggle-sw">
+            <input type="checkbox" ${c.is_featured?'checked':''} onchange="toggleFeatured('${c.id}',this.checked)">
+            <span class="sw-slider"></span>
+          </label>
+        </div>`).join('')||`<div style="color:var(--muted);font-size:13px">لا يوجد محتوى منشور بعد</div>`}
+    </div>
+    <div style="margin-top:16px">
+      <button class="tb-btn btn-p" onclick="toast('تم حفظ إعدادات الصفحة الرئيسية ✅')">💾 حفظ الإعدادات</button>
+    </div>`;
+}
+
+function saveHPSetting(key,val){ localStorage.setItem('cms_hp_'+key,JSON.stringify(val)); }
+function toggleFeatured(id,val){
+  LOCAL_CONTENT=LOCAL_CONTENT.map(c=>c.id===id?{...c,is_featured:val}:c);
+  localStorage.setItem('azza_cms_content',JSON.stringify(LOCAL_CONTENT));
+  toast(val?'تم تمييز المحتوى ⭐':'تم إلغاء التمييز');
+}
+
+/* ══ Roles ══ */
+const ROLES=[
+  {name:'super_admin',    label:'المشرف العام',      level:100,desc:'صلاحيات كاملة بدون قيود'},
+  {name:'academy_manager',label:'مدير الأكاديمية',   level:80, desc:'إدارة كل محتوى الأكاديمية'},
+  {name:'content_manager',label:'مدير المحتوى',      level:60, desc:'إنشاء وتعديل ونشر المحتوى'},
+  {name:'instructor',     label:'مدرّس',              level:40, desc:'إنشاء دروس وكورسات'},
+  {name:'article_editor', label:'محرر مقالات',       level:30, desc:'كتابة وتعديل المقالات فقط'},
+  {name:'reviewer',       label:'مراجع',             level:20, desc:'مراجعة المحتوى قبل النشر'},
+  {name:'student',        label:'طالب',              level:10, desc:'قراءة المحتوى والتفاعل'},
+  {name:'user',           label:'مستخدم عادي',       level:5,  desc:'قراءة المحتوى المجاني فقط'},
+];
+
+function renderRoles(el){
+  el.innerHTML=`
+    <div class="role-grid">
+      ${ROLES.map(r=>`
+        <div class="role-card">
+          <div class="role-card-name">${r.label}</div>
+          <div class="role-card-label">${r.desc}</div>
+          <div class="role-level">
+            <div class="level-bar"><div class="level-fill" style="width:${r.level}%"></div></div>
+            <span class="level-num">${r.level}</span>
+          </div>
+          <button class="tb-btn btn-o btn-sm" onclick="editRolePerms('${r.name}','${r.label}')">⚙️ الصلاحيات</button>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ══ Permissions ══ */
+const ALL_PERMS=[
+  {key:'create_article',  label:'إنشاء مقال',          group:'المقالات'},
+  {key:'edit_article',    label:'تعديل مقال',           group:'المقالات'},
+  {key:'publish_article', label:'نشر مقال',             group:'المقالات'},
+  {key:'delete_article',  label:'حذف مقال',             group:'المقالات'},
+  {key:'create_course',   label:'إنشاء كورس',          group:'الكورسات'},
+  {key:'edit_course',     label:'تعديل كورس',          group:'الكورسات'},
+  {key:'publish_course',  label:'نشر كورس',            group:'الكورسات'},
+  {key:'create_lesson',   label:'إنشاء درس',           group:'الكورسات'},
+  {key:'upload_video',    label:'رفع فيديو',            group:'الوسائط'},
+  {key:'upload_pdf',      label:'رفع PDF',              group:'الوسائط'},
+  {key:'upload_image',    label:'رفع صورة',             group:'الوسائط'},
+  {key:'moderate_comments',label:'إدارة التعليقات',     group:'التفاعل'},
+  {key:'issue_cert',      label:'إصدار شهادات',         group:'التفاعل'},
+  {key:'manage_cats',     label:'إدارة الفئات',         group:'الإدارة'},
+  {key:'view_analytics',  label:'عرض التحليلات',        group:'الإدارة'},
+  {key:'manage_users',    label:'إدارة المستخدمين',     group:'الإدارة'},
+];
+
+const ROLE_DEFAULT_PERMS={
+  super_admin:    ALL_PERMS.map(p=>p.key),
+  academy_manager:['create_article','edit_article','publish_article','delete_article','create_course','edit_course','publish_course','create_lesson','upload_video','upload_pdf','upload_image','moderate_comments','issue_cert','manage_cats','view_analytics'],
+  content_manager:['create_article','edit_article','publish_article','upload_image','upload_pdf','view_analytics'],
+  instructor:     ['create_lesson','upload_video','upload_pdf','upload_image'],
+  article_editor: ['create_article','edit_article','upload_image'],
+  reviewer:       ['edit_article'],
+  student:        [],
+  user:           [],
+};
+
+function renderPermissions(el){
+  const groups=[...new Set(ALL_PERMS.map(p=>p.group))];
+  el.innerHTML=`
+    <div style="margin-bottom:16px;font-size:14px;color:var(--sub)">
+      اختر دوراً لتخصيص صلاحياته:
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+      ${ROLES.map(r=>`<button class="filter-btn" onclick="showRolePerms('${r.name}',this)">${r.label}</button>`).join('')}
+    </div>
+    <div id="perm-content"><div style="color:var(--muted);font-size:13px;padding:32px;text-align:center">اختر دوراً من الأعلى</div></div>`;
+}
+
+function showRolePerms(roleName, btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===btn));
+  const role=ROLES.find(r=>r.name===roleName);
+  const savedPerms=JSON.parse(localStorage.getItem('cms_perms_'+roleName)||'null')||ROLE_DEFAULT_PERMS[roleName]||[];
+  const groups=[...new Set(ALL_PERMS.map(p=>p.group))];
+  document.getElementById('perm-content').innerHTML=`
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">${role?.label}</div>
+      <div style="font-size:12px;color:var(--muted)">${role?.desc} · مستوى الصلاحية: ${role?.level}/100</div>
+    </div>
+    ${groups.map(g=>`
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">${g}</div>
+        <div class="perm-grid">
+          ${ALL_PERMS.filter(p=>p.group===g).map(p=>`
+            <div class="perm-row">
+              <div style="flex:1"><div class="perm-name">${p.label}</div><div class="perm-desc">${p.key}</div></div>
+              <label class="toggle-sw">
+                <input type="checkbox" ${savedPerms.includes(p.key)?'checked':''} 
+                  onchange="togglePerm('${roleName}','${p.key}',this.checked)">
+                <span class="sw-slider"></span>
+              </label>
+            </div>`).join('')}
+        </div>
+      </div>`).join('')}
+    <button class="tb-btn btn-p" onclick="savePerms('${roleName}')">💾 حفظ الصلاحيات</button>`;
+}
+
+function togglePerm(role,perm,val){
+  const saved=JSON.parse(localStorage.getItem('cms_perms_'+role)||'null')||ROLE_DEFAULT_PERMS[role]||[];
+  const updated=val?[...new Set([...saved,perm])]:saved.filter(p=>p!==perm);
+  localStorage.setItem('cms_perms_'+role,JSON.stringify(updated));
+}
+function savePerms(role){ toast('تم حفظ صلاحيات '+ROLES.find(r=>r.name===role)?.label+' ✅'); }
+
+function editRolePerms(role,label){
+  document.getElementById('perm-modal-body').innerHTML='<div style="padding:8px;color:var(--muted)">جاري التحميل...</div>';
+  document.getElementById('perm-modal').classList.add('open');
+  setTimeout(()=>{
+    const savedPerms=JSON.parse(localStorage.getItem('cms_perms_'+role)||'null')||ROLE_DEFAULT_PERMS[role]||[];
+    document.getElementById('perm-modal-body').innerHTML=`
+      <div style="font-size:14px;font-weight:700;margin-bottom:16px">${label}</div>
+      <div class="perm-grid">
+        ${ALL_PERMS.map(p=>`
+          <div class="perm-row">
+            <div style="flex:1"><div class="perm-name">${p.label}</div></div>
+            <label class="toggle-sw">
+              <input type="checkbox" ${savedPerms.includes(p.key)?'checked':''}
+                onchange="togglePerm('${role}','${p.key}',this.checked)">
+              <span class="sw-slider"></span>
+            </label>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:16px">
+        <button class="tb-btn btn-p" onclick="savePerms('${role}');document.getElementById('perm-modal').classList.remove('open')">💾 حفظ</button>
+      </div>`;
+  },100);
+}
+
+/* ══ Users ══ */
+async function loadUsers(){
+  const {data}=await db.from('users').select('id,name,email,type,photo').limit(50);
+  LOCAL_USERS=data||[];
+}
+function renderUsers(el){
+  el.innerHTML=`
+    <div class="tbl-wrap">
+      <div class="tbl-head"><div class="tbl-head-title">👤 المستخدمون</div></div>
+      <div style="padding:16px">
+        ${LOCAL_USERS.map(u=>`
+          <div class="user-perm-row">
+            <div class="user-perm-av">${(u.name||'م')[0]}</div>
+            <div class="user-perm-info">
+              <div class="user-perm-name">${esc(u.name||'—')}</div>
+              <div class="user-perm-email">${esc(u.email||u.type||'')}</div>
+            </div>
+            <select class="role-select" onchange="assignRole('${u.id}',this.value)">
+              ${ROLES.map(r=>`<option value="${r.name}">${r.label}</option>`).join('')}
+            </select>
+            <button class="act-btn act-edit" onclick="editRolePerms('user','${esc(u.name||'مستخدم')}')">صلاحيات</button>
+          </div>`).join('')||`<div style="color:var(--muted);text-align:center;padding:32px">سجّل الدخول لرؤية المستخدمين</div>`}
+      </div>
+    </div>`;
+}
+
+function assignRole(userId,role){
+  toast('تم تعيين دور '+ROLES.find(r=>r.name===role)?.label);
+  db.from('cms_user_roles').upsert({user_id:userId,role_name:role,granted_by:me.id},{onConflict:'user_id,role_name'}).then(()=>{});
+}
+
+/* ══ Activity ══ */
+function renderActivity(el){
+  const log=JSON.parse(localStorage.getItem('cms_activity')||'[]').slice(0,20);
+  el.innerHTML=`
+    <div class="tbl-wrap">
+      <div class="tbl-head"><div class="tbl-head-title">🕐 سجل الأنشطة</div></div>
+      <div style="padding:16px">
+        ${log.map(l=>`
+          <div class="log-item">
+            <div class="log-icon" style="background:${l.color||'var(--ol)'}">  ${l.icon||'📝'}</div>
+            <div class="log-body">
+              <div class="log-text">${esc(l.text)}</div>
+              <div class="log-time">${fmtDate(l.at)}</div>
+            </div>
+          </div>`).join('')||`<div style="color:var(--muted);text-align:center;padding:32px">لا توجد أنشطة بعد</div>`}
+      </div>
+    </div>`;
+}
+
+function logActivity(text,icon='📝',color='rgba(28,91,56,.1)'){
+  const log=JSON.parse(localStorage.getItem('cms_activity')||'[]');
+  log.unshift({text,icon,color,at:new Date().toISOString()});
+  localStorage.setItem('cms_activity',JSON.stringify(log.slice(0,50)));
+}
+
+/* ══ Content CRUD ══ */
+function openEditor(){ clearEditor(); document.getElementById('editor-modal').classList.add('open'); }
+function closeEditor(){ document.getElementById('editor-modal').classList.remove('open'); }
+function clearEditor(){
+  document.getElementById('ed-id').value='';
+  document.getElementById('ed-title').value='';
+  document.getElementById('ed-subtitle').value='';
+  document.getElementById('ed-body').value='';
+  document.getElementById('ed-video').value='';
+  document.getElementById('ed-cover').value='';
+  document.getElementById('ed-time').value='5';
+  document.getElementById('editor-mode-title').textContent='مقال جديد';
+  updateWorkflow('draft');
+}
+
+function editContent(id){
+  const c=LOCAL_CONTENT.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('ed-id').value=c.id;
+  document.getElementById('ed-title').value=c.title||'';
+  document.getElementById('ed-subtitle').value=c.subtitle||'';
+  document.getElementById('ed-body').value=c.body||'';
+  document.getElementById('ed-type').value=c.type||'article';
+  document.getElementById('ed-cat').value=c.category||'biz';
+  document.getElementById('ed-video').value=c.video||'';
+  document.getElementById('ed-cover').value=c.cover_url||'';
+  document.getElementById('ed-time').value=c.reading_time||5;
+  document.getElementById('editor-mode-title').textContent='تعديل: '+c.title;
+  updateWorkflow(c.status);
+  document.getElementById('editor-modal').classList.add('open');
+}
+
+function updateWorkflow(status){
+  const steps=['draft','review','approved','published'];
+  steps.forEach(s=>{
+    const el=document.getElementById('wf-'+s);
+    if(el) el.classList.toggle('active',s===status);
+  });
+}
+
+async function saveContent(status){
+  const id=document.getElementById('ed-id').value;
+  const when=document.getElementById('ed-publish-when').value;
+  const actualStatus=when==='draft'?'draft':when==='schedule'?'scheduled':status;
+  const data={
+    id:id||crypto.randomUUID(),
+    type:document.getElementById('ed-type').value,
+    title:document.getElementById('ed-title').value.trim(),
+    subtitle:document.getElementById('ed-subtitle').value.trim(),
+    body:document.getElementById('ed-body').value.trim(),
+    category:document.getElementById('ed-cat').value,
+    video:document.getElementById('ed-video').value.trim(),
+    cover_url:document.getElementById('ed-cover').value.trim(),
+    reading_time:parseInt(document.getElementById('ed-time').value)||5,
+    status:actualStatus,
+    author_id:me.id,
+    author_name:me.name,
+    views:0,
+    is_featured:false,
+    created_at:new Date().toISOString(),
+    updated_at:new Date().toISOString(),
+  };
+  if(!data.title){ toast('أدخل عنواناً للمحتوى','err'); return; }
+  if(id){
+    LOCAL_CONTENT=LOCAL_CONTENT.map(c=>c.id===id?{...c,...data}:c);
+  }else{
+    LOCAL_CONTENT.unshift(data);
+  }
+  localStorage.setItem('azza_cms_content',JSON.stringify(LOCAL_CONTENT));
+
+  /* حفظ بـSupabase */
+  try{
+    const sbData={id:data.id,type:data.type,title:data.title,subtitle:data.subtitle,body:data.body,category:data.category,status:data.status,author_id:data.author_id,reading_time:data.reading_time};
+    if(id) await db.from('cms_content').update(sbData).eq('id',id);
+    else    await db.from('cms_content').insert(sbData);
+  }catch(e){ console.warn('Supabase save (يحتاج تشغيل cms_schema.sql):',e.message); }
+
+  logActivity(`${id?'تعديل':'إنشاء'} ${typeLbl(data.type)}: ${data.title}`,'📝','rgba(28,91,56,.1)');
+  closeEditor();
+  showPage('overview');
+  toast(actualStatus==='published'?'تم النشر ✅':actualStatus==='draft'?'تم الحفظ كمسودة 💾':'تم الإرسال للمراجعة 📋');
+}
+
+function quickPublish(id){
+  LOCAL_CONTENT=LOCAL_CONTENT.map(c=>c.id===id?{...c,status:'published'}:c);
+  localStorage.setItem('azza_cms_content',JSON.stringify(LOCAL_CONTENT));
+  logActivity('نشر محتوى: '+(LOCAL_CONTENT.find(c=>c.id===id)?.title||''),'🚀','rgba(22,163,74,.1)');
+  showPage('overview');
+  toast('تم النشر ✅');
+}
+
+function deleteContent(id){
+  if(!confirm('حذف هذا المحتوى نهائياً؟')) return;
+  const title=LOCAL_CONTENT.find(c=>c.id===id)?.title;
+  LOCAL_CONTENT=LOCAL_CONTENT.filter(c=>c.id!==id);
+  localStorage.setItem('azza_cms_content',JSON.stringify(LOCAL_CONTENT));
+  logActivity('حذف: '+title,'🗑️','rgba(220,38,38,.1)');
+  showPage('overview');
+  toast('تم الحذف');
+}
+
+/* ══ Editor helpers ══ */
+function insertBlock(type){
+  const ta=document.getElementById('ed-body');
+  const pos=ta.selectionStart;
+  const blocks={
+    h2:'\n\n## عنوان فرعي\n\n',
+    h3:'\n\n### عنوان ثالث\n\n',
+    p:'\n\nفقرة نصية...\n\n',
+    ul:'\n\n- عنصر أول\n- عنصر ثاني\n- عنصر ثالث\n\n',
+    tip:'\n\n💡 تلميح: اكتب تلميحك هنا...\n\n',
+    warn:'\n\n⚠️ تحذير: اكتب تحذيرك هنا...\n\n',
+    quote:'\n\n> اكتب اقتباسك هنا...\n\n',
+    step:'\n\n1. الخطوة الأولى\n2. الخطوة الثانية\n3. الخطوة الثالثة\n\n',
+    yt:'\n\n[VIDEO: https://youtube.com/watch?v=XXXXX]\n\n',
+    bold:'\n\n**نص مميز**: ...\n\n',
+  };
+  const ins=blocks[type]||'';
+  ta.value=ta.value.slice(0,pos)+ins+ta.value.slice(pos);
+  ta.focus();
+  ta.selectionStart=ta.selectionEnd=pos+ins.length;
+}
+function autoGrow(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,600)+'px'; }
+
+/* ══ Search ══ */
+function quickSearch(q){
+  if(!q) return;
+  const res=LOCAL_CONTENT.filter(c=>c.title?.toLowerCase().includes(q.toLowerCase()));
+  if(res.length===0){ toast('لا نتائج','warn'); return; }
+  // توجيه للمقالات مع الفلتر
+}
+
+/* ══ Helpers ══ */
+function typeLbl(t){ return{article:'📝 مقال',course:'📚 كورس',lesson:'🎬 درس',announcement:'📢 إعلان',scholarship:'🏅 منحة'}[t]||t||'—'; }
+function statusLbl(s){ return{draft:'مسودة',review:'مراجعة',approved:'موافق',scheduled:'مجدول',published:'منشور',archived:'أرشيف'}[s]||s; }
+</script>
+</body>
+</html>
