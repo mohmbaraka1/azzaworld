@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>شهاداتي — AZZA Academy</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Amiri:wght@400;700&display=swap');
+:root{--gold:#c69749;--gs:#e8c06a;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--line:rgba(0,0,0,.08);--r:14px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
+
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* Main */
+.main{max-width:900px;margin:0 auto;padding:28px 20px}
+.sec-title{font-size:18px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Cert Cards */
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px}
+.cert-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.25s}
+.cert-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);transform:translateY(-2px)}
+.cert-thumb{height:140px;background:linear-gradient(135deg,var(--od),var(--olive));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.cert-thumb::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.cert-badge{font-size:48px}
+.cert-verified{position:absolute;top:10px;left:10px;background:rgba(34,197,94,.9);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px}
+.cert-body{padding:14px 16px}
+.cert-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.cert-meta{font-size:12px;color:var(--sub);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cert-id{font-size:11px;color:var(--muted);font-family:monospace;margin-bottom:10px}
+.cert-actions{display:flex;gap:6px}
+.cert-btn{flex:1;padding:7px 10px;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+.cb-pdf{background:var(--olive);color:#fff}.cb-pdf:hover{background:var(--od)}
+.cb-share{background:var(--bg2);color:var(--ink)}.cb-share:hover{background:var(--ol);color:var(--olive)}
+.cb-qr{background:rgba(198,151,73,.12);color:#854F0B}.cb-qr:hover{background:rgba(198,151,73,.2)}
+
+/* Certificate Page (A4) */
+.cert-preview-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.cert-preview-wrap.open{display:flex}
+.cert-preview-inner{background:#888;padding:24px;border-radius:16px;width:100%;max-width:900px}
+.cert-preview-toolbar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.cert-preview-toolbar span{color:#fff;font-size:13px;font-weight:700;flex:1}
+.ptb-btn{padding:8px 16px;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.ptb-primary{background:var(--gold);color:var(--od)}
+.ptb-close{background:rgba(255,255,255,.15);color:#fff}
+
+/* The Actual Certificate */
+.certificate{width:100%;background:#fff;font-family:'Amiri',serif;direction:rtl;position:relative;overflow:hidden;aspect-ratio:1.414/1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 60px;text-align:center}
+.cert-border-outer{position:absolute;inset:12px;border:3px solid var(--gold);border-radius:4px;pointer-events:none}
+.cert-border-inner{position:absolute;inset:18px;border:1px solid rgba(198,151,73,.4);border-radius:2px;pointer-events:none}
+.cert-corner{position:absolute;width:40px;height:40px;border-color:var(--gold)}
+.cert-corner.tl{top:8px;right:8px;border-top:3px solid;border-right:3px solid;border-radius:0 4px 0 0}
+.cert-corner.tr{top:8px;left:8px;border-top:3px solid;border-left:3px solid;border-radius:4px 0 0 0}
+.cert-corner.bl{bottom:8px;right:8px;border-bottom:3px solid;border-right:3px solid;border-radius:0 0 0 4px}
+.cert-corner.br{bottom:8px;left:8px;border-bottom:3px solid;border-left:3px solid;border-radius:0 0 4px 0}
+.cert-logo-top{font-size:22px;font-weight:900;color:var(--olive);letter-spacing:.08em;margin-bottom:4px;font-family:Tajawal,sans-serif}
+.cert-divider{width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:8px auto 14px}
+.cert-subtitle{font-size:14px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:20px;font-family:Tajawal,sans-serif}
+.cert-presented{font-size:15px;color:#666;margin-bottom:8px;font-style:italic}
+.cert-name{font-size:36px;font-weight:700;color:var(--od);margin-bottom:8px;font-family:'Amiri',serif}
+.cert-name-divider{width:200px;height:1.5px;background:var(--gold);margin:6px auto 16px}
+.cert-for{font-size:14px;color:#666;margin-bottom:8px;font-style:italic}
+.cert-course{font-size:22px;font-weight:700;color:var(--od);margin-bottom:16px;line-height:1.3;font-family:Tajawal,sans-serif}
+.cert-desc{font-size:12px;color:#888;line-height:1.7;max-width:480px;margin:0 auto 20px}
+.cert-footer{display:flex;align-items:flex-end;justify-content:space-between;width:100%;margin-top:auto}
+.cert-sign{text-align:center}
+.cert-sign-line{width:120px;height:1px;background:#ccc;margin:0 auto 4px}
+.cert-sign-name{font-size:12px;color:var(--od);font-weight:700;font-family:Tajawal,sans-serif}
+.cert-sign-title{font-size:10px;color:#888;font-family:Tajawal,sans-serif}
+.cert-qr-wrap{text-align:center}
+.cert-qr-wrap img{width:64px;height:64px;border-radius:6px}
+.cert-qr-label{font-size:9px;color:#aaa;margin-top:3px;font-family:Tajawal,sans-serif}
+.cert-meta-bottom{text-align:center}
+.cert-id-text{font-size:10px;color:#aaa;font-family:monospace;display:block;margin-bottom:2px}
+.cert-date-text{font-size:10px;color:#aaa;font-family:Tajawal,sans-serif}
+.cert-stamp{position:absolute;bottom:50px;left:50%;transform:translateX(-50%) rotate(-15deg);opacity:.06;font-size:60px;font-weight:900;color:var(--olive);white-space:nowrap;font-family:Tajawal,sans-serif}
+
+/* New Cert Form */
+.new-cert-card{background:var(--card);border:2px dashed var(--line);border-radius:var(--r);padding:32px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:16px}
+.new-cert-card:hover{border-color:var(--olive);background:var(--ol)}
+.new-cert-em{font-size:48px;margin-bottom:12px}
+.new-cert-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.new-cert-desc{font-size:13px;color:var(--sub)}
+
+/* QR Modal */
+.qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center}
+.qr-modal.open{display:flex}
+.qr-box{background:var(--card);border-radius:16px;padding:28px;text-align:center;max-width:300px;width:90%}
+.qr-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.qr-sub{font-size:13px;color:var(--sub);margin-bottom:16px}
+.qr-img{width:200px;height:200px;border-radius:12px;border:3px solid var(--olive);margin:0 auto 12px}
+.qr-url{font-size:11px;color:var(--muted);word-break:break-all;background:var(--bg2);padding:8px;border-radius:8px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="font-size:15px;font-weight:900;color:var(--olive);flex:1">🏆 شهاداتي</span>
+  <button onclick="location.href='academy.html'" style="padding:7px 14px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink)">← الأكاديمية</button>
+</div>
+
+<div class="main">
+  <div id="certs-wrap"></div>
+</div>
+
+<!-- Certificate Preview -->
+<div class="cert-preview-wrap" id="cert-preview-wrap">
+  <div class="cert-preview-inner">
+    <div class="cert-preview-toolbar">
+      <span>📄 معاينة الشهادة</span>
+      <button class="ptb-btn ptb-primary" onclick="printCert()">🖨️ طباعة / PDF</button>
+      <button class="ptb-btn" style="background:rgba(255,255,255,.15);color:#fff" onclick="closeCertPreview()">✕ إغلاق</button>
+    </div>
+    <div id="cert-display"></div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="qr-modal" id="qr-modal">
+  <div class="qr-box">
+    <div class="qr-title">📱 QR Code للشهادة</div>
+    <div class="qr-sub">امسحه للتحقق من الشهادة</div>
+    <img id="qr-img" class="qr-img">
+    <div class="qr-url" id="qr-url"></div>
+    <button onclick="navigator.clipboard?.writeText(document.getElementById('qr-url').textContent).then(()=>alert('تم النسخ'))" style="width:100%;padding:9px;border-radius:8px;border:none;background:var(--olive);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📋 نسخ الرابط</button>
+    <button onclick="document.getElementById('qr-modal').classList.remove('open')" style="width:100%;padding:9px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">إغلاق</button>
+  </div>
+</div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+const esc = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+let CERTS = [];
+
+/* ── توليد ID فريد ── */
+function genCertId(){
+  const year=new Date().getFullYear();
+  const rand=Math.random().toString(36).substring(2,8).toUpperCase();
+  return `AZZA-${year}-${rand}`;
+}
+
+/* ── تحميل الشهادات ── */
+async function loadCerts(){
+  /* من localStorage */
+  const local=JSON.parse(localStorage.getItem('azza_certs_'+me.id)||'[]');
+  CERTS=local;
+
+  /* من URL params (قادم من course.html) */
+  const params=new URLSearchParams(location.search);
+  const courseTitle=params.get('course');
+  if(courseTitle){
+    const exists=CERTS.find(c=>c.course_title===courseTitle);
+    if(!exists) await issueCert(courseTitle);
+    return;
+  }
+
+  /* من Supabase */
+  try{
+    const {data}=await db.from('academy_certificates').select('*').eq('user_id',me.id).order('issued_at',{ascending:false});
+    if(data?.length){
+      CERTS=data;
+      localStorage.setItem('azza_certs_'+me.id,JSON.stringify(data));
+    }
+  }catch(e){}
+
+  render();
+}
+
+/* ── إصدار شهادة ── */
+async function issueCert(courseTitle){
+  const certId=genCertId();
+  const cert={
+    id:crypto.randomUUID(),
+    cert_id:certId,
+    user_id:me.id,
+    user_name:me.name||'الطالب',
+    course_title:courseTitle,
+    instructor:'فريق AZZA Academy',
+    issued_at:new Date().toISOString(),
+    is_valid:true,
+  };
+  CERTS.unshift(cert);
+  localStorage.setItem('azza_certs_'+me.id,JSON.stringify(CERTS));
+  try{
+    await db.from('academy_certificates').insert({...cert,course_id:new URLSearchParams(location.search).get('id')||null});
+  }catch(e){}
+  render();
+  showCert(cert);
+}
+
+/* ── عرض القائمة ── */
+function render(){
+  const wrap=document.getElementById('certs-wrap');
+  if(!CERTS.length){
+    wrap.innerHTML=`
+      <div class="new-cert-card" onclick="location.href='academy.html'">
+        <div class="new-cert-em">🎓</div>
+        <div class="new-cert-title">لا توجد شهادات بعد</div>
+        <div class="new-cert-desc">أكمل أي كورس في الأكاديمية واحصل على شهادتك</div>
+      </div>`;
+    return;
+  }
+  wrap.innerHTML=`
+    <div class="sec-title">🏆 شهاداتك (${CERTS.length})</div>
+    <div class="certs-grid">
+      ${CERTS.map(cert=>`
+        <div class="cert-card">
+          <div class="cert-thumb">
+            <div class="cert-badge">🏆</div>
+            <div class="cert-verified">✓ موثّقة</div>
+          </div>
+          <div class="cert-body">
+            <div class="cert-title">${esc(cert.course_title)}</div>
+            <div class="cert-meta">
+              <span>📅 ${new Date(cert.issued_at).toLocaleDateString('ar',{year:'numeric',month:'long',day:'numeric'})}</span>
+              <span>✓ صالحة</span>
+            </div>
+            <div class="cert-id">🔑 ${cert.cert_id}</div>
+            <div class="cert-actions">
+              <button class="cert-btn cb-pdf" onclick="showCert(${JSON.stringify(cert).replace(/"/g,'&quot;')})">📄 عرض</button>
+              <button class="cert-btn cb-share" onclick="shareCert('${cert.cert_id}')">🔗 مشاركة</button>
+              <button class="cert-btn cb-qr" onclick="showQR('${cert.cert_id}')">📱 QR</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="new-cert-card" onclick="location.href='academy.html'">
+      <div class="new-cert-em">➕</div>
+      <div class="new-cert-title">احصل على شهادة جديدة</div>
+      <div class="new-cert-desc">أكمل كورساً آخر لتضيف شهادة لملفك</div>
+    </div>`;
+}
+
+/* ── عرض الشهادة ── */
+function showCert(cert){
+  if(typeof cert==='string') cert=JSON.parse(cert);
+  const verifyUrl=`https://mohmbaraka1.github.io/azzaworld/cert-verify.html?id=${cert.cert_id}`;
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(verifyUrl)}`;
+  const date=new Date(cert.issued_at).toLocaleDateString('ar',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('cert-display').innerHTML=`
+    <div class="certificate" id="cert-print">
+      <div class="cert-border-outer"></div>
+      <div class="cert-border-inner"></div>
+      <div class="cert-corner tl"></div>
+      <div class="cert-corner tr"></div>
+      <div class="cert-corner bl"></div>
+      <div class="cert-corner br"></div>
+      <div class="cert-stamp">AZZA ACADEMY</div>
+      <div class="cert-logo-top">✦ AZZA ACADEMY</div>
+      <div class="cert-divider"></div>
+      <div class="cert-subtitle">شهادة إتمام</div>
+      <div class="cert-presented">تُقدَّم هذه الشهادة إلى</div>
+      <div class="cert-name">${esc(cert.user_name)}</div>
+      <div class="cert-name-divider"></div>
+      <div class="cert-for">لإتمامه بنجاح كورس</div>
+      <div class="cert-course">${esc(cert.course_title)}</div>
+      <div class="cert-desc">تؤكد أكاديمية AZZA أن حامل هذه الشهادة قد أتم المتطلبات الكاملة للكورس المذكور أعلاه وأثبت إتقانه للمهارات والمعرفة المطلوبة.</div>
+      <div class="cert-footer">
+        <div class="cert-sign">
+          <div class="cert-sign-line"></div>
+          <div class="cert-sign-name">${esc(cert.instructor||'فريق AZZA Academy')}</div>
+          <div class="cert-sign-title">المدرّس / الأكاديمية</div>
+        </div>
+        <div class="cert-qr-wrap">
+          <img src="${qrUrl}" class="cert-qr-img" style="width:64px;height:64px;border-radius:6px" alt="QR">
+          <div class="cert-qr-label">للتحقق امسح QR</div>
+        </div>
+        <div class="cert-meta-bottom">
+          <span class="cert-id-text">${cert.cert_id}</span>
+          <span class="cert-date-text">${date}</span>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('cert-preview-wrap').classList.add('open');
+}
+
+function closeCertPreview(){ document.getElementById('cert-preview-wrap').classList.remove('open'); }
+
+function printCert(){
+  const content=document.getElementById('cert-print').outerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head>
+    <meta charset="UTF-8"><title>شهادة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    @page{size:A4 landscape;margin:0}
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
+    .certificate{width:100%;max-width:900px;font-family:'Amiri',serif;direction:rtl;position:relative;overflow:hidden;aspect-ratio:1.414/1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 60px;text-align:center;background:#fff}
+    .cert-border-outer{position:absolute;inset:12px;border:3px solid #c69749;border-radius:4px}
+    .cert-border-inner{position:absolute;inset:18px;border:1px solid rgba(198,151,73,.4);border-radius:2px}
+    .cert-corner{position:absolute;width:40px;height:40px;border-color:#c69749}
+    .cert-corner.tl{top:8px;right:8px;border-top:3px solid;border-right:3px solid;border-radius:0 4px 0 0}
+    .cert-corner.tr{top:8px;left:8px;border-top:3px solid;border-left:3px solid;border-radius:4px 0 0 0}
+    .cert-corner.bl{bottom:8px;right:8px;border-bottom:3px solid;border-right:3px solid;border-radius:0 0 0 4px}
+    .cert-corner.br{bottom:8px;left:8px;border-bottom:3px solid;border-left:3px solid;border-radius:0 0 4px 0}
+    .cert-stamp{position:absolute;bottom:50px;left:50%;transform:translateX(-50%) rotate(-15deg);opacity:.06;font-size:60px;font-weight:900;color:#1c5b38;white-space:nowrap;font-family:Tajawal,sans-serif}
+    .cert-logo-top{font-size:22px;font-weight:900;color:#1c5b38;letter-spacing:.08em;margin-bottom:4px;font-family:Tajawal,sans-serif}
+    .cert-divider{width:120px;height:2px;background:linear-gradient(90deg,transparent,#c69749,transparent);margin:8px auto 14px}
+    .cert-subtitle{font-size:14px;color:#888;letter-spacing:.2em;text-transform:uppercase;margin-bottom:20px;font-family:Tajawal,sans-serif}
+    .cert-presented{font-size:15px;color:#666;margin-bottom:8px;font-style:italic}
+    .cert-name{font-size:36px;font-weight:700;color:#0e3622;margin-bottom:8px}
+    .cert-name-divider{width:200px;height:1.5px;background:#c69749;margin:6px auto 16px}
+    .cert-for{font-size:14px;color:#666;margin-bottom:8px;font-style:italic}
+    .cert-course{font-size:22px;font-weight:700;color:#0e3622;margin-bottom:16px;line-height:1.3;font-family:Tajawal,sans-serif}
+    .cert-desc{font-size:12px;color:#888;line-height:1.7;max-width:480px;margin:0 auto 20px}
+    .cert-footer{display:flex;align-items:flex-end;justify-content:space-between;width:100%;margin-top:auto}
+    .cert-sign{text-align:center}.cert-sign-line{width:120px;height:1px;background:#ccc;margin:0 auto 4px}
+    .cert-sign-name{font-size:12px;color:#0e3622;font-weight:700;font-family:Tajawal,sans-serif}
+    .cert-sign-title{font-size:10px;color:#888;font-family:Tajawal,sans-serif}
+    .cert-qr-img{width:64px;height:64px;border-radius:6px}
+    .cert-qr-label{font-size:9px;color:#aaa;margin-top:3px;font-family:Tajawal,sans-serif}
+    .cert-id-text{font-size:10px;color:#aaa;font-family:monospace;display:block;margin-bottom:2px}
+    .cert-date-text{font-size:10px;color:#aaa;font-family:Tajawal,sans-serif}
+    .cert-meta-bottom{text-align:center}
+    .cert-qr-wrap{text-align:center}
+    </style></head><body>${content}</body></html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),800);
+}
+
+/* ── QR ── */
+function showQR(certId){
+  const url=`https://mohmbaraka1.github.io/azzaworld/cert-verify.html?id=${certId}`;
+  document.getElementById('qr-img').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+  document.getElementById('qr-url').textContent=url;
+  document.getElementById('qr-modal').classList.add('open');
+}
+
+/* ── مشاركة ── */
+function shareCert(certId){
+  const url=`https://mohmbaraka1.github.io/azzaworld/cert-verify.html?id=${certId}`;
+  if(navigator.share){
+    navigator.share({title:'شهادة AZZA Academy',text:'حصلت على شهادة من AZZA Academy!',url});
+  }else{
+    navigator.clipboard?.writeText(url).then(()=>alert('تم نسخ رابط الشهادة:\n'+url));
+  }
+}
+
+/* ── Init ── */
+(()=>{
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  loadCerts();
+})();
+</script>
+</body>
+</html>
