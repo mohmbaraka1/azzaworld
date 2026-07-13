@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحتي — AZZA Academy</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--gs:#e8c06a;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;
+  --line:rgba(0,0,0,.08);--r:14px;
+  --xp:#7c3aed;--streak:#ef4444;--badge:#c69749}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
+
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,var(--od),var(--olive));padding:28px 20px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hero-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:20px}
+.hero-av{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--gs));color:var(--od);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.hero-info{flex:1}
+.hero-greeting{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:2px}
+.hero-name{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px}
+.hero-level{display:flex;align-items:center;gap:8px}
+.hero-level-badge{padding:4px 12px;border-radius:99px;background:rgba(198,151,73,.2);color:var(--gold);font-size:12px;font-weight:700;border:1px solid rgba(198,151,73,.3)}
+.hero-xp-bar{flex:1;height:8px;background:rgba(255,255,255,.15);border-radius:99px;overflow:hidden}
+.hero-xp-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gs));border-radius:99px;transition:.8s}
+.hero-xp-text{font-size:11px;color:rgba(255,255,255,.6)}
+.hero-stats{display:flex;gap:20px;margin-top:16px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat strong{display:block;font-size:22px;font-weight:900;color:#fff}
+.hero-stat span{font-size:11px;color:rgba(255,255,255,.55)}
+
+/* Main */
+.main{max-width:900px;margin:0 auto;padding:24px 20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.sec-title{font-size:17px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* Stat Cards */
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:14px}
+.stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.stat-info{flex:1}
+.stat-num{font-size:26px;font-weight:900;line-height:1}
+.stat-label{font-size:12px;color:var(--sub);margin-top:3px}
+.stat-delta{font-size:11px;margin-top:4px;font-weight:700}
+.up{color:#16a34a}
+
+/* Streak */
+.streak-card{background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:var(--r);padding:20px;color:#fff}
+.streak-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.streak-icon{font-size:36px}
+.streak-info flex:1}
+.streak-num{font-size:36px;font-weight:900}
+.streak-label{font-size:13px;opacity:.8}
+.streak-days{display:flex;gap:6px;flex-wrap:wrap}
+.streak-day{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+.streak-day.done{background:rgba(255,255,255,.9);color:#dc2626}
+.streak-day.today{background:#fff;color:#dc2626;box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+
+/* XP Card */
+.xp-card{background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:var(--r);padding:20px;color:#fff}
+.xp-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.xp-icon{font-size:32px}
+.xp-current{font-size:32px;font-weight:900}
+.xp-label{font-size:13px;opacity:.8}
+.xp-bar-wrap{margin-bottom:8px}
+.xp-bar{height:10px;background:rgba(255,255,255,.2);border-radius:99px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,#a78bfa,#e9d5ff);border-radius:99px;transition:.8s}
+.xp-next{font-size:11px;opacity:.7;display:flex;justify-content:space-between}
+.xp-log{margin-top:12px;display:flex;flex-direction:column;gap:4px;max-height:80px;overflow:hidden}
+.xp-log-item{font-size:12px;opacity:.8;display:flex;justify-content:space-between}
+.xp-log-plus{color:#a78bfa;font-weight:700}
+
+/* Badges */
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-bottom:20px}
+.badge-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 8px;text-align:center;transition:.2s}
+.badge-item.earned{border-color:var(--gold);background:rgba(198,151,73,.05)}
+.badge-item.locked{opacity:.4;filter:grayscale(1)}
+.badge-em{font-size:28px;margin-bottom:6px}
+.badge-name{font-size:11px;font-weight:700;color:var(--ink)}
+.badge-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.badge-item.earned .badge-name{color:var(--gold)}
+
+/* Progress courses */
+.course-progress-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.cp-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
+.cp-item:hover{border-color:var(--olive)}
+.cp-em{font-size:28px;width:44px;text-align:center;flex-shrink:0}
+.cp-info{flex:1;min-width:0}
+.cp-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.cp-bar{height:6px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-bottom:4px}
+.cp-fill{height:100%;background:var(--olive);border-radius:99px;transition:.5s}
+.cp-meta{font-size:12px;color:var(--muted)}
+.cp-pct{font-size:16px;font-weight:900;color:var(--olive);flex-shrink:0}
+
+/* Activity Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:20px}
+.cal-day{aspect-ratio:1;border-radius:4px;background:var(--bg2)}
+.cal-day.active{background:var(--olive)}
+.cal-day.today{background:var(--gold)}
+.cal-labels{display:flex;gap:0;margin-bottom:6px;font-size:10px;color:var(--muted)}
+.cal-labels span{flex:1;text-align:center}
+
+/* Leaderboard */
+.lb-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.lb-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:.2s}
+.lb-item.me{border-color:var(--olive);background:var(--ol)}
+.lb-rank{font-size:16px;font-weight:900;width:28px;text-align:center;flex-shrink:0}
+.lb-rank.top1{color:#fbbf24}
+.lb-rank.top2{color:#94a3b8}
+.lb-rank.top3{color:#cd7c3f}
+.lb-av{width:36px;height:36px;border-radius:10px;background:var(--olive);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.lb-info{flex:1}
+.lb-name{font-size:13px;font-weight:700}
+.lb-xp{font-size:12px;color:var(--sub)}
+.lb-badge-wrap{display:flex;gap:4px}
+.lb-badge{font-size:14px}
+.lb-score{font-size:16px;font-weight:900;color:var(--xp)}
+
+/* Goals */
+.goals-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.goal-item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.goal-check{width:24px;height:24px;border-radius:6px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:.2s}
+.goal-check.done{background:var(--olive);border-color:var(--olive);color:#fff}
+.goal-text{flex:1;font-size:13px}
+.goal-xp{font-size:12px;font-weight:700;color:var(--xp)}
+
+@keyframes pop{from{opacity:0;transform:scale(.8) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.xp-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:900;z-index:9999;animation:pop .3s ease;box-shadow:0 8px 24px rgba(124,58,237,.4)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="font-size:15px;font-weight:900;color:var(--olive);flex:1" id="page-title">لوحتي</span>
+  <button onclick="location.href='academy.html'" style="padding:7px 14px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink)">🎓 الأكاديمية</button>
+  <button onclick="location.href='certificates.html'" style="padding:7px 14px;border-radius:8px;border:none;background:var(--gold);color:var(--od);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">🏆 شهاداتي</button>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-av" id="hero-av">م</div>
+    <div class="hero-info">
+      <div class="hero-greeting">مرحباً بعودتك 👋</div>
+      <div class="hero-name" id="hero-name">الطالب</div>
+      <div class="hero-level">
+        <div class="hero-level-badge" id="level-badge">🌱 مبتدئ</div>
+        <div class="hero-xp-bar"><div class="hero-xp-fill" id="xp-bar-fill" style="width:0%"></div></div>
+        <div class="hero-xp-text" id="xp-text">0 / 500 XP</div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong id="h-xp">0</strong><span>نقطة XP</span></div>
+        <div class="hero-stat"><strong id="h-streak">0</strong><span>🔥 Streak</span></div>
+        <div class="hero-stat"><strong id="h-courses">0</strong><span>كورس مكتمل</span></div>
+        <div class="hero-stat"><strong id="h-certs">0</strong><span>شهادة</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+const esc = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+/* ══ نظام XP ══ */
+const XP_ACTIONS = {
+  read_article:  10,
+  complete_lesson: 25,
+  complete_course: 100,
+  earn_cert:     200,
+  login_streak:  15,
+  endorse_skill: 5,
+};
+
+const LEVELS = [
+  {name:'🌱 مبتدئ',   min:0,    max:500},
+  {name:'⚡ نشيط',    min:500,  max:1500},
+  {name:'🔥 متقدم',   min:1500, max:3500},
+  {name:'💎 خبير',    min:3500, max:7000},
+  {name:'🏆 أسطورة',  min:7000, max:Infinity},
+];
+
+const ALL_BADGES = [
+  {id:'first_lesson', em:'🎯', name:'الانطلاقة', desc:'أكمل أول درس', condition: s=>s.lessons>=1},
+  {id:'week_streak',  em:'🔥', name:'أسبوع كامل', desc:'7 أيام متتالية', condition: s=>s.streak>=7},
+  {id:'first_cert',   em:'🏆', name:'أول شهادة', desc:'احصل على شهادة', condition: s=>s.certs>=1},
+  {id:'explorer',     em:'🗺️', name:'المستكشف', desc:'اقرأ 5 مقالات', condition: s=>s.reads>=5},
+  {id:'learner',      em:'📚', name:'المتعلم', desc:'أكمل 3 كورسات', condition: s=>s.courses>=3},
+  {id:'xp_500',       em:'⚡', name:'محطة 500', desc:'اجمع 500 XP', condition: s=>s.xp>=500},
+  {id:'xp_1500',      em:'💫', name:'محطة 1500', desc:'اجمع 1500 XP', condition: s=>s.xp>=1500},
+  {id:'networker',    em:'🤝', name:'الشبكة', desc:'أيّد 3 مهارات', condition: s=>s.endorsements>=3},
+  {id:'helper',       em:'💬', name:'المساعد', desc:'علّق 10 مرات', condition: s=>s.comments>=10},
+  {id:'perfectionist',em:'✨', name:'الكمالي', desc:'أكمل كورساً 100%', condition: s=>s.courses>=1},
+  {id:'consistent',   em:'📅', name:'المثابر', desc:'30 يوم Streak', condition: s=>s.streak>=30},
+  {id:'champion',     em:'👑', name:'البطل', desc:'اجمع 5000 XP', condition: s=>s.xp>=5000},
+];
+
+const DAILY_GOALS = [
+  {id:'g1', text:'اقرأ مقالاً واحداً', xp:10},
+  {id:'g2', text:'أكمل درساً', xp:25},
+  {id:'g3', text:'تفاعل مع محتوى', xp:5},
+  {id:'g4', text:'أيّد مهارة لزميل', xp:5},
+];
+
+/* ══ قراءة البيانات ══ */
+function getStats(){
+  const xpLog    = JSON.parse(localStorage.getItem('azza_xp_log_'+me.id)||'[]');
+  const xp       = xpLog.reduce((s,e)=>s+e.amount,0);
+  const streak   = parseInt(localStorage.getItem('azza_streak_'+me.id)||'0');
+  const reads    = parseInt(localStorage.getItem('azza_academy_read') ? JSON.parse(localStorage.getItem('azza_academy_read')||'[]').length : 0);
+  const certs    = JSON.parse(localStorage.getItem('azza_certs_'+me.id)||'[]').length;
+  const lessons  = Object.keys(Object.assign({},...Object.keys(localStorage).filter(k=>k.startsWith('azza_progress_')).map(k=>JSON.parse(localStorage.getItem(k)||'{}')))).filter(k=>localStorage.getItem('azza_progress_'+me.id+'_'+k)!==null).length||
+    Object.values(Object.assign({},...Object.keys(localStorage).filter(k=>k.startsWith('azza_progress_')).map(k=>JSON.parse(localStorage.getItem(k)||'{}')||{}))).filter(Boolean).length;
+  const courses  = Object.keys(localStorage).filter(k=>k.startsWith('azza_enrolled_')).length;
+  const endorsements=0;
+  const comments=0;
+  return {xp,streak,reads,certs,lessons,courses,endorsements,comments,xpLog};
+}
+
+function getLevel(xp){
+  return LEVELS.find(l=>xp>=l.min&&xp<l.max)||LEVELS[LEVELS.length-1];
+}
+
+function getLevelPct(xp){
+  const lv=getLevel(xp);
+  if(lv.max===Infinity) return 100;
+  return Math.round(((xp-lv.min)/(lv.max-lv.min))*100);
+}
+
+function getEarnedBadges(stats){
+  return ALL_BADGES.filter(b=>b.condition(stats));
+}
+
+/* ══ إضافة XP ══ */
+function addXP(action, label){
+  const amount=XP_ACTIONS[action]||0;
+  if(!amount) return;
+  const log=JSON.parse(localStorage.getItem('azza_xp_log_'+me.id)||'[]');
+  log.push({action,amount,label,at:new Date().toISOString()});
+  localStorage.setItem('azza_xp_log_'+me.id,JSON.stringify(log));
+  showXPToast('+'+amount+' XP · '+label);
+  checkNewBadges();
+  updateHeader();
+}
+
+function showXPToast(msg){
+  const t=document.createElement('div');
+  t.className='xp-toast';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+function checkNewBadges(){
+  const stats=getStats();
+  const earned=getEarnedBadges(stats).map(b=>b.id);
+  const prev=JSON.parse(localStorage.getItem('azza_badges_'+me.id)||'[]');
+  const newBadges=earned.filter(id=>!prev.includes(id));
+  if(newBadges.length){
+    localStorage.setItem('azza_badges_'+me.id,JSON.stringify(earned));
+    newBadges.forEach(id=>{
+      const b=ALL_BADGES.find(x=>x.id===id);
+      if(b) showXPToast('🏅 شارة جديدة: '+b.name+' '+b.em);
+    });
+  }
+}
+
+/* ══ تحديث الـHeader ══ */
+function updateHeader(){
+  const stats=getStats();
+  const lv=getLevel(stats.xp);
+  const pct=getLevelPct(stats.xp);
+  document.getElementById('hero-av').textContent=(me.name||'م')[0];
+  document.getElementById('hero-name').textContent=me.name||'الطالب';
+  document.getElementById('level-badge').textContent=lv.name;
+  document.getElementById('xp-bar-fill').style.width=pct+'%';
+  document.getElementById('xp-text').textContent=stats.xp+' / '+lv.max+' XP';
+  document.getElementById('h-xp').textContent=stats.xp;
+  document.getElementById('h-streak').textContent=stats.streak;
+  document.getElementById('h-courses').textContent=stats.courses;
+  document.getElementById('h-certs').textContent=stats.certs;
+}
+
+/* ══ بناء الصفحة ══ */
+function render(){
+  const stats=getStats();
+  const earned=getEarnedBadges(stats);
+  const earnedIds=earned.map(b=>b.id);
+  const todayGoals=JSON.parse(localStorage.getItem('azza_goals_'+me.id+'_'+today())||'[]');
+  const xpLog=stats.xpLog.slice(-5).reverse();
+
+  /* Streak days */
+  const days=['ح','ن','ث','ر','خ','ج','س'];
+  const today_=new Date().getDay();
+  const streakDays=days.map((d,i)=>({
+    label:d,
+    done: stats.streak > (6-i),
+    today: i===today_
+  }));
+
+  /* Course Progress */
+  const progressKeys=Object.keys(localStorage).filter(k=>k.startsWith('azza_progress_'));
+  const courseProgress=progressKeys.map(k=>{
+    const courseId=k.replace('azza_progress_','');
+    const prog=JSON.parse(localStorage.getItem(k)||'{}');
+    const done=Object.values(prog).filter(Boolean).length;
+    return {courseId, done};
+  }).filter(c=>c.done>0);
+
+  /* Leaderboard (محلي) */
+  const me_lb={name:me.name||'أنت',xp:stats.xp,badges:earned.slice(0,3).map(b=>b.em),isMe:true};
+  const others=[
+    {name:'أحمد محمد',   xp:Math.max(stats.xp+320,320), badges:['🔥','📚','🏆'], isMe:false},
+    {name:'سارة علي',    xp:Math.max(stats.xp+150,150), badges:['⚡','🎯'],       isMe:false},
+    {name:'محمد خالد',   xp:Math.max(stats.xp+80,80),   badges:['🌱'],           isMe:false},
+    {name:'ليلى يوسف',   xp:Math.max(stats.xp-50,10),   badges:['📅'],           isMe:false},
+  ];
+  const lb=[me_lb,...others].sort((a,b)=>b.xp-a.xp).slice(0,5);
+
+  document.getElementById('main').innerHTML=`
+
+    <!-- Stat Cards -->
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(124,58,237,.1)">⚡</div>
+        <div class="stat-info">
+          <div class="stat-num" style="color:var(--xp)">${stats.xp}</div>
+          <div class="stat-label">نقاط XP</div>
+          <div class="stat-delta up">+${xpLog[0]?.amount||0} اليوم</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(239,68,68,.1)">🔥</div>
+        <div class="stat-info">
+          <div class="stat-num" style="color:var(--streak)">${stats.streak}</div>
+          <div class="stat-label">Streak يوم</div>
+          <div class="stat-delta up">متتالية</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(198,151,73,.1)">🏆</div>
+        <div class="stat-info">
+          <div class="stat-num" style="color:var(--gold)">${stats.certs}</div>
+          <div class="stat-label">شهادة</div>
+          <div class="stat-delta" style="color:var(--muted)">${stats.courses} كورس مكتمل</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak + XP -->
+    <div class="grid-2">
+      <div class="streak-card">
+        <div class="streak-top">
+          <div class="streak-icon">🔥</div>
+          <div>
+            <div class="streak-num">${stats.streak}</div>
+            <div class="streak-label">يوم متتالي</div>
+          </div>
+        </div>
+        <div class="streak-days">
+          ${streakDays.map(d=>`<div class="streak-day${d.done?' done':''}${d.today?' today':''}">${d.label}</div>`).join('')}
+        </div>
+      </div>
+      <div class="xp-card">
+        <div class="xp-top">
+          <div class="xp-icon">⚡</div>
+          <div>
+            <div class="xp-current">${stats.xp} XP</div>
+            <div class="xp-label">${getLevel(stats.xp).name}</div>
+          </div>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar"><div class="xp-fill" style="width:${getLevelPct(stats.xp)}%"></div></div>
+        </div>
+        <div class="xp-next">
+          <span>${stats.xp} XP</span>
+          <span>${getLevel(stats.xp).max===Infinity?'MAX':getLevel(stats.xp).max+' XP'}</span>
+        </div>
+        <div class="xp-log">
+          ${xpLog.map(e=>`<div class="xp-log-item"><span>${esc(e.label||e.action)}</span><span class="xp-log-plus">+${e.amount}</span></div>`).join('')||'<div style="font-size:12px;opacity:.6">ابدأ التعلم لتجميع XP!</div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Goals -->
+    <div class="sec-title">🎯 أهداف اليوم</div>
+    <div class="goals-list">
+      ${DAILY_GOALS.map(g=>`
+        <div class="goal-item">
+          <div class="goal-check${todayGoals.includes(g.id)?' done':''}" onclick="toggleGoal('${g.id}')">
+            ${todayGoals.includes(g.id)?'✓':''}
+          </div>
+          <div class="goal-text" style="${todayGoals.includes(g.id)?'text-decoration:line-through;color:var(--muted)':''}">${g.text}</div>
+          <div class="goal-xp">+${g.xp} XP</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Badges -->
+    <div class="sec-title">🏅 الشارات (${earned.length}/${ALL_BADGES.length})</div>
+    <div class="badges-grid">
+      ${ALL_BADGES.map(b=>`
+        <div class="badge-item${earnedIds.includes(b.id)?' earned':' locked'}" title="${b.desc}">
+          <div class="badge-em">${b.em}</div>
+          <div class="badge-name">${b.name}</div>
+          <div class="badge-desc">${b.desc}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Course Progress -->
+    ${courseProgress.length?`
+    <div class="sec-title">📚 كورساتي</div>
+    <div class="course-progress-list">
+      ${courseProgress.map(c=>`
+        <div class="cp-item" onclick="location.href='course.html?id=${c.courseId}'">
+          <div class="cp-em">📚</div>
+          <div class="cp-info">
+            <div class="cp-title">كورس مستمر</div>
+            <div class="cp-bar"><div class="cp-fill" style="width:${Math.min(c.done*12,100)}%"></div></div>
+            <div class="cp-meta">${c.done} دروس مكتملة</div>
+          </div>
+          <div class="cp-pct">${Math.min(c.done*12,100)}%</div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <!-- Activity Calendar -->
+    <div class="sec-title">📅 نشاطك هذا الشهر</div>
+    <div class="cal-labels">
+      ${['ح','ن','ث','ر','خ','ج','س'].map(d=>`<span>${d}</span>`).join('')}
+    </div>
+    <div class="cal-grid">
+      ${Array.from({length:28},(_,i)=>{
+        const rand=Math.random();
+        const isToday=i===new Date().getDate()-1;
+        return`<div class="cal-day${rand>.6?' active':''}${isToday?' today':''}" title="يوم ${i+1}"></div>`;
+      }).join('')}
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="sec-title">🏆 المتصدرون</div>
+    <div class="lb-list">
+      ${lb.map((u,i)=>`
+        <div class="lb-item${u.isMe?' me':''}">
+          <div class="lb-rank${i===0?' top1':i===1?' top2':i===2?' top3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div class="lb-av">${(u.name||'م')[0]}</div>
+          <div class="lb-info">
+            <div class="lb-name">${esc(u.name)}${u.isMe?' (أنت)':''}</div>
+            <div class="lb-xp">${u.xp} XP</div>
+          </div>
+          <div class="lb-badge-wrap">${(u.badges||[]).map(b=>`<span class="lb-badge">${b}</span>`).join('')}</div>
+          <div class="lb-score">${u.xp}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="sec-title">⚡ اكسب XP الآن</div>
+    <div class="grid-2" style="margin-bottom:32px">
+      <button onclick="location.href='academy.html';addXP('read_article','قراءة مقال')" style="padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--ink);transition:.2s" onmouseover="this.style.borderColor='var(--olive)'" onmouseout="this.style.borderColor='var(--line)'">
+        📝 اقرأ مقالاً (+10 XP)
+      </button>
+      <button onclick="location.href='course.html?id=local-1'" style="padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:var(--ink);transition:.2s" onmouseover="this.style.borderColor='var(--xp)'" onmouseout="this.style.borderColor='var(--line)'">
+        📚 أكمل درساً (+25 XP)
+      </button>
+    </div>`;
+}
+
+/* ── Daily Goals ── */
+function today(){ return new Date().toISOString().slice(0,10); }
+function toggleGoal(id){
+  const key='azza_goals_'+me.id+'_'+today();
+  const goals=JSON.parse(localStorage.getItem(key)||'[]');
+  const g=DAILY_GOALS.find(x=>x.id===id);
+  if(goals.includes(id)){
+    const updated=goals.filter(x=>x!==id);
+    localStorage.setItem(key,JSON.stringify(updated));
+  }else{
+    goals.push(id);
+    localStorage.setItem(key,JSON.stringify(goals));
+    if(g) addXP('daily_goal','هدف يومي: '+g.text);
+  }
+  render();
+}
+
+/* ── Streak ── */
+function updateStreak(){
+  const key='azza_last_visit_'+me.id;
+  const streakKey='azza_streak_'+me.id;
+  const last=localStorage.getItem(key);
+  const today_=new Date().toISOString().slice(0,10);
+  if(last===today_) return;
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const cur=parseInt(localStorage.getItem(streakKey)||'0');
+  localStorage.setItem(streakKey,last===yesterday?cur+1:1);
+  localStorage.setItem(key,today_);
+  if(last!==today_) addXP('login_streak','Streak يومي');
+}
+
+/* ── Init ── */
+(()=>{
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  updateStreak();
+  updateHeader();
+  render();
+  checkNewBadges();
+})();
+</script>
+</body>
+</html>
