@@ -2,986 +2,543 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عزّة — اكتشف</title>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tokens.css">
-<script src="arab_cities.js"></script>
-<script src="d3.min.js"></script>
-<script src="arab_geo_data.js"></script>
-<script src="arab_world_map.js"></script>
-<style>
-body{transition:background-color .25s,color .25s}
-.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
-.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
-.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
-.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
-
-/* ══ هيدر ══ */
-.top{position:sticky;top:0;z-index:60;background:rgba(247,241,227,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.top-in{display:flex;align-items:center;gap:12px;height:62px;padding:0 20px;max-width:1200px;margin:0 auto}
-.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
-.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
-.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
-.top-search{flex:1;min-width:0;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:6px 12px;transition:.2s}
-.top-search:focus-within{border-color:var(--olive)}
-.top-search svg{width:15px;height:15px;stroke:var(--muted);fill:none;flex-shrink:0}
-.top-search input{flex:1;min-width:0;border:none;outline:none;font-family:inherit;font-size:14px;color:var(--ink);background:transparent}
-.top-search input::placeholder{color:#b3aa92}
-.back-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0;margin-right:auto}
-.back-btn:hover{border-color:var(--olive);color:var(--olive)}
-
-/* ══ تبويبات رئيسية ══ */
-.main-tabs{background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:8px;padding:12px 20px;overflow-x:auto;scrollbar-width:none}
-.main-tabs::-webkit-scrollbar{display:none}
-.main-tabs-wrap{position:relative}
-.main-tabs-fade{position:absolute;top:0;bottom:1px;width:32px;pointer-events:none;opacity:0;transition:opacity .2s ease;z-index:2}
-.main-tabs-fade.right{right:0;background:linear-gradient(to left,var(--card),transparent)}
-.main-tabs-fade.left{left:0;background:linear-gradient(to right,var(--card),transparent)}
-.main-tabs-fade.show{opacity:1}
-.mtab{
-  display:flex;align-items:center;gap:7px;
-  padding:10px 18px;border-radius:999px;
-  border:1.5px solid var(--line);background:var(--cream);
-  font-family:inherit;font-size:13.5px;font-weight:700;color:var(--muted);
-  cursor:pointer;white-space:nowrap;flex-shrink:0;
-  transition:background .22s ease,border-color .22s ease,color .22s ease,box-shadow .22s ease,transform .15s ease
-}
-.mtab:hover{border-color:var(--olive);color:var(--olive);transform:translateY(-1px)}
-.mtab:active{transform:translateY(0)}
-.mtab.on{
-  background:var(--olive);border-color:var(--olive);color:#fff;
-  box-shadow:0 3px 10px rgba(28,91,56,.28)
-}
-.mtab-count{background:var(--cream-2);color:var(--muted);font-size:11px;font-weight:700;border-radius:999px;padding:2px 7px;transition:background .22s ease,color .22s ease}
-.mtab.on .mtab-count{background:rgba(255,255,255,.22);color:#fff}
-
-/* ══ شريط فلاتر ══ */
-.filters-wrap{background:var(--card);border-bottom:1px solid var(--line);padding:10px 20px}
-.filters-inner{max-width:1200px;margin:0 auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.role-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
-.role-pills::-webkit-scrollbar{display:none}
-.rpill{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
-.rpill:hover{border-color:var(--olive);color:var(--olive)}
-.rpill.on{background:var(--olive);border-color:var(--olive);color:#fff}
-.rpill .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.rpill.on .dot{background:#fff !important}
-.filters-sep{width:1px;height:28px;background:var(--line);flex-shrink:0}
-.f-sel{border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-family:inherit;font-size:13px;color:var(--ink);background:var(--card);outline:none;cursor:pointer;transition:.2s}
-.f-sel:focus{border-color:var(--olive)}
-.sort-pills{display:flex;gap:6px;margin-right:auto}
-.spill{padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
-.spill:hover{border-color:var(--olive);color:var(--olive)}
-.spill.on{background:rgba(28,91,56,.08);border-color:var(--olive);color:var(--olive)}
-
-/* ══ نتائج header ══ */
-.results-bar{max-width:1200px;margin:14px auto 0;padding:0 20px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted)}
-.results-bar strong{color:var(--ink)}
-
-/* ══ شبكة المستخدمين ══ */
-.grid{max-width:1200px;margin:14px auto 40px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
-.tab-fade-in{animation:tabFadeIn .32s ease both}
-@keyframes tabFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* بطاقة مستخدم */
-.u-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden;transition:.2s;cursor:pointer;display:flex;flex-direction:column}
-.u-card:hover{box-shadow:0 8px 32px rgba(28,26,20,.1);transform:translateY(-3px)}
-.u-cover{height:72px;position:relative;flex-shrink:0}
-.u-av-ring{position:absolute;bottom:-20px;right:14px;width:52px;height:52px;border-radius:50%;border:3px solid var(--card);overflow:hidden;box-shadow:0 3px 12px rgba(28,26,20,.18);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.2rem}
-.match-tag{position:absolute;top:9px;left:9px;background:rgba(28,91,56,.88);color:#fff;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:4px}
-.u-body{padding:26px 14px 12px;flex:1}
-.u-name{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:1px}
-.u-handle{font-size:12px;color:var(--olive);font-weight:600;margin-bottom:6px}
-.u-badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;margin-bottom:7px}
-.u-bio{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
-.u-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-.u-tag{padding:3px 9px;border-radius:999px;background:var(--cream);border:1px solid var(--line);font-size:11px;font-weight:700;color:var(--muted)}
-.u-meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-.u-actions{display:flex;gap:8px;padding:11px 14px;border-top:1px solid var(--line);margin-top:auto}
-.u-msg{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s}
-.u-msg:hover{border-color:var(--olive);color:var(--olive)}
-.u-follow{flex:1;display:flex;align-items:center;justify-content:center;padding:8px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s}
-.u-follow:hover{background:var(--olive-deep)}
-.u-follow.on{background:transparent;color:var(--olive);border:1.5px solid var(--olive)}
-
-/* ══ شبكة الأفكار ══ */
-.ideas-grid{max-width:1200px;margin:14px auto 40px;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-
-/* بطاقة فكرة/مشروع في explore */
-.p-card{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden;cursor:pointer;transition:.2s;display:flex;flex-direction:column}
-.p-card:hover{box-shadow:0 8px 32px rgba(28,26,20,.1);transform:translateY(-2px)}
-.p-stripe{height:4px}
-.p-card-head{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}
-.p-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:900;font-size:.9rem;flex-shrink:0;overflow:hidden}
-.p-author{flex:1;min-width:0}
-.p-author-name{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.p-author-role{font-size:11px;color:var(--muted);margin-top:1px}
-.p-type-badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;flex-shrink:0}
-.p-card-body{padding:0 14px 12px;flex:1}
-.p-title{font-family:'Aref Ruqaa',serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.p-pitch{font-size:13px;color:var(--muted);line-height:1.7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
-.p-tags-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-.p-tag{padding:3px 9px;border-radius:999px;background:var(--cream);border:1px solid var(--line);font-size:11px;font-weight:700;color:var(--muted)}
-/* شريط تمويل مصغر */
-.mini-fund{background:rgba(28,91,56,.04);border:1px solid rgba(28,91,56,.1);border-radius:10px;padding:10px 12px;margin-bottom:8px}
-.mini-fund-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
-.mini-fund-amt{font-weight:700;color:var(--olive)}
-.mini-fund-track{height:5px;background:rgba(28,26,20,.08);border-radius:999px;overflow:hidden}
-.mini-fund-fill{height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));border-radius:999px}
-.p-card-foot{display:flex;align-items:center;padding:10px 14px;border-top:1px solid var(--line);gap:8px}
-.p-vote-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:.15s}
-.p-vote-btn:hover{border-color:var(--olive);color:var(--olive)}
-.p-vote-btn.voted{background:var(--olive);border-color:var(--olive);color:#fff}
-.p-stat{font-size:12px;color:var(--muted)}
-.p-interest-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.2s;margin-right:auto}
-.p-interest-btn:hover{background:var(--olive-deep)}
-.p-interest-btn.done{background:transparent;color:var(--olive);border:1.5px solid var(--olive)}
-
-/* فارغ */
-.empty-state{grid-column:1/-1;padding:64px 20px;text-align:center}
-.empty-icon{font-size:3.2rem;margin-bottom:14px}
-.empty-state b{display:block;font-size:17px;color:var(--ink);margin-bottom:7px}
-.empty-state span{font-size:14px;color:var(--muted)}
-
-/* مقترحون لك */
-.suggested-wrap{max-width:1200px;margin:0 auto 0;padding:0 20px}
-.suggested-head{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.suggested-row{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
-.suggested-row::-webkit-scrollbar{display:none}
-.sugg-chip{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--card);border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:.15s;white-space:nowrap;flex-shrink:0}
-.sugg-chip:hover{border-color:var(--olive)}
-.sugg-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:700;font-size:.7rem;overflow:hidden;flex-shrink:0}
-.sugg-name{font-size:13px;font-weight:700;color:var(--ink)}
-.sugg-role{font-size:11px;color:var(--muted)}
-.sugg-follow{padding:5px 12px;border-radius:999px;background:var(--olive);color:#fff;border:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
-.sugg-follow:hover{background:var(--olive-deep)}
-
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
-
-@media(max-width:680px){
-  .grid,.ideas-grid{grid-template-columns:1fr}
-  .filters-sep,.sort-pills{display:none}
-  .filters-inner{gap:6px}
-}
-
-/* ══ خريطة الوطن العربي ══ */
-.arab-map-sel{
-  width:100%;font-family:'Tajawal',sans-serif;font-size:13px;direction:rtl;color:#1a2030;
-  background:rgba(255,255,255,.96);border:1px solid rgba(0,0,0,.13);border-radius:6px;
-  padding:9px 12px 9px 30px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%236a7a8a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:left 10px center;transition:border-color .15s,box-shadow .15s;
-}
-.arab-map-sel:focus{border-color:rgba(42,80,140,.35);box-shadow:0 0 0 3px rgba(42,80,140,.08)}
-.arab-map-sel:disabled{opacity:.4;cursor:not-allowed;background-color:rgba(240,238,234,.8)}
-.arab-map-role-chip{
-  font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;color:#5a6a7a;
-  background:rgba(240,238,234,.9);border:1px solid rgba(0,0,0,.08);border-radius:999px;
-  padding:5px 12px;cursor:pointer;transition:.15s
-}
-.arab-map-role-chip.on{background:#2a5878;color:#fff;border-color:#2a5878}
-.arab-map-role-chip:hover{border-color:#2a5878}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>استكشاف الخريطة — AZZA</title>
 <script src="supabase.js"></script>
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- Clustering -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;
+  --line:rgba(0,0,0,.08);--r:12px;--sidebar-w:300px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl}
+
+/* ── Topbar ── */
+.topbar{position:fixed;top:0;right:0;left:0;height:54px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);z-index:1000;display:flex;align-items:center;padding:0 14px;gap:10px}
+.dk .topbar{background:rgba(30,28,18,.95)}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.tb-logo{font-size:15px;font-weight:900;color:var(--olive)}
+.tb-search-wrap{flex:1;max-width:360px;margin:0 auto;position:relative}
+.tb-search{width:100%;height:36px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg2);padding:0 36px 0 12px;font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none;transition:.2s}
+.tb-search:focus{border-color:var(--olive);background:var(--card)}
+.tb-search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.tb-acts{display:flex;gap:6px;margin-right:auto}
+.tb-act{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--sub);transition:.15s}
+.tb-act:hover,.tb-act.active{background:var(--olive);color:#fff}
+
+/* ── Map ── */
+#map{position:fixed;top:54px;right:0;bottom:0;left:0;z-index:1}
+.dk #map .leaflet-tile{filter:brightness(.7) invert(1) contrast(3) hue-rotate(200deg) saturate(.3) brightness(.7)}
+
+/* ── Sidebar ── */
+.sidebar{position:fixed;top:54px;right:0;bottom:0;width:var(--sidebar-w);background:var(--card);border-left:1px solid var(--line);z-index:500;display:flex;flex-direction:column;transition:.3s;transform:translateX(0)}
+.sidebar.closed{transform:translateX(var(--sidebar-w))}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-toggle{position:fixed;top:50%;right:0;transform:translateY(-50%);z-index:501;width:24px;height:56px;background:var(--olive);color:#fff;border:none;border-radius:8px 0 0 8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.3s}
+.sb-toggle.closed{right:var(--sidebar-w) !important;right:0}
+.sidebar.closed~.sb-toggle{right:0}
+
+/* Sidebar Sections */
+.sb-hdr{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sb-hdr-title{font-size:15px;font-weight:900;color:var(--olive)}
+.sb-body{flex:1;overflow-y:auto;padding:14px}
+.sb-body::-webkit-scrollbar{width:3px}
+.sb-body::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
+.sb-section{margin-bottom:20px}
+.sb-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+
+/* Filters */
+.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.filter-btn{padding:8px 6px;border-radius:9px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:5px;justify-content:center}
+.filter-btn:hover,.filter-btn.active{color:#fff;border-color:transparent}
+.filter-btn span{font-size:14px}
+
+/* Country Buttons */
+.country-list{display:flex;flex-direction:column;gap:4px}
+.country-btn{padding:9px 12px;border-radius:9px;border:none;background:var(--bg2);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;text-align:right;display:flex;align-items:center;gap:8px}
+.country-btn:hover{background:var(--ol);color:var(--olive)}
+.country-btn.active{background:var(--olive);color:#fff}
+.country-flag{font-size:18px}
+.country-count{margin-right:auto;font-size:11px;opacity:.7}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-mini{background:var(--bg2);border-radius:10px;padding:12px;text-align:center}
+.stat-mini-num{font-size:20px;font-weight:900;color:var(--olive)}
+.stat-mini-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Recent */
+.recent-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--line);cursor:pointer}
+.recent-item:last-child{border:none}
+.recent-av{width:32px;height:32px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.recent-info{flex:1;min-width:0}
+.recent-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-type{font-size:11px;color:var(--muted)}
+
+/* Popup */
+.azza-popup{font-family:Tajawal,sans-serif;direction:rtl;min-width:230px;max-width:260px}
+.pp-header{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.pp-av{width:46px;height:46px;border-radius:14px;object-fit:cover;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.pp-av img{width:100%;height:100%;border-radius:14px;object-fit:cover}
+.pp-info{flex:1}
+.pp-name{font-size:14px;font-weight:900;color:#1a1814;display:flex;align-items:center;gap:4px}
+.pp-verified{color:#1c5b38;font-size:12px}
+.pp-type{font-size:11px;color:#7a7060}
+.pp-trust{font-size:11px;font-weight:700;color:#c69749}
+.pp-body{font-size:12px;color:#6b6555;line-height:1.6;margin-bottom:10px}
+.pp-location{display:flex;align-items:center;gap:4px;font-size:12px;color:#7a7060;margin-bottom:10px}
+.pp-actions{display:flex;gap:6px}
+.pp-btn{flex:1;padding:7px 0;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
+.pp-msg{background:#1c5b38;color:#fff}.pp-msg:hover{background:#0e3622}
+.pp-follow{border:1.5px solid #e0d8c8;background:none;color:#1a1814}.pp-follow:hover{border-color:#1c5b38;color:#1c5b38}
+.pp-profile{background:#f5f0e8;color:#1a1814;border:none}.pp-profile:hover{background:#ece5d4}
+.pp-sep{height:.5px;background:#e0d8c8;margin:8px 0}
+
+/* Entity type colors */
+.t-investor{background:#1c5b38!important}.t-entrepreneur{background:#c69749!important}
+.t-student{background:#2563eb!important}.t-expert{background:#7c3aed!important}
+.t-company{background:#0891b2!important}.t-startup{background:#ef4444!important}
+.t-job{background:#16a34a!important}.t-ngo{background:#db2777!important}
+.t-university{background:#854F0B!important}.t-project{background:#6b7280!important}
+
+/* Legend */
+.legend{position:fixed;bottom:20px;right:calc(var(--sidebar-w) + 10px);z-index:400;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;transition:.3s;max-width:180px}
+.sidebar.closed~.legend{right:10px}
+.legend-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Controls */
+.map-controls{position:fixed;bottom:20px;left:14px;z-index:400;display:flex;flex-direction:column;gap:6px}
+.mc-btn{width:36px;height:36px;border-radius:10px;border:none;background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--ink)}
+.mc-btn:hover{background:var(--olive);color:#fff}
+
+/* Toast */
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
+
+/* Responsive */
+@media(max-width:600px){
+  :root{--sidebar-w:85vw}
+  .sidebar{transform:translateX(var(--sidebar-w));width:var(--sidebar-w)}
+  .sidebar.open{transform:translateX(0)}
+  .legend,.map-controls{display:none}
+}
+</style>
 </head>
 <body>
 
-<header class="top">
-  <div class="top-in">
-    <a href="app.html" class="brand">
-      <div class="brand-mark">ع</div>
-      <span class="brand-text">عزّة</span>
-    </a>
-    <div class="top-search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="q" placeholder="ابحث بالاسم أو المجال أو العنوان..." oninput="render()">
-    </div>
-    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
-      <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-    </button>
-    <button class="back-btn" onclick="history.back()">
-      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      رجوع
-    </button>
+<!-- Topbar -->
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="tb-logo">✦ خريطة AZZA</div>
+  <div class="tb-search-wrap">
+    <input class="tb-search" id="map-search" placeholder="ابحث عن شخص، مشروع، شركة..." oninput="doMapSearch(this.value)">
+    <svg class="tb-search-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
   </div>
-</header>
-
-<!-- تبويبات رئيسية -->
-<div class="main-tabs-wrap">
-<nav class="main-tabs">
-  <button class="mtab on" data-tab="people" onclick="switchTab(this)">
-    <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    الأشخاص <span class="mtab-count" id="tab-people-n">0</span>
-  </button>
-  <button class="mtab" data-tab="ideas" onclick="switchTab(this)">
-    <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
-    أفكار ومشاريع <span class="mtab-count" id="tab-ideas-n">0</span>
-  </button>
-  <button class="mtab" data-tab="jobs" onclick="switchTab(this)">
-    <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-    وظائف <span class="mtab-count" id="tab-jobs-n">0</span>
-  </button>
-  <button class="mtab" data-tab="map" onclick="switchTab(this)">
-    <svg class="ic" width="15" height="15" viewBox="0 0 24 24"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-    الخريطة
-  </button>
-</nav>
-<div class="main-tabs-fade right"></div>
-<div class="main-tabs-fade left"></div>
+  <div class="tb-acts">
+    <button class="tb-act" onclick="locateMe()" title="موقعي">📍</button>
+    <button class="tb-act" onclick="toggleTheme()" id="theme-btn">🌙</button>
+    <button class="tb-act" onclick="location.href='app.html'" title="الفيد">🏠</button>
+  </div>
 </div>
 
-<!-- فلاتر -->
-<div class="filters-wrap">
-  <div class="filters-inner">
+<!-- Map -->
+<div id="map"></div>
 
-    <!-- فلاتر الأشخاص -->
-    <div id="people-filters" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
-      <div class="role-pills" id="role-pills">
-        <button class="rpill on" data-r="all" onclick="setRole(this)"><span class="dot" style="background:#888"></span>الكل</button>
-        <button class="rpill" data-r="idea"        onclick="setRole(this)"><span class="dot" style="background:#1c5b38"></span>أصحاب أفكار</button>
-        <button class="rpill" data-r="investor"    onclick="setRole(this)"><span class="dot" style="background:#854F0B"></span>مستثمرون</button>
-        <button class="rpill" data-r="skill"       onclick="setRole(this)"><span class="dot" style="background:#0F6E56"></span>خبراء</button>
-        <button class="rpill" data-r="company"     onclick="setRole(this)"><span class="dot" style="background:#D85A30"></span>شركات</button>
-      </div>
-      <div class="filters-sep"></div>
-      <select class="f-sel" id="f-sector" onchange="render()">
-        <option value="all">كل القطاعات</option>
-        <option value="تقنية">💻 تقنية</option>
-        <option value="صحة">🩺 صحة</option>
-        <option value="تعليم">📚 تعليم</option>
-        <option value="بيئة">🌿 بيئة</option>
-        <option value="أعمال">💼 أعمال</option>
-        <option value="زراعة">🌾 زراعة</option>
-      </select>
-      <select class="f-sel" id="f-collab" onchange="render()">
-        <option value="all">وضع التعاون</option>
-        <option value="seeking_investor">🔍 يبحث عن مستثمر</option>
-        <option value="seeking_expert">🔍 يبحث عن خبير</option>
-        <option value="seeking_partner">🔍 يبحث عن شريك</option>
-        <option value="open">🟡 منفتح</option>
-      </select>
-      <div class="sort-pills">
-        <button class="spill on" data-s="match"  onclick="setSort(this)">✓ الأنسب</button>
-        <button class="spill"    data-s="trust"  onclick="setSort(this)">⭐ الأوثق</button>
-        <button class="spill"    data-s="active" onclick="setSort(this)">📝 الأنشط</button>
-        <button class="spill"    data-s="new"    onclick="setSort(this)">🕐 الأحدث</button>
+<!-- Sidebar Toggle -->
+<button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()">◀</button>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-hdr">
+    <div class="sb-hdr-title">🗺️ استكشاف الخريطة</div>
+    <button onclick="resetFilters()" style="font-size:12px;color:var(--muted);border:none;background:none;cursor:pointer;font-family:Tajawal,sans-serif">إعادة تعيين</button>
+  </div>
+  <div class="sb-body">
+
+    <!-- Stats -->
+    <div class="sb-section">
+      <div class="sb-section-title">إحصاءات</div>
+      <div class="stats-row">
+        <div class="stat-mini"><div class="stat-mini-num" id="stat-total">0</div><div class="stat-mini-lbl">كيان</div></div>
+        <div class="stat-mini"><div class="stat-mini-num" id="stat-visible">0</div><div class="stat-mini-lbl">مرئي</div></div>
+        <div class="stat-mini"><div class="stat-mini-num" id="stat-countries">22</div><div class="stat-mini-lbl">دولة</div></div>
+        <div class="stat-mini"><div class="stat-mini-num" id="stat-types">10</div><div class="stat-mini-lbl">نوع</div></div>
       </div>
     </div>
 
-    <!-- فلاتر الأفكار -->
-    <div id="ideas-filters" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
-      <div class="role-pills">
-        <button class="rpill on" data-pt="all"     onclick="setPType(this)">الكل</button>
-        <button class="rpill"    data-pt="idea"    onclick="setPType(this)">💡 أفكار</button>
-        <button class="rpill"    data-pt="project" onclick="setPType(this)">🚀 مشاريع</button>
-      </div>
-      <div class="filters-sep"></div>
-      <select class="f-sel" id="fp-sector" onchange="render()">
-        <option value="all">كل القطاعات</option>
-        <option value="tech">💻 تقنية</option>
-        <option value="health">🩺 صحة</option>
-        <option value="education">📚 تعليم</option>
-        <option value="environment">🌿 بيئة</option>
-        <option value="business">💼 أعمال</option>
-      </select>
-      <select class="f-sel" id="fp-nda" onchange="render()">
-        <option value="all">NDA: الكل</option>
-        <option value="nda">🔒 محمية بـ NDA</option>
-        <option value="open">🔓 مفتوحة</option>
-      </select>
-      <div class="sort-pills">
-        <button class="spill on" data-ps="new"      onclick="setPSort(this)">🕐 الأحدث</button>
-        <button class="spill"    data-ps="votes"    onclick="setPSort(this)">▲ الأكثر تصويتاً</button>
-        <button class="spill"    data-ps="interest" onclick="setPSort(this)">🤝 الأكثر اهتماماً</button>
-      </div>
+    <!-- Filters -->
+    <div class="sb-section">
+      <div class="sb-section-title">فلتر حسب النوع</div>
+      <div class="filter-grid" id="filter-grid"></div>
     </div>
 
-    <!-- فلاتر الوظائف -->
-    <div id="jobs-filters" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
-      <select class="f-sel" id="fj-type" onchange="render()">
-        <option value="all">كل أنواع التوظيف</option>
-        <option value="fulltime">دوام كامل</option>
-        <option value="parttime">دوام جزئي</option>
-        <option value="freelance">عمل حر / مستقل</option>
-        <option value="internship">تدريب</option>
-      </select>
-      <div class="sort-pills">
-        <button class="spill on" data-js="new" onclick="setJSort(this)">🕐 الأحدث</button>
-      </div>
+    <!-- Countries -->
+    <div class="sb-section">
+      <div class="sb-section-title">الدول العربية</div>
+      <div class="country-list" id="country-list"></div>
+    </div>
+
+    <!-- Nearby -->
+    <div class="sb-section">
+      <div class="sb-section-title">قريب منك</div>
+      <button onclick="locateMe()" style="width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub)">📍 استخدم موقعي الحالي</button>
+    </div>
+
+    <!-- Recent -->
+    <div class="sb-section">
+      <div class="sb-section-title">تم عرضهم مؤخراً</div>
+      <div id="recent-list"><div style="font-size:12px;color:var(--muted)">اضغط على أي نقطة للبدء</div></div>
     </div>
 
   </div>
 </div>
 
-<!-- مقترحون لك -->
-<div class="suggested-wrap" id="suggested-wrap" style="margin-top:14px;margin-bottom:6px"></div>
-
-<!-- نتائج -->
-<div class="results-bar">
-  <div id="results-label">جاري التحميل...</div>
+<!-- Legend -->
+<div class="legend" id="legend">
+  <div class="legend-title">دليل الألوان</div>
+  <div id="legend-items"></div>
 </div>
 
-<!-- شبكة الأشخاص -->
-<div class="grid" id="people-grid"></div>
-
-<!-- شبكة الأفكار -->
-<div class="ideas-grid" id="ideas-grid" style="display:none"></div>
-
-<!-- شبكة الوظائف -->
-<div class="ideas-grid" id="jobs-grid" style="display:none"></div>
-
-<!-- الخريطة التفاعلية — خريطة الوطن العربي الحقيقية (D3.js + GeoJSON) -->
-<div id="map-wrap" style="display:none;max-width:1200px;margin:0 auto;padding:0 20px 30px">
-
-  <!-- شريط البحث المستقل — منفصل تماماً عن الخريطة -->
-  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <span style="font-family:'Aref Ruqaa',serif;font-size:18px;color:var(--olive-deep)">خريطة الوطن العربي</span>
-    </div>
-    <div style="height:24px;width:1px;background:var(--line);flex-shrink:0"></div>
-    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:240px">
-      <select id="arab-map-country-sel" class="arab-map-sel" style="flex:1">
-        <option value="">— اختر الدولة —</option>
-      </select>
-      <select id="arab-map-city-sel" class="arab-map-sel" style="flex:1" disabled>
-        <option value="">— اختر المدينة —</option>
-      </select>
-    </div>
-  </div>
-  <p style="font-size:12px;color:var(--muted);margin:-6px 4px 14px">الأسماء المعروضة بكل مدينة هي مستخدمون حقيقيون مسجّلون على عزّة فقط — لن تظهر نتائج قبل تسجيل مستخدمين بهذي المدينة.</p>
-
-  <div id="arab-map-container" style="position:relative;width:100%;height:640px;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#a8cee8">
-
-    <!-- منطقة رسم الخريطة (D3 يحقن SVG هنا) -->
-    <div id="arab-map-svg-mount" style="position:absolute;inset:0"></div>
-
-    <!-- لوحة المعلومات اليسرى: بطاقة إحصائيات المدينة فقط -->
-    <div style="position:absolute;top:14px;right:14px;z-index:10;width:260px;display:flex;flex-direction:column;gap:10px;max-height:calc(100% - 28px);overflow-y:auto">
-
-      <!-- بطاقة إحصائيات المدينة -->
-      <div id="arab-map-city-stats" style="display:none;background:rgba(255,255,255,0.97);border-radius:6px;padding:14px 16px;box-shadow:0 2px 18px rgba(0,0,0,0.11);border-top:4px solid #888">
-        <div id="arab-map-stats-ar" style="font-family:'Tajawal',sans-serif;font-size:17px;font-weight:700;color:#1a1e28;text-align:right;line-height:1.2"></div>
-        <div id="arab-map-stats-en" style="font-family:'Tajawal',sans-serif;font-size:12px;color:#6a7a8a;font-style:italic;margin-bottom:10px"></div>
-        <div id="arab-map-stats-total" style="font-family:'Tajawal',sans-serif;font-size:12px;color:#3a4a5a;margin-bottom:10px"></div>
-        <div style="height:1px;background:#ede6dc;margin-bottom:10px"></div>
-
-        <!-- فلاتر نوع الحساب -->
-        <div id="arab-map-role-filters" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
-
-        <!-- قائمة الأسماء -->
-        <div id="arab-map-users-list" style="display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto"></div>
-      </div>
-
-    </div>
-
-    <!-- لوحة معلومات الدولة (يمين، تنزلق) -->
-    <div id="arab-map-info-panel" style="position:absolute;top:0;left:0;width:280px;height:100%;background:rgba(252,249,245,0.98);box-shadow:4px 0 32px rgba(0,0,0,0.12);z-index:20;transform:translateX(-108%);transition:transform .38s cubic-bezier(.34,1.1,.64,1);display:flex;flex-direction:column;overflow:hidden">
-      <div id="arab-map-info-strip" style="height:5px;background:#888;flex-shrink:0;transition:background .3s"></div>
-      <div style="display:flex;justify-content:flex-start;padding:12px 14px 0;flex-shrink:0">
-        <button id="arab-map-close-btn" style="width:28px;height:28px;background:rgba(0,0,0,.07);border:none;border-radius:50%;cursor:pointer;font-size:12px;color:#6a7a8a;display:flex;align-items:center;justify-content:center">✕</button>
-      </div>
-      <div style="padding:4px 20px 16px;flex-shrink:0">
-        <div id="arab-map-info-ar" style="font-family:'Tajawal',sans-serif;font-size:24px;font-weight:700;color:#1a1e28;text-align:right;line-height:1.2"></div>
-        <div id="arab-map-info-en" style="font-family:'Tajawal',sans-serif;font-size:15px;color:#5a6070;margin-top:3px;font-style:italic"></div>
-      </div>
-      <div style="height:1px;background:#ede6dc;margin:0 18px;flex-shrink:0"></div>
-      <div style="padding:14px 20px;display:flex;flex-direction:column;gap:13px;overflow-y:auto;flex:1">
-        <div>
-          <div style="font-family:'Tajawal',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1px;color:#9a8a76;margin-bottom:6px;text-transform:uppercase">العاصمة</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="width:11px;height:11px;background:#bf1f1f;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px #bf1f1f;flex-shrink:0"></span>
-            <div>
-              <div id="arab-map-cap-ar" style="font-family:'Tajawal',sans-serif;font-size:15px;font-weight:600;color:#1a1e28"></div>
-              <div id="arab-map-cap-en" style="font-family:'Tajawal',sans-serif;font-size:12px;color:#7a8898;font-style:italic"></div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div style="font-family:'Tajawal',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1px;color:#9a8a76;margin-bottom:5px;text-transform:uppercase">السكان</div>
-          <div id="arab-map-pop" style="font-family:'Tajawal',sans-serif;font-size:15px;color:#1a1e28"></div>
-        </div>
-        <div>
-          <div style="font-family:'Tajawal',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1px;color:#9a8a76;margin-bottom:5px;text-transform:uppercase">المساحة</div>
-          <div id="arab-map-area" style="font-family:'Tajawal',sans-serif;font-size:14px;color:#1a1e28"></div>
-        </div>
-        <div>
-          <div style="font-family:'Tajawal',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:1px;color:#9a8a76;margin-bottom:6px;text-transform:uppercase">أهم المدن</div>
-          <div id="arab-map-cities-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- أزرار التحكم بالزووم -->
-    <div id="arab-map-zoom-ctrl" style="position:absolute;bottom:24px;left:20px;z-index:10;transition:left .38s ease;display:flex;flex-direction:column">
-      <button id="arab-map-zoom-in" style="width:36px;height:36px;background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.13);border-bottom:none;border-radius:6px 6px 0 0;cursor:pointer;font-size:20px;font-weight:300;color:#2a3a4a">+</button>
-      <button id="arab-map-zoom-out" style="width:36px;height:36px;background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.13);border-radius:0 0 6px 6px;cursor:pointer;font-size:20px;font-weight:300;color:#2a3a4a">−</button>
-      <button id="arab-map-zoom-reset" style="width:36px;height:36px;background:rgba(255,255,255,.88);border:1px solid rgba(0,0,0,.13);border-radius:6px;cursor:pointer;font-size:16px;color:#4a5a6a;margin-top:5px">⊙</button>
-    </div>
-
-    <!-- تلميح أولي -->
-    <div id="arab-map-hint" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(10,20,40,.62);color:rgba(255,255,255,.88);padding:8px 20px;border-radius:24px;font-family:'Tajawal',sans-serif;font-size:11.5px;pointer-events:none;z-index:10;white-space:nowrap;backdrop-filter:blur(6px)">
-      انقر على أي دولة لعرض معلوماتها
-    </div>
-
-    <!-- شاشة التحميل -->
-    <div id="arab-map-loading" style="position:absolute;inset:0;background:linear-gradient(140deg,#1c3a56,#2a5878);display:flex;align-items:center;justify-content:center;z-index:60;transition:opacity .6s ease">
-      <div style="text-align:center;color:#fff">
-        <div style="font-family:'Tajawal',sans-serif;font-size:17px;font-style:italic;opacity:.65;letter-spacing:1.2px">The Arab World</div>
-        <div style="margin-top:22px;font-family:'Tajawal',sans-serif;font-size:12px;opacity:.4">جارٍ تحميل الخريطة…</div>
-      </div>
-    </div>
-
-  </div>
-  <div style="margin-top:8px;font-family:'Tajawal',sans-serif;font-size:11px;color:var(--muted);text-align:center">* بيانات تجريبية للعرض — تُستبدل ببيانات AZZA الحقيقية لاحقاً</div>
+<!-- Map Controls -->
+<div class="map-controls">
+  <button class="mc-btn" onclick="MAP.zoomIn()" title="تكبير">+</button>
+  <button class="mc-btn" onclick="MAP.zoomOut()" title="تصغير">−</button>
+  <button class="mc-btn" onclick="fitArabWorld()" title="الوطن العربي">🌍</button>
+  <button class="mc-btn" onclick="focusPalestine()" title="فلسطين">🇵🇸</button>
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* ── الوضع الليلي ── */
-const THEME_KEY='azza_theme';
-function applyTheme(){
-  const saved=localStorage.getItem(THEME_KEY);
-  document.body.classList.toggle('dark',saved==='dark');
-  const icon=document.getElementById('theme-icon');
-  if(icon)icon.innerHTML=saved==='dark'
-    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
-    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-}
-function toggleTheme(){
-  const isDark=document.body.classList.contains('dark');
-  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
-  applyTheme();
-}
-applyTheme();
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL, SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':'#c0392b';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-/* ══ AZZA — explore.html v2 ══ */
-const getMe    = ()=>{try{return JSON.parse(localStorage.getItem('azza_user'));}catch{return null;}};
-/* === Supabase - تهيئة العميل (اسم azzaDB لتجنب أي تعارض محتمل) === */
-const SB_URL='https://iecniydswotsilaueogq.supabase.co';
-const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
-const azzaDB=supabase.createClient(SB_URL,SB_ANON_KEY);
-let _postsMem=null, _usersMem=null;
+/* ══ Entity Types ══ */
+const ENTITY_TYPES = [
+  {id:'investor',     label:'مستثمر',        em:'💰', color:'#1c5b38'},
+  {id:'entrepreneur', label:'رائد أعمال',    em:'🚀', color:'#c69749'},
+  {id:'student',      label:'طالب',          em:'🎓', color:'#2563eb'},
+  {id:'expert',       label:'خبير',          em:'🧠', color:'#7c3aed'},
+  {id:'company',      label:'شركة',          em:'🏢', color:'#0891b2'},
+  {id:'startup',      label:'Startup',       em:'⚡', color:'#ef4444'},
+  {id:'job',          label:'وظيفة',         em:'💼', color:'#16a34a'},
+  {id:'ngo',          label:'منظمة',         em:'🤝', color:'#db2777'},
+  {id:'university',   label:'جامعة',         em:'🏛️', color:'#854F0B'},
+  {id:'project',      label:'مشروع',         em:'📋', color:'#6b7280'},
+];
 
-function _mapSupabasePost(row){
-  return {
-    id:row.id,author_id:row.author_id,author_name:row.author_name||'',
-    author_username:row.author_username||'',author_type:row.author_type||'idea',
-    author_photo:row.author_photo||null,type:row.type,text:row.text||'',
-    title:row.title||'',category:row.category||null,
-    image:row.image||null,video:row.video||null,pitch:row.pitch||'',
-    nda:row.nda||false,funding_goal:row.funding_goal||0,funding_stage:row.funding_stage||'',
-    job_location:row.job_location||'',job_salary:row.job_salary||'',job_type:row.job_type||'',
-    votes:row.votes||[],r_insightful:row.r_insightful||[],r_collab:row.r_collab||[],
-    comments:row.comments||[],views:row.views||0,created_at:row.created_at,
-  };
-}
+const ARAB_COUNTRIES = [
+  {code:'PS',name:'🇵🇸 فلسطين',lat:31.9,lng:35.2,zoom:8},
+  {code:'JO',name:'🇯🇴 الأردن',lat:30.5,lng:36.2,zoom:7},
+  {code:'SA',name:'🇸🇦 السعودية',lat:23.8,lng:45.0,zoom:5},
+  {code:'EG',name:'🇪🇬 مصر',lat:26.8,lng:30.8,zoom:6},
+  {code:'AE',name:'🇦🇪 الإمارات',lat:23.4,lng:53.8,zoom:7},
+  {code:'LB',name:'🇱🇧 لبنان',lat:33.8,lng:35.8,zoom:8},
+  {code:'MA',name:'🇲🇦 المغرب',lat:31.7,lng:-7.0,zoom:6},
+  {code:'TN',name:'🇹🇳 تونس',lat:33.8,lng:9.5,zoom:7},
+];
 
-async function loadInitialDataFromSupabase(){
-  try{
-    const {data,error}=await azzaDB.from('posts').select('*').order('created_at',{ascending:false});
-    if(error)throw error;
-    _postsMem=(data||[]).map(_mapSupabasePost);
-  }catch(e){ console.error('تعذر جلب المنشورات من Supabase:',e.message); _postsMem=null; }
-  try{
-    const {data,error}=await azzaDB.from('users').select('*');
-    if(error)throw error;
-    _usersMem=data||[];
-  }catch(e){ console.error('تعذر جلب المستخدمين من Supabase:',e.message); _usersMem=null; }
-}
+/* ══ State ══ */
+let MAP, CLUSTER, ALL_MARKERS=[], activeFilters=new Set(), activeCountry='', sidebarOpen=true;
+const RECENT=[];
 
-const getUsers = ()=>{ if(_usersMem!==null)return _usersMem; try{return JSON.parse(localStorage.getItem('azza_users')||'[]');}catch{return[];} };
-const getPosts = ()=>{ if(_postsMem!==null)return _postsMem; try{return JSON.parse(localStorage.getItem('azza_posts')||'[]');}catch{return[];} };
-const getInts  = ()=>{try{return JSON.parse(localStorage.getItem('azza_interests')||'{}');}catch{return{};}};
-const getSigs  = ()=>{try{return JSON.parse(localStorage.getItem('azza_nda_sigs')||'{}');}catch{return{};}};
-const getConvs = ()=>{try{return JSON.parse(localStorage.getItem('azza_conversations')||'[]');}catch{return[];}};
-const saveConvs= c=>localStorage.setItem('azza_conversations',JSON.stringify(c));
-const genId    = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
-const ini      = n=>(n||'م').trim()[0].toUpperCase();
-const esc      = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const timeAgo  = iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+'د';const h=Math.floor(m/60);if(h<24)return h+'س';return Math.floor(h/24)+' يوم';};
+/* ══ Init ══ */
+(function(){
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  document.getElementById('theme-btn').textContent=localStorage.getItem('azza_theme')==='dark'?'☀️':'🌙';
+  initMap();
+  buildFilters();
+  buildCountryList();
+  buildLegend();
+  loadEntities();
+})();
 
-const me = getMe();
-if(!me){ location.href='login.html'; }
+/* ══ Map Init ══ */
+function initMap(){
+  MAP=L.map('map',{zoomControl:false,attributionControl:false}).setView([31.5,35.0],7);
 
-const VERIFY={
-  idea:       {label:'صاحب فكرة',color:'#1c5b38',bg:'rgba(28,91,56,.1)'},
-  skill:      {label:'خبير',     color:'#0F6E56',bg:'rgba(15,110,86,.1)'},
-  investor:   {label:'مستثمر',   color:'#854F0B',bg:'rgba(133,79,11,.1)'},
-  company:    {label:'شركة',     color:'#D85A30',bg:'rgba(216,90,48,.1)'},
-  institution:{label:'مؤسسة',   color:'#185FA5',bg:'rgba(24,95,165,.1)'},
-};
-const COVER={
-  idea:'linear-gradient(135deg,#051e0f,#1c5b38)',
-  skill:'linear-gradient(135deg,#02201a,#0F6E56)',
-  investor:'linear-gradient(135deg,#1a0d00,#854F0B)',
-  company:'linear-gradient(135deg,#1e0805,#D85A30)',
-  institution:'linear-gradient(135deg,#010e1f,#185FA5)',
-};
-const COLLAB={seeking_investor:'🔍 مستثمر',seeking_expert:'🔍 خبير',seeking_partner:'🔍 شريك',open:'🟡 منفتح'};
-const MATCH={idea:['investor','skill','company'],skill:['idea','company','investor'],investor:['idea','company','skill'],company:['skill','idea','investor'],institution:['idea','skill','company']};
-const CAT_L={tech:'💻 تقنية',health:'🩺 صحة',education:'📚 تعليم',environment:'🌿 بيئة',business:'💼 أعمال'};
-const CAT_C={tech:'#185FA5',health:'#D85A30',education:'#854F0B',environment:'#0F6E56',business:'#3B6D11'};
+  /* Light Tiles */
+  const lightTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
+  /* Dark Tiles */
+  const darkTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
+  const isDk=localStorage.getItem('azza_theme')==='dark';
+  (isDk?darkTiles:lightTiles).addTo(MAP);
+  MAP._lightTiles=lightTiles; MAP._darkTiles=darkTiles;
 
-const vType = u=>(u?.subtype==='institution'?'institution':(u?.type||'idea'));
-
-let curTab='people', curRole='all', curSort='match';
-let curPType='all', curPSort='new', curJSort='new';
-
-function toast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':'#c0392b';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2600);}
-
-/* ── init ── */
-function init(){
-  const allUsers=getUsers().filter(u=>u.id!==me.id);
-  const allPosts=getPosts();
-  document.getElementById('tab-people-n').textContent=allUsers.length;
-  document.getElementById('tab-ideas-n').textContent=allPosts.filter(p=>p.type==='idea'||p.type==='project').length;
-  document.getElementById('tab-jobs-n').textContent=allPosts.filter(p=>p.type==='job').length;
-  buildSuggested(allUsers);
-  /* تعبئة خانة البحث تلقائياً لو وصلنا من dropdown البحث الموحّد بـ app.html */
-  const urlParams=new URLSearchParams(location.search);
-  const qParam=urlParams.get('q');
-  if(qParam){document.getElementById('q').value=qParam;}
-  render();
-
-  /* تحديث فعلي بالبيانات الحقيقية من Supabase فور وصولها (عادة أقل من ثانية) */
-  loadInitialDataFromSupabase().then(()=>{
-    const u2=getUsers().filter(u=>u.id!==me.id);
-    const p2=getPosts();
-    document.getElementById('tab-people-n').textContent=u2.length;
-    document.getElementById('tab-ideas-n').textContent=p2.filter(p=>p.type==='idea'||p.type==='project').length;
-    document.getElementById('tab-jobs-n').textContent=p2.filter(p=>p.type==='job').length;
-    buildSuggested(u2);
-    render();
+  /* Cluster */
+  CLUSTER=L.markerClusterGroup({
+    maxClusterRadius:50,
+    spiderfyOnMaxZoom:true,
+    showCoverageOnHover:false,
+    zoomToBoundsOnClick:true,
+    iconCreateFunction(c){
+      const n=c.getChildCount();
+      const size=n<10?36:n<50?44:52;
+      return L.divIcon({html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Tajawal,sans-serif;font-size:${size>40?15:13}px;font-weight:900;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25)">${n}</div>`,className:'',iconSize:[size,size]});
+    }
   });
+  MAP.addLayer(CLUSTER);
+
+  /* Events */
+  MAP.on('moveend',updateStats);
+  MAP.on('zoomend',updateStats);
 }
 
-/* ── مقترحون لك ── */
-function buildSuggested(users){
-  const myType=vType(me);
-  const priority=MATCH[myType]||[];
-  const suggested=users
-    .filter(u=>priority.includes(vType(u)))
-    .sort((a,b)=>quickTrust(b)-quickTrust(a))
-    .slice(0,8);
-  if(!suggested.length){document.getElementById('suggested-wrap').style.display='none';return;}
-  const chips=suggested.map(u=>{
-    const vc=VERIFY[vType(u)]||VERIFY.idea;
-    const av=u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(u.name);
-    const following=JSON.parse(localStorage.getItem('azza_following_'+me.id)||'[]');
-    const isF=following.includes(u.id);
-    return `<div class="sugg-chip" onclick="openUser('${u.id}')">
-      <div class="sugg-av">${av}</div>
-      <div>
-        <div class="sugg-name">${esc(u.name)}</div>
-        <div class="sugg-role" style="color:${vc.color}">${vc.label}</div>
+/* ══ تحميل الكيانات ══ */
+async function loadEntities(){
+  /* 1. المستخدمون من Supabase */
+  const {data:users}=await db.from('users').select('id,name,type,bio,photo,city_name,country_code,lat,lng,is_verified,trust_score').not('lat','is',null).not('lng','is',null).limit(200);
+
+  /* 2. بيانات تجريبية لفلسطين */
+  const DEMO=[
+    {id:'d1',name:'أحمد محمد - مستثمر',type:'investor',bio:'مستثمر ملاك في التقنية والابتكار',city:'رام الله',country_code:'PS',lat:31.9038,lng:35.2034,is_verified:true,trust_score:87},
+    {id:'d2',name:'سارة علي - رائدة أعمال',type:'entrepreneur',bio:'مؤسسة شركة تقنية في فلسطين',city:'نابلس',country_code:'PS',lat:32.2211,lng:35.2544,is_verified:true,trust_score:74},
+    {id:'d3',name:'محمد خالد - طالب',type:'student',bio:'طالب هندسة برمجيات، يبحث عن فرص تدريب',city:'الخليل',country_code:'PS',lat:31.5326,lng:35.0998,is_verified:false,trust_score:42},
+    {id:'d4',name:'جامعة بيرزيت',type:'university',bio:'أعرق الجامعات الفلسطينية',city:'بيرزيت',country_code:'PS',lat:31.9794,lng:35.1856,is_verified:true,trust_score:95},
+    {id:'d5',name:'Startup فلسطين',type:'startup',bio:'حاضنة أعمال للشركات الناشئة في غزة',city:'غزة',country_code:'PS',lat:31.5017,lng:34.4668,is_verified:true,trust_score:68},
+    {id:'d6',name:'وظيفة: مطور Flutter',type:'job',bio:'مطلوب مطور Flutter لشركة تقنية في رام الله',city:'رام الله',country_code:'PS',lat:31.9100,lng:35.2100,is_verified:false,trust_score:0},
+    {id:'d7',name:'منظمة ريادة فلسطين',type:'ngo',bio:'ندعم رواد الأعمال الشباب في فلسطين',city:'بيت لحم',country_code:'PS',lat:31.7054,lng:35.2024,is_verified:true,trust_score:81},
+    {id:'d8',name:'خبير تسويق رقمي',type:'expert',bio:'خبرة 10 سنوات في التسويق الرقمي للشركات العربية',city:'القدس',country_code:'PS',lat:31.7683,lng:35.2137,is_verified:true,trust_score:79},
+    {id:'d9',name:'شركة تك بالستين',type:'company',bio:'شركة تقنية رائدة في تطوير التطبيقات',city:'رام الله',country_code:'PS',lat:31.8900,lng:35.1950,is_verified:true,trust_score:88},
+    {id:'d10',name:'مشروع تخرج: منصة تعليمية',type:'project',bio:'منصة تعليمية لطلاب المدارس الفلسطينية',city:'جنين',country_code:'PS',lat:32.4598,lng:35.3027,is_verified:false,trust_score:30},
+    {id:'d11',name:'مستثمر أردني',type:'investor',bio:'أبحث عن مشاريع ناشئة في الأردن وفلسطين',city:'عمان',country_code:'JO',lat:31.9539,lng:35.9106,is_verified:true,trust_score:72},
+    {id:'d12',name:'رائدة أعمال لبنانية',type:'entrepreneur',bio:'مؤسسة منصة التجارة الإلكترونية',city:'بيروت',country_code:'LB',lat:33.8938,lng:35.5018,is_verified:true,trust_score:65},
+  ];
+
+  const all=[...(users||[]),...DEMO];
+  all.forEach(u=>addMarker(u));
+  document.getElementById('stat-total').textContent=all.length;
+  updateStats();
+}
+
+/* ══ إضافة Marker ══ */
+function addMarker(entity){
+  if(!entity.lat||!entity.lng) return;
+  const type=ENTITY_TYPES.find(t=>t.id===entity.type)||ENTITY_TYPES[0];
+  const icon=L.divIcon({
+    html:`<div style="width:36px;height:36px;border-radius:50%;background:${type.color};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.2s">${type.em}</div>`,
+    className:'',
+    iconSize:[36,36],
+    iconAnchor:[18,18],
+    popupAnchor:[0,-18],
+  });
+
+  const m=L.marker([entity.lat,entity.lng],{icon});
+  m.entity=entity;
+  m.on('click',()=>showPopup(m,entity));
+  CLUSTER.addLayer(m);
+  ALL_MARKERS.push({marker:m,entity,type:entity.type,country:entity.country_code});
+}
+
+/* ══ Popup ══ */
+function showPopup(m,e){
+  const type=ENTITY_TYPES.find(t=>t.id===e.type)||ENTITY_TYPES[0];
+  const photoHTML=e.photo
+    ?`<img src="${esc(e.photo)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+  const html=`
+    <div class="azza-popup">
+      <div class="pp-header">
+        <div class="pp-av">${photoHTML}<span>${type.em}</span></div>
+        <div class="pp-info">
+          <div class="pp-name">${esc(e.name||'—')}${e.is_verified?'<span class="pp-verified">✓</span>':''}</div>
+          <div class="pp-type">${type.em} ${type.label}</div>
+          ${e.trust_score?`<div class="pp-trust">⭐ Trust ${e.trust_score}</div>`:''}
+        </div>
       </div>
-      <button class="sugg-follow${isF?' on':''}" id="sf-${u.id}" onclick="event.stopPropagation();quickFollow('${u.id}',this)">${isF?'✓':'+ متابعة'}</button>
+      ${e.bio?`<div class="pp-body">${esc((e.bio||'').substring(0,90))}${(e.bio||'').length>90?'...':''}</div>`:''}
+      <div class="pp-location">📍 ${esc(e.city_name||e.city||'')}${e.country_code?', '+e.country_code:''}</div>
+      <div class="pp-sep"></div>
+      <div class="pp-actions">
+        <button class="pp-btn pp-msg" onclick="location.href='messages.html?to=${esc(e.id)}'">💬 رسالة</button>
+        <button class="pp-btn pp-follow" onclick="followEntity('${esc(e.id)}')">+ تابع</button>
+        <button class="pp-btn pp-profile" onclick="location.href='user.html?id=${esc(e.id)}'">الملف</button>
+      </div>
     </div>`;
-  }).join('');
-  document.getElementById('suggested-wrap').innerHTML=`
-    <div class="suggested-head">
-      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      مقترحون لك
-    </div>
-    <div class="suggested-row">${chips}</div>`;
+
+  m.bindPopup(L.popup({maxWidth:270,closeButton:true,className:'azza-leaflet-popup'}).setContent(html)).openPopup();
+  addRecent(e);
 }
 
-/* ── تبديل التاب ── */
-function switchTab(btn){
-  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  curTab=btn.dataset.tab;
-  document.getElementById('people-filters').style.display=curTab==='people'?'flex':'none';
-  document.getElementById('ideas-filters').style.display=curTab==='ideas'?'flex':'none';
-  document.getElementById('jobs-filters').style.display=curTab==='jobs'?'flex':'none';
-  document.getElementById('people-grid').style.display=curTab==='people'?'grid':'none';
-  document.getElementById('ideas-grid').style.display=curTab==='ideas'?'grid':'none';
-  document.getElementById('jobs-grid').style.display=curTab==='jobs'?'grid':'none';
-  document.getElementById('map-wrap').style.display=curTab==='map'?'block':'none';
-  document.getElementById('suggested-wrap').style.display=curTab==='people'?'block':'none';
-  /* انتقال سلس (fade) للقسم النشط حديثاً */
-  const activePanel=document.getElementById(curTab==='map'?'map-wrap':(curTab+'-grid'));
-  if(activePanel){
-    activePanel.classList.remove('tab-fade-in');
-    void activePanel.offsetWidth; /* إعادة تشغيل الأنيميشن لو نفس التبويب اتضغط مرتين */
-    activePanel.classList.add('tab-fade-in');
-  }
-  if(curTab==='map'){
-    document.querySelector('.results-bar').style.display='none';
-    initArabWorldMap();
+/* ══ Filters ══ */
+function buildFilters(){
+  document.getElementById('filter-grid').innerHTML=ENTITY_TYPES.map(t=>`
+    <button class="filter-btn" id="f-${t.id}" onclick="toggleFilter('${t.id}')" style="border-color:${t.color}20">
+      <span>${t.em}</span>${t.label}
+    </button>`).join('');
+}
+
+function toggleFilter(type){
+  const btn=document.getElementById('f-'+type);
+  const t=ENTITY_TYPES.find(x=>x.id===type);
+  if(activeFilters.has(type)){
+    activeFilters.delete(type);
+    btn.classList.remove('active');
+    btn.style.background='';
+    btn.style.color='';
   }else{
-    document.querySelector('.results-bar').style.display='flex';
-    render();
+    activeFilters.add(type);
+    btn.classList.add('active');
+    btn.style.background=t.color;
+    btn.style.color='#fff';
   }
-  scrollActiveTabIntoView(btn);
+  applyFilters();
 }
 
-/* تمرير شريط التبويبات برمجياً عشان التبويب النشط يبان كاملاً دائماً — يلافي خلل قياس RTL+overflow بالمتصفح */
-function scrollActiveTabIntoView(btn){
-  const wrap=document.querySelector('.main-tabs');
-  if(!wrap||!btn)return;
-  const wrapRect=wrap.getBoundingClientRect();
-  const btnRect=btn.getBoundingClientRect();
-  if(btnRect.right>wrapRect.right){
-    wrap.scrollLeft+= (btnRect.right-wrapRect.right) + 16;
-  }else if(btnRect.left<wrapRect.left){
-    wrap.scrollLeft-= (wrapRect.left-btnRect.left) + 16;
-  }
-  updateTabsFade();
-}
-
-/* إظهار/إخفاء تظليلات التدرج حسب وجود محتوى مخفي فعلياً بكل جهة (يدعم RTL بدقة) */
-function updateTabsFade(){
-  const wrap=document.querySelector('.main-tabs');
-  const fadeRight=document.querySelector('.main-tabs-fade.right');
-  const fadeLeft=document.querySelector('.main-tabs-fade.left');
-  if(!wrap||!fadeRight||!fadeLeft)return;
-  const maxScroll=wrap.scrollWidth-wrap.clientWidth;
-  /* بمعيار RTL بمتصفحات Chromium: scrollLeft يبدأ من 0 (أقصى اليمين منطقياً) ويصل لقيمة سالبة كل ما تحركت لليسار */
-  const atStart=wrap.scrollLeft>=-2;
-  const atEnd=wrap.scrollLeft<=-(maxScroll-2);
-  fadeRight.classList.toggle('show',!atStart);
-  fadeLeft.classList.toggle('show',!atEnd&&maxScroll>2);
-}
-
-/* ── فلاتر الأشخاص ── */
-function setRole(btn){
-  document.querySelectorAll('#role-pills .rpill').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');curRole=btn.dataset.r;render();
-}
-function setSort(btn){
-  document.querySelectorAll('.spill[data-s]').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');curSort=btn.dataset.s;render();
-}
-/* ── فلاتر الأفكار ── */
-function setPType(btn){
-  document.querySelectorAll('[data-pt]').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');curPType=btn.dataset.pt;render();
-}
-function setPSort(btn){
-  document.querySelectorAll('.spill[data-ps]').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');curPSort=btn.dataset.ps;render();
-}
-/* ── فلاتر الوظائف ── */
-function setJSort(btn){
-  document.querySelectorAll('.spill[data-js]').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');curJSort=btn.dataset.js;render();
-}
-
-/* ── trust score ── */
-function quickTrust(u){
-  let s=0;
-  if(u.photo)s+=15;if((u.bio||'').length>10)s+=15;
-  if(u.phone||u.email)s+=10;if((u.skills||[]).length)s+=10;
-  if(u.role_meta&&Object.keys(u.role_meta).length>2)s+=15;
-  s+=Math.min(35,getPosts().filter(p=>p.author_id===u.id).length*5);
-  return Math.min(100,s);
-}
-
-/* ── render ── */
-function render(){
-  if(curTab==='people') renderPeople();
-  else if(curTab==='jobs') renderJobs();
-  else renderIdeas();
-}
-
-function renderPeople(){
-  const q=(document.getElementById('q')?.value||'').toLowerCase();
-  const sector=document.getElementById('f-sector')?.value||'all';
-  const collab=document.getElementById('f-collab')?.value||'all';
-  const priority=MATCH[vType(me)]||[];
-
-  let users=getUsers().filter(u=>u.id!==me.id);
-
-  if(curRole!=='all') users=users.filter(u=>{
-    const t=vType(u);
-    if(curRole==='company') return t==='company'||t==='institution';
-    return t===curRole;
+function applyFilters(){
+  CLUSTER.clearLayers();
+  const hasF=activeFilters.size>0;
+  const hasC=activeCountry!=='';
+  ALL_MARKERS.forEach(({marker,entity,type,country})=>{
+    const typeOK=!hasF||activeFilters.has(type);
+    const countryOK=!hasC||country===activeCountry;
+    if(typeOK&&countryOK) CLUSTER.addLayer(marker);
   });
-  if(q) users=users.filter(u=>
-    (u.name||'').toLowerCase().includes(q)||
-    (u.username||'').toLowerCase().includes(q)||
-    (u.bio||'').toLowerCase().includes(q)||
-    (u.skills||[]).some(s=>s.toLowerCase().includes(q))
-  );
-  if(sector!=='all') users=users.filter(u=>[
-    ...(u.role_meta?.inv_sectors||[]),
-    ...(u.role_meta?.exp_sectors||[]),
-    ...(u.role_meta?.co_sectors||[]),
-    ...(u.role_meta?.idea_sectors||[]),
-    ...(u.skills||[])
-  ].some(s=>s.includes(sector)));
-  if(collab!=='all') users=users.filter(u=>u.collab_status===collab);
+  updateStats();
+}
 
-  if(curSort==='match') users.sort((a,b)=>{const ap=priority.indexOf(vType(a)),bp=priority.indexOf(vType(b));return(ap===-1?99:ap)-(bp===-1?99:bp);});
-  else if(curSort==='trust') users.sort((a,b)=>quickTrust(b)-quickTrust(a));
-  else if(curSort==='active'){const posts=getPosts();users.sort((a,b)=>posts.filter(p=>p.author_id===b.id).length-posts.filter(p=>p.author_id===a.id).length);}
-  else if(curSort==='new') users.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+function resetFilters(){
+  activeFilters.clear();
+  activeCountry='';
+  document.querySelectorAll('.filter-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';});
+  document.querySelectorAll('.country-btn').forEach(b=>b.classList.remove('active'));
+  applyFilters();
+}
 
-  document.getElementById('results-label').innerHTML=`عرض <strong>${users.length}</strong> مستخدم`;
-  const grid=document.getElementById('people-grid');
-  if(!users.length){
-    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><b>لا نتائج</b><span>جرّب تغيير الفلاتر أو البحث</span></div>`;
-    return;
+/* ══ Countries ══ */
+function buildCountryList(){
+  document.getElementById('country-list').innerHTML=ARAB_COUNTRIES.map(c=>`
+    <button class="country-btn" id="cb-${c.code}" onclick="focusCountry('${c.code}',${c.lat},${c.lng},${c.zoom})">
+      ${c.name}<span class="country-count"></span>
+    </button>`).join('');
+}
+
+function focusCountry(code,lat,lng,zoom){
+  activeCountry=activeCountry===code?'':code;
+  document.querySelectorAll('.country-btn').forEach(b=>b.classList.toggle('active',b.id==='cb-'+code&&activeCountry===code));
+  if(activeCountry) MAP.setView([lat,lng],zoom,{animate:true,duration:.5});
+  applyFilters();
+}
+
+/* ══ Legend ══ */
+function buildLegend(){
+  document.getElementById('legend-items').innerHTML=ENTITY_TYPES.slice(0,6).map(t=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${t.color}"></div>
+      <span>${t.em} ${t.label}</span>
+    </div>`).join('');
+}
+
+/* ══ Navigate ══ */
+function fitArabWorld(){ MAP.setView([25,38],4,{animate:true,duration:.8}); }
+function focusPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.6}); }
+
+function locateMe(){
+  navigator.geolocation?.getCurrentPosition(pos=>{
+    const {latitude:lat,longitude:lng}=pos.coords;
+    MAP.setView([lat,lng],12,{animate:true});
+    L.circleMarker([lat,lng],{radius:10,color:'#1c5b38',fillColor:'#1c5b38',fillOpacity:.4}).addTo(MAP).bindPopup('📍 موقعك الحالي').openPopup();
+    toast('تم تحديد موقعك');
+  },()=>toast('تعذّر تحديد الموقع','err'));
+}
+
+/* ══ Search ══ */
+function doMapSearch(q){
+  if(!q.trim()){ applyFilters(); return; }
+  const low=q.toLowerCase();
+  CLUSTER.clearLayers();
+  let count=0;
+  ALL_MARKERS.forEach(({marker,entity})=>{
+    const match=(entity.name||'').toLowerCase().includes(low)||(entity.bio||'').toLowerCase().includes(low)||(entity.city_name||entity.city||'').toLowerCase().includes(low);
+    if(match){ CLUSTER.addLayer(marker); count++; }
+  });
+  document.getElementById('stat-visible').textContent=count;
+  if(count>0) toast(`${count} نتيجة`);
+  else toast('لا نتائج','err');
+}
+
+/* ══ Stats ══ */
+function updateStats(){
+  const bounds=MAP.getBounds();
+  let visible=0;
+  CLUSTER.eachLayer(m=>{ if(bounds.contains(m.getLatLng())) visible++; });
+  document.getElementById('stat-visible').textContent=visible;
+}
+
+/* ══ Recent ══ */
+function addRecent(e){
+  if(RECENT.find(r=>r.id===e.id)) return;
+  RECENT.unshift(e);
+  if(RECENT.length>5) RECENT.pop();
+  renderRecent();
+}
+function renderRecent(){
+  const type=t=>ENTITY_TYPES.find(x=>x.id===t)||ENTITY_TYPES[0];
+  document.getElementById('recent-list').innerHTML=RECENT.map(e=>`
+    <div class="recent-item" onclick="MAP.setView([${e.lat},${e.lng}],14,{animate:true})">
+      <div class="recent-av">${type(e.type).em}</div>
+      <div class="recent-info">
+        <div class="recent-name">${esc(e.name||'—')}</div>
+        <div class="recent-type">${type(e.type).label} · ${esc(e.city_name||e.city||'')}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══ Follow ══ */
+async function followEntity(id){
+  if(!me){ toast('سجّل دخولاً','err'); return; }
+  await db.from('follows').upsert({follower_id:me.id,following_id:id},{onConflict:'follower_id,following_id'});
+  toast('تم المتابعة ✅');
+}
+
+/* ══ Sidebar ══ */
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  const sb=document.getElementById('sidebar');
+  const btn=document.getElementById('sb-toggle');
+  const legend=document.getElementById('legend');
+  if(sidebarOpen){ sb.classList.remove('closed'); btn.textContent='▶'; }
+  else{ sb.classList.add('closed'); btn.textContent='◀'; }
+}
+
+/* ══ Theme ══ */
+function toggleTheme(){
+  const dk=document.documentElement.classList.toggle('dk');
+  localStorage.setItem('azza_theme',dk?'dark':'light');
+  document.getElementById('theme-btn').textContent=dk?'☀️':'🌙';
+  if(dk){ MAP._lightTiles.remove(); MAP._darkTiles.addTo(MAP); }
+  else  { MAP._darkTiles.remove(); MAP._lightTiles.addTo(MAP); }
+}
+
+/* تلقائياً: إضافة المستخدم الحالي على الخريطة */
+(async()=>{
+  if(me?.lat&&me?.lng){
+    const myIcon=L.divIcon({
+      html:`<div style="width:40px;height:40px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#0e3622">${(me.name||'م')[0]}</div>`,
+      className:'',iconSize:[40,40],iconAnchor:[20,20],popupAnchor:[0,-20]
+    });
+    L.marker([me.lat,me.lng],{icon:myIcon}).addTo(MAP)
+      .bindPopup(`<div style="font-family:Tajawal,sans-serif;text-align:center;direction:rtl"><strong>أنت 📍</strong><br>${esc(me.name||'')}</div>`);
+    MAP.setView([me.lat,me.lng],10,{animate:true});
   }
-  grid.innerHTML=users.map(u=>buildUserCard(u,priority)).join('');
-}
-
-function renderIdeas(){
-  const q=(document.getElementById('q')?.value||'').toLowerCase();
-  const sector=document.getElementById('fp-sector')?.value||'all';
-  const ndaF=document.getElementById('fp-nda')?.value||'all';
-
-  let posts=getPosts().filter(p=>p.type==='idea'||p.type==='project');
-
-  if(curPType!=='all') posts=posts.filter(p=>p.type===curPType);
-  if(q) posts=posts.filter(p=>
-    (p.title||'').toLowerCase().includes(q)||
-    (p.pitch||'').toLowerCase().includes(q)||
-    (p.text||'').toLowerCase().includes(q)||
-    (p.author_name||'').toLowerCase().includes(q)
-  );
-  if(sector!=='all') posts=posts.filter(p=>p.category===sector);
-  if(ndaF==='nda') posts=posts.filter(p=>p.nda);
-  else if(ndaF==='open') posts=posts.filter(p=>!p.nda);
-
-  const ints=getInts();
-  if(curPSort==='new') posts.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  else if(curPSort==='votes') posts.sort((a,b)=>(b.votes?.length||0)-(a.votes?.length||0));
-  else if(curPSort==='interest') posts.sort((a,b)=>(ints[b.id]?.length||0)-(ints[a.id]?.length||0));
-
-  document.getElementById('results-label').innerHTML=`عرض <strong>${posts.length}</strong> فكرة ومشروع`;
-  const grid=document.getElementById('ideas-grid');
-  if(!posts.length){
-    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">💡</div><b>لا أفكار بعد</b><span>كن أول من ينشر فكرته!</span></div>`;
-    return;
-  }
-  grid.innerHTML=posts.map(p=>buildPostCard(p)).join('');
-}
-
-function renderJobs(){
-  const q=(document.getElementById('q')?.value||'').toLowerCase();
-  const jType=document.getElementById('fj-type')?.value||'all';
-
-  let jobs=getPosts().filter(p=>p.type==='job');
-
-  if(jType!=='all') jobs=jobs.filter(p=>p.job_type===jType);
-  if(q) jobs=jobs.filter(p=>
-    (p.title||'').toLowerCase().includes(q)||
-    (p.text||'').toLowerCase().includes(q)||
-    (p.job_location||'').toLowerCase().includes(q)||
-    (p.author_name||'').toLowerCase().includes(q)
-  );
-
-  jobs.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-
-  document.getElementById('results-label').innerHTML=`عرض <strong>${jobs.length}</strong> وظيفة`;
-  const grid=document.getElementById('jobs-grid');
-  if(!jobs.length){
-    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><b>لا وظائف بعد</b><span>كن أول من ينشر فرصة توظيف!</span></div>`;
-    return;
-  }
-  grid.innerHTML=jobs.map(p=>buildJobCard(p)).join('');
-}
-
-/* ── بطاقة مستخدم ── */
-function buildUserCard(u,priority){
-  const t=vType(u);const vc=VERIFY[t]||VERIFY.idea;
-  const cover=COVER[t]||COVER.idea;
-  const av=u.photo?`<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover">`:ini(u.name);
-  const isMatch=priority.includes(t);
-  const following=JSON.parse(localStorage.getItem('azza_following_'+me.id)||'[]');
-  const isF=following.includes(u.id);
-  const meta=u.role_meta||{};
-  const trust=quickTrust(u);
-  const posts=getPosts().filter(p=>p.author_id===u.id);
-  const tags=[...(u.skills||[]).slice(0,2),...(meta.inv_sectors||meta.exp_sectors||meta.co_sectors||meta.idea_sectors||[]).slice(0,2)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,3);
-  let roleMeta='';
-  if(t==='investor'&&meta.inv_min) roleMeta=`<span>💰 $${(meta.inv_min/1000).toFixed(0)}K+</span>`;
-  else if(t==='skill'&&meta.exp_rate) roleMeta=`<span>💵 $${meta.exp_rate}/س</span>`;
-  else if((t==='company'||t==='institution')&&meta.co_size) roleMeta=`<span>👥 ${meta.co_size}</span>`;
-
-  return `<div class="u-card" onclick="openUser('${u.id}')">
-    <div class="u-cover" style="background:${cover}">
-      ${isMatch?`<span class="match-tag">✓ مناسب لك</span>`:''}
-      <div class="u-av-ring" style="background:${vc.bg}">${av}</div>
-    </div>
-    <div class="u-body">
-      <div class="u-name">${esc(u.name)}</div>
-      ${u.username?`<div class="u-handle">@${esc(u.username)}</div>`:''}
-      <div>
-        <span class="u-badge" style="background:${vc.bg};color:${vc.color}">✓ ${vc.label}</span>
-        ${u.collab_status&&COLLAB[u.collab_status]?`<span style="font-size:11px;color:var(--muted);margin-right:4px">${COLLAB[u.collab_status]}</span>`:''}
-      </div>
-      <div class="u-bio">${esc(u.bio||'لم يضف هذا المستخدم نبذة بعد.')}</div>
-      ${tags.length?`<div class="u-tags">${tags.map(tg=>`<span class="u-tag">${esc(tg)}</span>`).join('')}</div>`:''}
-      <div class="u-meta">
-        ${roleMeta}
-        ${posts.length?`<span>📝 ${posts.length}</span>`:''}
-        ${trust>=50?`<span style="color:var(--olive)">⭐ ${trust}%</span>`:''}
-      </div>
-    </div>
-    <div class="u-actions" onclick="event.stopPropagation()">
-      <button class="u-msg" onclick="startMsg('${u.id}')">
-        <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        رسالة
-      </button>
-      <button class="u-follow${isF?' on':''}" id="fw-${u.id}" onclick="toggleFollow('${u.id}',this)">
-        ${isF?'✓ تتابعه':'+ متابعة'}
-      </button>
-    </div>
-  </div>`;
-}
-
-/* ── بطاقة فكرة/مشروع ── */
-function buildPostCard(p){
-  const ints=getInts();
-  const voteN=(p.votes||[]).length;
-  const voted=(p.votes||[]).includes(me.id);
-  const intCount=(ints[p.id]||[]).length;
-  const isInt=(ints[p.id]||[]).some(x=>x.id===me.id);
-  const isSig=(getSigs()[p.id]||[]).some(x=>x.id===me.id);
-  const catColor=CAT_C[p.category]||'#1c5b38';
-  const vc=VERIFY[p.author_type]||VERIFY.idea;
-  const av=p.author_photo?`<img src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(p.author_name);
-  const isIdea=p.type==='idea';
-  const mine=p.author_id===me.id;
-
-  let miniFund='';
-  if(p.type==='project'&&p.funding_goal>0){
-    const raised=Math.min(p.funding_goal,Math.round(intCount*(p.funding_goal/15)));
-    const pct=Math.round(raised/p.funding_goal*100);
-    miniFund=`<div class="mini-fund">
-      <div class="mini-fund-top"><span class="mini-fund-amt">$${raised.toLocaleString()}</span><span style="color:var(--muted);font-size:11px">${pct}% من $${p.funding_goal.toLocaleString()}</span></div>
-      <div class="mini-fund-track"><div class="mini-fund-fill" style="width:${pct}%"></div></div>
-    </div>`;
-  }
-
-  return `<div class="p-card" onclick="location.href='post.html?id=${p.id}'">
-    <div class="p-stripe" style="background:${catColor}"></div>
-    <div class="p-card-head">
-      <div class="p-av" onclick="event.stopPropagation();openUser('${p.author_id}')">${av}</div>
-      <div class="p-author">
-        <div class="p-author-name">${esc(p.author_name)}</div>
-        <div class="p-author-role" style="color:${vc.color}">${vc.label}</div>
-      </div>
-      <span class="p-type-badge" style="background:${isIdea?'rgba(28,91,56,.08)':'rgba(198,151,73,.1)'};color:${isIdea?'#0e3622':'#9b7420'};border:1px solid ${isIdea?'rgba(28,91,56,.2)':'rgba(198,151,73,.3)'}">
-        ${isIdea?'💡 فكرة':'🚀 مشروع'}
-      </span>
-    </div>
-    <div class="p-card-body">
-      ${p.title?`<div class="p-title">${esc(p.title)}</div>`:''}
-      ${p.pitch?`<div class="p-pitch">${esc(p.pitch)}</div>`:p.text?`<div class="p-pitch">${esc(p.text.substring(0,120))}</div>`:''}
-      <div class="p-tags-row">
-        ${p.category&&CAT_L[p.category]?`<span class="p-tag">${CAT_L[p.category]}</span>`:''}
-        ${p.nda?`<span class="p-tag" style="color:#0e3622;border-color:rgba(14,54,34,.25)">🔒 NDA</span>`:''}
-        ${timeAgo(p.created_at)?`<span class="p-tag">${timeAgo(p.created_at)}</span>`:''}
-      </div>
-      ${miniFund}
-    </div>
-    <div class="p-card-foot" onclick="event.stopPropagation()">
-      ${isIdea?`<button class="p-vote-btn${voted?' voted':''}" onclick="votePost('${p.id}',this)">▲ ${voteN||0}</button>`:''}
-      ${intCount?`<span class="p-stat">🤝 ${intCount}</span>`:''}
-      <span class="p-stat">💬 ${(p.comments||[]).length||0}</span>
-      ${!mine?`<button class="p-interest-btn${isInt?' done':''}" onclick="expressInterest('${p.id}',this)">${isInt?'✅ مهتم':'🤝 اهتمام'}</button>`:''}
-    </div>
-  </div>`;
-}
-
-/* ── بطاقة وظيفة ── */
-function buildJobCard(p){
-  const catColor='#185fa5';
-  const vc=VERIFY[p.author_type]||VERIFY.idea;
-  const av=p.author_photo?`<img src="${p.author_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(p.author_name);
-  const JTYPE_L={fulltime:'دوام كامل',parttime:'دوام جزئي',freelance:'عمل حر / مستقل',internship:'تدريب'};
-
-  return `<div class="p-card" onclick="location.href='post.html?id=${p.id}'">
-    <div class="p-stripe" style="background:${catColor}"></div>
-    <div class="p-card-head">
-      <div class="p-av" onclick="event.stopPropagation();openUser('${p.author_id}')">${av}</div>
-      <div class="p-author">
-        <div class="p-author-name">${esc(p.author_name)}</div>
-        <div class="p-author-role" style="color:${vc.color}">${vc.label}</div>
-      </div>
-      <span class="p-type-badge" style="background:rgba(24,95,165,.08);color:#0c447c;border:1px solid rgba(24,95,165,.2)">
-        📋 وظيفة
-      </span>
-    </div>
-    <div class="p-card-body">
-      ${p.title?`<div class="p-title">${esc(p.title)}</div>`:''}
-      ${p.text?`<div class="p-pitch">${esc(p.text.substring(0,120))}</div>`:''}
-      <div class="p-tags-row">
-        ${p.job_location?`<span class="p-tag">📍 ${esc(p.job_location)}</span>`:''}
-        ${p.job_salary?`<span class="p-tag">💰 ${esc(p.job_salary)}</span>`:''}
-        ${p.job_type&&JTYPE_L[p.job_type]?`<span class="p-tag">${JTYPE_L[p.job_type]}</span>`:''}
-        ${timeAgo(p.created_at)?`<span class="p-tag">${timeAgo(p.created_at)}</span>`:''}
-      </div>
-    </div>
-    <div class="p-card-foot" onclick="event.stopPropagation()">
-      <span class="p-stat">💬 ${(p.comments||[]).length||0}</span>
-    </div>
-  </div>`;
-}
-
-/* ── إجراءات ── */
-function openUser(id){if(id===me.id)location.href='profile.html';else location.href='user.html?id='+id;}
-
-function toggleFollow(uid,btn){
-  const k='azza_following_'+me.id;
-  let f=JSON.parse(localStorage.getItem(k)||'[]');
-  const i=f.indexOf(uid);i===-1?f.push(uid):f.splice(i,1);
-  localStorage.setItem(k,JSON.stringify(f));
-  btn.textContent=i===-1?'✓ تتابعه':'+ متابعة';
-  btn.classList.toggle('on',i===-1);
-  toast(i===-1?'بدأت المتابعة ✅':'ألغيت المتابعة','info');
-}
-
-function quickFollow(uid,btn){
-  const k='azza_following_'+me.id;
-  let f=JSON.parse(localStorage.getItem(k)||'[]');
-  if(!f.includes(uid)){f.push(uid);localStorage.setItem(k,JSON.stringify(f));btn.textContent='✓';btn.classList.add('on');toast('بدأت المتابعة ✅');}
-}
-
-function startMsg(uid){
-  let c=getConvs();
-  let conv=c.find(x=>x.participants.some(p=>p.id===me.id)&&x.participants.some(p=>p.id===uid));
-  if(!conv){
-    conv={id:genId(),participants:[{id:me.id,name:me.name,username:me.username||'',photo:me.photo||null},{id:uid,name:'مستخدم'}],messages:[],createdAt:new Date().toISOString()};
-    c.push(conv);saveConvs(c);
-  }
-  location.href='messages.html?conv='+conv.id;
-}
-
-function votePost(pid,btn){
-  const posts=getPosts();const p=posts.find(x=>x.id===pid);if(!p)return;
-  p.votes=p.votes||[];const i=p.votes.indexOf(me.id);
-  i===-1?p.votes.push(me.id):p.votes.splice(i,1);
-  localStorage.setItem('azza_posts',JSON.stringify(posts));
-  btn.classList.toggle('voted',i===-1);
-  btn.textContent='▲ '+(p.votes.length||0);
-}
-
-function expressInterest(pid,btn){
-  const ints=getInts();ints[pid]=ints[pid]||[];
-  if(ints[pid].some(x=>x.id===me.id)){toast('أبديت اهتمامك مسبقاً ✅');return;}
-  ints[pid].push({id:me.id,name:me.name,username:me.username||'',photo:me.photo||null,at:new Date().toISOString()});
-  localStorage.setItem('azza_interests',JSON.stringify(ints));
-  btn.className='p-interest-btn done';btn.textContent='✅ مهتم';
-  toast('تم إبداء الاهتمام ✅');
-}
-
-
-init();
-/* ضبط موضع شريط التبويبات عند التحميل الأولي، عشان التبويب النشط الافتراضي يبان كاملاً */
-setTimeout(()=>{
-  const activeTab=document.querySelector('.mtab.on');
-  if(activeTab)scrollActiveTabIntoView(activeTab);
-  updateTabsFade();
-},50);
-document.querySelector('.main-tabs')?.addEventListener('scroll',updateTabsFade);
+})();
 </script>
 </body>
 </html>
