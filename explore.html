@@ -3,135 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>استكشاف الخريطة — AZZA</title>
+<title>خريطة AZZA الذكية</title>
 <script src="supabase.js"></script>
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<!-- Clustering -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<!-- Heatmap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
+:root{
+  --gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
   --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;
-  --line:rgba(0,0,0,.08);--r:12px;--sidebar-w:300px}
-.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+  --line:rgba(0,0,0,.08);--r:12px;--sw:320px
+}
+.dk{--bg:#0d0d0a;--bg2:#1a180f;--card:#1a1810;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl}
 
 /* ── Topbar ── */
-.topbar{position:fixed;top:0;right:0;left:0;height:54px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);z-index:1000;display:flex;align-items:center;padding:0 14px;gap:10px}
-.dk .topbar{background:rgba(30,28,18,.95)}
-.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.tb-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.tb-logo{font-size:15px;font-weight:900;color:var(--olive)}
-.tb-search-wrap{flex:1;max-width:360px;margin:0 auto;position:relative}
-.tb-search{width:100%;height:36px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg2);padding:0 36px 0 12px;font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none;transition:.2s}
-.tb-search:focus{border-color:var(--olive);background:var(--card)}
-.tb-search-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
-.tb-acts{display:flex;gap:6px;margin-right:auto}
-.tb-act{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--sub);transition:.15s}
-.tb-act:hover,.tb-act.active{background:var(--olive);color:#fff}
+.topbar{position:fixed;top:0;right:0;left:0;height:52px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);z-index:2000;display:flex;align-items:center;padding:0 12px;gap:8px}
+.dk .topbar{background:rgba(20,18,10,.96)}
+.tb-logo{font-size:14px;font-weight:900;color:var(--olive);white-space:nowrap}
+.tb-search-wrap{flex:1;max-width:440px;margin:0 auto;position:relative}
+.tb-inp{width:100%;height:36px;border-radius:99px;border:1.5px solid var(--line);background:var(--bg2);padding:0 36px 0 12px;font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none;transition:.2s}
+.tb-inp:focus{border-color:var(--olive);background:var(--card)}
+.tb-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.tb-btn{width:34px;height:34px;border-radius:9px;border:none;background:var(--bg2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.tb-btn:hover,.tb-btn.on{background:var(--olive);color:#fff}
+/* autocomplete */
+.autocomplete{position:absolute;top:40px;right:0;left:0;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:3000;max-height:260px;overflow-y:auto;display:none}
+.autocomplete.show{display:block}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;border-bottom:.5px solid var(--line);transition:.15s}
+.ac-item:last-child{border:none}
+.ac-item:hover{background:var(--ol)}
+.ac-type{font-size:10px;color:var(--muted)}
 
 /* ── Map ── */
-#map{position:fixed;top:54px;right:0;bottom:0;left:0;z-index:1}
-.dk #map .leaflet-tile{filter:brightness(.7) invert(1) contrast(3) hue-rotate(200deg) saturate(.3) brightness(.7)}
+#map{position:fixed;top:52px;right:0;bottom:0;left:0;z-index:1}
 
 /* ── Sidebar ── */
-.sidebar{position:fixed;top:54px;right:0;bottom:0;width:var(--sidebar-w);background:var(--card);border-left:1px solid var(--line);z-index:500;display:flex;flex-direction:column;transition:.3s;transform:translateX(0)}
-.sidebar.closed{transform:translateX(var(--sidebar-w))}
-.sidebar::-webkit-scrollbar{width:0}
-.sb-toggle{position:fixed;top:50%;right:0;transform:translateY(-50%);z-index:501;width:24px;height:56px;background:var(--olive);color:#fff;border:none;border-radius:8px 0 0 8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.3s}
-.sb-toggle.closed{right:var(--sidebar-w) !important;right:0}
-.sidebar.closed~.sb-toggle{right:0}
+.sidebar{position:fixed;top:52px;right:0;bottom:0;width:var(--sw);background:var(--card);border-left:1px solid var(--line);z-index:1000;display:flex;flex-direction:column;transition:.3s;overflow:hidden}
+.sidebar.closed{transform:translateX(var(--sw))}
+.sb-toggle{position:fixed;top:50%;right:0;z-index:1001;width:22px;height:52px;background:var(--olive);color:#fff;border:none;border-radius:8px 0 0 8px;cursor:pointer;font-size:12px;transition:.3s;transform:translateY(-50%)}
+.sidebar.closed~.sb-toggle{right:var(--sw)}
 
-/* Sidebar Sections */
-.sb-hdr{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.sb-hdr-title{font-size:15px;font-weight:900;color:var(--olive)}
-.sb-body{flex:1;overflow-y:auto;padding:14px}
-.sb-body::-webkit-scrollbar{width:3px}
-.sb-body::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
-.sb-section{margin-bottom:20px}
-.sb-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+/* Sidebar Nav */
+.sb-nav{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;flex-shrink:0}
+.sb-nav::-webkit-scrollbar{height:0}
+.sb-tab{padding:10px 12px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s;flex-shrink:0}
+.sb-tab:hover{color:var(--ink)}
+.sb-tab.active{color:var(--olive);border-color:var(--olive)}
+.sb-panel{display:none;flex:1;overflow-y:auto;padding:14px}
+.sb-panel.active{display:block}
+.sb-panel::-webkit-scrollbar{width:3px}
+.sb-panel::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
+.sb-sec-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px}
 
-/* Filters */
-.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.filter-btn{padding:8px 6px;border-radius:9px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:5px;justify-content:center}
-.filter-btn:hover,.filter-btn.active{color:#fff;border-color:transparent}
-.filter-btn span{font-size:14px}
+/* Filter */
+.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:14px}
+.f-btn{padding:7px 4px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px;justify-content:center}
+.f-btn.on{color:#fff;border-color:transparent}
 
-/* Country Buttons */
-.country-list{display:flex;flex-direction:column;gap:4px}
-.country-btn{padding:9px 12px;border-radius:9px;border:none;background:var(--bg2);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s;text-align:right;display:flex;align-items:center;gap:8px}
-.country-btn:hover{background:var(--ol);color:var(--olive)}
-.country-btn.active{background:var(--olive);color:#fff}
-.country-flag{font-size:18px}
-.country-count{margin-right:auto;font-size:11px;opacity:.7}
+/* Range Filter */
+.range-wrap{margin-bottom:14px}
+.range-inp{width:100%;accent-color:var(--olive)}
 
-/* Stats */
-.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat-mini{background:var(--bg2);border-radius:10px;padding:12px;text-align:center}
-.stat-mini-num{font-size:20px;font-weight:900;color:var(--olive)}
-.stat-mini-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+/* Nearby */
+.nearby-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--line);cursor:pointer}
+.nearby-item:last-child{border:none}
+.nearby-item:hover .nearby-name{color:var(--olive)}
+.nearby-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.nearby-info{flex:1;min-width:0}
+.nearby-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nearby-sub{font-size:11px;color:var(--muted)}
+.nearby-dist{font-size:11px;font-weight:700;color:var(--olive);flex-shrink:0}
 
-/* Recent */
-.recent-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--line);cursor:pointer}
-.recent-item:last-child{border:none}
-.recent-av{width:32px;height:32px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.recent-info{flex:1;min-width:0}
-.recent-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recent-type{font-size:11px;color:var(--muted)}
+/* City Dashboard */
+.city-dash{background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:14px}
+.cd-title{font-size:16px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.cd-sub{font-size:12px;color:var(--sub);margin-bottom:14px}
+.cd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.cd-stat{background:var(--card);border-radius:8px;padding:8px;text-align:center}
+.cd-stat-num{font-size:18px;font-weight:900;color:var(--olive)}
+.cd-stat-lbl{font-size:10px;color:var(--muted);margin-top:1px}
+.cd-score{display:flex;align-items:center;gap:8px;margin-top:10px}
+.cd-score-bar{flex:1;height:8px;background:var(--card);border-radius:99px;overflow:hidden}
+.cd-score-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--olive),var(--gold));transition:.5s}
+.cd-score-num{font-size:12px;font-weight:700;color:var(--olive);flex-shrink:0}
 
-/* Popup */
-.azza-popup{font-family:Tajawal,sans-serif;direction:rtl;min-width:230px;max-width:260px}
-.pp-header{display:flex;gap:10px;align-items:center;margin-bottom:10px}
-.pp-av{width:46px;height:46px;border-radius:14px;object-fit:cover;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
-.pp-av img{width:100%;height:100%;border-radius:14px;object-fit:cover}
-.pp-info{flex:1}
-.pp-name{font-size:14px;font-weight:900;color:#1a1814;display:flex;align-items:center;gap:4px}
-.pp-verified{color:#1c5b38;font-size:12px}
-.pp-type{font-size:11px;color:#7a7060}
-.pp-trust{font-size:11px;font-weight:700;color:#c69749}
-.pp-body{font-size:12px;color:#6b6555;line-height:1.6;margin-bottom:10px}
-.pp-location{display:flex;align-items:center;gap:4px;font-size:12px;color:#7a7060;margin-bottom:10px}
-.pp-actions{display:flex;gap:6px}
-.pp-btn{flex:1;padding:7px 0;border-radius:8px;border:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
-.pp-msg{background:#1c5b38;color:#fff}.pp-msg:hover{background:#0e3622}
-.pp-follow{border:1.5px solid #e0d8c8;background:none;color:#1a1814}.pp-follow:hover{border-color:#1c5b38;color:#1c5b38}
-.pp-profile{background:#f5f0e8;color:#1a1814;border:none}.pp-profile:hover{background:#ece5d4}
-.pp-sep{height:.5px;background:#e0d8c8;margin:8px 0}
-
-/* Entity type colors */
-.t-investor{background:#1c5b38!important}.t-entrepreneur{background:#c69749!important}
-.t-student{background:#2563eb!important}.t-expert{background:#7c3aed!important}
-.t-company{background:#0891b2!important}.t-startup{background:#ef4444!important}
-.t-job{background:#16a34a!important}.t-ngo{background:#db2777!important}
-.t-university{background:#854F0B!important}.t-project{background:#6b7280!important}
+/* Stats Panel */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{background:var(--bg2);border-radius:10px;padding:12px;text-align:center}
+.stat-num{font-size:22px;font-weight:900;color:var(--olive)}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
 
 /* Legend */
-.legend{position:fixed;bottom:20px;right:calc(var(--sidebar-w) + 10px);z-index:400;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;transition:.3s;max-width:180px}
-.sidebar.closed~.legend{right:10px}
-.legend-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
-.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:4px}
-.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+.leg-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 
-/* Controls */
-.map-controls{position:fixed;bottom:20px;left:14px;z-index:400;display:flex;flex-direction:column;gap:6px}
-.mc-btn{width:36px;height:36px;border-radius:10px;border:none;background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--ink)}
-.mc-btn:hover{background:var(--olive);color:#fff}
+/* AI Panel */
+.ai-rec{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:.15s}
+.ai-rec:hover{border-color:var(--gold)}
+.ai-rec-title{font-size:13px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.ai-rec-sub{font-size:11px;color:var(--muted)}
+.ai-match{font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(28,91,56,.1);color:var(--olive);font-weight:700;margin-right:auto}
+
+/* Map controls */
+.mc{position:fixed;bottom:20px;left:12px;z-index:900;display:flex;flex-direction:column;gap:5px}
+.mc-btn{width:34px;height:34px;border-radius:9px;background:var(--card);border:none;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.mc-btn:hover,.mc-btn.on{background:var(--olive);color:#fff}
+.mc-sep{height:8px}
+
+/* Legend Fixed */
+.map-legend{position:fixed;bottom:20px;right:calc(var(--sw) + 12px);z-index:900;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;transition:.3s;max-width:160px}
+.sidebar.closed~.map-legend{right:12px}
+.ml-title{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px}
 
 /* Toast */
-#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal}
 
-/* Responsive */
-@media(max-width:600px){
-  :root{--sidebar-w:85vw}
-  .sidebar{transform:translateX(var(--sidebar-w));width:var(--sidebar-w)}
+/* Heatmap mode indicator */
+.mode-badge{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:1500;padding:6px 16px;border-radius:99px;background:rgba(239,68,68,.9);color:#fff;font-size:12px;font-weight:700;font-family:Tajawal;display:none;backdrop-filter:blur(8px)}
+.mode-badge.show{display:block}
+
+@media(max-width:700px){
+  :root{--sw:90vw}
+  .sidebar{transform:translateX(var(--sw))}
   .sidebar.open{transform:translateX(0)}
-  .legend,.map-controls{display:none}
+  .map-legend{display:none}
 }
 </style>
 </head>
@@ -139,85 +142,121 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
 
 <!-- Topbar -->
 <div class="topbar">
-  <button class="tb-back" onclick="history.back()">
-    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
+  <button class="tb-btn" onclick="history.back()">←</button>
   <div class="tb-logo">✦ خريطة AZZA</div>
   <div class="tb-search-wrap">
-    <input class="tb-search" id="map-search" placeholder="ابحث عن شخص، مشروع، شركة..." oninput="doMapSearch(this.value)">
-    <svg class="tb-search-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input class="tb-inp" id="srch" placeholder="ابحث عن مستثمر، شركة، وظيفة، مدينة..." oninput="onSearch(this.value)" autocomplete="off">
+    <svg class="tb-ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <div class="autocomplete" id="ac"></div>
   </div>
-  <div class="tb-acts">
-    <button class="tb-act" onclick="locateMe()" title="موقعي">📍</button>
-    <button class="tb-act" onclick="toggleTheme()" id="theme-btn">🌙</button>
-    <button class="tb-act" onclick="location.href='app.html'" title="الفيد">🏠</button>
-  </div>
+  <button class="tb-btn" id="heat-btn" onclick="toggleHeatmap()" title="Heatmap">🔥</button>
+  <button class="tb-btn" onclick="locateMe()" title="موقعي">📍</button>
+  <button class="tb-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+  <button class="tb-btn" onclick="location.href='app.html'">🏠</button>
 </div>
+
+<!-- Heatmap Mode Badge -->
+<div class="mode-badge" id="mode-badge">🔥 وضع Heatmap — اضغط مرة أخرى للخروج</div>
 
 <!-- Map -->
 <div id="map"></div>
 
 <!-- Sidebar Toggle -->
-<button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()">◀</button>
+<button class="sb-toggle" id="sb-toggle" onclick="toggleSB()">◀</button>
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <div class="sb-hdr">
-    <div class="sb-hdr-title">🗺️ استكشاف الخريطة</div>
-    <button onclick="resetFilters()" style="font-size:12px;color:var(--muted);border:none;background:none;cursor:pointer;font-family:Tajawal,sans-serif">إعادة تعيين</button>
+  <!-- Nav Tabs -->
+  <div class="sb-nav">
+    <div class="sb-tab active" onclick="switchTab('filters',this)">🔍 فلاتر</div>
+    <div class="sb-tab" onclick="switchTab('nearby',this)">📍 قريب</div>
+    <div class="sb-tab" onclick="switchTab('city',this)">🏙️ مدينة</div>
+    <div class="sb-tab" onclick="switchTab('ai',this)">🤖 AI</div>
+    <div class="sb-tab" onclick="switchTab('stats',this)">📊 إحصاء</div>
+    <div class="sb-tab" onclick="switchTab('legend',this)">🗺️ دليل</div>
   </div>
-  <div class="sb-body">
 
-    <!-- Stats -->
-    <div class="sb-section">
-      <div class="sb-section-title">إحصاءات</div>
-      <div class="stats-row">
-        <div class="stat-mini"><div class="stat-mini-num" id="stat-total">0</div><div class="stat-mini-lbl">كيان</div></div>
-        <div class="stat-mini"><div class="stat-mini-num" id="stat-visible">0</div><div class="stat-mini-lbl">مرئي</div></div>
-        <div class="stat-mini"><div class="stat-mini-num" id="stat-countries">22</div><div class="stat-mini-lbl">دولة</div></div>
-        <div class="stat-mini"><div class="stat-mini-num" id="stat-types">10</div><div class="stat-mini-lbl">نوع</div></div>
+  <!-- Filters Panel -->
+  <div class="sb-panel active" id="panel-filters">
+    <div class="sb-sec-title">النوع</div>
+    <div class="filter-grid" id="filter-grid"></div>
+    <div class="sb-sec-title">الدولة</div>
+    <select id="sel-country" onchange="filterCountry(this.value)" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg2);font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none;margin-bottom:14px">
+      <option value="">🌍 كل الدول</option>
+    </select>
+    <div class="sb-sec-title">نطاق Trust Score</div>
+    <div class="range-wrap" style="margin-bottom:6px">
+      <input type="range" class="range-inp" id="trust-range" min="0" max="100" value="0" oninput="filterTrust(this.value)">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>0</span><span id="trust-val">الكل</span><span>100</span></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer"><input type="checkbox" id="chk-verified" onchange="applyAll()"> موثّق فقط ✓</label>
+    </div>
+    <button onclick="resetAll()" style="width:100%;padding:9px;border-radius:9px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub)">إعادة تعيين الكل</button>
+  </div>
+
+  <!-- Nearby Panel -->
+  <div class="sb-panel" id="panel-nearby">
+    <div class="sb-sec-title">نطاق البحث</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${[['250م',0.25],['800م',0.8],['2كم',2],['15كم',15]].map(([l,v])=>`<button class="f-btn" onclick="setRadius(${v},this)" style="flex:1">${l}</button>`).join('')}
+    </div>
+    <button onclick="locateMe()" style="width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--olive);background:var(--ol);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--olive);margin-bottom:14px">📍 استخدم موقعي</button>
+    <div class="sb-sec-title">الأقرب إليك</div>
+    <div id="nearby-list"><div style="font-size:12px;color:var(--muted)">اضغط "استخدم موقعي" أولاً</div></div>
+  </div>
+
+  <!-- City Panel -->
+  <div class="sb-panel" id="panel-city">
+    <div id="city-panel-content">
+      <div style="text-align:center;padding:32px;color:var(--muted)">
+        <div style="font-size:36px;margin-bottom:10px">🏙️</div>
+        <div style="font-size:13px">اضغط على أي مدينة أو دولة لعرض لوحة البيانات</div>
       </div>
     </div>
-
-    <!-- Filters -->
-    <div class="sb-section">
-      <div class="sb-section-title">فلتر حسب النوع</div>
-      <div class="filter-grid" id="filter-grid"></div>
-    </div>
-
-    <!-- Countries -->
-    <div class="sb-section">
-      <div class="sb-section-title">الدول العربية</div>
-      <div class="country-list" id="country-list"></div>
-    </div>
-
-    <!-- Nearby -->
-    <div class="sb-section">
-      <div class="sb-section-title">قريب منك</div>
-      <button onclick="locateMe()" style="width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub)">📍 استخدم موقعي الحالي</button>
-    </div>
-
-    <!-- Recent -->
-    <div class="sb-section">
-      <div class="sb-section-title">تم عرضهم مؤخراً</div>
-      <div id="recent-list"><div style="font-size:12px;color:var(--muted)">اضغط على أي نقطة للبدء</div></div>
-    </div>
-
   </div>
-</div>
 
-<!-- Legend -->
-<div class="legend" id="legend">
-  <div class="legend-title">دليل الألوان</div>
-  <div id="legend-items"></div>
+  <!-- AI Panel -->
+  <div class="sb-panel" id="panel-ai">
+    <div class="sb-sec-title" style="margin-bottom:10px">🤖 مقترحات مخصصة لك</div>
+    <div id="ai-recs"><div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">⏳ جاري التحليل...</div></div>
+  </div>
+
+  <!-- Stats Panel -->
+  <div class="sb-panel" id="panel-stats">
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="sb-sec-title">توزيع الأنواع</div>
+    <div id="type-dist"></div>
+  </div>
+
+  <!-- Legend Panel -->
+  <div class="sb-panel" id="panel-legend">
+    <div class="sb-sec-title">أنواع الكيانات</div>
+    <div id="legend-list"></div>
+    <div style="margin-top:14px;padding:12px;background:var(--bg2);border-radius:10px;font-size:12px;color:var(--sub)">
+      💡 اضغط على أي نقطة للاطلاع على تفاصيلها<br>
+      🔍 ابحث بالاسم أو المدينة أو الكلمة المفتاحية<br>
+      📍 استخدم "قريب" لاكتشاف ما حولك<br>
+      🔥 اضغط Heatmap لرؤية الكثافة
+    </div>
+  </div>
 </div>
 
 <!-- Map Controls -->
-<div class="map-controls">
-  <button class="mc-btn" onclick="MAP.zoomIn()" title="تكبير">+</button>
-  <button class="mc-btn" onclick="MAP.zoomOut()" title="تصغير">−</button>
-  <button class="mc-btn" onclick="fitArabWorld()" title="الوطن العربي">🌍</button>
-  <button class="mc-btn" onclick="focusPalestine()" title="فلسطين">🇵🇸</button>
+<div class="mc">
+  <button class="mc-btn" onclick="MAP.zoomIn()">+</button>
+  <button class="mc-btn" onclick="MAP.zoomOut()">−</button>
+  <div class="mc-sep"></div>
+  <button class="mc-btn" onclick="goArab()" title="الوطن العربي">🌍</button>
+  <button class="mc-btn" onclick="goPalestine()" title="فلسطين">🇵🇸</button>
+  <div class="mc-sep"></div>
+  <button class="mc-btn" onclick="toggleHeatmap()" id="mc-heat">🔥</button>
+</div>
+
+<!-- Map Legend -->
+<div class="map-legend" id="map-legend">
+  <div class="ml-title">دليل الخريطة</div>
+  <div id="ml-items"></div>
 </div>
 
 <div id="toast"></div>
@@ -228,37 +267,74 @@ const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 const db  = supabase.createClient(SB_URL, SB_ANON);
 const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
 if(!me) location.href='login.html';
-const toast=(msg,t='ok')=>{const el=document.getElementById('toast');el.textContent=msg;el.style.background=t==='ok'?'#1c5b38':'#c0392b';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const toast=(m,t='ok')=>{const el=document.getElementById('toast');el.textContent=m;el.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'#854F0B';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
+const dist=(a,b,c,d)=>{const R=6371;const dL=(c-a)*Math.PI/180;const dG=(d-b)*Math.PI/180;const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));};
 
 /* ══ Entity Types ══ */
-const ENTITY_TYPES = [
-  {id:'investor',     label:'مستثمر',        em:'💰', color:'#1c5b38'},
-  {id:'entrepreneur', label:'رائد أعمال',    em:'🚀', color:'#c69749'},
-  {id:'student',      label:'طالب',          em:'🎓', color:'#2563eb'},
-  {id:'expert',       label:'خبير',          em:'🧠', color:'#7c3aed'},
-  {id:'company',      label:'شركة',          em:'🏢', color:'#0891b2'},
-  {id:'startup',      label:'Startup',       em:'⚡', color:'#ef4444'},
-  {id:'job',          label:'وظيفة',         em:'💼', color:'#16a34a'},
-  {id:'ngo',          label:'منظمة',         em:'🤝', color:'#db2777'},
-  {id:'university',   label:'جامعة',         em:'🏛️', color:'#854F0B'},
-  {id:'project',      label:'مشروع',         em:'📋', color:'#6b7280'},
+const ET=[
+  {id:'investor',      label:'مستثمر',         em:'💰',color:'#1c5b38'},
+  {id:'entrepreneur',  label:'رائد أعمال',     em:'🚀',color:'#c69749'},
+  {id:'student',       label:'طالب',           em:'🎓',color:'#2563eb'},
+  {id:'expert',        label:'خبير',           em:'🧠',color:'#7c3aed'},
+  {id:'company',       label:'شركة',           em:'🏢',color:'#0891b2'},
+  {id:'startup',       label:'Startup',        em:'⚡',color:'#ef4444'},
+  {id:'job',           label:'وظيفة',          em:'💼',color:'#16a34a'},
+  {id:'ngo',           label:'منظمة/NGO',      em:'🤝',color:'#db2777'},
+  {id:'university',    label:'جامعة',          em:'🏛️',color:'#854F0B'},
+  {id:'project',       label:'مشروع',          em:'📋',color:'#6b7280'},
+  {id:'incubator',     label:'حاضنة',          em:'🌱',color:'#059669'},
+  {id:'accelerator',   label:'مسرّع',          em:'🏎️',color:'#dc2626'},
+  {id:'training',      label:'مركز تدريب',     em:'📚',color:'#9333ea'},
+  {id:'grant',         label:'منحة',           em:'🏅',color:'#b45309'},
+  {id:'competition',   label:'مسابقة',         em:'🏆',color:'#f59e0b'},
+  {id:'event',         label:'فعالية',         em:'📅',color:'#6366f1'},
+  {id:'coworking',     label:'مساحة عمل',      em:'🏠',color:'#0e7490'},
+  {id:'research',      label:'مركز بحثي',      em:'🔬',color:'#065f46'},
+  {id:'government',    label:'جهة حكومية',     em:'🏛',color:'#4b5563'},
+  {id:'investment',    label:'فرصة استثمار',   em:'💹',color:'#1d4ed8'},
 ];
 
-const ARAB_COUNTRIES = [
-  {code:'PS',name:'🇵🇸 فلسطين',lat:31.9,lng:35.2,zoom:8},
-  {code:'JO',name:'🇯🇴 الأردن',lat:30.5,lng:36.2,zoom:7},
-  {code:'SA',name:'🇸🇦 السعودية',lat:23.8,lng:45.0,zoom:5},
-  {code:'EG',name:'🇪🇬 مصر',lat:26.8,lng:30.8,zoom:6},
-  {code:'AE',name:'🇦🇪 الإمارات',lat:23.4,lng:53.8,zoom:7},
-  {code:'LB',name:'🇱🇧 لبنان',lat:33.8,lng:35.8,zoom:8},
-  {code:'MA',name:'🇲🇦 المغرب',lat:31.7,lng:-7.0,zoom:6},
-  {code:'TN',name:'🇹🇳 تونس',lat:33.8,lng:9.5,zoom:7},
+/* ══ CITIES Intelligence ══ */
+const CITIES_DATA=[
+  {name:'رام الله',country:'فلسطين',lat:31.9038,lng:35.2034,score:78,pop:'50k',users:234,companies:45,investors:23,jobs:67,ngos:12},
+  {name:'القدس',country:'فلسطين',lat:31.7683,lng:35.2137,score:85,pop:'900k',users:456,companies:89,investors:34,jobs:123,ngos:28},
+  {name:'نابلس',country:'فلسطين',lat:32.2211,lng:35.2544,score:65,pop:'180k',users:178,companies:34,investors:12,jobs:45,ngos:9},
+  {name:'الخليل',country:'فلسطين',lat:31.5326,lng:35.0998,score:58,pop:'230k',users:145,companies:28,investors:8,jobs:34,ngos:7},
+  {name:'غزة',country:'فلسطين',lat:31.5017,lng:34.4668,score:42,pop:'600k',users:312,companies:23,investors:5,jobs:28,ngos:45},
+  {name:'جنين',country:'فلسطين',lat:32.4598,lng:35.3027,score:52,pop:'45k',users:89,companies:15,investors:6,jobs:22,ngos:8},
+  {name:'بيت لحم',country:'فلسطين',lat:31.7054,lng:35.2024,score:70,pop:'30k',users:134,companies:25,investors:10,jobs:38,ngos:14},
+  {name:'أريحا',country:'فلسطين',lat:31.8571,lng:35.4607,score:48,pop:'25k',users:67,companies:10,investors:4,jobs:15,ngos:5},
+];
+
+/* ══ DEMO DATA ══ */
+const DEMO=[
+  {id:'d1',name:'خالد الراشد',type:'investor',bio:'مستثمر ملاك في التقنية والابتكار، لدي محفظة 12 شركة',city:'رام الله',country_code:'PS',lat:31.9038,lng:35.2034,is_verified:true,trust_score:87,industry:'تقنية'},
+  {id:'d2',name:'سارة أبو شاور',type:'entrepreneur',bio:'مؤسسة شركة تك للتجارة الإلكترونية',city:'رام الله',country_code:'PS',lat:31.9100,lng:35.2100,is_verified:true,trust_score:74,industry:'تجارة إلكترونية'},
+  {id:'d3',name:'محمد الخضري',type:'student',bio:'طالب هندسة برمجيات، أبحث عن فرص تدريب في التقنية',city:'الخليل',country_code:'PS',lat:31.5326,lng:35.0998,is_verified:false,trust_score:42,industry:'تعليم'},
+  {id:'d4',name:'جامعة بيرزيت',type:'university',bio:'أعرق الجامعات الفلسطينية، تأسست عام 1924',city:'بيرزيت',country_code:'PS',lat:31.9794,lng:35.1856,is_verified:true,trust_score:95,industry:'تعليم'},
+  {id:'d5',name:'حاضنة غزة للابتكار',type:'incubator',bio:'حاضنة أعمال تدعم 50+ شركة ناشئة سنوياً',city:'غزة',country_code:'PS',lat:31.5017,lng:34.4668,is_verified:true,trust_score:68,industry:'ريادة'},
+  {id:'d6',name:'مطلوب: مطور Flutter',type:'job',bio:'شركة تقنية رائدة تبحث عن مطور Flutter خبرة 2 سنة',city:'رام الله',country_code:'PS',lat:31.9000,lng:35.1950,is_verified:false,trust_score:0,industry:'تقنية'},
+  {id:'d7',name:'منظمة ريادة فلسطين',type:'ngo',bio:'ندعم رواد الأعمال الشباب بالتدريب والتمويل',city:'بيت لحم',country_code:'PS',lat:31.7054,lng:35.2024,is_verified:true,trust_score:81,industry:'دعم الأعمال'},
+  {id:'d8',name:'أحمد عبد الرازق',type:'expert',bio:'خبير تسويق رقمي | 10 سنوات خبرة | استشاري',city:'القدس',country_code:'PS',lat:31.7683,lng:35.2137,is_verified:true,trust_score:79,industry:'تسويق'},
+  {id:'d9',name:'تك بالستين',type:'company',bio:'شركة تقنية رائدة في تطوير التطبيقات والمنصات',city:'رام الله',country_code:'PS',lat:31.8900,lng:35.1900,is_verified:true,trust_score:88,industry:'تقنية'},
+  {id:'d10',name:'منحة ريادة الأعمال 2026',type:'grant',bio:'منحة بقيمة 10,000$ للشركات الناشئة في فلسطين',city:'رام الله',country_code:'PS',lat:31.9200,lng:35.2200,is_verified:true,trust_score:90,industry:'تمويل'},
+  {id:'d11',name:'مسابقة Startup فلسطين',type:'competition',bio:'مسابقة سنوية للشركات الناشئة — جائزة 25,000$',city:'نابلس',country_code:'PS',lat:32.2211,lng:35.2544,is_verified:true,trust_score:85,industry:'ريادة'},
+  {id:'d12',name:'مسرّع الأعمال الرقمية',type:'accelerator',bio:'برنامج تسريع 6 أشهر مع تمويل أولي 50k$',city:'الخليل',country_code:'PS',lat:31.5400,lng:35.1100,is_verified:true,trust_score:77,industry:'تقنية'},
+  {id:'d13',name:'مركز التدريب المهني',type:'training',bio:'دورات تدريبية في البرمجة والتصميم والتسويق',city:'جنين',country_code:'PS',lat:32.4598,lng:35.3027,is_verified:false,trust_score:55,industry:'تدريب'},
+  {id:'d14',name:'فرصة استثمار: تطبيق صحة',type:'investment',bio:'نبحث عن شريك استراتيجي في قطاع الصحة الرقمية',city:'القدس',country_code:'PS',lat:31.7800,lng:35.2200,is_verified:true,trust_score:72,industry:'صحة'},
+  {id:'d15',name:'مستثمر أردني',type:'investor',bio:'مستثمر أبحث عن مشاريع ناشئة في فلسطين والأردن',city:'عمان',country_code:'JO',lat:31.9539,lng:35.9106,is_verified:true,trust_score:70,industry:'تقنية'},
+  {id:'d16',name:'رائدة أعمال لبنانية',type:'entrepreneur',bio:'مؤسسة منصة Fashion عربية',city:'بيروت',country_code:'LB',lat:33.8938,lng:35.5018,is_verified:true,trust_score:65,industry:'تجارة'},
+  {id:'d17',name:'مؤتمر Tech Palestine 2026',type:'event',bio:'أكبر مؤتمر تقني فلسطيني — 500 مشارك',city:'رام الله',country_code:'PS',lat:31.8950,lng:35.2150,is_verified:true,trust_score:80,industry:'تقنية'},
+  {id:'d18',name:'مركز أبحاث الذكاء الاصطناعي',type:'research',bio:'بحوث متقدمة في AI وتطبيقاتها في المنطقة',city:'نابلس',country_code:'PS',lat:32.2300,lng:35.2600,is_verified:true,trust_score:88,industry:'ذكاء اصطناعي'},
 ];
 
 /* ══ State ══ */
-let MAP, CLUSTER, ALL_MARKERS=[], activeFilters=new Set(), activeCountry='', sidebarOpen=true;
-const RECENT=[];
+let MAP, CLUSTER, HEAT_LAYER, MY_LOC=null;
+let ALL_DATA=[...DEMO], ALL_MARKERS=[];
+let activeTypes=new Set(), activeCountry='', minTrust=0, verifiedOnly=false;
+let heatmapOn=false, sidebarOpen=true, nearbyRadius=2;
+let RECENT_SEARCHES=[];
 
 /* ══ Init ══ */
 (function(){
@@ -266,256 +342,352 @@ const RECENT=[];
   document.getElementById('theme-btn').textContent=localStorage.getItem('azza_theme')==='dark'?'☀️':'🌙';
   initMap();
   buildFilters();
-  buildCountryList();
+  buildCountrySelect();
   buildLegend();
-  loadEntities();
+  loadFromSupabase();
 })();
 
-/* ══ Map Init ══ */
+/* ══ Map ══ */
 function initMap(){
-  MAP=L.map('map',{zoomControl:false,attributionControl:false}).setView([31.5,35.0],7);
+  MAP=L.map('map',{zoomControl:false,attributionControl:false}).setView([31.9,35.2],8);
+  const lt=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
+  const dt=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
+  const dk=localStorage.getItem('azza_theme')==='dark';
+  (dk?dt:lt).addTo(MAP); MAP._lt=lt; MAP._dt=dt;
 
-  /* Light Tiles */
-  const lightTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
-  /* Dark Tiles */
-  const darkTiles=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
-  const isDk=localStorage.getItem('azza_theme')==='dark';
-  (isDk?darkTiles:lightTiles).addTo(MAP);
-  MAP._lightTiles=lightTiles; MAP._darkTiles=darkTiles;
-
-  /* Cluster */
   CLUSTER=L.markerClusterGroup({
-    maxClusterRadius:50,
-    spiderfyOnMaxZoom:true,
-    showCoverageOnHover:false,
-    zoomToBoundsOnClick:true,
+    maxClusterRadius:60,spiderfyOnMaxZoom:true,showCoverageOnHover:false,
     iconCreateFunction(c){
-      const n=c.getChildCount();
-      const size=n<10?36:n<50?44:52;
-      return L.divIcon({html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Tajawal,sans-serif;font-size:${size>40?15:13}px;font-weight:900;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25)">${n}</div>`,className:'',iconSize:[size,size]});
+      const n=c.getChildCount(),s=n<10?34:n<50?42:50;
+      return L.divIcon({html:`<div style="width:${s}px;height:${s}px;border-radius:50%;background:var(--olive,#1c5b38);color:#fff;display:flex;align-items:center;justify-content:center;font-family:Tajawal,sans-serif;font-size:${s>38?14:12}px;font-weight:900;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.3)">${n}</div>`,className:'',iconSize:[s,s]});
     }
   });
   MAP.addLayer(CLUSTER);
-
-  /* Events */
   MAP.on('moveend',updateStats);
-  MAP.on('zoomend',updateStats);
-}
+  MAP.on('click',e=>onMapClick(e));
 
-/* ══ تحميل الكيانات ══ */
-async function loadEntities(){
-  /* 1. المستخدمون من Supabase */
-  const {data:users}=await db.from('users').select('id,name,type,bio,photo,city_name,country_code,lat,lng,is_verified,trust_score').not('lat','is',null).not('lng','is',null).limit(200);
-
-  /* 2. بيانات تجريبية لفلسطين */
-  const DEMO=[
-    {id:'d1',name:'أحمد محمد - مستثمر',type:'investor',bio:'مستثمر ملاك في التقنية والابتكار',city:'رام الله',country_code:'PS',lat:31.9038,lng:35.2034,is_verified:true,trust_score:87},
-    {id:'d2',name:'سارة علي - رائدة أعمال',type:'entrepreneur',bio:'مؤسسة شركة تقنية في فلسطين',city:'نابلس',country_code:'PS',lat:32.2211,lng:35.2544,is_verified:true,trust_score:74},
-    {id:'d3',name:'محمد خالد - طالب',type:'student',bio:'طالب هندسة برمجيات، يبحث عن فرص تدريب',city:'الخليل',country_code:'PS',lat:31.5326,lng:35.0998,is_verified:false,trust_score:42},
-    {id:'d4',name:'جامعة بيرزيت',type:'university',bio:'أعرق الجامعات الفلسطينية',city:'بيرزيت',country_code:'PS',lat:31.9794,lng:35.1856,is_verified:true,trust_score:95},
-    {id:'d5',name:'Startup فلسطين',type:'startup',bio:'حاضنة أعمال للشركات الناشئة في غزة',city:'غزة',country_code:'PS',lat:31.5017,lng:34.4668,is_verified:true,trust_score:68},
-    {id:'d6',name:'وظيفة: مطور Flutter',type:'job',bio:'مطلوب مطور Flutter لشركة تقنية في رام الله',city:'رام الله',country_code:'PS',lat:31.9100,lng:35.2100,is_verified:false,trust_score:0},
-    {id:'d7',name:'منظمة ريادة فلسطين',type:'ngo',bio:'ندعم رواد الأعمال الشباب في فلسطين',city:'بيت لحم',country_code:'PS',lat:31.7054,lng:35.2024,is_verified:true,trust_score:81},
-    {id:'d8',name:'خبير تسويق رقمي',type:'expert',bio:'خبرة 10 سنوات في التسويق الرقمي للشركات العربية',city:'القدس',country_code:'PS',lat:31.7683,lng:35.2137,is_verified:true,trust_score:79},
-    {id:'d9',name:'شركة تك بالستين',type:'company',bio:'شركة تقنية رائدة في تطوير التطبيقات',city:'رام الله',country_code:'PS',lat:31.8900,lng:35.1950,is_verified:true,trust_score:88},
-    {id:'d10',name:'مشروع تخرج: منصة تعليمية',type:'project',bio:'منصة تعليمية لطلاب المدارس الفلسطينية',city:'جنين',country_code:'PS',lat:32.4598,lng:35.3027,is_verified:false,trust_score:30},
-    {id:'d11',name:'مستثمر أردني',type:'investor',bio:'أبحث عن مشاريع ناشئة في الأردن وفلسطين',city:'عمان',country_code:'JO',lat:31.9539,lng:35.9106,is_verified:true,trust_score:72},
-    {id:'d12',name:'رائدة أعمال لبنانية',type:'entrepreneur',bio:'مؤسسة منصة التجارة الإلكترونية',city:'بيروت',country_code:'LB',lat:33.8938,lng:35.5018,is_verified:true,trust_score:65},
-  ];
-
-  const all=[...(users||[]),...DEMO];
-  all.forEach(u=>addMarker(u));
-  document.getElementById('stat-total').textContent=all.length;
-  updateStats();
-}
-
-/* ══ إضافة Marker ══ */
-function addMarker(entity){
-  if(!entity.lat||!entity.lng) return;
-  const type=ENTITY_TYPES.find(t=>t.id===entity.type)||ENTITY_TYPES[0];
-  const icon=L.divIcon({
-    html:`<div style="width:36px;height:36px;border-radius:50%;background:${type.color};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.2s">${type.em}</div>`,
-    className:'',
-    iconSize:[36,36],
-    iconAnchor:[18,18],
-    popupAnchor:[0,-18],
+  /* Add city markers */
+  CITIES_DATA.forEach(c=>{
+    L.circleMarker([c.lat,c.lng],{radius:14,color:'rgba(198,151,73,.5)',fillColor:'rgba(198,151,73,.15)',fillOpacity:.8,weight:1.5})
+      .addTo(MAP).on('click',()=>showCityDash(c));
   });
 
+  /* Me marker */
+  if(me?.lat&&me?.lng){
+    L.marker([me.lat,me.lng],{icon:L.divIcon({html:`<div style="width:38px;height:38px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#0e3622">${(me.name||'م')[0]}</div>`,className:'',iconSize:[38,38],iconAnchor:[19,19]})}).addTo(MAP)
+      .bindPopup(`<div style="font-family:Tajawal,sans-serif;text-align:center"><strong>📍 ${esc(me.name||'أنت')}</strong></div>`);
+    MAP.setView([me.lat,me.lng],10,{animate:true});
+  }
+}
+
+function onMapClick(e){
+  /* إغلاق autocomplete */
+  document.getElementById('ac').classList.remove('show');
+}
+
+/* ══ Add Markers ══ */
+function addMarker(entity){
+  if(!entity.lat||!entity.lng) return;
+  const t=ET.find(x=>x.id===entity.type)||ET[0];
+  const icon=L.divIcon({
+    html:`<div style="width:34px;height:34px;border-radius:50%;background:${t.color};border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:.2s">${t.em}</div>`,
+    className:'',iconSize:[34,34],iconAnchor:[17,17],popupAnchor:[0,-17]
+  });
   const m=L.marker([entity.lat,entity.lng],{icon});
   m.entity=entity;
-  m.on('click',()=>showPopup(m,entity));
+  m.on('click',()=>openEntityPopup(m,entity));
   CLUSTER.addLayer(m);
-  ALL_MARKERS.push({marker:m,entity,type:entity.type,country:entity.country_code});
+  ALL_MARKERS.push({m,e:entity});
 }
 
 /* ══ Popup ══ */
-function showPopup(m,e){
-  const type=ENTITY_TYPES.find(t=>t.id===e.type)||ENTITY_TYPES[0];
-  const photoHTML=e.photo
-    ?`<img src="${esc(e.photo)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+function openEntityPopup(m,e){
+  const t=ET.find(x=>x.id===e.type)||ET[0];
   const html=`
-    <div class="azza-popup">
-      <div class="pp-header">
-        <div class="pp-av">${photoHTML}<span>${type.em}</span></div>
-        <div class="pp-info">
-          <div class="pp-name">${esc(e.name||'—')}${e.is_verified?'<span class="pp-verified">✓</span>':''}</div>
-          <div class="pp-type">${type.em} ${type.label}</div>
-          ${e.trust_score?`<div class="pp-trust">⭐ Trust ${e.trust_score}</div>`:''}
+    <div style="font-family:Tajawal,sans-serif;direction:rtl;min-width:220px">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <div style="width:44px;height:44px;border-radius:12px;background:${t.color}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${e.photo?`<img src="${esc(e.photo)}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">`:'<span>'+t.em+'</span>'}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:900;color:#1a1814">${esc(e.name||'—')}${e.is_verified?' <span style="color:#1c5b38;font-size:11px">✓</span>':''}</div>
+          <div style="font-size:11px;color:#7a7060">${t.em} ${t.label}${e.industry?' · '+esc(e.industry):''}</div>
+          ${e.trust_score?`<div style="font-size:11px;font-weight:700;color:#c69749">⭐ Trust ${e.trust_score}</div>`:''}
         </div>
       </div>
-      ${e.bio?`<div class="pp-body">${esc((e.bio||'').substring(0,90))}${(e.bio||'').length>90?'...':''}</div>`:''}
-      <div class="pp-location">📍 ${esc(e.city_name||e.city||'')}${e.country_code?', '+e.country_code:''}</div>
-      <div class="pp-sep"></div>
-      <div class="pp-actions">
-        <button class="pp-btn pp-msg" onclick="location.href='messages.html?to=${esc(e.id)}'">💬 رسالة</button>
-        <button class="pp-btn pp-follow" onclick="followEntity('${esc(e.id)}')">+ تابع</button>
-        <button class="pp-btn pp-profile" onclick="location.href='user.html?id=${esc(e.id)}'">الملف</button>
+      ${e.bio?`<div style="font-size:12px;color:#6b6555;line-height:1.6;margin-bottom:8px">${esc((e.bio||'').substring(0,80))}${(e.bio||'').length>80?'...':''}</div>`:''}
+      <div style="font-size:11px;color:#7a7060;margin-bottom:8px">📍 ${esc(e.city_name||e.city||'')}${e.country_code?', '+e.country_code:''}</div>
+      <div style="height:.5px;background:#eee;margin:8px 0"></div>
+      <div style="display:flex;gap:5px">
+        <button onclick="location.href='messages.html?to=${esc(e.id)}'" style="flex:1;padding:7px;border-radius:7px;border:none;background:#1c5b38;color:#fff;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;cursor:pointer">💬 رسالة</button>
+        <button onclick="followUser('${esc(e.id)}')" style="flex:1;padding:7px;border-radius:7px;border:1.5px solid #e0d8c8;background:none;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;cursor:pointer">+ تابع</button>
+        <button onclick="location.href='user.html?id=${esc(e.id)}'" style="flex:1;padding:7px;border-radius:7px;border:none;background:#f5f0e8;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;cursor:pointer">الملف</button>
       </div>
     </div>`;
+  m.bindPopup(L.popup({maxWidth:260,className:'azza-pp'}).setContent(html)).openPopup();
+}
 
-  m.bindPopup(L.popup({maxWidth:270,closeButton:true,className:'azza-leaflet-popup'}).setContent(html)).openPopup();
-  addRecent(e);
+/* ══ City Dashboard ══ */
+function showCityDash(city){
+  switchTab('city', document.querySelector('.sb-tab:nth-child(3)'));
+  const score=city.score||50;
+  document.getElementById('city-panel-content').innerHTML=`
+    <div class="city-dash">
+      <div class="cd-title">🏙️ ${city.name}</div>
+      <div class="cd-sub">📍 ${city.country} · ${city.pop||'—'} ساكن</div>
+      <div class="cd-grid">
+        <div class="cd-stat"><div class="cd-stat-num">${city.users||0}</div><div class="cd-stat-lbl">مستخدم</div></div>
+        <div class="cd-stat"><div class="cd-stat-num">${city.companies||0}</div><div class="cd-stat-lbl">شركة</div></div>
+        <div class="cd-stat"><div class="cd-stat-num">${city.investors||0}</div><div class="cd-stat-lbl">مستثمر</div></div>
+        <div class="cd-stat"><div class="cd-stat-num">${city.jobs||0}</div><div class="cd-stat-lbl">وظيفة</div></div>
+        <div class="cd-stat"><div class="cd-stat-num">${city.ngos||0}</div><div class="cd-stat-lbl">منظمة</div></div>
+        <div class="cd-stat"><div class="cd-stat-num">${Math.round(score*1.2)}</div><div class="cd-stat-lbl">مشروع</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">نشاط المنظومة الريادية</div>
+      <div class="cd-score">
+        <div class="cd-score-bar"><div class="cd-score-fill" style="width:${score}%"></div></div>
+        <div class="cd-score-num">${score}/100</div>
+      </div>
+    </div>
+    <button onclick="filterByCity('${city.name}',${city.lat},${city.lng})" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--olive);background:var(--ol);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--olive)">
+      🔍 عرض كيانات ${city.name}
+    </button>`;
+  MAP.setView([city.lat,city.lng],12,{animate:true,duration:.5});
+  if(sidebarOpen) return;
+  toggleSB();
+}
+
+function filterByCity(name,lat,lng){
+  CLUSTER.clearLayers();
+  let count=0;
+  ALL_MARKERS.forEach(({m,e})=>{
+    if((e.city_name||e.city||'')=== name){CLUSTER.addLayer(m);count++;}
+  });
+  toast(count?`${count} كيان في ${name}`:`لا كيانات في ${name} بعد`);
+  MAP.setView([lat,lng],13,{animate:true});
 }
 
 /* ══ Filters ══ */
 function buildFilters(){
-  document.getElementById('filter-grid').innerHTML=ENTITY_TYPES.map(t=>`
-    <button class="filter-btn" id="f-${t.id}" onclick="toggleFilter('${t.id}')" style="border-color:${t.color}20">
-      <span>${t.em}</span>${t.label}
+  document.getElementById('filter-grid').innerHTML=ET.map(t=>`
+    <button class="f-btn" id="f-${t.id}" onclick="toggleType('${t.id}')" style="border-color:${t.color}30">
+      <span>${t.em}</span><span style="font-size:10px">${t.label}</span>
     </button>`).join('');
 }
 
-function toggleFilter(type){
-  const btn=document.getElementById('f-'+type);
-  const t=ENTITY_TYPES.find(x=>x.id===type);
-  if(activeFilters.has(type)){
-    activeFilters.delete(type);
-    btn.classList.remove('active');
-    btn.style.background='';
-    btn.style.color='';
-  }else{
-    activeFilters.add(type);
-    btn.classList.add('active');
-    btn.style.background=t.color;
-    btn.style.color='#fff';
-  }
-  applyFilters();
+function toggleType(id){
+  const btn=document.getElementById('f-'+id);
+  const t=ET.find(x=>x.id===id);
+  if(activeTypes.has(id)){activeTypes.delete(id);btn.classList.remove('on');btn.style.background='';btn.style.color='';}
+  else{activeTypes.add(id);btn.classList.add('on');btn.style.background=t.color;btn.style.color='#fff';}
+  applyAll();
 }
 
-function applyFilters(){
+function filterCountry(v){ activeCountry=v; applyAll(); }
+function filterTrust(v){ minTrust=parseInt(v); document.getElementById('trust-val').textContent=v>0?'≥'+v:'الكل'; applyAll(); }
+
+function applyAll(){
+  verifiedOnly=document.getElementById('chk-verified').checked;
   CLUSTER.clearLayers();
-  const hasF=activeFilters.size>0;
-  const hasC=activeCountry!=='';
-  ALL_MARKERS.forEach(({marker,entity,type,country})=>{
-    const typeOK=!hasF||activeFilters.has(type);
-    const countryOK=!hasC||country===activeCountry;
-    if(typeOK&&countryOK) CLUSTER.addLayer(marker);
+  let vis=0;
+  ALL_MARKERS.forEach(({m,e})=>{
+    const ok=(activeTypes.size===0||activeTypes.has(e.type))
+      &&(!activeCountry||e.country_code===activeCountry)
+      &&(e.trust_score||0)>=minTrust
+      &&(!verifiedOnly||e.is_verified);
+    if(ok){CLUSTER.addLayer(m);vis++;}
   });
+  document.getElementById('stat-visible')&&(document.getElementById('stat-visible').textContent=vis);
   updateStats();
 }
 
-function resetFilters(){
-  activeFilters.clear();
-  activeCountry='';
-  document.querySelectorAll('.filter-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';});
-  document.querySelectorAll('.country-btn').forEach(b=>b.classList.remove('active'));
-  applyFilters();
+function resetAll(){
+  activeTypes.clear();activeCountry='';minTrust=0;verifiedOnly=false;
+  document.getElementById('sel-country').value='';
+  document.getElementById('trust-range').value=0;
+  document.getElementById('trust-val').textContent='الكل';
+  document.getElementById('chk-verified').checked=false;
+  document.querySelectorAll('.f-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  CLUSTER.clearLayers();
+  ALL_MARKERS.forEach(({m})=>CLUSTER.addLayer(m));
+  updateStats();
+  toast('تم إعادة التعيين');
 }
 
-/* ══ Countries ══ */
-function buildCountryList(){
-  document.getElementById('country-list').innerHTML=ARAB_COUNTRIES.map(c=>`
-    <button class="country-btn" id="cb-${c.code}" onclick="focusCountry('${c.code}',${c.lat},${c.lng},${c.zoom})">
-      ${c.name}<span class="country-count"></span>
-    </button>`).join('');
+/* ══ Country Select ══ */
+function buildCountrySelect(){
+  const countries=[...new Set(DEMO.map(d=>d.country_code))];
+  const names={PS:'🇵🇸 فلسطين',JO:'🇯🇴 الأردن',SA:'🇸🇦 السعودية',EG:'🇪🇬 مصر',AE:'🇦🇪 الإمارات',LB:'🇱🇧 لبنان',MA:'🇲🇦 المغرب'};
+  const sel=document.getElementById('sel-country');
+  countries.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=names[c]||c; sel.appendChild(o); });
 }
 
-function focusCountry(code,lat,lng,zoom){
-  activeCountry=activeCountry===code?'':code;
-  document.querySelectorAll('.country-btn').forEach(b=>b.classList.toggle('active',b.id==='cb-'+code&&activeCountry===code));
-  if(activeCountry) MAP.setView([lat,lng],zoom,{animate:true,duration:.5});
-  applyFilters();
+/* ══ Nearby ══ */
+let radiusCircle=null;
+function setRadius(km,btn){
+  nearbyRadius=km;
+  document.querySelectorAll('#panel-nearby .f-btn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';});
+  btn.classList.add('on');btn.style.background='#1c5b38';btn.style.color='#fff';
+  if(MY_LOC) showNearby(MY_LOC.lat,MY_LOC.lng);
 }
 
-/* ══ Legend ══ */
-function buildLegend(){
-  document.getElementById('legend-items').innerHTML=ENTITY_TYPES.slice(0,6).map(t=>`
-    <div class="legend-item">
-      <div class="legend-dot" style="background:${t.color}"></div>
-      <span>${t.em} ${t.label}</span>
-    </div>`).join('');
+function showNearby(lat,lng){
+  if(radiusCircle) MAP.removeLayer(radiusCircle);
+  radiusCircle=L.circle([lat,lng],{radius:nearbyRadius*1000,color:'#1c5b38',fillColor:'#1c5b38',fillOpacity:.06,weight:1.5}).addTo(MAP);
+  const nearby=ALL_DATA.map(e=>({...e,_dist:dist(lat,lng,e.lat,e.lng)}))
+    .filter(e=>e._dist<=nearbyRadius).sort((a,b)=>a._dist-b._dist).slice(0,10);
+  const list=document.getElementById('nearby-list');
+  const t=id=>ET.find(x=>x.id===id)||ET[0];
+  list.innerHTML=nearby.length?nearby.map(e=>`
+    <div class="nearby-item" onclick="MAP.setView([${e.lat},${e.lng}],14,{animate:true})">
+      <div class="nearby-av" style="background:${t(e.type).color}22">${t(e.type).em}</div>
+      <div class="nearby-info">
+        <div class="nearby-name">${esc(e.name||'—')}</div>
+        <div class="nearby-sub">${t(e.type).label} · ${esc(e.city_name||e.city||'')}</div>
+      </div>
+      <div class="nearby-dist">${e._dist<1?(e._dist*1000).toFixed(0)+'م':e._dist.toFixed(1)+'كم'}</div>
+    </div>`).join(''):'<div style="font-size:12px;color:var(--muted)">لا يوجد كيانات في هذا النطاق</div>';
 }
 
-/* ══ Navigate ══ */
-function fitArabWorld(){ MAP.setView([25,38],4,{animate:true,duration:.8}); }
-function focusPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.6}); }
-
+/* ══ GPS ══ */
 function locateMe(){
   navigator.geolocation?.getCurrentPosition(pos=>{
     const {latitude:lat,longitude:lng}=pos.coords;
-    MAP.setView([lat,lng],12,{animate:true});
-    L.circleMarker([lat,lng],{radius:10,color:'#1c5b38',fillColor:'#1c5b38',fillOpacity:.4}).addTo(MAP).bindPopup('📍 موقعك الحالي').openPopup();
-    toast('تم تحديد موقعك');
+    MY_LOC={lat,lng};
+    MAP.setView([lat,lng],13,{animate:true});
+    L.circleMarker([lat,lng],{radius:9,color:'#1c5b38',fillColor:'#1c5b38',fillOpacity:.35,weight:2}).addTo(MAP).bindPopup('📍 موقعك').openPopup();
+    showNearby(lat,lng);
+    switchTab('nearby',document.querySelector('.sb-tab:nth-child(2)'));
+    toast('تم تحديد موقعك ✅');
   },()=>toast('تعذّر تحديد الموقع','err'));
 }
 
+/* ══ Heatmap ══ */
+function toggleHeatmap(){
+  heatmapOn=!heatmapOn;
+  const badge=document.getElementById('mode-badge');
+  const hBtn=document.getElementById('heat-btn');
+  const mcH=document.getElementById('mc-heat');
+  if(heatmapOn){
+    const pts=ALL_DATA.filter(e=>e.lat&&e.lng).map(e=>[e.lat,e.lng,(e.trust_score||30)/100]);
+    HEAT_LAYER=L.heatLayer(pts,{radius:35,blur:20,maxZoom:13,gradient:{0.2:'#1c5b38',0.5:'#c69749',0.8:'#ef4444',1:'#7c3aed'}}).addTo(MAP);
+    CLUSTER.eachLayer(m=>m.setOpacity(0.15));
+    badge.classList.add('show');
+    hBtn.classList.add('on'); mcH.classList.add('on');
+    toast('وضع Heatmap — تُظهر كثافة النشاط');
+  }else{
+    if(HEAT_LAYER){MAP.removeLayer(HEAT_LAYER);HEAT_LAYER=null;}
+    CLUSTER.eachLayer(m=>m.setOpacity(1));
+    badge.classList.remove('show');
+    hBtn.classList.remove('on'); mcH.classList.remove('on');
+    toast('عودة لوضع Markers');
+  }
+}
+
 /* ══ Search ══ */
-function doMapSearch(q){
-  if(!q.trim()){ applyFilters(); return; }
+function onSearch(q){
+  const ac=document.getElementById('ac');
+  if(!q.trim()){ac.classList.remove('show');applyAll();return;}
   const low=q.toLowerCase();
-  CLUSTER.clearLayers();
-  let count=0;
-  ALL_MARKERS.forEach(({marker,entity})=>{
-    const match=(entity.name||'').toLowerCase().includes(low)||(entity.bio||'').toLowerCase().includes(low)||(entity.city_name||entity.city||'').toLowerCase().includes(low);
-    if(match){ CLUSTER.addLayer(marker); count++; }
-  });
-  document.getElementById('stat-visible').textContent=count;
-  if(count>0) toast(`${count} نتيجة`);
-  else toast('لا نتائج','err');
+  const res=ALL_DATA.filter(e=>(e.name||'').toLowerCase().includes(low)||(e.bio||'').toLowerCase().includes(low)||(e.city_name||e.city||'').toLowerCase().includes(low)||(e.industry||'').toLowerCase().includes(low)).slice(0,8);
+  const cities=CITIES_DATA.filter(c=>c.name.includes(q)).slice(0,3);
+  const items=[...cities.map(c=>({name:c.name,type:'city',lat:c.lat,lng:c.lng,em:'🏙️'})),...res];
+  if(!items.length){ac.innerHTML='<div class="ac-item">لا نتائج</div>';ac.classList.add('show');return;}
+  ac.innerHTML=items.map((e,i)=>`
+    <div class="ac-item" onclick="selectAC(${i})">
+      <span>${e.em||(ET.find(x=>x.id===e.type)||ET[0]).em}</span>
+      <div><div>${esc(e.name||'')}</div><div class="ac-type">${e.type==='city'?'مدينة':(ET.find(x=>x.id===e.type)||ET[0]).label}</div></div>
+    </div>`).join('');
+  ac._items=items;
+  ac.classList.add('show');
+}
+
+function selectAC(i){
+  const ac=document.getElementById('ac');
+  const item=ac._items[i];
+  if(!item) return;
+  ac.classList.remove('show');
+  document.getElementById('srch').value=item.name||'';
+  if(item.type==='city'){ const c=CITIES_DATA.find(x=>x.name===item.name); if(c) showCityDash(c); }
+  else MAP.setView([item.lat,item.lng],14,{animate:true});
+  RECENT_SEARCHES.unshift(item.name||'');
+  RECENT_SEARCHES=RECENT_SEARCHES.slice(0,5);
+}
+
+document.addEventListener('click',e=>{ if(!e.target.closest('.tb-search-wrap')) document.getElementById('ac').classList.remove('show'); });
+
+/* ══ AI Recommendations ══ */
+function buildAIRecs(){
+  const myType=me?.type||'entrepreneur';
+  const compatible={investor:['startup','company','project'],entrepreneur:['investor','expert','incubator'],student:['university','training','grant'],expert:['company','startup','entrepreneur']};
+  const targets=compatible[myType]||['investor','startup'];
+  const recs=ALL_DATA.filter(e=>targets.includes(e.type)).slice(0,6);
+  const t=id=>ET.find(x=>x.id===id)||ET[0];
+  document.getElementById('ai-recs').innerHTML=recs.map(e=>`
+    <div class="ai-rec" onclick="MAP.setView([${e.lat},${e.lng}],14,{animate:true})">
+      <div class="ai-rec-title">
+        ${t(e.type).em} ${esc(e.name||'—')}
+        <span class="ai-match">مناسب لك</span>
+      </div>
+      <div class="ai-rec-sub">${t(e.type).label} · ${esc(e.city_name||e.city||'')}${e.trust_score?' · ⭐'+e.trust_score:''}</div>
+    </div>`).join('')||'<div style="color:var(--muted);font-size:13px">لا مقترحات حالياً</div>';
 }
 
 /* ══ Stats ══ */
 function updateStats(){
+  const total=ALL_DATA.length;
   const bounds=MAP.getBounds();
   let visible=0;
-  CLUSTER.eachLayer(m=>{ if(bounds.contains(m.getLatLng())) visible++; });
-  document.getElementById('stat-visible').textContent=visible;
+  CLUSTER.eachLayer(m=>{if(bounds.contains(m.getLatLng()))visible++;});
+  const grid=document.getElementById('stats-grid');
+  if(grid) grid.innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">إجمالي الكيانات</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-visible">${visible}</div><div class="stat-lbl">مرئي الآن</div></div>
+    <div class="stat-card"><div class="stat-num">${ALL_DATA.filter(e=>e.is_verified).length}</div><div class="stat-lbl">موثّق</div></div>
+    <div class="stat-card"><div class="stat-num">${CITIES_DATA.length}</div><div class="stat-lbl">مدينة فعّالة</div></div>`;
+  const dist_el=document.getElementById('type-dist');
+  if(dist_el) dist_el.innerHTML=ET.slice(0,8).map(t=>{
+    const c=ALL_DATA.filter(e=>e.type===t.id).length;
+    return`<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+      <span style="font-size:13px">${t.em}</span>
+      <div style="flex:1;height:6px;background:var(--bg2);border-radius:99px;overflow:hidden"><div style="width:${Math.min(c/total*100*3,100)}%;height:100%;background:${t.color};border-radius:99px"></div></div>
+      <span style="font-size:11px;color:var(--muted);width:16px;text-align:right">${c}</span>
+    </div>`;
+  }).join('');
 }
 
-/* ══ Recent ══ */
-function addRecent(e){
-  if(RECENT.find(r=>r.id===e.id)) return;
-  RECENT.unshift(e);
-  if(RECENT.length>5) RECENT.pop();
-  renderRecent();
-}
-function renderRecent(){
-  const type=t=>ENTITY_TYPES.find(x=>x.id===t)||ENTITY_TYPES[0];
-  document.getElementById('recent-list').innerHTML=RECENT.map(e=>`
-    <div class="recent-item" onclick="MAP.setView([${e.lat},${e.lng}],14,{animate:true})">
-      <div class="recent-av">${type(e.type).em}</div>
-      <div class="recent-info">
-        <div class="recent-name">${esc(e.name||'—')}</div>
-        <div class="recent-type">${type(e.type).label} · ${esc(e.city_name||e.city||'')}</div>
-      </div>
-    </div>`).join('');
+/* ══ Legend ══ */
+function buildLegend(){
+  const items=ET.map(t=>`<div class="legend-item"><div class="leg-dot" style="background:${t.color}"></div>${t.em} ${t.label}</div>`).join('');
+  document.getElementById('legend-list').innerHTML=items;
+  document.getElementById('ml-items').innerHTML=ET.slice(0,6).map(t=>`<div class="legend-item"><div class="leg-dot" style="background:${t.color}"></div>${t.em} ${t.label}</div>`).join('');
 }
 
-/* ══ Follow ══ */
-async function followEntity(id){
-  if(!me){ toast('سجّل دخولاً','err'); return; }
-  await db.from('follows').upsert({follower_id:me.id,following_id:id},{onConflict:'follower_id,following_id'});
-  toast('تم المتابعة ✅');
-}
+/* ══ Navigation ══ */
+function goArab(){ MAP.setView([25,38],4,{animate:true,duration:.8}); }
+function goPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.6}); toast('فلسطين 🇵🇸'); }
 
 /* ══ Sidebar ══ */
-function toggleSidebar(){
+function toggleSB(){
   sidebarOpen=!sidebarOpen;
   const sb=document.getElementById('sidebar');
   const btn=document.getElementById('sb-toggle');
-  const legend=document.getElementById('legend');
-  if(sidebarOpen){ sb.classList.remove('closed'); btn.textContent='▶'; }
-  else{ sb.classList.add('closed'); btn.textContent='◀'; }
+  if(sidebarOpen){sb.classList.remove('closed');btn.textContent='▶';btn.style.right='0';}
+  else{sb.classList.add('closed');btn.textContent='◀';btn.style.right='var(--sw)';}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.sb-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-panel').forEach(p=>p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='ai') buildAIRecs();
+  if(name==='stats') updateStats();
+}
+
+/* ══ Follow ══ */
+async function followUser(id){
+  if(!me){toast('سجّل دخولاً','err');return;}
+  await db.from('follows').upsert({follower_id:me.id,following_id:id},{onConflict:'follower_id,following_id'});
+  toast('تم المتابعة ✅');
 }
 
 /* ══ Theme ══ */
@@ -523,22 +695,27 @@ function toggleTheme(){
   const dk=document.documentElement.classList.toggle('dk');
   localStorage.setItem('azza_theme',dk?'dark':'light');
   document.getElementById('theme-btn').textContent=dk?'☀️':'🌙';
-  if(dk){ MAP._lightTiles.remove(); MAP._darkTiles.addTo(MAP); }
-  else  { MAP._darkTiles.remove(); MAP._lightTiles.addTo(MAP); }
+  if(dk){MAP._lt.remove();MAP._dt.addTo(MAP);}
+  else{MAP._dt.remove();MAP._lt.addTo(MAP);}
 }
 
-/* تلقائياً: إضافة المستخدم الحالي على الخريطة */
-(async()=>{
-  if(me?.lat&&me?.lng){
-    const myIcon=L.divIcon({
-      html:`<div style="width:40px;height:40px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#0e3622">${(me.name||'م')[0]}</div>`,
-      className:'',iconSize:[40,40],iconAnchor:[20,20],popupAnchor:[0,-20]
+/* ══ Load from Supabase ══ */
+async function loadFromSupabase(){
+  /* إضافة البيانات التجريبية أولاً */
+  ALL_DATA.forEach(d=>addMarker(d));
+  updateStats();
+  /* ثم Supabase */
+  try{
+    const {data}=await db.from('users').select('id,name,type,bio,photo,city_name,country_code,lat,lng,is_verified,trust_score').not('lat','is',null).limit(300);
+    (data||[]).forEach(u=>{
+      if(!ALL_DATA.find(x=>x.id===u.id)){
+        ALL_DATA.push(u);
+        addMarker(u);
+      }
     });
-    L.marker([me.lat,me.lng],{icon:myIcon}).addTo(MAP)
-      .bindPopup(`<div style="font-family:Tajawal,sans-serif;text-align:center;direction:rtl"><strong>أنت 📍</strong><br>${esc(me.name||'')}</div>`);
-    MAP.setView([me.lat,me.lng],10,{animate:true});
-  }
-})();
+    updateStats();
+  }catch(e){}
+}
 </script>
 </body>
 </html>
