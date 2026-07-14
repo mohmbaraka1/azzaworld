@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>مساعد AZZA الذكي</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;--line:rgba(0,0,0,.08);--r:16px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;display:flex;flex-direction:column}
+
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.tb-av{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--olive),var(--od));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tb-info{flex:1}
+.tb-name{font-size:14px;font-weight:900;color:var(--olive)}
+.tb-status{font-size:11px;color:#22c55e;display:flex;align-items:center;gap:4px}
+.tb-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;display:block}
+
+/* Chat */
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat::-webkit-scrollbar{width:3px}
+.chat::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
+
+/* Messages */
+.bot-row{display:flex;gap:8px;align-items:flex-end;max-width:85%}
+.bot-av{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--olive),var(--od));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.bot-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:12px 15px;font-size:14px;line-height:1.75}
+.bot-bbl strong{font-weight:700;color:var(--olive)}
+.bot-bbl ul{margin:8px 0 4px 18px}
+.bot-bbl li{margin-bottom:6px}
+.bot-bbl p{margin-bottom:8px}
+.bot-bbl p:last-child{margin:0}
+
+.user-row{display:flex;flex-direction:row-reverse;gap:8px;align-items:flex-end;max-width:85%;align-self:flex-end}
+.user-av{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#e8b96a);color:var(--od);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.user-bbl{background:linear-gradient(135deg,var(--olive),var(--od));border-radius:var(--r) var(--r) 4px var(--r);padding:12px 15px;font-size:14px;line-height:1.75;color:#fff}
+
+/* Suggestions */
+.sugs{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.sug{padding:7px 13px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line);font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s}
+.sug:hover{background:var(--ol);color:var(--olive);border-color:var(--olive)}
+
+/* Quick Topics */
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.topic-card{background:var(--bg2);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.2s;border:1.5px solid transparent}
+.topic-card:hover{background:var(--ol);border-color:var(--olive)}
+.topic-em{font-size:22px;margin-bottom:4px}
+.topic-name{font-size:13px;font-weight:700}
+.topic-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Typing */
+.typing-bbl{background:var(--card);border:1px solid var(--line);border-radius:var(--r) var(--r) var(--r) 4px;padding:12px 16px;display:flex;gap:4px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:b .9s infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* Input */
+.inp-bar{padding:10px 12px;background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.inp-wrap{flex:1;background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;padding:8px 12px;display:flex;align-items:flex-end;gap:6px;transition:.2s}
+.inp-wrap:focus-within{border-color:var(--olive)}
+.inp-ta{flex:1;background:none;border:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none;resize:none;min-height:22px;max-height:100px;line-height:1.5}
+.inp-ta::placeholder{color:var(--muted)}
+.send-btn{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--olive),var(--od));color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(14,54,34,.25);flex-shrink:0;transition:.2s}
+.send-btn:hover{transform:scale(1.05)}
+.send-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
+.pop{animation:pop .2s cubic-bezier(.34,1.3,.64,1)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="tb-av">🤖</div>
+  <div class="tb-info">
+    <div class="tb-name">مساعد AZZA الذكي</div>
+    <div class="tb-status">يعمل بـ Claude AI</div>
+  </div>
+  <button onclick="clearChat()" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--sub)">🔄 جديد</button>
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="inp-bar">
+  <div class="inp-wrap">
+    <textarea class="inp-ta" id="inp" placeholder="اسألني عن ريادة الأعمال، الاستثمار، CV..." rows="1"
+      oninput="autoH(this)"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+  </div>
+  <button class="send-btn" id="send-btn" onclick="send()">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  </button>
+</div>
+
+<script>
+const me = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+
+const chat = document.getElementById('chat');
+const inp  = document.getElementById('inp');
+const btn  = document.getElementById('send-btn');
+const myIni= (me?.name||'م')[0];
+const esc  = s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sleep= ms=>new Promise(r=>setTimeout(r,ms));
+
+let messages = []; // تاريخ المحادثة
+let isLoading = false;
+
+const SYSTEM = `أنت مساعد AZZA الذكي — منصة عربية تربط رواد الأعمال بالمستثمرين والخبراء.
+أجب باللغة العربية دائماً. كن واضحاً ومفيداً ومختصراً.
+تخصصك في: ريادة الأعمال، الاستثمار، بناء المشاريع، تطوير المهارات، CV، البحث عن عمل، الابتكار، وحماية الأفكار.
+قدم إجابات عملية وقابلة للتطبيق. استخدم قوائم نقطية للخطوات. أضف أمثلة عملية.
+لا تذكر منافسين. إذا سُئلت عن شيء خارج تخصصك قل "هذا خارج مجالي لكن أنصحك بـ..."`;
+
+/* ── الرسائل ── */
+function addBot(html){
+  const d=document.createElement('div');
+  d.className='bot-row pop';
+  d.innerHTML=`<div class="bot-av">🤖</div><div class="bot-bbl">${html}</div>`;
+  chat.appendChild(d); scroll();
+}
+function addUser(text){
+  const d=document.createElement('div');
+  d.className='user-row pop';
+  d.innerHTML=`<div class="user-bbl">${esc(text)}</div><div class="user-av">${myIni}</div>`;
+  chat.appendChild(d); scroll();
+}
+function addSugs(list){
+  const d=document.createElement('div');
+  d.className='sugs pop';
+  d.innerHTML=list.map(s=>`<button class="sug" onclick="quickAsk(this,'${esc(s)}')">${s}</button>`).join('');
+  chat.appendChild(d); scroll();
+}
+function addTopics(){
+  const topics=[
+    {em:'💡',name:'توليد أفكار',desc:'أفكار مشاريع ناجحة',q:'كيف أجد فكرة مشروع مربحة؟'},
+    {em:'💰',name:'جذب مستثمر',desc:'كيف تجد التمويل',q:'كيف أجد مستثمراً لمشروعي؟'},
+    {em:'🎯',name:'Pitch Deck',desc:'عرض مشروعك',q:'كيف أبني Pitch Deck احترافياً؟'},
+    {em:'📄',name:'تحسين CV',desc:'سيرة ذاتية قوية',q:'كيف أحسّن سيرتي الذاتية؟'},
+    {em:'🔒',name:'حماية الفكرة',desc:'NDA والحقوق',q:'كيف أحمي فكرتي من السرقة؟'},
+    {em:'🚀',name:'إطلاق مشروع',desc:'الخطوات الأولى',q:'كيف أبدأ مشروعي من الصفر؟'},
+  ];
+  const d=document.createElement('div');
+  d.className='topics pop';
+  d.innerHTML=topics.map(t=>`
+    <div class="topic-card" onclick="quickAsk(this,'${esc(t.q)}')">
+      <div class="topic-em">${t.em}</div>
+      <div class="topic-name">${t.name}</div>
+      <div class="topic-desc">${t.desc}</div>
+    </div>`).join('');
+  chat.appendChild(d); scroll();
+}
+function typing(){
+  const d=document.createElement('div');
+  d.className='bot-row pop'; d.id='typing';
+  d.innerHTML=`<div class="bot-av">🤖</div><div class="typing-bbl"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  chat.appendChild(d); scroll();
+}
+function rmTyping(){ document.getElementById('typing')?.remove(); }
+function scroll(){ setTimeout(()=>chat.scrollTop=chat.scrollHeight,40); }
+function autoH(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+
+/* ── إرسال ── */
+async function send(){
+  const text=inp.value.trim();
+  if(!text||isLoading) return;
+  inp.value=''; inp.style.height='auto';
+  /* احذف الـtopics/sugs */
+  chat.querySelectorAll('.topics,.sugs').forEach(e=>e.remove());
+  addUser(text);
+  messages.push({role:'user',content:text});
+  await callClaude();
+}
+
+async function quickAsk(el, text){
+  el.closest('.sugs,.topics')?.remove();
+  inp.value='';
+  addUser(text);
+  messages.push({role:'user',content:text});
+  await callClaude();
+}
+
+/* ── Claude API ── */
+async function callClaude(){
+  if(isLoading) return;
+  isLoading=true;
+  btn.disabled=true;
+  typing();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:SYSTEM,
+        messages:messages.slice(-12),
+      })
+    });
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'عذراً، لم أستطع الإجابة الآن.';
+    messages.push({role:'assistant',content:reply});
+    rmTyping();
+    addBot(formatReply(reply));
+    addSugs(getSugs(reply));
+  }catch(e){
+    rmTyping();
+    addBot('⚠️ تعذّر الاتصال. تأكد من الإنترنت وحاول مرة أخرى.');
+  }
+  isLoading=false;
+  btn.disabled=false;
+}
+
+/* ── تنسيق الرد ── */
+function formatReply(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^## (.+)$/gm,'<strong style="font-size:15px;color:var(--olive)">$1</strong>')
+    .replace(/^### (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/^(\d+)\. (.+)$/gm,'<li><strong>$1.</strong> $2</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`)
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/^(.)/,'<p>$1')
+    .replace(/(.)$/,'$1</p>')
+    .replace(/<p><ul>/g,'<ul>').replace(/<\/ul><\/p>/g,'</ul>');
+}
+
+/* ── اقتراحات ذكية ── */
+function getSugs(reply){
+  const sugs=[];
+  if(reply.includes('مستثمر')||reply.includes('تمويل')) sugs.push('كيف أقيّم عرض المستثمر؟','ما الأوراق المطلوبة؟');
+  if(reply.includes('فكرة')||reply.includes('مشروع')) sugs.push('كيف أختبر فكرتي؟','ما الخطوة الأولى؟');
+  if(reply.includes('CV')||reply.includes('سيرة')) sugs.push('ما أهم أخطاء CV؟','كيف أكتب Summary قوي؟');
+  if(reply.includes('Pitch')||reply.includes('عرض')) sugs.push('ما مدة Pitch المثالي؟','كيف أحضّر للأسئلة؟');
+  if(reply.includes('فريق')||reply.includes('شريك')) sugs.push('كيف أقسّم الحصص؟','كيف أتعامل مع خلافات الفريق؟');
+  if(sugs.length===0) sugs.push('اشرح بمثال عملي','ما الخطوة التالية؟','ما الأخطاء الشائعة؟');
+  return sugs.slice(0,3);
+}
+
+/* ── تهيئة ── */
+function clearChat(){
+  chat.innerHTML='';
+  messages=[];
+  init();
+}
+
+function init(){
+  addBot(`أهلاً ${me.name||''}! 👋 أنا مساعدك الذكي في AZZA.<br>اسألني عن <strong>ريادة الأعمال، الاستثمار، CV، أو أي موضوع يهمك.</strong>`);
+  addTopics();
+}
+
+(()=>{
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  init();
+})();
+</script>
+</body>
+</html>
