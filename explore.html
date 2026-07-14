@@ -72,23 +72,7 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
 .fb:hover,.fb.on{background:var(--o);color:#fff;border-color:var(--o);box-shadow:0 4px 14px rgba(28,91,56,.3)}
 .fb-sep{height:4px}
 
-/* Category Chips (bottom float) */
-.cat-strip{
-  position:fixed;bottom:140px;right:0;left:0;z-index:400;
-  padding:0 16px;overflow-x:auto;white-space:nowrap;
-  display:flex;gap:8px;scrollbar-width:none;
-}
-.cat-strip::-webkit-scrollbar{display:none}
-.cat-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:99px;
-  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1.5px solid rgba(255,255,255,.5);
-  box-shadow:var(--shadow-sm);cursor:pointer;font-size:13px;font-weight:700;
-  color:var(--ink);white-space:nowrap;transition:.2s;flex-shrink:0;font-family:Tajawal;
-}
-.dk .cat-chip{border-color:rgba(255,255,255,.1)}
-.cat-chip:hover,.cat-chip.on{background:var(--o);color:#fff;border-color:var(--o)}
+
 .cat-chip span{font-size:15px}
 
 /* Sidebar */
@@ -127,19 +111,32 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
 .sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:699;display:none;backdrop-filter:blur(2px)}
 .sb-overlay.show{display:block}
 
-/* Geo Breadcrumb */
+/* Geo Nav */
 .geo-nav{
   position:fixed;top:72px;right:16px;z-index:400;
   background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1.5px solid rgba(255,255,255,.5);
   border-radius:12px;box-shadow:var(--shadow-sm);
-  padding:8px 12px;display:flex;align-items:center;gap:6px;
-  font-size:12px;font-weight:700;color:var(--ink);
+  display:flex;align-items:center;gap:0;overflow:hidden;
 }
 .dk .geo-nav{border-color:rgba(255,255,255,.12)}
-.geo-crumb{cursor:pointer;color:var(--o);transition:.15s}
-.geo-crumb:hover{text-decoration:underline}
-.geo-sep{color:var(--muted);font-size:10px}
+.geo-btn{padding:8px 12px;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--ink);display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.geo-btn:hover{background:var(--ol);color:var(--o)}
+.geo-btn.active{background:var(--o);color:#fff}
+.geo-divider{width:1px;height:20px;background:var(--line);flex-shrink:0}
+
+/* Geo Dropdown */
+.geo-dropdown{
+  position:fixed;top:112px;right:16px;z-index:600;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);min-width:220px;overflow:hidden;display:none;
+}
+.geo-dropdown.open{display:block;animation:fadeUp .15s ease}
+.geo-dd-hdr{padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:var(--bg2);border-bottom:1px solid var(--line)}
+.geo-dd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;transition:.15s;border-bottom:.5px solid var(--line)}
+.geo-dd-item:last-child{border:none}
+.geo-dd-item:hover{background:var(--ol);color:var(--o)}
+.geo-dd-count{margin-right:auto;font-size:11px;color:var(--muted)}
 
 /* Bottom Card (Popup) */
 .bottom-card{
@@ -255,11 +252,21 @@ body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direct
   <button class="fb" onclick="locateMe()" style="flex-shrink:0;border-radius:14px">📍</button>
 </div>
 
-<!-- Geo Breadcrumb -->
+<!-- Geo Nav -->
 <div class="geo-nav" id="geo-nav">
-  <span class="geo-crumb" onclick="goArab()">🌍 الوطن العربي</span>
-  <span class="geo-sep">›</span>
-  <span class="geo-crumb" id="geo-country" onclick="goPalestine()">🇵🇸 فلسطين</span>
+  <button class="geo-btn" onclick="goArab();closeGeoDd()">🌍 العالم العربي</button>
+  <div class="geo-divider"></div>
+  <button class="geo-btn active" id="geo-country-btn" onclick="toggleGeoDd()">🇵🇸 فلسطين ▾</button>
+</div>
+
+<!-- Geo Dropdown -->
+<div class="geo-dropdown" id="geo-dd">
+  <div class="geo-dd-hdr">اختر دولة أو مدينة</div>
+  <div class="geo-dd-item" onclick="goPalestine()">🇵🇸 فلسطين <span class="geo-dd-count">فعّالة</span></div>
+  <div class="geo-dd-hdr" style="font-size:11px">مدن فلسطين</div>
+  <div id="geo-cities-list"></div>
+  <div class="geo-dd-hdr" style="font-size:11px">دول أخرى قريباً</div>
+  ${['🇯🇴 الأردن','🇸🇦 السعودية','🇪🇬 مصر','🇦🇪 الإمارات','🇱🇧 لبنان'].map(c=>`<div class="geo-dd-item" style="opacity:.5;cursor:default">${c} <span class="geo-dd-count">قريباً</span></div>`).join('')}
 </div>
 
 <!-- Float Buttons -->
@@ -401,7 +408,6 @@ let activeType='', heatOn=false, sbOpen=false;
   if(me?.name){D('sb-av').textContent=(me.name||'م')[0];D('sb-name').textContent=me.name;}
   initMap();
   buildSidebar();
-  buildCatStrip();
   ALL.forEach(e=>addM(e));
   loadSupa();
   buildMobSheet();
@@ -530,15 +536,15 @@ function filterCity(name,la,lo){
 }
 
 /* ══ Category Filter ══ */
-function buildCatStrip(){
-  D('cat-strip').innerHTML=`<div class="cat-chip on" id="cat-all" onclick="filterType('',this)"><span>🌐</span>الكل</div>`
-    +ET.map(t=>`<div class="cat-chip" id="cat-${t.id}" onclick="filterType('${t.id}',this)"><span>${t.em}</span>${t.label}</div>`).join('');
-}
+
 
 function filterType(type,chip){
   activeType=type;
-  document.querySelectorAll('.cat-chip').forEach(c=>{c.classList.remove('on');});
-  chip?.classList.add('on');
+  /* تحديث أزرار Sidebar */
+  document.querySelectorAll('[id^="cat-"]').forEach(b=>{
+    b.style.background='';b.style.color='var(--ink)';b.style.borderColor='var(--line)';
+  });
+  if(chip){chip.style.background='#1c5b38';chip.style.color='#fff';chip.style.borderColor='#1c5b38';}
   CLUSTER.clearLayers();
   let n=0;
   MARKERS.forEach(({m,e})=>{ if(!type||e.type===type){CLUSTER.addLayer(m);n++;} });
@@ -613,6 +619,12 @@ function buildSidebar(){
   ];
   D('sb-body').innerHTML=`
     <div class="sb-section-title">تصفح حسب النوع</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 12px" id="sb-cat-chips">
+      <button style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--o);background:var(--o);color:#fff;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer" id="cat-all" onclick="filterType('',this)">🌐 الكل</button>
+      ${ET.map(t=>`<button style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--line);background:none;color:var(--ink);font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s" id="cat-${t.id}" onclick="filterType('${t.id}',this)">${t.em} ${t.label}</button>`).join('')}
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-section-title">تفاصيل</div>
     ${items.map(it=>`
       <div class="sb-item" onclick="filterType('${it.type}',document.getElementById('cat-${it.type}'));closeSB()">
         <div class="sb-item-em" style="background:${(ET.find(t=>t.id===it.type)||ET[0]).bg}">${it.em}</div>
@@ -666,9 +678,33 @@ function locateMe(){
   },()=>toast('تعذّر تحديد الموقع','err'));
 }
 
+/* ══ Geo Dropdown ══ */
+function toggleGeoDd(){
+  const dd=D('geo-dd');
+  const isOpen=dd.classList.contains('open');
+  if(isOpen){ closeGeoDd(); return; }
+  /* بناء قائمة المدن */
+  D('geo-cities-list').innerHTML=CITIES.map(c=>`
+    <div class="geo-dd-item" onclick="selectCity_geo(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      🏙️ ${c.n}
+      <span class="geo-dd-count">${c.u} مستخدم</span>
+    </div>`).join('');
+  dd.classList.add('open');
+  /* إغلاق عند النقر خارجه */
+  setTimeout(()=>document.addEventListener('click',closeGeoDdOut),10);
+}
+function closeGeoDd(){ D('geo-dd').classList.remove('open'); document.removeEventListener('click',closeGeoDdOut); }
+function closeGeoDdOut(e){ if(!e.target.closest('.geo-nav')&&!e.target.closest('.geo-dropdown')) closeGeoDd(); }
+function selectCity_geo(c){
+  if(typeof c==='string') c=JSON.parse(c);
+  showCity(c);
+  D('geo-country-btn').textContent='🏙️ '+c.n+' ▾';
+  closeGeoDd();
+}
+
 /* ══ Navigation ══ */
-function goArab(){ MAP.setView([25,38],4,{animate:true,duration:.8});D('geo-country').textContent='كل الدول'; }
-function goPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.5});D('geo-country').textContent='🇵🇸 فلسطين';toast('فلسطين 🇵🇸'); }
+function goArab(){ MAP.setView([25,38],4,{animate:true,duration:.8});const b=D('geo-country-btn');if(b)b.textContent='🌍 الوطن العربي ▾'; }
+function goPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.5});const b=D('geo-country-btn');if(b)b.textContent='🇵🇸 فلسطين ▾';closeGeoDd();toast('فلسطين 🇵🇸'); }
 
 /* ══ Theme ══ */
 function toggleTheme(){
