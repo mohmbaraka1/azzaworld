@@ -51,28 +51,36 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 .ac-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .ac-n{font-size:13px;font-weight:700}.ac-s{font-size:11px;color:var(--muted)}
 
-/* Geo Selector */
-.geo-sel{
-  position:fixed;top:72px;right:14px;z-index:400;
-  display:flex;align-items:center;background:var(--glass);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+/* Geo Button + Dropdown */
+.geo-wrap{position:fixed;top:72px;right:14px;z-index:400}
+.geo-btn-main{
+  display:flex;align-items:center;gap:7px;padding:9px 14px;
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:1.5px solid rgba(255,255,255,.6);border-radius:12px;
-  box-shadow:0 4px 16px rgba(0,0,0,.1);overflow:hidden;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);cursor:pointer;
+  font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;color:var(--ink);
+  white-space:nowrap;transition:.2s;
 }
-.dk .geo-sel{border-color:rgba(255,255,255,.1)}
-.geo-b{padding:9px 13px;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--ink);display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
-.geo-b:hover{color:var(--o)}.geo-b.on{background:var(--o);color:#fff}
-.geo-sep{width:1px;height:22px;background:var(--line)}
-/* City Dropdown */
+.dk .geo-btn-main{border-color:rgba(255,255,255,.1)}
+.geo-btn-main:hover{border-color:var(--o);color:var(--o)}
+.geo-btn-main.dd-open{background:var(--o);color:#fff;border-color:var(--o)}
+.geo-arrow{font-size:9px;transition:transform .2s}
+.geo-btn-main.dd-open .geo-arrow{transform:rotate(180deg)}
+/* Dropdown */
 .city-dd{
-  position:fixed;top:112px;right:14px;z-index:600;
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  box-shadow:var(--shadow);min-width:200px;overflow:hidden;display:none;
+  position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);min-width:220px;overflow:hidden;
+  display:none;z-index:10;
 }
 .city-dd.open{display:block;animation:pop .15s ease}
-.city-dd-hdr{padding:9px 14px;font-size:11px;font-weight:700;color:var(--muted);background:var(--bg2);border-bottom:1px solid var(--line)}
-.city-dd-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;transition:.15s;border-bottom:.5px solid var(--line)}
-.city-dd-item:last-child{border:none}.city-dd-item:hover{background:var(--ol);color:var(--o)}
+.city-dd-hdr{padding:8px 14px;font-size:10px;font-weight:700;color:var(--muted);
+  background:var(--bg2);border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em}
+.city-dd-item{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;
+  transition:.15s;border-bottom:.5px solid var(--line)}
+.city-dd-item:last-child{border:none}
+.city-dd-item:hover{background:var(--ol);color:var(--o)}
 .city-dd-count{font-size:10px;color:var(--muted)}
 
 /* Fab Buttons */
@@ -203,20 +211,23 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
   <button class="fab" onclick="locateMe()" style="flex-shrink:0">📍</button>
 </div>
 
-<!-- Geo Selector -->
-<div class="geo-sel" id="geo-sel">
-  <button class="geo-b" onclick="flyArab();closeDd()">🌍 الوطن العربي</button>
-  <div class="geo-sep"></div>
-  <button class="geo-b on" id="geo-btn" onclick="toggleDd()">🇵🇸 فلسطين ▾</button>
-</div>
-
-<!-- City Dropdown -->
-<div class="city-dd" id="city-dd">
-  <div class="city-dd-hdr">مدن فلسطين</div>
-  <div id="city-dd-list"></div>
-  <div class="city-dd-hdr">دول أخرى — قريباً</div>
-  <div class="city-dd-item" style="opacity:.45;cursor:default">🇯🇴 الأردن <span class="city-dd-count">قريباً</span></div>
-  <div class="city-dd-item" style="opacity:.45;cursor:default">🇸🇦 السعودية <span class="city-dd-count">قريباً</span></div>
+<!-- Geo Button + Dropdown -->
+<div class="geo-wrap" id="geo-wrap">
+  <button class="geo-btn-main" id="geo-btn" onclick="toggleDd()">
+    <span id="geo-label">🌍 الوطن العربي | 🇵🇸 فلسطين</span>
+    <span class="geo-arrow">▾</span>
+  </button>
+  <div class="city-dd" id="city-dd">
+    <div class="city-dd-hdr">🌍 التنقل السريع</div>
+    <div class="city-dd-item" onclick="flyArab();closeDd()">🌍 الوطن العربي <span class="city-dd-count">22 دولة</span></div>
+    <div class="city-dd-item" onclick="flyPalestine();closeDd()">🇵🇸 فلسطين <span class="city-dd-count">فعّالة</span></div>
+    <div class="city-dd-hdr">🏙️ مدن فلسطين</div>
+    <div id="city-dd-list"></div>
+    <div class="city-dd-hdr">🌐 دول أخرى</div>
+    <div class="city-dd-item" style="opacity:.45;cursor:default">🇯🇴 الأردن <span class="city-dd-count">قريباً</span></div>
+    <div class="city-dd-item" style="opacity:.45;cursor:default">🇸🇦 السعودية <span class="city-dd-count">قريباً</span></div>
+    <div class="city-dd-item" style="opacity:.45;cursor:default">🇪🇬 مصر <span class="city-dd-count">قريباً</span></div>
+  </div>
 </div>
 
 <!-- Fabs -->
@@ -620,20 +631,21 @@ function buildCityDd(){
     </div>`).join('');
 }
 function toggleDd(){
-  const dd=D('city-dd');
+  const dd=D('city-dd'),btn=D('geo-btn');
   if(dd.classList.contains('open')){closeDd();return;}
   dd.classList.add('open');
+  btn.classList.add('dd-open');
   setTimeout(()=>document.addEventListener('click',ddOut),10);
 }
-function ddOut(e){if(!e.target.closest('.geo-sel')&&!e.target.closest('.city-dd'))closeDd();}
-function closeDd(){D('city-dd').classList.remove('open');document.removeEventListener('click',ddOut);}
+function ddOut(e){if(!e.target.closest('.geo-wrap'))closeDd();}
+function closeDd(){D('city-dd').classList.remove('open');D('geo-btn').classList.remove('dd-open');document.removeEventListener('click',ddOut);}
 function pickCity(c){
   if(typeof c==='string')c=JSON.parse(c);
-  D('geo-btn').textContent='🏙️ '+c.n+' ▾';
+  D('geo-label').textContent='🏙️ '+c.n;
   showCityPanel(c); closeDd();
 }
-function flyArab(){MAP.flyTo({center:[38,25],zoom:4,pitch:0,bearing:0,duration:1200,essential:true});D('geo-btn').textContent='🌍 الوطن العربي ▾';}
-function flyPalestine(){MAP.flyTo({center:[35.2,31.9],zoom:8,pitch:IS_3D?50:0,duration:800,essential:true});D('geo-btn').textContent='🇵🇸 فلسطين ▾';toast('🇵🇸 فلسطين');}
+function flyArab(){MAP.flyTo({center:[38,25],zoom:4,pitch:0,bearing:0,duration:1200,essential:true});D('geo-label').textContent='🌍 الوطن العربي | 🇵🇸 فلسطين';}
+function flyPalestine(){MAP.flyTo({center:[35.2,31.9],zoom:8,pitch:IS_3D?50:0,duration:800,essential:true});D('geo-label').textContent='🌍 الوطن العربي | 🇵🇸 فلسطين';toast('🇵🇸 فلسطين');}
 
 /* ══ GPS ══ */
 function locateMe(){
