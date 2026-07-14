@@ -3,716 +3,648 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>خريطة AZZA — اكتشف الفرص</title>
+<title>خريطة AZZA الذكية</title>
 <script src="supabase.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<!-- MapLibre GL JS -->
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
 :root{
-  --g:#c69749;--gs:#e8c06a;
-  --o:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
+  --g:#c69749;--gs:#e8c06a;--o:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.1);
   --card:#fff;--bg:#f5f1ea;--bg2:#ebe5d8;
-  --ink:#18160f;--sub:#6b6354;--muted:#9a9080;
-  --line:rgba(0,0,0,.07);--r:14px;
-  --glass:rgba(255,255,255,.92);--glass-d:rgba(16,14,8,.92);
-  --shadow:0 8px 32px rgba(0,0,0,.12);--shadow-sm:0 2px 10px rgba(0,0,0,.1);
+  --ink:#18160f;--sub:#6b6354;--muted:#9a9080;--line:rgba(0,0,0,.07);
+  --glass:rgba(255,255,255,.92);--shadow:0 8px 32px rgba(0,0,0,.14);--r:14px;
 }
-.dk{--card:#1a1810;--bg:#0d0c07;--bg2:#1a1810;--ink:#f0ead8;--sub:#9a9080;--muted:#6b6354;--line:rgba(255,255,255,.07);--glass:rgba(20,18,10,.92);--glass-d:rgba(20,18,10,.92)}
+.dk{--card:#1a1810;--bg:#0d0c07;--bg2:#1a1810;--ink:#f0ead8;--sub:#9a9080;--muted:#6b6354;--line:rgba(255,255,255,.07);--glass:rgba(18,16,8,.93)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl}
+html,body{height:100%;overflow:hidden}
+body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 
-/* ══ Map (full screen) ══ */
+/* ── Map Full Screen ── */
 #map{position:fixed;inset:0;z-index:0}
 
-/* ══ Float Search Bar ══ */
-.float-search{
-  position:fixed;top:16px;right:16px;left:16px;z-index:500;
+/* ── Floating Search ── */
+.fsearch{
+  position:fixed;top:14px;right:14px;left:14px;z-index:500;
   display:flex;align-items:center;gap:8px;
 }
-.search-pill{
-  flex:1;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1.5px solid rgba(255,255,255,.6);border-radius:99px;
-  box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;padding:0 14px 0 10px;
-  height:46px;transition:.2s;position:relative;
+.s-pill{
+  flex:1;height:48px;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1.5px solid rgba(255,255,255,.7);border-radius:99px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;padding:0 14px;
+  position:relative;transition:.2s;
 }
-.dk .search-pill{border-color:rgba(255,255,255,.12);background:var(--glass-d)}
-.search-pill:focus-within{border-color:var(--o);box-shadow:0 0 0 3px rgba(28,91,56,.12),var(--shadow)}
-.search-pill svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
-.search-inp{flex:1;border:none;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none}
-.search-inp::placeholder{color:var(--muted)}
-.search-clear{width:20px;height:20px;border-radius:50%;background:var(--muted);color:#fff;border:none;font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;flex-shrink:0}
-.search-clear.show{display:flex}
+.dk .s-pill{border-color:rgba(255,255,255,.1)}
+.s-pill:focus-within{border-color:var(--o);box-shadow:0 0 0 3px rgba(28,91,56,.1),var(--shadow)}
+.s-pill svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.s-inp{flex:1;border:none;background:none;font-family:Tajawal,sans-serif;font-size:14px;color:var(--ink);outline:none}
+.s-inp::placeholder{color:var(--muted)}
+.s-clear{width:20px;height:20px;border-radius:50%;background:var(--muted);color:#fff;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;flex-shrink:0}
+.s-clear.show{display:flex}
 /* Autocomplete */
-.ac-drop{
-  position:absolute;top:52px;right:0;left:0;
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  box-shadow:var(--shadow);z-index:600;overflow:hidden;
-  max-height:280px;overflow-y:auto;display:none;
+.ac{position:absolute;top:54px;right:0;left:0;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;max-height:300px;overflow-y:auto;display:none;z-index:10}
+.ac.open{display:block;animation:pop .15s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ac-row{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:.5px solid var(--line);transition:.15s}
+.ac-row:last-child{border:none}.ac-row:hover{background:var(--ol)}
+.ac-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ac-n{font-size:13px;font-weight:700}.ac-s{font-size:11px;color:var(--muted)}
+
+/* Geo Selector */
+.geo-sel{
+  position:fixed;top:72px;right:14px;z-index:400;
+  display:flex;align-items:center;background:var(--glass);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(255,255,255,.6);border-radius:12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.1);overflow:hidden;
 }
-.ac-drop.open{display:block;animation:fadeUp .15s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.ac-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:.15s;border-bottom:.5px solid var(--line)}
-.ac-item:last-child{border:none}
-.ac-item:hover,.ac-item:active{background:var(--ol)}
-.ac-em{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.ac-info{flex:1;min-width:0}
-.ac-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ac-type{font-size:11px;color:var(--muted)}
+.dk .geo-sel{border-color:rgba(255,255,255,.1)}
+.geo-b{padding:9px 13px;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--ink);display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.geo-b:hover{color:var(--o)}.geo-b.on{background:var(--o);color:#fff}
+.geo-sep{width:1px;height:22px;background:var(--line)}
+/* City Dropdown */
+.city-dd{
+  position:fixed;top:112px;right:14px;z-index:600;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow);min-width:200px;overflow:hidden;display:none;
+}
+.city-dd.open{display:block;animation:pop .15s ease}
+.city-dd-hdr{padding:9px 14px;font-size:11px;font-weight:700;color:var(--muted);background:var(--bg2);border-bottom:1px solid var(--line)}
+.city-dd-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;transition:.15s;border-bottom:.5px solid var(--line)}
+.city-dd-item:last-child{border:none}.city-dd-item:hover{background:var(--ol);color:var(--o)}
+.city-dd-count{font-size:10px;color:var(--muted)}
 
-/* Float Buttons (right) */
-.float-btns{position:fixed;top:72px;left:16px;z-index:400;display:flex;flex-direction:column;gap:8px}
-.fb{width:42px;height:42px;border-radius:14px;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.5);box-shadow:var(--shadow-sm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;color:var(--ink);font-family:Tajawal}
-.dk .fb{border-color:rgba(255,255,255,.1)}
-.fb:hover,.fb.on{background:var(--o);color:#fff;border-color:var(--o);box-shadow:0 4px 14px rgba(28,91,56,.3)}
-.fb-sep{height:4px}
-
-
-.cat-chip span{font-size:15px}
+/* Fab Buttons */
+.fabs{position:fixed;top:72px;left:14px;z-index:400;display:flex;flex-direction:column;gap:8px}
+.fab{width:42px;height:42px;border-radius:13px;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,.6);box-shadow:0 3px 10px rgba(0,0,0,.1);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:Tajawal}
+.dk .fab{border-color:rgba(255,255,255,.1)}
+.fab:hover,.fab.on{background:var(--o);border-color:var(--o);color:#fff;box-shadow:0 4px 14px rgba(28,91,56,.3)}
 
 /* Sidebar */
-.sidebar{
-  position:fixed;top:0;bottom:0;right:-360px;width:340px;
-  background:var(--card);z-index:700;
-  display:flex;flex-direction:column;
-  transition:right .3s cubic-bezier(.4,0,.2,1);
-  box-shadow:-8px 0 32px rgba(0,0,0,.15);
-}
+.sb-ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:699;display:none;backdrop-filter:blur(3px)}
+.sb-ov.show{display:block}
+.sidebar{position:fixed;top:0;bottom:0;right:-350px;width:320px;background:var(--card);z-index:700;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.18)}
 .sidebar.open{right:0}
-.sb-header{padding:52px 20px 16px;background:linear-gradient(135deg,var(--od),var(--o));color:#fff;flex-shrink:0}
-.sb-user{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.sb-av{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
-.sb-user-name{font-size:15px;font-weight:700}
-.sb-user-sub{font-size:12px;opacity:.7}
-.sb-geo{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.8;flex-wrap:wrap}
-.sb-geo-sep{opacity:.4}
-
-.sb-body{flex:1;overflow-y:auto;padding:8px 0}
+.sb-hdr{background:linear-gradient(135deg,var(--od),var(--o));padding:52px 18px 16px;flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sb-av{width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.2);color:#fff;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-uname{font-size:15px;font-weight:700;color:#fff}
+.sb-usub{font-size:11px;color:rgba(255,255,255,.65)}
+.sb-close{margin-right:auto;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:13px}
+.sb-chips{display:flex;flex-wrap:wrap;gap:5px}
+.sb-chip{padding:6px 11px;border-radius:99px;border:1.5px solid rgba(255,255,255,.25);font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);cursor:pointer;transition:.15s;background:rgba(255,255,255,.07)}
+.sb-chip:hover,.sb-chip.on{background:#fff;color:var(--od);border-color:#fff}
+.sb-body{flex:1;overflow-y:auto;padding:12px 0}
 .sb-body::-webkit-scrollbar{width:3px}
 .sb-body::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:99px}
-.sb-item{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:.15s;position:relative}
-.sb-item:hover{background:var(--ol)}
-.sb-item.active{background:var(--ol)}
-.sb-item.active::before{content:'';position:absolute;right:0;top:8px;bottom:8px;width:3px;background:var(--o);border-radius:99px 0 0 99px}
-.sb-item-em{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.sb-item-info{flex:1}
-.sb-item-label{font-size:14px;font-weight:700}
-.sb-item-sub{font-size:11px;color:var(--muted)}
-.sb-item-count{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--bg2);color:var(--sub)}
-.sb-sep{height:.5px;background:var(--line);margin:8px 20px}
-.sb-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:12px 20px 4px}
-
-/* Sidebar Overlay */
-.sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:699;display:none;backdrop-filter:blur(2px)}
-.sb-overlay.show{display:block}
-
-/* Geo Nav */
-.geo-nav{
-  position:fixed;top:72px;right:16px;z-index:400;
-  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1.5px solid rgba(255,255,255,.5);
-  border-radius:12px;box-shadow:var(--shadow-sm);
-  display:flex;align-items:center;gap:0;overflow:hidden;
-}
-.dk .geo-nav{border-color:rgba(255,255,255,.12)}
-.geo-btn{padding:8px 12px;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--ink);display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
-.geo-btn:hover{background:var(--ol);color:var(--o)}
-.geo-btn.active{background:var(--o);color:#fff}
-.geo-divider{width:1px;height:20px;background:var(--line);flex-shrink:0}
-
-/* Geo Dropdown */
-.geo-dropdown{
-  position:fixed;top:112px;right:16px;z-index:600;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;
-  box-shadow:var(--shadow);min-width:220px;overflow:hidden;display:none;
-}
-.geo-dropdown.open{display:block;animation:fadeUp .15s ease}
-.geo-dd-hdr{padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:var(--bg2);border-bottom:1px solid var(--line)}
-.geo-dd-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;transition:.15s;border-bottom:.5px solid var(--line)}
-.geo-dd-item:last-child{border:none}
-.geo-dd-item:hover{background:var(--ol);color:var(--o)}
-.geo-dd-count{margin-right:auto;font-size:11px;color:var(--muted)}
+.sb-it{display:flex;align-items:center;gap:12px;padding:11px 18px;cursor:pointer;transition:.15s}
+.sb-it:hover{background:var(--ol)}
+.sb-em{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-il{font-size:13px;font-weight:700}.sb-is{font-size:11px;color:var(--muted)}
+.sb-count{margin-right:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--bg2);color:var(--sub)}
+.sb-div{height:.5px;background:var(--line);margin:8px 18px}
+.sb-sec{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:10px 18px 4px}
 
 /* Bottom Card (Popup) */
-.bottom-card{
-  position:fixed;bottom:-320px;right:0;left:0;z-index:800;
+.bcard{
+  position:fixed;bottom:-360px;right:0;left:0;z-index:800;
   background:var(--card);border-radius:24px 24px 0 0;
-  box-shadow:0 -8px 40px rgba(0,0,0,.15);
+  box-shadow:0 -8px 40px rgba(0,0,0,.16);
   transition:bottom .3s cubic-bezier(.4,0,.2,1);
-  max-height:380px;overflow-y:auto;
+  max-height:90vh;overflow-y:auto;
 }
-.bottom-card.open{bottom:0}
-.bc-handle{width:40px;height:4px;border-radius:99px;background:var(--line);margin:12px auto 8px}
-.bc-body{padding:0 20px 20px}
-.bc-header{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
-.bc-av{width:56px;height:56px;border-radius:16px;flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:26px}
-.bc-av img{width:100%;height:100%;border-radius:16px;object-fit:cover}
-.bc-info{flex:1}
-.bc-name{font-size:17px;font-weight:900;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.bc-verified{color:var(--o);font-size:13px}
-.bc-type{font-size:12px;color:var(--muted);margin-top:2px}
-.bc-trust{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--g);margin-top:4px}
-.bc-desc{font-size:14px;color:var(--sub);line-height:1.65;margin-bottom:10px}
-.bc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.bcard.open{bottom:0}
+.bc-pull{width:36px;height:4px;border-radius:99px;background:var(--line);margin:12px auto 0}
+.bc-x{position:absolute;top:12px;left:14px;width:28px;height:28px;border-radius:50%;border:none;background:var(--bg2);cursor:pointer;font-size:12px;color:var(--sub)}
+.bc-body{padding:8px 18px 24px}
+.bc-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
+.bc-av{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;background:var(--bg2)}
+.bc-name{font-size:17px;font-weight:900;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bc-vbadge{background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px}
+.bc-type{font-size:12px;color:var(--muted);margin-bottom:4px}
+.bc-trust{font-size:12px;font-weight:700;color:var(--g);display:flex;align-items:center;gap:4px}
+.bc-desc{font-size:14px;color:var(--sub);line-height:1.65;margin-bottom:10px;padding-top:8px;border-top:.5px solid var(--line)}
+.bc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .bc-tag{padding:4px 10px;border-radius:8px;background:var(--bg2);font-size:12px;font-weight:700;color:var(--sub)}
-.bc-actions{display:flex;gap:8px}
-.bc-btn{flex:1;padding:11px;border-radius:12px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-.bc-primary{background:var(--o);color:#fff}.bc-primary:hover{background:var(--od)}
-.bc-sec{border:1.5px solid var(--line);background:none;color:var(--ink)}.bc-sec:hover{border-color:var(--o);color:var(--o)}
-.bc-close{position:absolute;top:14px;left:16px;width:30px;height:30px;border-radius:50%;border:none;background:var(--bg2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--sub)}
+.bc-acts{display:flex;gap:8px}
+.bca{flex:1;padding:11px;border-radius:12px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.bca-p{background:var(--o);color:#fff}.bca-p:hover{background:var(--od)}
+.bca-s{border:1.5px solid var(--line);background:none;color:var(--ink)}.bca-s:hover{border-color:var(--o);color:var(--o)}
 
 /* City Panel */
-.city-panel{
-  position:fixed;bottom:-440px;right:0;left:0;z-index:800;
+.cpanel{
+  position:fixed;bottom:-500px;right:0;left:0;z-index:800;
   background:var(--card);border-radius:24px 24px 0 0;
-  box-shadow:0 -8px 40px rgba(0,0,0,.15);
+  box-shadow:0 -8px 40px rgba(0,0,0,.16);
   transition:bottom .3s cubic-bezier(.4,0,.2,1);
-  max-height:460px;overflow-y:auto;
+  max-height:90vh;overflow-y:auto;
 }
-.city-panel.open{bottom:0}
-.cp-handle{width:40px;height:4px;border-radius:99px;background:var(--line);margin:12px auto 0}
-.cp-hero{padding:16px 20px 12px;background:linear-gradient(135deg,var(--od),var(--o));color:#fff;margin-bottom:0}
-.cp-name{font-size:22px;font-weight:900;margin-bottom:2px}
-.cp-sub{font-size:12px;opacity:.75}
-.cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 20px}
+.cpanel.open{bottom:0}
+.cp-hdr{background:linear-gradient(135deg,var(--od),var(--o));padding:20px 18px 16px;position:relative}
+.cp-pull{width:36px;height:4px;border-radius:99px;background:rgba(255,255,255,.3);margin:0 auto 14px}
+.cp-x{position:absolute;top:12px;left:14px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.2);cursor:pointer;color:#fff;font-size:12px}
+.cp-city{font-size:22px;font-weight:900;color:#fff;margin-bottom:2px}
+.cp-country{font-size:12px;color:rgba(255,255,255,.7)}
+.cp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 18px}
 .cp-stat{background:var(--bg2);border-radius:10px;padding:10px 6px;text-align:center}
 .cp-num{font-size:18px;font-weight:900;color:var(--o)}
 .cp-lbl{font-size:10px;color:var(--muted);margin-top:1px}
-.cp-score{padding:0 20px 14px}
-.cp-score-row{display:flex;align-items:center;gap:10px}
-.cp-score-label{font-size:12px;font-weight:700;width:100px;flex-shrink:0}
-.cp-score-bar{flex:1;height:7px;background:var(--bg2);border-radius:99px;overflow:hidden}
-.cp-score-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--o),var(--g));transition:.8s}
-.cp-score-num{font-size:11px;font-weight:700;color:var(--o);width:30px;text-align:left}
-.cp-close{position:absolute;top:14px;left:16px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,.2);cursor:pointer;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cp-bars{padding:0 18px 18px}
+.cp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cp-bar-lbl{font-size:12px;font-weight:700;width:90px;flex-shrink:0}
+.cp-bar-bg{flex:1;height:7px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.cp-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--o),var(--g));transition:.8s}
+.cp-bar-val{font-size:11px;font-weight:700;color:var(--o);width:28px;text-align:left}
+.cp-filter-btn{width:calc(100% - 36px);margin:0 18px 18px;padding:11px;border-radius:12px;border:none;background:var(--o);color:#fff;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer}
 
-/* Heatmap Badge */
-.heat-badge{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:600;padding:7px 18px;border-radius:99px;background:rgba(239,68,68,.92);color:#fff;font-size:12px;font-weight:700;font-family:Tajawal;backdrop-filter:blur(8px);display:none;white-space:nowrap}
-.heat-badge.show{display:block;animation:fadeUp .2s ease}
+/* Heat Badge */
+.heat-badge{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:600;padding:7px 18px;border-radius:99px;background:rgba(239,68,68,.9);color:#fff;font-size:12px;font-weight:700;display:none;white-space:nowrap;backdrop-filter:blur(8px);font-family:Tajawal}
+.heat-badge.show{display:block;animation:pop .2s ease}
 
-/* Result Count */
-.result-count{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:350;padding:6px 16px;border-radius:99px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--o);display:none;white-space:nowrap;box-shadow:var(--shadow-sm)}
-.result-count.show{display:block}
+/* Count Pill */
+.count-pill{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:350;padding:6px 16px;border-radius:99px;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--o);display:none;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.08);font-family:Tajawal}
+.count-pill.show{display:block}
 
-/* Zoom controls */
-.zoom-wrap{position:fixed;bottom:160px;left:16px;z-index:400;display:flex;flex-direction:column;gap:4px}
-.z-btn{width:36px;height:36px;border-radius:10px;background:var(--glass);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.5);box-shadow:var(--shadow-sm);cursor:pointer;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:.15s;font-family:Tajawal}
-.z-btn:hover{background:var(--o);color:#fff;border-color:var(--o)}
-.dk .z-btn{border-color:rgba(255,255,255,.1)}
+/* 3D toggle badge */
+.badge-3d{position:fixed;bottom:90px;left:14px;z-index:400;padding:6px 12px;border-radius:99px;background:rgba(99,102,241,.9);color:#fff;font-size:11px;font-weight:700;display:none;font-family:Tajawal;backdrop-filter:blur(8px)}
+.badge-3d.show{display:block}
 
-/* Mobile bottom sheet */
-.mob-sheet{
-  position:fixed;bottom:0;right:0;left:0;z-index:400;
-  background:var(--card);border-radius:20px 20px 0 0;
-  box-shadow:0 -4px 24px rgba(0,0,0,.1);
-  transition:bottom .3s cubic-bezier(.4,0,.2,1);
-  display:none;
-}
-@media(max-width:600px){
-  .mob-sheet{display:block}
-  .cat-strip{bottom:100px}
-  .zoom-wrap,.float-btns{display:none}
-}
-.ms-handle{width:36px;height:4px;border-radius:99px;background:var(--line);margin:10px auto 0;cursor:pointer}
-.ms-cats{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
-.ms-cats::-webkit-scrollbar{display:none}
-.ms-cat{display:inline-flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;border-radius:12px;cursor:pointer;flex-shrink:0;transition:.15s;min-width:52px}
-.ms-cat:hover,.ms-cat.on{background:var(--ol)}
-.ms-cat-em{font-size:20px}
-.ms-cat-lbl{font-size:9px;font-weight:700;color:var(--sub)}
+/* Zoom */
+.zooms{position:fixed;bottom:100px;left:14px;z-index:400;display:flex;flex-direction:column;gap:4px}
+.zbtn{width:36px;height:36px;border-radius:10px;background:var(--glass);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.6);box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:Tajawal;color:var(--ink)}
+.dk .zbtn{border-color:rgba(255,255,255,.1)}.zbtn:hover{background:var(--o);color:#fff;border-color:var(--o)}
 
 /* Toast */
-#toast{position:fixed;bottom:180px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal;white-space:nowrap;backdrop-filter:blur(8px)}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal;white-space:nowrap;backdrop-filter:blur(10px)}
 
-/* Leaflet popup override */
-.leaflet-popup-content-wrapper{border-radius:16px!important;box-shadow:var(--shadow)!important;font-family:Tajawal!important}
-.leaflet-popup-tip{display:none!important}
+/* Mobile */
+@media(max-width:600px){
+  .fabs{display:none}
+  .zooms{bottom:80px}
+  .geo-sel{top:auto;bottom:80px;right:14px}
+  .city-dd{top:auto;bottom:130px}
+}
 </style>
 </head>
 <body>
 
-<!-- Map -->
 <div id="map"></div>
 
-<!-- Search Bar -->
-<div class="float-search">
-  <!-- Sidebar Toggle -->
-  <button class="fb" onclick="toggleSB()" style="flex-shrink:0;border-radius:14px">☰</button>
-  <div class="search-pill">
+<!-- Search -->
+<div class="fsearch">
+  <button class="fab" onclick="toggleSB()" style="flex-shrink:0">☰</button>
+  <div class="s-pill">
     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input class="search-inp" id="srch" placeholder="ابحث عن مستثمر، شركة، مدينة..." oninput="onSrch(this.value)" autocomplete="off">
-    <button class="search-clear" id="srch-clear" onclick="clearSrch()">✕</button>
-    <div class="ac-drop" id="ac-drop"></div>
+    <input class="s-inp" id="srch" placeholder="ابحث: مستثمر، شركة، وظيفة، مدينة..." oninput="onQ(this.value)" autocomplete="off">
+    <button class="s-clear" id="s-clr" onclick="clearQ()">✕</button>
+    <div class="ac" id="ac"></div>
   </div>
-  <button class="fb" onclick="locateMe()" style="flex-shrink:0;border-radius:14px">📍</button>
+  <button class="fab" onclick="locateMe()" style="flex-shrink:0">📍</button>
 </div>
 
-<!-- Geo Nav -->
-<div class="geo-nav" id="geo-nav">
-  <button class="geo-btn" onclick="goArab();closeGeoDd()">🌍 العالم العربي</button>
-  <div class="geo-divider"></div>
-  <button class="geo-btn active" id="geo-country-btn" onclick="toggleGeoDd()">🇵🇸 فلسطين ▾</button>
+<!-- Geo Selector -->
+<div class="geo-sel" id="geo-sel">
+  <button class="geo-b" onclick="flyArab();closeDd()">🌍 الوطن العربي</button>
+  <div class="geo-sep"></div>
+  <button class="geo-b on" id="geo-btn" onclick="toggleDd()">🇵🇸 فلسطين ▾</button>
 </div>
 
-<!-- Geo Dropdown -->
-<div class="geo-dropdown" id="geo-dd">
-  <div class="geo-dd-hdr">اختر دولة أو مدينة</div>
-  <div class="geo-dd-item" onclick="goPalestine()">🇵🇸 فلسطين <span class="geo-dd-count">فعّالة</span></div>
-  <div class="geo-dd-hdr" style="font-size:11px">مدن فلسطين</div>
-  <div id="geo-cities-list"></div>
-  <div class="geo-dd-hdr" style="font-size:11px">دول أخرى قريباً</div>
-  ${['🇯🇴 الأردن','🇸🇦 السعودية','🇪🇬 مصر','🇦🇪 الإمارات','🇱🇧 لبنان'].map(c=>`<div class="geo-dd-item" style="opacity:.5;cursor:default">${c} <span class="geo-dd-count">قريباً</span></div>`).join('')}
+<!-- City Dropdown -->
+<div class="city-dd" id="city-dd">
+  <div class="city-dd-hdr">مدن فلسطين</div>
+  <div id="city-dd-list"></div>
+  <div class="city-dd-hdr">دول أخرى — قريباً</div>
+  <div class="city-dd-item" style="opacity:.45;cursor:default">🇯🇴 الأردن <span class="city-dd-count">قريباً</span></div>
+  <div class="city-dd-item" style="opacity:.45;cursor:default">🇸🇦 السعودية <span class="city-dd-count">قريباً</span></div>
 </div>
 
-<!-- Float Buttons -->
-<div class="float-btns">
-  <button class="fb" onclick="toggleHeat()" id="btn-heat" title="Heatmap">🔥</button>
-  <button class="fb" onclick="toggleTheme()" id="btn-theme">🌙</button>
-  <div class="fb-sep"></div>
-  <button class="fb" onclick="goArab()" title="الوطن العربي">🌍</button>
-  <button class="fb" onclick="goPalestine()" title="فلسطين">🇵🇸</button>
+<!-- Fabs -->
+<div class="fabs">
+  <button class="fab" id="fab-heat" onclick="toggleHeat()" title="Heatmap">🔥</button>
+  <button class="fab" id="fab-3d" onclick="toggle3D()" title="3D مباني">🏙️</button>
+  <button class="fab" id="fab-theme" onclick="toggleTheme()">🌙</button>
+  <div style="height:4px"></div>
+  <button class="fab" onclick="flyArab()">🌍</button>
+  <button class="fab" onclick="flyPalestine()">🇵🇸</button>
 </div>
 
-<!-- Category Strip -->
-<div class="cat-strip" id="cat-strip"></div>
-
-<!-- Zoom Controls -->
-<div class="zoom-wrap">
-  <button class="z-btn" onclick="MAP.zoomIn()">+</button>
-  <button class="z-btn" onclick="MAP.zoomOut()">−</button>
+<!-- Zoom -->
+<div class="zooms">
+  <button class="zbtn" onclick="MAP.zoomIn({duration:300})">+</button>
+  <button class="zbtn" onclick="MAP.zoomOut({duration:300})">−</button>
 </div>
 
-<!-- Heatmap Badge -->
+<!-- Badges -->
 <div class="heat-badge" id="heat-badge">🔥 Heatmap — كثافة النشاط</div>
-
-<!-- Result Count -->
-<div class="result-count" id="result-count"></div>
+<div class="badge-3d" id="badge-3d">🏙️ وضع 3D مفعّل</div>
+<div class="count-pill" id="count-pill"></div>
 
 <!-- Sidebar -->
-<div class="sb-overlay" id="sb-overlay" onclick="closeSB()"></div>
+<div class="sb-ov" id="sb-ov" onclick="closeSB()"></div>
 <div class="sidebar" id="sidebar">
-  <div class="sb-header">
+  <div class="sb-hdr">
     <div class="sb-user">
       <div class="sb-av" id="sb-av">م</div>
-      <div>
-        <div class="sb-user-name" id="sb-name">مرحباً!</div>
-        <div class="sb-user-sub">استكشف المنطقة العربية</div>
-      </div>
-      <button onclick="closeSB()" style="margin-right:auto;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px">✕</button>
+      <div><div class="sb-uname" id="sb-nm">مرحباً</div><div class="sb-usub">استكشف المنظومة العربية</div></div>
+      <button class="sb-close" onclick="closeSB()">✕</button>
     </div>
-    <div class="sb-geo">
-      <span onclick="goArab()" style="cursor:pointer">🌍 الوطن العربي</span>
-      <span class="sb-geo-sep">›</span>
-      <span onclick="goPalestine()" style="cursor:pointer">🇵🇸 فلسطين</span>
-    </div>
+    <div class="sb-chips" id="sb-chips"></div>
   </div>
   <div class="sb-body" id="sb-body"></div>
 </div>
 
-<!-- Entity Bottom Card -->
-<div class="bottom-card" id="bottom-card">
-  <div class="bc-handle"></div>
-  <button class="bc-close" onclick="closeCard()">✕</button>
+<!-- Bottom Card -->
+<div class="bcard" id="bcard">
+  <div class="bc-pull"></div>
+  <button class="bc-x" onclick="closeBCard()">✕</button>
   <div class="bc-body" id="bc-body"></div>
 </div>
 
 <!-- City Panel -->
-<div class="city-panel" id="city-panel">
-  <div class="cp-handle"></div>
-  <button class="cp-close" onclick="closeCityPanel()">✕</button>
-  <div id="city-panel-body"></div>
-</div>
-
-<!-- Mobile Bottom Sheet -->
-<div class="mob-sheet" id="mob-sheet">
-  <div class="ms-handle" onclick="toggleMobSheet()"></div>
-  <div class="ms-cats" id="ms-cats"></div>
+<div class="cpanel" id="cpanel">
+  <button class="cp-x" onclick="closeCPanel()">✕</button>
+  <div id="cp-body"></div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* ══ Config ══ */
 const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
-const db  = supabase.createClient(SB_URL,SB_ANON);
-const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+const db = supabase.createClient(SB_URL,SB_ANON);
+const me = JSON.parse(localStorage.getItem('azza_user')||'null');
 if(!me) location.href='login.html';
-const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const toast=(m,t='ok')=>{const el=document.getElementById('toast');el.textContent=m;el.style.background=t==='ok'?'#1c5b38':t==='err'?'#c0392b':'rgba(198,151,73,.9)';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
 const D=id=>document.getElementById(id);
-const haversine=(a,b,c,d)=>{const R=6371,dL=(c-a)*Math.PI/180,dG=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dG/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))};
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const toast=(m,t='ok')=>{const el=D('toast');el.textContent=m;el.style.background=t==='ok'?'rgba(28,91,56,.9)':'rgba(192,57,43,.9)';el.style.opacity='1';clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2500)};
 
 /* ══ Entity Types ══ */
 const ET=[
-  {id:'investor',     em:'💰',label:'مستثمر',       color:'#1c5b38',bg:'rgba(28,91,56,.12)'},
-  {id:'entrepreneur', em:'🚀',label:'رائد أعمال',   color:'#c69749',bg:'rgba(198,151,73,.12)'},
-  {id:'student',      em:'🎓',label:'طالب',         color:'#2563eb',bg:'rgba(37,99,235,.1)'},
-  {id:'expert',       em:'🧠',label:'خبير',         color:'#7c3aed',bg:'rgba(124,58,237,.1)'},
-  {id:'company',      em:'🏢',label:'شركة',         color:'#0891b2',bg:'rgba(8,145,178,.1)'},
-  {id:'startup',      em:'⚡',label:'Startup',      color:'#ef4444',bg:'rgba(239,68,68,.1)'},
-  {id:'job',          em:'💼',label:'وظيفة',        color:'#16a34a',bg:'rgba(22,163,74,.1)'},
-  {id:'ngo',          em:'🤝',label:'منظمة',        color:'#db2777',bg:'rgba(219,39,119,.1)'},
-  {id:'university',   em:'🏛️',label:'جامعة',       color:'#92400e',bg:'rgba(146,64,14,.1)'},
-  {id:'grant',        em:'🏅',label:'منحة',         color:'#b45309',bg:'rgba(180,83,9,.1)'},
-  {id:'competition',  em:'🏆',label:'مسابقة',       color:'#f59e0b',bg:'rgba(245,158,11,.1)'},
-  {id:'incubator',    em:'🌱',label:'حاضنة',        color:'#059669',bg:'rgba(5,150,105,.1)'},
-  {id:'event',        em:'📅',label:'فعالية',       color:'#6366f1',bg:'rgba(99,102,241,.1)'},
-  {id:'project',      em:'📋',label:'مشروع',        color:'#6b7280',bg:'rgba(107,114,128,.1)'},
+  {id:'investor',     em:'💰',label:'مستثمر',      color:'#1c5b38'},
+  {id:'entrepreneur', em:'🚀',label:'رائد أعمال',  color:'#c69749'},
+  {id:'student',      em:'🎓',label:'طالب',        color:'#2563eb'},
+  {id:'expert',       em:'🧠',label:'خبير',        color:'#7c3aed'},
+  {id:'company',      em:'🏢',label:'شركة',        color:'#0891b2'},
+  {id:'startup',      em:'⚡',label:'Startup',     color:'#ef4444'},
+  {id:'job',          em:'💼',label:'وظيفة',       color:'#16a34a'},
+  {id:'ngo',          em:'🤝',label:'منظمة',       color:'#db2777'},
+  {id:'university',   em:'🏛️',label:'جامعة',      color:'#92400e'},
+  {id:'grant',        em:'🏅',label:'منحة',        color:'#b45309'},
+  {id:'competition',  em:'🏆',label:'مسابقة',      color:'#f59e0b'},
+  {id:'incubator',    em:'🌱',label:'حاضنة',       color:'#059669'},
+  {id:'event',        em:'📅',label:'فعالية',      color:'#6366f1'},
+  {id:'project',      em:'📋',label:'مشروع',       color:'#6b7280'},
 ];
 
 const CITIES=[
-  {n:'رام الله',c:'PS',la:31.9038,lo:35.2034,sc:78,pop:'50k',u:234,co:45,in:23,j:67,ng:12},
-  {n:'القدس',c:'PS',la:31.7683,lo:35.2137,sc:85,pop:'900k',u:456,co:89,in:34,j:123,ng:28},
-  {n:'نابلس',c:'PS',la:32.2211,lo:35.2544,sc:65,pop:'180k',u:178,co:34,in:12,j:45,ng:9},
-  {n:'الخليل',c:'PS',la:31.5326,lo:35.0998,sc:58,pop:'230k',u:145,co:28,in:8,j:34,ng:7},
-  {n:'غزة',c:'PS',la:31.5017,lo:34.4668,sc:42,pop:'600k',u:312,co:23,in:5,j:28,ng:45},
-  {n:'جنين',c:'PS',la:32.4598,lo:35.3027,sc:52,pop:'45k',u:89,co:15,in:6,j:22,ng:8},
-  {n:'بيت لحم',c:'PS',la:31.7054,lo:35.2024,sc:70,pop:'30k',u:134,co:25,in:10,j:38,ng:14},
-  {n:'طولكرم',c:'PS',la:32.3100,lo:35.0300,sc:45,pop:'55k',u:67,co:12,in:4,j:18,ng:6},
+  {n:'رام الله', la:31.9038,lo:35.2034,sc:78,pop:'50k', u:234,co:45,inv:23,j:67,ng:12},
+  {n:'القدس',    la:31.7683,lo:35.2137,sc:85,pop:'900k',u:456,co:89,inv:34,j:123,ng:28},
+  {n:'نابلس',   la:32.2211,lo:35.2544,sc:65,pop:'180k',u:178,co:34,inv:12,j:45, ng:9},
+  {n:'الخليل',  la:31.5326,lo:35.0998,sc:58,pop:'230k',u:145,co:28,inv:8, j:34, ng:7},
+  {n:'غزة',     la:31.5017,lo:34.4668,sc:42,pop:'600k',u:312,co:23,inv:5, j:28, ng:45},
+  {n:'جنين',    la:32.4598,lo:35.3027,sc:52,pop:'45k', u:89, co:15,inv:6, j:22, ng:8},
+  {n:'بيت لحم', la:31.7054,lo:35.2024,sc:70,pop:'30k', u:134,co:25,inv:10,j:38, ng:14},
+  {n:'طولكرم',  la:32.3100,lo:35.0300,sc:45,pop:'55k', u:67, co:12,inv:4, j:18, ng:6},
+  {n:'خان يونس',la:31.3479,lo:34.3036,sc:38,pop:'200k',u:98, co:14,inv:3, j:20, ng:18},
 ];
 
 const DEMO=[
-  {id:'d1',name:'خالد الراشد',type:'investor',bio:'مستثمر ملاك في التقنية والابتكار — 12 شركة بمحفظتي',city:'رام الله',country_code:'PS',lat:31.9038,lng:35.2034,is_verified:true,trust_score:87,industry:'تقنية'},
-  {id:'d2',name:'سارة أبو شاور',type:'entrepreneur',bio:'مؤسسة شركة تك للتجارة الإلكترونية — 200k مبيعات شهرياً',city:'رام الله',country_code:'PS',lat:31.9100,lng:35.2100,is_verified:true,trust_score:74,industry:'تجارة إلكترونية'},
-  {id:'d3',name:'محمد الخضري',type:'student',bio:'طالب هندسة برمجيات، أبحث عن فرص تدريب',city:'الخليل',country_code:'PS',lat:31.5326,lng:35.0998,is_verified:false,trust_score:42,industry:'تعليم'},
-  {id:'d4',name:'جامعة بيرزيت',type:'university',bio:'أعرق الجامعات الفلسطينية — تأسست 1924',city:'بيرزيت',country_code:'PS',lat:31.9794,lng:35.1856,is_verified:true,trust_score:95,industry:'تعليم'},
-  {id:'d5',name:'حاضنة غزة للابتكار',type:'incubator',bio:'حاضنة أعمال — 50+ شركة ناشئة سنوياً',city:'غزة',country_code:'PS',lat:31.5017,lng:34.4668,is_verified:true,trust_score:68,industry:'ريادة'},
-  {id:'d6',name:'مطلوب: مطور Flutter',type:'job',bio:'شركة تقنية رائدة تبحث عن مطور Flutter خبرة 2 سنة — عن بُعد',city:'رام الله',country_code:'PS',lat:31.9000,lng:35.1950,is_verified:false,trust_score:0,industry:'تقنية'},
-  {id:'d7',name:'منظمة ريادة فلسطين',type:'ngo',bio:'ندعم رواد الأعمال الشباب بالتدريب والتمويل الأولي',city:'بيت لحم',country_code:'PS',lat:31.7054,lng:35.2024,is_verified:true,trust_score:81,industry:'دعم الأعمال'},
-  {id:'d8',name:'أحمد عبد الرازق',type:'expert',bio:'خبير تسويق رقمي | 10 سنوات | استشاري',city:'القدس',country_code:'PS',lat:31.7683,lng:35.2137,is_verified:true,trust_score:79,industry:'تسويق'},
-  {id:'d9',name:'تك بالستين',type:'company',bio:'شركة تقنية رائدة في تطوير التطبيقات والمنصات الرقمية',city:'رام الله',country_code:'PS',lat:31.8900,lng:35.1900,is_verified:true,trust_score:88,industry:'تقنية'},
-  {id:'d10',name:'منحة ريادة 2026',type:'grant',bio:'منحة 10,000$ للشركات الناشئة في فلسطين — آخر موعد ديسمبر',city:'رام الله',country_code:'PS',lat:31.9200,lng:35.2200,is_verified:true,trust_score:90,industry:'تمويل'},
-  {id:'d11',name:'مسابقة Startup PS',type:'competition',bio:'مسابقة سنوية — جائزة 25,000$ للفائز',city:'نابلس',country_code:'PS',lat:32.2211,lng:35.2544,is_verified:true,trust_score:85,industry:'ريادة'},
-  {id:'d12',name:'مسرّع الأعمال الرقمية',type:'startup',bio:'برنامج تسريع 6 أشهر مع تمويل أولي 50k$',city:'الخليل',country_code:'PS',lat:31.5400,lng:35.1100,is_verified:true,trust_score:77,industry:'تقنية'},
-  {id:'d13',name:'مؤتمر Tech Palestine',type:'event',bio:'أكبر مؤتمر تقني فلسطيني — 500 مشارك — أكتوبر 2026',city:'رام الله',country_code:'PS',lat:31.8950,lng:35.2150,is_verified:true,trust_score:80,industry:'تقنية'},
-  {id:'d14',name:'مستثمر من الأردن',type:'investor',bio:'أبحث عن مشاريع في التقنية والتعليم',city:'عمان',country_code:'JO',lat:31.9539,lng:35.9106,is_verified:true,trust_score:70,industry:'تقنية'},
-  {id:'d15',name:'رائدة أعمال لبنانية',type:'entrepreneur',bio:'مؤسسة منصة Fashion عربية — $2M ARR',city:'بيروت',country_code:'LB',lat:33.8938,lng:35.5018,is_verified:true,trust_score:65,industry:'أزياء'},
+  {id:'d1', name:'خالد الراشد',        type:'investor',     bio:'مستثمر ملاك في التقنية — 12 شركة بمحفظتي',          city:'رام الله',   lat:31.9038,lng:35.2034,is_verified:true, trust_score:87, country_code:'PS'},
+  {id:'d2', name:'سارة أبو شاور',      type:'entrepreneur', bio:'مؤسسة شركة تك — 200k مبيعات شهرياً',               city:'رام الله',   lat:31.9100,lng:35.2100,is_verified:true, trust_score:74, country_code:'PS'},
+  {id:'d3', name:'محمد الخضري',        type:'student',      bio:'طالب هندسة برمجيات — أبحث عن فرص تدريب',           city:'الخليل',    lat:31.5326,lng:35.0998,is_verified:false,trust_score:42, country_code:'PS'},
+  {id:'d4', name:'جامعة بيرزيت',       type:'university',   bio:'أعرق الجامعات الفلسطينية — تأسست 1924',            city:'بيرزيت',    lat:31.9794,lng:35.1856,is_verified:true, trust_score:95, country_code:'PS'},
+  {id:'d5', name:'حاضنة غزة',          type:'incubator',    bio:'50+ شركة ناشئة سنوياً',                             city:'غزة',       lat:31.5017,lng:34.4668,is_verified:true, trust_score:68, country_code:'PS'},
+  {id:'d6', name:'مطور Flutter مطلوب', type:'job',          bio:'شركة تقنية تبحث عن مطور Flutter خبرة 2 سنة',        city:'رام الله',   lat:31.9000,lng:35.1950,is_verified:false,trust_score:0,  country_code:'PS'},
+  {id:'d7', name:'منظمة ريادة فلسطين', type:'ngo',          bio:'ندعم رواد الأعمال الشباب بالتدريب والتمويل',        city:'بيت لحم',   lat:31.7054,lng:35.2024,is_verified:true, trust_score:81, country_code:'PS'},
+  {id:'d8', name:'أحمد عبد الرازق',    type:'expert',       bio:'خبير تسويق رقمي | 10 سنوات | استشاري',             city:'القدس',     lat:31.7683,lng:35.2137,is_verified:true, trust_score:79, country_code:'PS'},
+  {id:'d9', name:'تك بالستين',          type:'company',      bio:'شركة تطوير تطبيقات رائدة في فلسطين',               city:'رام الله',   lat:31.8900,lng:35.1900,is_verified:true, trust_score:88, country_code:'PS'},
+  {id:'d10',name:'منحة ريادة 2026',    type:'grant',        bio:'10,000$ للشركات الناشئة — آخر موعد ديسمبر',         city:'رام الله',   lat:31.9200,lng:35.2200,is_verified:true, trust_score:90, country_code:'PS'},
+  {id:'d11',name:'Startup PS 2026',    type:'competition',  bio:'مسابقة سنوية — جائزة 25,000$',                     city:'نابلس',     lat:32.2211,lng:35.2544,is_verified:true, trust_score:85, country_code:'PS'},
+  {id:'d12',name:'مؤتمر Tech Palestine',type:'event',       bio:'500 مشارك — أكتوبر 2026 — رام الله',               city:'رام الله',   lat:31.8950,lng:35.2150,is_verified:true, trust_score:80, country_code:'PS'},
+  {id:'d13',name:'مستثمر أردني',        type:'investor',     bio:'أبحث عن مشاريع تقنية في فلسطين والأردن',           city:'عمان',      lat:31.9539,lng:35.9106,is_verified:true, trust_score:70, country_code:'JO'},
+  {id:'d14',name:'رائدة أعمال لبنانية', type:'entrepreneur', bio:'مؤسسة منصة Fashion عربية — $2M ARR',               city:'بيروت',     lat:33.8938,lng:35.5018,is_verified:true, trust_score:65, country_code:'LB'},
+  {id:'d15',name:'مشروع طاقة شمسية',   type:'project',      bio:'مشروع طاقة شمسية للمدارس الفلسطينية',             city:'جنين',      lat:32.4598,lng:35.3027,is_verified:false,trust_score:55, country_code:'PS'},
 ];
 
 /* ══ State ══ */
-let MAP,CLUSTER,HEAT=null;
-let ALL=[...DEMO], MARKERS=[];
-let activeType='', heatOn=false, sbOpen=false;
+let MAP, POPUP_ELS=[], HEAT_SRC=false, IS_3D=false, sbOpen=false;
+let ALL=[...DEMO], ACTIVE_TYPE='';
+const isDK=()=>document.documentElement.classList.contains('dk');
 
 /* ══ Init ══ */
 (()=>{
   const dk=localStorage.getItem('azza_theme')==='dark';
   document.documentElement.classList.toggle('dk',dk);
-  D('btn-theme').textContent=dk?'☀️':'🌙';
-  if(me?.name){D('sb-av').textContent=(me.name||'م')[0];D('sb-name').textContent=me.name;}
+  D('fab-theme').textContent=dk?'☀️':'🌙';
+  if(me?.name){D('sb-av').textContent=(me.name||'م')[0];D('sb-nm').textContent=me.name;}
   initMap();
+  buildCityDd();
   buildSidebar();
-  ALL.forEach(e=>addM(e));
   loadSupa();
-  buildMobSheet();
+  // keyboard
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){closeBCard();closeCPanel();closeSB();closeDd();}
+    if(e.key==='/'&&!e.target.closest('input')){e.preventDefault();D('srch').focus();}
+    if(e.key==='f'&&!e.target.closest('input')) toggleHeat();
+    if(e.key==='d'&&!e.target.closest('input')) toggle3D();
+  });
 })();
 
-/* ══ Map ══ */
-function initMap(){
-  MAP=L.map('map',{zoomControl:false,attributionControl:false,zoomAnimation:true}).setView([31.9,35.2],8);
-  const lt=L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
-  const dt=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd'});
-  const dk=localStorage.getItem('azza_theme')==='dark';
-  (dk?dt:lt).addTo(MAP); MAP.lt=lt; MAP.dt=dt;
-
-  CLUSTER=L.markerClusterGroup({
-    maxClusterRadius:55,spiderfyOnMaxZoom:true,showCoverageOnHover:false,
-    iconCreateFunction(c){
-      const n=c.getChildCount(),s=n<10?34:n<50?42:50;
-      return L.divIcon({html:`<div style="width:${s}px;height:${s}px;border-radius:50%;background:#1c5b38;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Tajawal,sans-serif;font-size:${s>38?14:12}px;font-weight:900;border:3px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,.3)">${n}</div>`,className:'',iconSize:[s,s]});
-    }
-  });
-  MAP.addLayer(CLUSTER);
-
-  /* City zones */
-  CITIES.forEach(c=>{
-    L.circleMarker([c.la,c.lo],{radius:18,color:c.sc>70?'#1c5b38':c.sc>50?'#c69749':'#ef4444',fillColor:'transparent',fillOpacity:0,weight:2,dashArray:'5,4',opacity:.5})
-      .addTo(MAP).on('click',()=>showCity(c));
-    L.marker([c.la,c.lo],{icon:L.divIcon({html:`<div style="background:rgba(255,255,255,.9);backdrop-filter:blur(4px);border-radius:6px;padding:2px 8px;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;color:#1a1814;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.15);cursor:pointer">${c.n}</div>`,className:'',iconAnchor:[-4,-10]})})
-      .addTo(MAP).on('click',()=>showCity(c));
-  });
-
-  /* Me marker */
-  if(me?.lat&&me?.lng){
-    const myM=L.divIcon({html:`<div style="width:40px;height:40px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#0e3622">${(me.name||'م')[0]}</div>`,className:'',iconSize:[40,40],iconAnchor:[20,20]});
-    L.marker([me.lat,me.lng],{icon:myM}).addTo(MAP).bindPopup(`<div style="font-family:Tajawal;direction:rtl;text-align:center;padding:4px"><strong>📍 ${esc(me.name||'أنت')}</strong></div>`);
-    MAP.setView([me.lat,me.lng],10,{animate:true});
-  }
-
-  MAP.on('click',()=>{closeCard();closeCityPanel();D('ac-drop').classList.remove('open');});
+/* ══ Map Init (MapLibre) ══ */
+function getStyle(dark){
+  return dark
+    ? 'https://tiles.openfreemap.org/styles/dark'
+    : 'https://tiles.openfreemap.org/styles/liberty';
 }
 
-/* ══ Add Marker ══ */
-function addM(e){
-  if(!e.lat||!e.lng||!e.id) return;
-  const t=ET.find(x=>x.id===e.type)||ET[0];
-  const icon=L.divIcon({
-    html:`<div style="width:36px;height:36px;border-radius:50%;background:${t.color};border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:.2s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''">${t.em}</div>`,
-    className:'',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-20],
+function initMap(){
+  const dk=isDK();
+  MAP=new maplibregl.Map({
+    container:'map',
+    style:getStyle(dk),
+    center:[35.2,31.9],
+    zoom:8,
+    pitch:0,
+    bearing:0,
+    antialias:true,
+    attributionControl:false,
   });
-  const m=L.marker([e.lat,e.lng],{icon});
-  m.on('click',()=>showCard(e));
-  CLUSTER.addLayer(m);
-  MARKERS.push({m,e,type:e.type,cc:e.country_code});
+
+  MAP.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
+
+  MAP.on('load',()=>{
+    add3DBuildings();
+    ALL.forEach(e=>addMarker(e));
+    addCityLabels();
+    addMeMarker();
+  });
+
+  MAP.on('click',()=>{closeDd();D('ac').classList.remove('open');});
+}
+
+/* ══ 3D Buildings ══ */
+function add3DBuildings(){
+  if(MAP.getLayer('3d-buildings')) return;
+  if(!MAP.getSource('openmaptiles')&&!MAP.getSource('composite')) return;
+  const src=MAP.getSource('openmaptiles')?'openmaptiles':'composite';
+  try{
+    MAP.addLayer({
+      id:'3d-buildings',
+      source:src,
+      'source-layer':'building',
+      type:'fill-extrusion',
+      minzoom:14,
+      paint:{
+        'fill-extrusion-color':isDK()?'#2a2820':'#d4cfc7',
+        'fill-extrusion-height':['get','height'],
+        'fill-extrusion-base':['get','min_height'],
+        'fill-extrusion-opacity':0,
+      }
+    });
+  }catch(e){}
+}
+
+function toggle3D(){
+  IS_3D=!IS_3D;
+  const b=D('fab-3d'), badge=D('badge-3d');
+  if(IS_3D){
+    MAP.easeTo({pitch:55,bearing:-15,duration:800});
+    try{ MAP.setPaintProperty('3d-buildings','fill-extrusion-opacity',.85); }catch(e){}
+    b.classList.add('on'); badge.classList.add('show');
+    toast('وضع 3D — المباني ثلاثية الأبعاد 🏙️');
+  }else{
+    MAP.easeTo({pitch:0,bearing:0,duration:600});
+    try{ MAP.setPaintProperty('3d-buildings','fill-extrusion-opacity',0); }catch(e){}
+    b.classList.remove('on'); badge.classList.remove('show');
+  }
+}
+
+/* ══ Markers ══ */
+function addMarker(e){
+  if(!e.lat||!e.lng) return;
+  const t=ET.find(x=>x.id===e.type)||ET[0];
+  const el=document.createElement('div');
+  el.style.cssText=`width:36px;height:36px;border-radius:50%;background:${t.color};border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:transform .15s;user-select:none`;
+  el.textContent=t.em;
+  el.onmouseenter=()=>el.style.transform='scale(1.2)';
+  el.onmouseleave=()=>el.style.transform='';
+  el.onclick=(ev)=>{ev.stopPropagation();showCard(e);};
+  const m=new maplibregl.Marker({element:el,anchor:'center'})
+    .setLngLat([e.lng,e.lat])
+    .addTo(MAP);
+  m._entity=e;
+  m._typeId=e.type;
+  POPUP_ELS.push(m);
+}
+
+/* ══ Me Marker ══ */
+function addMeMarker(){
+  if(!me?.lat||!me?.lng) return;
+  const el=document.createElement('div');
+  el.style.cssText='width:42px;height:42px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#0e3622;z-index:10';
+  el.textContent=(me.name||'م')[0];
+  el.title='أنت';
+  new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([me.lng,me.lat]).addTo(MAP);
+}
+
+/* ══ City Labels ══ */
+function addCityLabels(){
+  CITIES.forEach(c=>{
+    const el=document.createElement('div');
+    const color=c.sc>70?'#1c5b38':c.sc>50?'#c69749':'#ef4444';
+    el.style.cssText=`background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border-radius:6px;padding:3px 9px;font-family:Tajawal,sans-serif;font-size:11px;font-weight:700;color:${color};box-shadow:0 2px 6px rgba(0,0,0,.14);cursor:pointer;white-space:nowrap;border:1.5px solid ${color}30`;
+    el.textContent=c.n;
+    el.onclick=(ev)=>{ev.stopPropagation();showCityPanel(c);};
+    new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([c.lo,c.la]).addTo(MAP);
+  });
 }
 
 /* ══ Bottom Card ══ */
 function showCard(e){
   const t=ET.find(x=>x.id===e.type)||ET[0];
-  closeCityPanel();
+  closeCPanel();
   D('bc-body').innerHTML=`
-    <div class="bc-header">
-      <div class="bc-av" style="background:${t.bg}">${t.em}</div>
-      <div class="bc-info">
-        <div class="bc-name">${esc(e.name||'—')}${e.is_verified?'<span class="bc-verified">✓</span>':''}</div>
-        <div class="bc-type">${t.em} ${t.label}${e.industry?' · '+esc(e.industry):''}</div>
+    <div class="bc-top">
+      <div class="bc-av" style="background:${t.color}18">${t.em}</div>
+      <div style="flex:1">
+        <div class="bc-name">${esc(e.name||'—')}${e.is_verified?'<span class="bc-vbadge">✓ موثّق</span>':''}</div>
+        <div class="bc-type">${t.em} ${t.label} · ${esc(e.city||e.city_name||'')}</div>
         ${e.trust_score?`<div class="bc-trust">⭐ Trust Score ${e.trust_score}/100</div>`:''}
       </div>
     </div>
     ${e.bio?`<div class="bc-desc">${esc(e.bio)}</div>`:''}
     <div class="bc-tags">
-      <span class="bc-tag">📍 ${esc(e.city_name||e.city||'—')}</span>
+      <span class="bc-tag">📍 ${esc(e.city||e.city_name||'—')}</span>
       ${e.country_code?`<span class="bc-tag">${e.country_code}</span>`:''}
-      ${e.is_verified?'<span class="bc-tag" style="background:rgba(28,91,56,.1);color:#1c5b38">✓ موثّق</span>':''}
     </div>
-    <div class="bc-actions">
-      <button class="bc-btn bc-primary" onclick="location.href='messages.html?to=${esc(e.id)}'">💬 رسالة</button>
-      <button class="bc-btn bc-sec" onclick="location.href='user.html?id=${esc(e.id)}'">👤 الملف</button>
-      <button class="bc-btn bc-sec" onclick="follow('${esc(e.id)}')">+ تابع</button>
+    <div class="bc-acts">
+      <button class="bca bca-p" onclick="location.href='messages.html?to=${esc(e.id)}'">💬 رسالة</button>
+      <button class="bca bca-s" onclick="location.href='user.html?id=${esc(e.id)}'">👤 الملف</button>
+      <button class="bca bca-s" onclick="follow('${esc(e.id)}');this.textContent='✓ تابع'">+ تابع</button>
     </div>`;
-  D('bottom-card').classList.add('open');
-  if(e.lat&&e.lng) MAP.panTo([e.lat,e.lng],{animate:true,duration:.4});
+  D('bcard').classList.add('open');
+  MAP.flyTo({center:[e.lng,e.lat],zoom:Math.max(MAP.getZoom(),13),duration:600,essential:true});
 }
-
-function closeCard(){ D('bottom-card').classList.remove('open'); }
+function closeBCard(){D('bcard').classList.remove('open');}
 
 /* ══ City Panel ══ */
-function showCity(c){
-  closeCard();
-  D('city-panel-body').innerHTML=`
-    <div class="cp-hero">
-      <div class="cp-name">🏙️ ${c.n}</div>
-      <div class="cp-sub">📍 فلسطين · ${c.pop||'—'} ساكن · نشاط ريادي ${c.sc}%</div>
+function showCityPanel(c){
+  closeBCard();
+  const score=c.sc||50;
+  D('cp-body').innerHTML=`
+    <div class="cp-hdr">
+      <div class="cp-pull"></div>
+      <div class="cp-city">🏙️ ${c.n}</div>
+      <div class="cp-country">📍 فلسطين · ${c.pop||'—'} ساكن · نشاط ${score}%</div>
     </div>
     <div class="cp-grid">
       <div class="cp-stat"><div class="cp-num">${c.u||0}</div><div class="cp-lbl">مستخدم</div></div>
       <div class="cp-stat"><div class="cp-num">${c.co||0}</div><div class="cp-lbl">شركة</div></div>
-      <div class="cp-stat"><div class="cp-num">${c.in||0}</div><div class="cp-lbl">مستثمر</div></div>
+      <div class="cp-stat"><div class="cp-num">${c.inv||0}</div><div class="cp-lbl">مستثمر</div></div>
       <div class="cp-stat"><div class="cp-num">${c.j||0}</div><div class="cp-lbl">وظيفة</div></div>
       <div class="cp-stat"><div class="cp-num">${c.ng||0}</div><div class="cp-lbl">منظمة</div></div>
-      <div class="cp-stat"><div class="cp-num">${Math.round(c.sc*1.5)}</div><div class="cp-lbl">مشروع</div></div>
-      <div class="cp-stat"><div class="cp-num">${Math.round(c.u*0.3)}</div><div class="cp-lbl">خبير</div></div>
-      <div class="cp-stat"><div class="cp-num">${Math.round(c.u*0.4)}</div><div class="cp-lbl">طالب</div></div>
+      <div class="cp-stat"><div class="cp-num">${Math.round(score*2)}</div><div class="cp-lbl">مشروع</div></div>
+      <div class="cp-stat"><div class="cp-num">${Math.round(c.u*.3)}</div><div class="cp-lbl">خبير</div></div>
+      <div class="cp-stat"><div class="cp-num">${Math.round(c.u*.4)}</div><div class="cp-lbl">طالب</div></div>
     </div>
-    <div class="cp-score" style="padding:0 20px 20px">
-      ${[['نشاط ريادي',c.sc],['نمو المنظومة',Math.round(c.sc*0.8)],['كثافة الاستثمار',Math.round(c.in/(c.co||1)*10)]].map(([l,v])=>`
-        <div class="cp-score-row" style="margin-bottom:8px">
-          <div class="cp-score-label">${l}</div>
-          <div class="cp-score-bar"><div class="cp-score-fill" style="width:${Math.min(v,100)}%"></div></div>
-          <div class="cp-score-num">${Math.min(v,100)}%</div>
+    <div class="cp-bars">
+      ${[['النشاط الريادي',score],['كثافة الاستثمار',Math.min(Math.round(c.inv/(c.co||1)*12),100)],['نمو المنظومة',Math.round(score*.85)]].map(([l,v])=>`
+        <div class="cp-bar-row">
+          <div class="cp-bar-lbl">${l}</div>
+          <div class="cp-bar-bg"><div class="cp-bar-fill" style="width:${v}%"></div></div>
+          <div class="cp-bar-val">${v}%</div>
         </div>`).join('')}
-      <button onclick="filterCity('${c.n}',${c.la},${c.lo})" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:none;background:#1c5b38;color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">
-        🔍 عرض كيانات ${c.n}
-      </button>
-    </div>`;
-  D('city-panel').classList.add('open');
-  MAP.setView([c.la,c.lo],12,{animate:true,duration:.5});
+    </div>
+    <button class="cp-filter-btn" onclick="filterCity('${c.n}',${c.la},${c.lo})">🔍 عرض كيانات ${c.n}</button>`;
+  D('cpanel').classList.add('open');
+  MAP.flyTo({center:[c.lo,c.la],zoom:13,duration:700,essential:true});
 }
-function closeCityPanel(){ D('city-panel').classList.remove('open'); }
+function closeCPanel(){D('cpanel').classList.remove('open');}
 
 function filterCity(name,la,lo){
-  CLUSTER.clearLayers();
   let n=0;
-  MARKERS.forEach(({m,e})=>{ if((e.city_name||e.city||'')===name){CLUSTER.addLayer(m);n++;} });
-  closeCityPanel();
-  MAP.setView([la,lo],13,{animate:true});
+  POPUP_ELS.forEach(m=>{
+    const e=m._entity;
+    const show=(e.city||e.city_name||'')=== name;
+    m.getElement().style.display=show?'':'none';
+    if(show) n++;
+  });
+  closeCPanel();
   showCount(n+' كيان في '+name);
+  MAP.flyTo({center:[lo,la],zoom:13,duration:600,essential:true});
 }
 
-/* ══ Category Filter ══ */
-
-
-function filterType(type,chip){
-  activeType=type;
-  /* تحديث أزرار Sidebar */
-  document.querySelectorAll('[id^="cat-"]').forEach(b=>{
-    b.style.background='';b.style.color='var(--ink)';b.style.borderColor='var(--line)';
-  });
-  if(chip){chip.style.background='#1c5b38';chip.style.color='#fff';chip.style.borderColor='#1c5b38';}
-  CLUSTER.clearLayers();
+/* ══ Type Filter ══ */
+function filterType(type){
+  ACTIVE_TYPE=type;
   let n=0;
-  MARKERS.forEach(({m,e})=>{ if(!type||e.type===type){CLUSTER.addLayer(m);n++;} });
-  if(type) showCount(n+' '+( ET.find(x=>x.id===type)?.label||''));
+  POPUP_ELS.forEach(m=>{
+    const show=!type||m._typeId===type;
+    m.getElement().style.display=show?'':'none';
+    if(show) n++;
+  });
+  /* تحديث Sidebar chips */
+  document.querySelectorAll('.sb-chip').forEach(c=>{
+    const on=c.dataset.type===type||(!type&&c.dataset.type==='all');
+    c.classList.toggle('on',on);
+  });
+  if(type){showCount(n+' '+(ET.find(x=>x.id===type)?.label||''));}
   else hideCount();
 }
 
+function showCount(t){const p=D('count-pill');p.textContent=t;p.classList.add('show');}
+function hideCount(){D('count-pill').classList.remove('show');}
+
 /* ══ Heatmap ══ */
 function toggleHeat(){
-  heatOn=!heatOn;
-  const b=D('btn-heat'), badge=D('heat-badge');
-  if(heatOn){
-    const pts=ALL.filter(e=>e.lat&&e.lng).map(e=>[e.lat,e.lng,(e.trust_score||30)/100]);
-    HEAT=L.heatLayer(pts,{radius:32,blur:18,maxZoom:13,gradient:{0.2:'#1c5b38',0.5:'#c69749',0.8:'#ef4444',1:'#7c3aed'}}).addTo(MAP);
-    CLUSTER.eachLayer(m=>m.setOpacity(.15));
+  HEAT_SRC=!HEAT_SRC;
+  const b=D('fab-heat'),badge=D('heat-badge');
+  if(HEAT_SRC){
+    if(!MAP.getSource('heat-data')){
+      MAP.addSource('heat-data',{type:'geojson',data:{type:'FeatureCollection',features:ALL.filter(e=>e.lat&&e.lng).map(e=>({type:'Feature',geometry:{type:'Point',coordinates:[e.lng,e.lat]},properties:{weight:(e.trust_score||30)/100}}))}});
+      MAP.addLayer({id:'heatmap',type:'heatmap',source:'heat-data',maxzoom:15,paint:{
+        'heatmap-weight':['get','weight'],
+        'heatmap-intensity':['interpolate',['linear'],['zoom'],0,1,14,3],
+        'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'transparent',.2,'#1c5b38',.5,'#c69749',.8,'#ef4444',1,'#7c3aed'],
+        'heatmap-radius':['interpolate',['linear'],['zoom'],0,16,14,40],
+        'heatmap-opacity':.85
+      }});
+    }else{
+      MAP.setLayoutProperty('heatmap','visibility','visible');
+    }
+    POPUP_ELS.forEach(m=>m.getElement().style.opacity='.2');
     b.classList.add('on'); badge.classList.add('show');
-    toast('Heatmap — كثافة النشاط التجاري');
+    toast('Heatmap — كثافة النشاط التجاري 🔥');
   }else{
-    if(HEAT){MAP.removeLayer(HEAT);HEAT=null;}
-    CLUSTER.eachLayer(m=>m.setOpacity(1));
+    if(MAP.getLayer('heatmap')) MAP.setLayoutProperty('heatmap','visibility','none');
+    POPUP_ELS.forEach(m=>m.getElement().style.opacity='1');
     b.classList.remove('on'); badge.classList.remove('show');
   }
 }
 
 /* ══ Search ══ */
-function onSrch(q){
-  const clr=D('srch-clear');
-  clr.classList.toggle('show',q.length>0);
-  if(!q.trim()){D('ac-drop').classList.remove('open');return;}
+function onQ(q){
+  D('s-clr').classList.toggle('show',q.length>0);
+  if(!q.trim()){D('ac').classList.remove('open');return;}
   const low=q.toLowerCase();
-  const cRes=CITIES.filter(c=>c.n.includes(q)).slice(0,3).map(c=>({name:c.n,sub:'مدينة فلسطينية',em:'🏙️',_city:c}));
-  const eRes=ALL.filter(e=>(e.name||'').toLowerCase().includes(low)||(e.bio||'').toLowerCase().includes(low)||(e.city||'').toLowerCase().includes(low)).slice(0,6).map(e=>({name:e.name,sub:(ET.find(t=>t.id===e.type)||ET[0]).label+' · '+(e.city||''),em:(ET.find(t=>t.id===e.type)||ET[0]).em,_e:e}));
-  const items=[...cRes,...eRes];
-  if(!items.length){D('ac-drop').innerHTML='<div class="ac-item" style="color:var(--muted)">لا نتائج</div>';D('ac-drop').classList.add('open');return;}
-  D('ac-drop')._items=items;
-  D('ac-drop').innerHTML=items.map((it,i)=>`
-    <div class="ac-item" onclick="_selAC(${i})">
-      <div class="ac-em" style="background:var(--bg2)">${it.em}</div>
-      <div class="ac-info"><div class="ac-name">${esc(it.name)}</div><div class="ac-type">${esc(it.sub)}</div></div>
-    </div>`).join('');
-  D('ac-drop').classList.add('open');
-}
-function _selAC(i){
-  const it=D('ac-drop')._items?.[i]; if(!it) return;
-  D('srch').value=it.name; D('ac-drop').classList.remove('open');
-  if(it._city) showCity(it._city);
-  else if(it._e) showCard(it._e);
-}
-function clearSrch(){D('srch').value='';D('srch-clear').classList.remove('show');D('ac-drop').classList.remove('open');filterType(activeType);}
-document.addEventListener('click',e=>{if(!e.target.closest('.search-pill'))D('ac-drop').classList.remove('open');});
-
-/* ══ Result Count ══ */
-function showCount(txt){const el=D('result-count');el.textContent=txt;el.classList.add('show');}
-function hideCount(){D('result-count').classList.remove('show');}
-
-/* ══ Sidebar ══ */
-function buildSidebar(){
-  const items=[
-    {em:'💰',label:'مستثمرون',sub:ALL.filter(e=>e.type==='investor').length+' مسجّل',type:'investor'},
-    {em:'🚀',label:'رواد أعمال',sub:ALL.filter(e=>e.type==='entrepreneur').length+' مسجّل',type:'entrepreneur'},
-    {em:'🏢',label:'شركات',sub:ALL.filter(e=>e.type==='company').length+' مسجّل',type:'company'},
-    {em:'⚡',label:'Startups',sub:ALL.filter(e=>e.type==='startup').length+' مسجّل',type:'startup'},
-    {em:'🏛️',label:'جامعات',sub:ALL.filter(e=>e.type==='university').length+' مسجّل',type:'university'},
-    {em:'🎓',label:'طلاب',sub:ALL.filter(e=>e.type==='student').length+' مسجّل',type:'student'},
-    {em:'🧠',label:'خبراء',sub:ALL.filter(e=>e.type==='expert').length+' مسجّل',type:'expert'},
-    {em:'🤝',label:'منظمات',sub:ALL.filter(e=>e.type==='ngo').length+' مسجّل',type:'ngo'},
-    {em:'💼',label:'وظائف',sub:ALL.filter(e=>e.type==='job').length+' متاح',type:'job'},
-    {em:'🏅',label:'منح',sub:ALL.filter(e=>e.type==='grant').length+' فرصة',type:'grant'},
-    {em:'🏆',label:'مسابقات',sub:ALL.filter(e=>e.type==='competition').length+' مسابقة',type:'competition'},
-    {em:'🌱',label:'حاضنات',sub:ALL.filter(e=>e.type==='incubator').length+' حاضنة',type:'incubator'},
-    {em:'📅',label:'فعاليات',sub:ALL.filter(e=>e.type==='event').length+' فعالية',type:'event'},
-  ];
-  D('sb-body').innerHTML=`
-    <div class="sb-section-title">تصفح حسب النوع</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 0 12px" id="sb-cat-chips">
-      <button style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--o);background:var(--o);color:#fff;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer" id="cat-all" onclick="filterType('',this)">🌐 الكل</button>
-      ${ET.map(t=>`<button style="padding:6px 12px;border-radius:99px;border:1.5px solid var(--line);background:none;color:var(--ink);font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s" id="cat-${t.id}" onclick="filterType('${t.id}',this)">${t.em} ${t.label}</button>`).join('')}
-    </div>
-    <div class="sb-sep"></div>
-    <div class="sb-section-title">تفاصيل</div>
-    ${items.map(it=>`
-      <div class="sb-item" onclick="filterType('${it.type}',document.getElementById('cat-${it.type}'));closeSB()">
-        <div class="sb-item-em" style="background:${(ET.find(t=>t.id===it.type)||ET[0]).bg}">${it.em}</div>
-        <div class="sb-item-info">
-          <div class="sb-item-label">${it.label}</div>
-          <div class="sb-item-sub">${it.sub}</div>
-        </div>
-      </div>`).join('')}
-    <div class="sb-sep"></div>
-    <div class="sb-section-title">أدوات</div>
-    <div class="sb-item" onclick="toggleHeat();closeSB()"><div class="sb-item-em" style="background:rgba(239,68,68,.1)">🔥</div><div class="sb-item-info"><div class="sb-item-label">Heatmap</div><div class="sb-item-sub">عرض كثافة النشاط</div></div></div>
-    <div class="sb-item" onclick="locateMe();closeSB()"><div class="sb-item-em" style="background:rgba(28,91,56,.1)">📍</div><div class="sb-item-info"><div class="sb-item-label">موقعي</div><div class="sb-item-sub">اكتشف ما حولك</div></div></div>
-    <div class="sb-item" onclick="filterType('',document.getElementById('cat-all'));closeSB()"><div class="sb-item-em" style="background:rgba(99,102,241,.1)">🔄</div><div class="sb-item-info"><div class="sb-item-label">عرض الكل</div><div class="sb-item-sub">إعادة تعيين الفلاتر</div></div></div>
-    <div class="sb-item" onclick="location.href='app.html'"><div class="sb-item-em" style="background:rgba(198,151,73,.1)">✦</div><div class="sb-item-info"><div class="sb-item-label">الفيد الرئيسي</div><div class="sb-item-sub">العودة للمنصة</div></div></div>
-    <div class="sb-sep"></div>
-    <div style="padding:16px 20px;font-size:12px;color:var(--muted);line-height:1.7">
-      💡 اضغط أي نقطة للتفاصيل<br>
-      🏙️ اضغط اسم مدينة للوحة بياناتها<br>
-      🔥 Heatmap يُظهر كثافة النشاط
+  const cities=CITIES.filter(c=>c.n.includes(q)).slice(0,2).map(c=>({...c,_t:'city'}));
+  const ents=ALL.filter(e=>(e.name||'').toLowerCase().includes(low)||(e.bio||'').toLowerCase().includes(low)||(e.city||'').toLowerCase().includes(low)).slice(0,6);
+  const items=[...cities,...ents];
+  D('ac')._items=items;
+  D('ac').innerHTML=items.length?items.map((it,i)=>{
+    const isCity=it._t==='city';
+    const t=ET.find(x=>x.id===it.type)||ET[0];
+    return`<div class="ac-row" onclick="_pick(${i})">
+      <div class="ac-ico" style="background:${isCity?'rgba(99,102,241,.1)':`${t.color}18`}">${isCity?'🏙️':t.em}</div>
+      <div><div class="ac-n">${esc(it.name||it.n)}</div><div class="ac-s">${isCity?'مدينة فلسطينية':t.label+' · '+(it.city||'')}</div></div>
     </div>`;
+  }).join(''):'<div class="ac-row" style="color:var(--muted)">لا نتائج</div>';
+  D('ac').classList.add('open');
 }
+function _pick(i){
+  const it=D('ac')._items?.[i]; if(!it) return;
+  D('srch').value=it.name||it.n;
+  D('ac').classList.remove('open');
+  if(it._t==='city') showCityPanel(it);
+  else showCard(it);
+}
+function clearQ(){D('srch').value='';D('s-clr').classList.remove('show');D('ac').classList.remove('open');filterType('');}
+document.addEventListener('click',e=>{if(!e.target.closest('.s-pill'))D('ac').classList.remove('open');});
 
-function toggleSB(){sbOpen?closeSB():openSB();}
-function openSB(){D('sidebar').classList.add('open');D('sb-overlay').classList.add('show');sbOpen=true;}
-function closeSB(){D('sidebar').classList.remove('open');D('sb-overlay').classList.remove('show');sbOpen=false;}
-
-/* ══ Mobile Bottom Sheet ══ */
-function buildMobSheet(){
-  D('ms-cats').innerHTML=ET.slice(0,10).map(t=>`
-    <div class="ms-cat" onclick="filterType('${t.id}',document.getElementById('cat-${t.id}'))">
-      <div class="ms-cat-em">${t.em}</div>
-      <div class="ms-cat-lbl">${t.label}</div>
+/* ══ Geo ══ */
+function buildCityDd(){
+  D('city-dd-list').innerHTML=CITIES.map(c=>`
+    <div class="city-dd-item" onclick="pickCity(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      🏙️ ${c.n}<span class="city-dd-count">${c.u} مستخدم</span>
     </div>`).join('');
 }
-function toggleMobSheet(){
-  const s=D('mob-sheet');
-  const isOpen=s.style.bottom==='0px';
-  s.style.bottom=isOpen?'-120px':'0px';
+function toggleDd(){
+  const dd=D('city-dd');
+  if(dd.classList.contains('open')){closeDd();return;}
+  dd.classList.add('open');
+  setTimeout(()=>document.addEventListener('click',ddOut),10);
 }
+function ddOut(e){if(!e.target.closest('.geo-sel')&&!e.target.closest('.city-dd'))closeDd();}
+function closeDd(){D('city-dd').classList.remove('open');document.removeEventListener('click',ddOut);}
+function pickCity(c){
+  if(typeof c==='string')c=JSON.parse(c);
+  D('geo-btn').textContent='🏙️ '+c.n+' ▾';
+  showCityPanel(c); closeDd();
+}
+function flyArab(){MAP.flyTo({center:[38,25],zoom:4,pitch:0,bearing:0,duration:1200,essential:true});D('geo-btn').textContent='🌍 الوطن العربي ▾';}
+function flyPalestine(){MAP.flyTo({center:[35.2,31.9],zoom:8,pitch:IS_3D?50:0,duration:800,essential:true});D('geo-btn').textContent='🇵🇸 فلسطين ▾';toast('🇵🇸 فلسطين');}
 
 /* ══ GPS ══ */
 function locateMe(){
   navigator.geolocation?.getCurrentPosition(p=>{
     const{latitude:la,longitude:lo}=p.coords;
-    MAP.setView([la,lo],13,{animate:true});
-    L.circleMarker([la,lo],{radius:10,color:'#1c5b38',fillColor:'#1c5b38',fillOpacity:.3,weight:2}).addTo(MAP).bindPopup('📍 موقعك').openPopup();
-    /* أقرب الكيانات */
-    const near=ALL.map(e=>({...e,_d:haversine(la,lo,e.lat,e.lng)})).filter(e=>e._d<15).sort((a,b)=>a._d-b._d).slice(0,3);
-    if(near.length) toast('قريب منك: '+near.map(e=>e.name).join('، '));
-    else toast('تم تحديد موقعك ✅');
+    MAP.flyTo({center:[lo,la],zoom:14,duration:800,essential:true});
+    const el=document.createElement('div');
+    el.style.cssText='width:16px;height:16px;border-radius:50%;background:#1c5b38;border:3px solid #fff;box-shadow:0 0 0 5px rgba(28,91,56,.2)';
+    new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lo,la]).addTo(MAP);
+    toast('تم تحديد موقعك ✅');
   },()=>toast('تعذّر تحديد الموقع','err'));
-}
-
-/* ══ Geo Dropdown ══ */
-function toggleGeoDd(){
-  const dd=D('geo-dd');
-  const isOpen=dd.classList.contains('open');
-  if(isOpen){ closeGeoDd(); return; }
-  /* بناء قائمة المدن */
-  D('geo-cities-list').innerHTML=CITIES.map(c=>`
-    <div class="geo-dd-item" onclick="selectCity_geo(${JSON.stringify(c).replace(/"/g,'&quot;')})">
-      🏙️ ${c.n}
-      <span class="geo-dd-count">${c.u} مستخدم</span>
-    </div>`).join('');
-  dd.classList.add('open');
-  /* إغلاق عند النقر خارجه */
-  setTimeout(()=>document.addEventListener('click',closeGeoDdOut),10);
-}
-function closeGeoDd(){ D('geo-dd').classList.remove('open'); document.removeEventListener('click',closeGeoDdOut); }
-function closeGeoDdOut(e){ if(!e.target.closest('.geo-nav')&&!e.target.closest('.geo-dropdown')) closeGeoDd(); }
-function selectCity_geo(c){
-  if(typeof c==='string') c=JSON.parse(c);
-  showCity(c);
-  D('geo-country-btn').textContent='🏙️ '+c.n+' ▾';
-  closeGeoDd();
-}
-
-/* ══ Navigation ══ */
-function goArab(){ MAP.setView([25,38],4,{animate:true,duration:.8});const b=D('geo-country-btn');if(b)b.textContent='🌍 الوطن العربي ▾'; }
-function goPalestine(){ MAP.setView([31.9,35.2],8,{animate:true,duration:.5});const b=D('geo-country-btn');if(b)b.textContent='🇵🇸 فلسطين ▾';closeGeoDd();toast('فلسطين 🇵🇸'); }
-
-/* ══ Theme ══ */
-function toggleTheme(){
-  const dk=document.documentElement.classList.toggle('dk');
-  localStorage.setItem('azza_theme',dk?'dark':'light');
-  D('btn-theme').textContent=dk?'☀️':'🌙';
-  if(dk){MAP.lt.remove();MAP.dt.addTo(MAP);}
-  else{MAP.dt.remove();MAP.lt.addTo(MAP);}
 }
 
 /* ══ Follow ══ */
@@ -721,21 +653,59 @@ async function follow(id){
   toast('تم المتابعة ✅');
 }
 
+/* ══ Sidebar ══ */
+function buildSidebar(){
+  /* Chips */
+  D('sb-chips').innerHTML=`<button class="sb-chip on" data-type="all" onclick="filterType('');closeSB()">🌐 الكل</button>`
+    +ET.slice(0,8).map(t=>`<button class="sb-chip" data-type="${t.id}" onclick="filterType('${t.id}');closeSB()">${t.em} ${t.label}</button>`).join('');
+  /* Body */
+  D('sb-body').innerHTML=`
+    <div class="sb-sec">الإجمالي على الخريطة</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 14px 12px">
+      ${[['الكيانات',ALL.length],['الدول',3],['موثّق',ALL.filter(e=>e.is_verified).length],['مدينة',CITIES.length]].map(([l,n])=>`
+        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:20px;font-weight:900;color:var(--o)">${n}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${l}</div>
+        </div>`).join('')}
+    </div>
+    <div class="sb-div"></div>
+    <div class="sb-sec">تفاصيل الأنواع</div>
+    ${ET.map(t=>{const n=ALL.filter(e=>e.type===t.id).length;return`
+      <div class="sb-it" onclick="filterType('${t.id}');closeSB()">
+        <div class="sb-em" style="background:${t.color}18">${t.em}</div>
+        <div><div class="sb-il">${t.label}</div><div class="sb-is">${n} مسجّل</div></div>
+        <div class="sb-count">${n}</div>
+      </div>`;}).join('')}
+    <div class="sb-div"></div>
+    <div class="sb-it" onclick="toggleHeat();closeSB()"><div class="sb-em" style="background:rgba(239,68,68,.1)">🔥</div><div><div class="sb-il">Heatmap</div><div class="sb-is">عرض كثافة النشاط</div></div></div>
+    <div class="sb-it" onclick="toggle3D();closeSB()"><div class="sb-em" style="background:rgba(99,102,241,.1)">🏙️</div><div><div class="sb-il">وضع 3D</div><div class="sb-is">مباني ثلاثية الأبعاد</div></div></div>
+    <div class="sb-it" onclick="locateMe();closeSB()"><div class="sb-em" style="background:rgba(28,91,56,.1)">📍</div><div><div class="sb-il">موقعي</div><div class="sb-is">اكتشف ما حولك</div></div></div>
+    <div class="sb-it" onclick="filterType('');closeSB()"><div class="sb-em" style="background:rgba(107,114,128,.1)">🔄</div><div><div class="sb-il">عرض الكل</div><div class="sb-is">إعادة تعيين الفلاتر</div></div></div>
+    <div class="sb-it" onclick="location.href='app.html'"><div class="sb-em" style="background:rgba(198,151,73,.1)">✦</div><div><div class="sb-il">الفيد الرئيسي</div><div class="sb-is">العودة للمنصة</div></div></div>`;
+}
+function toggleSB(){sbOpen?closeSB():openSB();}
+function openSB(){D('sidebar').classList.add('open');D('sb-ov').classList.add('show');sbOpen=true;}
+function closeSB(){D('sidebar').classList.remove('open');D('sb-ov').classList.remove('show');sbOpen=false;}
+
+/* ══ Theme ══ */
+function toggleTheme(){
+  const dk=document.documentElement.classList.toggle('dk');
+  localStorage.setItem('azza_theme',dk?'dark':'light');
+  D('fab-theme').textContent=dk?'☀️':'🌙';
+  MAP.setStyle(getStyle(dk));
+  MAP.once('styledata',()=>{add3DBuildings();addCityLabels();addMeMarker();if(HEAT_SRC)toggleHeat();});
+}
+
 /* ══ Supabase ══ */
 async function loadSupa(){
   try{
-    const{data}=await db.from('users').select('id,name,type,bio,photo,city_name,country_code,lat,lng,is_verified,trust_score').not('lat','is',null).limit(400);
-    (data||[]).forEach(u=>{if(!ALL.find(x=>x.id===u.id)){ALL.push(u);addM(u);}});
+    const{data}=await db.from('users').select('id,name,type,bio,city_name,country_code,lat,lng,is_verified,trust_score').not('lat','is',null).limit(500);
+    (data||[]).forEach(u=>{
+      if(!ALL.find(x=>x.id===u.id)){ALL.push(u);if(MAP.loaded())addMarker(u);}
+    });
     buildSidebar();
   }catch(e){}
 }
-
-/* Keyboard */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeCard();closeCityPanel();closeSB();}
-  if(e.key==='f'&&!e.target.closest('input')) toggleHeat();
-  if(e.key==='/'&&!e.target.closest('input')){e.preventDefault();D('srch').focus();}
-});
 </script>
 </body>
 </html>
