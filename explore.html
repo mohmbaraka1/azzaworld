@@ -189,6 +189,54 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 /* Toast */
 #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal;white-space:nowrap;backdrop-filter:blur(10px)}
 
+/* No Location Banner */
+.no-loc-banner{
+  position:fixed;bottom:0;right:0;left:0;z-index:900;
+  background:linear-gradient(135deg,var(--od),var(--o));
+  padding:16px 20px 28px;
+  border-radius:24px 24px 0 0;
+  box-shadow:0 -8px 32px rgba(0,0,0,.2);
+  transform:translateY(100%);
+  transition:transform .4s cubic-bezier(.34,1.06,.64,1);
+  color:#fff;
+}
+.no-loc-banner.show{transform:translateY(0)}
+.nlb-title{font-size:17px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.nlb-sub{font-size:13px;opacity:.8;margin-bottom:16px;line-height:1.6}
+.nlb-btns{display:flex;gap:10px}
+.nlb-btn{flex:1;padding:12px;border-radius:12px;border:none;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.nlb-primary{background:var(--g);color:var(--od)}.nlb-primary:hover{background:var(--gs)}
+.nlb-sec{background:rgba(255,255,255,.15);color:#fff}.nlb-sec:hover{background:rgba(255,255,255,.25)}
+
+/* Location Picker Mode */
+.pick-mode-bar{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:900;
+  background:rgba(239,68,68,.95);backdrop-filter:blur(12px);
+  color:#fff;padding:10px 20px;border-radius:99px;
+  font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;
+  display:none;align-items:center;gap:10px;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(239,68,68,.4);
+}
+.pick-mode-bar.show{display:flex;animation:pop .2s ease}
+.pick-cancel{padding:5px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,.4);background:none;color:#fff;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+
+/* Empty State */
+.empty-state{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:300;text-align:center;pointer-events:none;
+  transition:opacity .3s;
+}
+.empty-state.hidden{opacity:0}
+.es-em{font-size:52px;margin-bottom:12px}
+.es-title{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:6px;
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:8px 16px;border-radius:12px;
+}
+.es-sub{font-size:13px;color:var(--sub);
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  padding:6px 14px;border-radius:10px;margin-top:4px;
+}
+
 /* Mobile */
 @media(max-width:600px){
   .fabs{display:none}
@@ -304,6 +352,30 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 
 <div id="toast"></div>
 
+<!-- No Location Banner -->
+<div class="no-loc-banner" id="no-loc-banner">
+  <div class="nlb-title">📍 أنت غير موجود على الخريطة</div>
+  <div class="nlb-sub">ثبّت موقعك لتظهر للمستثمرين والخبراء القريبين منك — خطوة واحدة فقط</div>
+  <div class="nlb-btns">
+    <button class="nlb-btn nlb-primary" onclick="useGPS()">📡 استخدم GPS</button>
+    <button class="nlb-btn nlb-sec"     onclick="startPickMode()">🗺️ حدد يدوياً</button>
+    <button class="nlb-btn nlb-sec" style="flex:.5;padding:12px 8px" onclick="dismissBanner()">✕</button>
+  </div>
+</div>
+
+<!-- Pick Mode Bar -->
+<div class="pick-mode-bar" id="pick-bar">
+  📍 اضغط على الخريطة لتحديد موقعك
+  <button class="pick-cancel" onclick="cancelPickMode()">إلغاء</button>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" id="empty-state">
+  <div class="es-em">🗺️</div>
+  <div class="es-title">الخريطة فارغة حالياً</div>
+  <div class="es-sub">كن أول من يظهر — ثبّت موقعك الآن</div>
+</div>
+
 <script>
 const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
@@ -344,27 +416,11 @@ const CITIES=[
   {n:'خان يونس',la:31.3479,lo:34.3036,sc:38,pop:'200k',u:98, co:14,inv:3, j:20, ng:18},
 ];
 
-const DEMO=[
-  {id:'d1', name:'خالد الراشد',        type:'investor',     bio:'مستثمر ملاك في التقنية — 12 شركة بمحفظتي',          city:'رام الله',   lat:31.9038,lng:35.2034,is_verified:true, trust_score:87, country_code:'PS'},
-  {id:'d2', name:'سارة أبو شاور',      type:'entrepreneur', bio:'مؤسسة شركة تك — 200k مبيعات شهرياً',               city:'رام الله',   lat:31.9100,lng:35.2100,is_verified:true, trust_score:74, country_code:'PS'},
-  {id:'d3', name:'محمد الخضري',        type:'student',      bio:'طالب هندسة برمجيات — أبحث عن فرص تدريب',           city:'الخليل',    lat:31.5326,lng:35.0998,is_verified:false,trust_score:42, country_code:'PS'},
-  {id:'d4', name:'جامعة بيرزيت',       type:'university',   bio:'أعرق الجامعات الفلسطينية — تأسست 1924',            city:'بيرزيت',    lat:31.9794,lng:35.1856,is_verified:true, trust_score:95, country_code:'PS'},
-  {id:'d5', name:'حاضنة غزة',          type:'incubator',    bio:'50+ شركة ناشئة سنوياً',                             city:'غزة',       lat:31.5017,lng:34.4668,is_verified:true, trust_score:68, country_code:'PS'},
-  {id:'d6', name:'مطور Flutter مطلوب', type:'job',          bio:'شركة تقنية تبحث عن مطور Flutter خبرة 2 سنة',        city:'رام الله',   lat:31.9000,lng:35.1950,is_verified:false,trust_score:0,  country_code:'PS'},
-  {id:'d7', name:'منظمة ريادة فلسطين', type:'ngo',          bio:'ندعم رواد الأعمال الشباب بالتدريب والتمويل',        city:'بيت لحم',   lat:31.7054,lng:35.2024,is_verified:true, trust_score:81, country_code:'PS'},
-  {id:'d8', name:'أحمد عبد الرازق',    type:'expert',       bio:'خبير تسويق رقمي | 10 سنوات | استشاري',             city:'القدس',     lat:31.7683,lng:35.2137,is_verified:true, trust_score:79, country_code:'PS'},
-  {id:'d9', name:'تك بالستين',          type:'company',      bio:'شركة تطوير تطبيقات رائدة في فلسطين',               city:'رام الله',   lat:31.8900,lng:35.1900,is_verified:true, trust_score:88, country_code:'PS'},
-  {id:'d10',name:'منحة ريادة 2026',    type:'grant',        bio:'10,000$ للشركات الناشئة — آخر موعد ديسمبر',         city:'رام الله',   lat:31.9200,lng:35.2200,is_verified:true, trust_score:90, country_code:'PS'},
-  {id:'d11',name:'Startup PS 2026',    type:'competition',  bio:'مسابقة سنوية — جائزة 25,000$',                     city:'نابلس',     lat:32.2211,lng:35.2544,is_verified:true, trust_score:85, country_code:'PS'},
-  {id:'d12',name:'مؤتمر Tech Palestine',type:'event',       bio:'500 مشارك — أكتوبر 2026 — رام الله',               city:'رام الله',   lat:31.8950,lng:35.2150,is_verified:true, trust_score:80, country_code:'PS'},
-  {id:'d13',name:'مستثمر أردني',        type:'investor',     bio:'أبحث عن مشاريع تقنية في فلسطين والأردن',           city:'عمان',      lat:31.9539,lng:35.9106,is_verified:true, trust_score:70, country_code:'JO'},
-  {id:'d14',name:'رائدة أعمال لبنانية', type:'entrepreneur', bio:'مؤسسة منصة Fashion عربية — $2M ARR',               city:'بيروت',     lat:33.8938,lng:35.5018,is_verified:true, trust_score:65, country_code:'LB'},
-  {id:'d15',name:'مشروع طاقة شمسية',   type:'project',      bio:'مشروع طاقة شمسية للمدارس الفلسطينية',             city:'جنين',      lat:32.4598,lng:35.3027,is_verified:false,trust_score:55, country_code:'PS'},
-];
+const DEMO=[];
 
 /* ══ State ══ */
 let MAP, POPUP_ELS=[], HEAT_SRC=false, IS_3D=false, sbOpen=false;
-let ALL=[...DEMO], ACTIVE_TYPE='';
+let ALL=[], ACTIVE_TYPE='';
 const isDK=()=>document.documentElement.classList.contains('dk');
 
 /* ══ Init ══ */
@@ -377,6 +433,7 @@ const isDK=()=>document.documentElement.classList.contains('dk');
   buildCityDd();
   buildSidebar();
   loadSupa();
+  checkMyLocation();
   // keyboard
   document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){closeBCard();closeCPanel();closeSB();closeDd();}
@@ -415,7 +472,13 @@ function initMap(){
     addMeMarker();
   });
 
-  MAP.on('click',()=>{closeDd();D('ac').classList.remove('open');});
+  MAP.on('click',(ev)=>{
+    closeDd();D('ac').classList.remove('open');
+    if(pickMode){
+      const {lng,lat}=ev.lngLat;
+      saveMyLocation(lat,lng);
+    }
+  });
 }
 
 /* ══ 3D Buildings ══ */
@@ -691,6 +754,78 @@ async function follow(id){
   toast('تم المتابعة ✅');
 }
 
+/* ══ Location System ══ */
+let pickMode=false, pickMarkerEl=null;
+
+function checkMyLocation(){
+  if(me?.lat&&me?.lng){
+    D('no-loc-banner').classList.remove('show');
+    D('empty-state').classList.add('hidden');
+    return;
+  }
+  /* المستخدم ما عنده lat/lng — أظهر البانر بعد ثانيتين */
+  setTimeout(()=>{
+    if(!me?.lat) D('no-loc-banner').classList.add('show');
+  },2000);
+}
+
+function dismissBanner(){
+  D('no-loc-banner').classList.remove('show');
+  localStorage.setItem('azza_loc_dismissed','1');
+}
+
+/* GPS تلقائي */
+function useGPS(){
+  D('no-loc-banner').classList.remove('show');
+  navigator.geolocation?.getCurrentPosition(async p=>{
+    const lat=p.coords.latitude, lng=p.coords.longitude;
+    await saveMyLocation(lat,lng);
+    toast('✅ تم تثبيت موقعك بنجاح');
+  },()=>toast('تعذّر GPS — حدد يدوياً','err'));
+}
+
+/* وضع الاختيار اليدوي */
+function startPickMode(){
+  D('no-loc-banner').classList.remove('show');
+  pickMode=true;
+  D('pick-bar').classList.add('show');
+  MAP.getCanvas().style.cursor='crosshair';
+  toast('اضغط على الخريطة لتحديد موقعك');
+}
+function cancelPickMode(){
+  pickMode=false;
+  D('pick-bar').classList.remove('show');
+  MAP.getCanvas().style.cursor='';
+}
+
+/* حفظ الموقع */
+async function saveMyLocation(lat,lng){
+  /* مؤقت: تحديث localStorage */
+  me.lat=lat; me.lng=lng;
+  localStorage.setItem('azza_user',JSON.stringify(me));
+  /* Supabase */
+  try{
+    await db.from('users').update({lat,lng}).eq('id',me.id);
+  }catch(e){ console.warn('update loc:',e); }
+  /* أضف marker على الخريطة */
+  if(pickMarkerEl) pickMarkerEl.remove();
+  const el=document.createElement('div');
+  el.style.cssText='width:42px;height:42px;border-radius:50%;background:#c69749;border:4px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#0e3622';
+  el.textContent=(me.name||'م')[0];
+  pickMarkerEl=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat([lng,lat]).addTo(MAP);
+  MAP.flyTo({center:[lng,lat],zoom:14,duration:800});
+  D('no-loc-banner').classList.remove('show');
+  D('empty-state').classList.add('hidden');
+  cancelPickMode();
+}
+
+/* Empty State */
+function updateEmptyState(){
+  const hasData=ALL.length>0;
+  const es=D('empty-state');
+  if(es) es.classList.toggle('hidden',hasData);
+}
+
 /* ══ Sidebar ══ */
 function buildSidebar(){
   /* Chips */
@@ -742,7 +877,8 @@ async function loadSupa(){
       if(!ALL.find(x=>x.id===u.id)){ALL.push(u);if(MAP.loaded())addMarker(u);}
     });
     buildSidebar();
-  }catch(e){}
+    updateEmptyState();
+  }catch(e){updateEmptyState();}
 }
 </script>
 </body>
