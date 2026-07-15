@@ -2,342 +2,299 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عزّة — الإشعارات</title>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tokens.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الإشعارات — AZZA</title>
+<script src="supabase.js"></script>
+<script src="notification-service.js"></script>
 <style>
-body{transition:background-color .25s,color .25s}
-.theme-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-shrink:0}
-.theme-btn:hover{border-color:var(--olive);color:var(--olive)}
-.theme-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;--line:rgba(0,0,0,.08);--r:14px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased}
-.ic{stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block;flex-shrink:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
 
-/* ══ هيدر ══ */
-.top{position:sticky;top:0;z-index:50;background:rgba(247,241,227,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-in{display:flex;align-items:center;gap:12px;height:62px;padding:0 18px;max-width:680px;margin:0 auto}
-.brand{display:flex;align-items:center;gap:9px;text-decoration:none}
-.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Aref Ruqaa',serif;font-size:20px}
-.brand-text{font-family:'Aref Ruqaa',serif;font-size:22px;color:var(--olive-deep)}
-.top-actions{margin-right:auto;display:flex;align-items:center;gap:8px}
-.hbtn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-.hbtn:hover{border-color:var(--olive);color:var(--olive)}
-.sound-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;position:relative}
-.sound-btn:hover{border-color:var(--olive);color:var(--olive)}
-.sound-btn.on{border-color:var(--olive);background:rgba(28,91,56,.08);color:var(--olive)}
-/* نقطة اختيار الصوت */
-.sound-menu{position:absolute;top:calc(100% + 6px);left:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:180px;box-shadow:0 8px 28px rgba(28,26,20,.14);z-index:200;display:none}
-.sound-menu.open{display:block}
-.sound-opt{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;border-radius:10px;transition:.13s;text-align:right}
-.sound-opt:hover{background:var(--cream)}
-.sound-opt.active{color:var(--olive);background:rgba(28,91,56,.07)}
-.sound-opt .preview-btn{margin-right:auto;font-size:11px;color:var(--olive);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:700}
+/* Topbar */
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.tb-title{font-size:16px;font-weight:900;flex:1}
+.tb-badge{background:var(--olive);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;min-width:20px;text-align:center}
+.tb-btn{padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--sub)}
+.tb-btn:hover{border-color:var(--olive);color:var(--olive)}
 
-/* ══ صفحة ══ */
-.page{max-width:680px;margin:0 auto;padding:18px 18px 60px}
+/* Filter Tabs */
+.filter-bar{background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;display:flex;padding:0 16px}
+.filter-bar::-webkit-scrollbar{display:none}
+.ft{padding:12px 14px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s;display:flex;align-items:center;gap:5px}
+.ft:hover{color:var(--ink)}
+.ft.on{color:var(--olive);border-color:var(--olive)}
+.ft-count{font-size:10px;background:var(--olive);color:#fff;padding:1px 6px;border-radius:99px}
 
-/* رأس الصفحة */
-.page-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
-.page-title{font-family:'Aref Ruqaa',serif;font-size:1.55rem;color:var(--ink)}
-.unread-badge{background:var(--olive);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;margin-right:8px}
-.mark-all-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap}
-.mark-all-btn:hover{border-color:var(--olive);color:var(--olive)}
+/* List */
+.main{max-width:680px;margin:0 auto;padding:16px}
 
-/* ══ قائمة الإشعارات ══ */
-.notif-list{background:var(--card);border:1px solid var(--line);border-radius:var(--rxl);overflow:hidden}
+/* Notif Item */
+.notif-item{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;gap:12px;cursor:pointer;transition:.2s;margin-bottom:8px;position:relative;overflow:hidden}
+.notif-item:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateX(-2px)}
+.notif-item.unread{border-color:var(--olive)}
+.notif-item.unread::before{content:'';position:absolute;top:0;bottom:0;right:0;width:3px;background:var(--olive);border-radius:0 var(--r) var(--r) 0}
+.notif-item.priority-2{border-color:#ef4444}
+.notif-item.priority-2.unread::before{background:#ef4444}
+.notif-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:14px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.notif-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--olive);flex-shrink:0}
+.notif-desc{font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:6px}
+.notif-time{font-size:11px;color:var(--muted)}
+.notif-actions{display:flex;gap:6px;margin-top:8px}
+.na-btn{padding:5px 12px;border-radius:7px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;color:var(--sub)}
+.na-btn:hover{border-color:var(--olive);color:var(--olive)}
+.na-btn.primary{background:var(--olive);color:#fff;border-color:var(--olive)}
 
-/* إشعار واحد */
-.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:.5px solid rgba(28,26,20,.06);cursor:pointer;transition:.15s;position:relative}
-.notif-item:last-child{border-bottom:none}
-.notif-item:hover{background:var(--cream)}
-.notif-item.unread{background:rgba(28,91,56,.035)}
-.notif-item.unread:hover{background:rgba(28,91,56,.065)}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.notif-item.new-in{animation:slideIn .28s ease-out}
-@keyframes slideOut{to{opacity:0;transform:translateX(60px)}}
-.notif-item.removing{animation:slideOut .22s ease-in forwards}
+/* Group Header */
+.group-hdr{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:16px 0 8px;display:flex;align-items:center;gap:8px}
+.group-hdr::after{content:'';flex:1;height:.5px;background:var(--line)}
 
-/* نقطة غير مقروء */
-.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--olive);flex-shrink:0;margin-top:6px}
+/* Empty */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-em{font-size:52px;margin-bottom:14px}
+.empty-title{font-size:16px;font-weight:700;color:var(--sub);margin-bottom:6px}
 
-/* أفاتار */
-.notif-av-wrap{position:relative;flex-shrink:0}
-.notif-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:900;font-size:1.15rem;overflow:hidden}
-.notif-av img{width:100%;height:100%;object-fit:cover}
-.type-badge{position:absolute;bottom:-2px;left:-2px;width:20px;height:20px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid var(--card)}
+/* Prefs Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.prefs-sheet{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:20px}
+.pref-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid var(--line)}
+.pref-row:last-child{border:none}
+.pref-ic{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.pref-info{flex:1}
+.pref-label{font-size:14px;font-weight:700}
+.pref-desc{font-size:12px;color:var(--muted)}
+.sw{position:relative;width:44px;height:26px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-sl{position:absolute;inset:0;background:var(--bg2);border-radius:99px;cursor:pointer;transition:.2s}
+.sw-sl::before{content:'';position:absolute;width:20px;height:20px;right:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+.sw-sl{background:var(--olive)}
+.sw input:checked+.sw-sl::before{right:calc(100% - 23px)}
 
-/* محتوى */
-.notif-content{flex:1;min-width:0}
-.notif-text{font-size:14px;color:var(--ink);line-height:1.5;margin-bottom:6px}
-.notif-text strong{font-weight:700}
-.notif-text .action{color:var(--muted)}
-
-/* معاينة البوست */
-.post-preview{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:7px;max-width:100%;overflow:hidden}
-.post-preview-stripe{width:3px;height:28px;border-radius:999px;flex-shrink:0}
-.post-preview-text{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-.post-preview-arrow{font-size:11px;color:var(--olive);flex-shrink:0;font-weight:700}
-
-/* وقت */
-.notif-time{font-size:11.5px;color:var(--muted)}
-
-/* زر حذف (يظهر عند hover) */
-.del-btn{position:absolute;top:50%;left:12px;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;border:none;background:rgba(206,17,38,.08);color:var(--red);cursor:pointer;display:none;align-items:center;justify-content:center;transition:.15s}
-.del-btn:hover{background:var(--red);color:#fff}
-.notif-item:hover .del-btn{display:flex}
-
-/* فارغ */
-.empty-state{padding:64px 20px;text-align:center}
-.empty-icon{font-size:3rem;margin-bottom:14px}
-.empty-state b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
-.empty-state span{font-size:14px;color:var(--muted)}
-
-/* إشعار منبثق (toast للإشعارات الجديدة) */
-.notif-toast{position:fixed;top:20px;right:20px;max-width:320px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 8px 32px rgba(28,26,20,.16);z-index:500;transform:translateX(calc(100% + 24px));transition:transform .3s cubic-bezier(.22,1,.36,1);cursor:pointer}
-.notif-toast.show{transform:translateX(0)}
-[dir="rtl"] .notif-toast{right:auto;left:20px;transform:translateX(calc(-100% - 24px))}
-[dir="rtl"] .notif-toast.show{transform:translateX(0)}
-.nt-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--olive),var(--olive-deep));display:flex;align-items:center;justify-content:center;color:var(--gold-soft);font-weight:700;font-size:.9rem;overflow:hidden;flex-shrink:0}
-.nt-av img{width:100%;height:100%;object-fit:cover}
-.nt-body{flex:1;min-width:0}
-.nt-text{font-size:13px;color:var(--ink);line-height:1.45;margin-bottom:2px}
-.nt-text strong{font-weight:700}
-.nt-preview{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nt-close{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px;font-size:16px;flex-shrink:0;line-height:1}
-
-/* toast عادي */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 22px;border-radius:11px;font-size:14px;font-weight:700;color:#fff;z-index:999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw;text-align:center}
-
-@media(max-width:600px){
-  .del-btn{display:flex}
-  .notif-item:hover{background:inherit}
-  .notif-item.unread:hover{background:rgba(28,91,56,.035)}
-}
+/* Search */
+.search-wrap{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.search-inp{width:100%;height:38px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg2);padding:0 14px;font-family:Tajawal,sans-serif;font-size:13px;color:var(--ink);outline:none;transition:.2s}
+.search-inp:focus{border-color:var(--olive);background:var(--card)}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="top-in">
-    <a href="app.html" class="brand">
-      <div class="brand-mark">ع</div>
-      <span class="brand-text">عزّة</span>
-    </a>
-    <div class="top-actions">
-      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="تبديل المظهر">
-        <svg id="theme-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
-      <!-- زر الصوت مع القائمة -->
-      <div style="position:relative">
-        <button class="sound-btn" id="sound-toggle-btn" onclick="toggleSoundMenu()" title="نغمة الإشعارات">
-          <svg class="ic" width="16" height="16" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path id="sound-wave2" d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-        </button>
-        <div class="sound-menu" id="sound-menu">
-          <div style="font-size:11px;color:var(--muted);padding:4px 12px 6px;font-weight:700">نغمة الإشعارات</div>
-          <button class="sound-opt active" data-sound="none" onclick="selectSound('none',this)">🔕 بلا صوت</button>
-          <button class="sound-opt" data-sound="ding" onclick="selectSound('ding',this)">🔔 نغمة خفيفة <span class="preview-btn" onclick="event.stopPropagation();playPreview('ding')">▶</span></button>
-          <button class="sound-opt" data-sound="pop" onclick="selectSound('pop',this)">💬 نبضة <span class="preview-btn" onclick="event.stopPropagation();playPreview('pop')">▶</span></button>
-          <button class="sound-opt" data-sound="chime" onclick="selectSound('chime',this)">✨ رنين <span class="preview-btn" onclick="event.stopPropagation();playPreview('chime')">▶</span></button>
-          <button class="sound-opt" data-sound="alert" onclick="selectSound('alert',this)">📣 تنبيه <span class="preview-btn" onclick="event.stopPropagation();playPreview('alert')">▶</span></button>
-        </div>
-      </div>
-      <button class="hbtn" onclick="history.back()">
-        <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        رجوع
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="page">
-  <div class="page-top">
-    <div style="display:flex;align-items:center">
-      <span class="page-title">الإشعارات</span>
-      <span class="unread-badge" id="unread-badge" style="display:none">0</span>
-    </div>
-    <button class="mark-all-btn" onclick="markAllRead()">
-      <svg class="ic" width="14" height="14" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      قراءة الكل
-    </button>
-  </div>
-
-  <div class="notif-list" id="notif-list"></div>
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="tb-title">🔔 الإشعارات <span class="tb-badge" id="top-badge" style="display:none">0</span></div>
+  <button class="tb-btn" onclick="markAllRead()">قراءة الكل</button>
+  <button class="tb-btn" onclick="openPrefs()">⚙️ إعدادات</button>
 </div>
 
-<!-- إشعار منبثق -->
-<div class="notif-toast" id="notif-toast" onclick="goToastNotif()">
-  <div class="nt-av" id="nt-av">م</div>
-  <div class="nt-body">
-    <div class="nt-text" id="nt-text"></div>
-    <div class="nt-preview" id="nt-preview"></div>
-  </div>
-  <button class="nt-close" onclick="event.stopPropagation();hideToastNotif()">✕</button>
+<!-- Filter Tabs -->
+<div class="filter-bar">
+  <div class="ft on" onclick="setFilter('all',this)">الكل</div>
+  <div class="ft" onclick="setFilter('unread',this)">غير مقروء <span class="ft-count" id="unread-count">0</span></div>
+  <div class="ft" onclick="setFilter('messages',this)">💌 رسائل</div>
+  <div class="ft" onclick="setFilter('social',this)">👥 تفاعل</div>
+  <div class="ft" onclick="setFilter('opportunities',this)">💼 فرص</div>
+  <div class="ft" onclick="setFilter('ai',this)">🤖 AI</div>
+  <div class="ft" onclick="setFilter('system',this)">⚙️ نظام</div>
 </div>
 
-<div id="toast"></div>
+<!-- Search -->
+<div class="search-wrap">
+  <input class="search-inp" id="srch" placeholder="ابحث في الإشعارات..." oninput="doSearch(this.value)">
+</div>
 
-<script src="supabase.js"></script>
-<script src="notifications.js"></script>
+<!-- List -->
+<div class="main" id="list"></div>
+
+<!-- Prefs Modal -->
+<div class="overlay" id="prefs-overlay" onclick="closePrefs()">
+  <div class="prefs-sheet" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:900">⚙️ إعدادات الإشعارات</div>
+      <button onclick="closePrefs()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div id="prefs-list"></div>
+  </div>
+</div>
+
 <script>
-/* ── الوضع الليلي ── */
-const THEME_KEY='azza_theme';
-function applyTheme(){
-  const saved=localStorage.getItem(THEME_KEY);
-  document.body.classList.toggle('dark',saved==='dark');
-  const icon=document.getElementById('theme-icon');
-  if(icon)icon.innerHTML=saved==='dark'
-    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
-    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-}
-function toggleTheme(){
-  const isDark=document.body.classList.contains('dark');
-  localStorage.setItem(THEME_KEY,isDark?'light':'dark');
-  applyTheme();
-}
-applyTheme();
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL,SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-/* ══ AZZA — notifications.html — يستخدم AzzaNotif المركزية ══ */
-const SB_URL ='https://iecniydswotsilaueogq.supabase.co';
-const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
-const azzaDB =supabase.createClient(SB_URL,SB_ANON);
+let ALL=[], curFilter='all', curSearch='';
+const CATS={messages:['message','msg_request','msg_accept'],social:['like','comment','reply','mention','follow','follow_request','follow_accept','reaction'],opportunities:['job','investment','grant','competition','project','training','scholarship','nearby_investor','nearby_job','nearby_event','job_alert'],ai:['ai_rec'],system:['system','security','login_new','verified','verify_reject']};
+const LABELS={like:'أعجب بمنشورك',comment:'علّق على منشورك',reply:'رد على تعليقك',mention:'ذكرك في منشور',follow:'بدأ بمتابعتك',follow_request:'طلب متابعتك',follow_accept:'قبل طلب متابعتك',message:'أرسل لك رسالة',msg_request:'طلب مراسلتك',msg_accept:'قبل طلب المراسلة',job:'وظيفة مناسبة',investment:'أبدى اهتماماً بمشروعك',grant:'منحة متاحة',competition:'مسابقة جديدة',certificate:'شهادة جديدة',course_complete:'أكملت كورساً',verified:'تم توثيق حسابك',security:'تنبيه أمني',ai_rec:'توصية ذكية',job_alert:'وظيفة تناسب مهاراتك',system:'تحديث النظام'};
+const ICONS={like:'❤️',comment:'💬',reply:'↩️',mention:'📢',follow:'👤',follow_request:'🤝',follow_accept:'✅',message:'💌',msg_request:'📩',msg_accept:'✉️',job:'💼',investment:'💰',grant:'🏅',competition:'🏆',certificate:'🎓',course_complete:'🎓',verified:'✅',security:'🔐',ai_rec:'🤖',job_alert:'🔔',system:'⚙️'};
+const COLORS={like:'#ef4444',comment:'#2563eb',reply:'#7c3aed',mention:'#f59e0b',follow:'#1c5b38',follow_request:'#059669',message:'#1c5b38',investment:'#c69749',grant:'#b45309',certificate:'#c69749',verified:'#16a34a',security:'#ef4444',ai_rec:'#7c3aed',job_alert:'#16a34a',system:'#6b7280'};
+const URLS={message:n=>`messages.html?to=${n.actor_id}`,like:n=>`post.html?id=${n.entity_id}`,comment:n=>`post.html?id=${n.entity_id}`,reply:n=>`post.html?id=${n.entity_id}`,follow:n=>`user.html?id=${n.actor_id}`,follow_request:n=>`user.html?id=${n.actor_id}`,investment:n=>`user.html?id=${n.actor_id}`,job:n=>`post.html?id=${n.entity_id}`,certificate:n=>`certificates.html`,verified:n=>`profile.html`,security:n=>`settings.html`,ai_rec:n=>`ai-assistant.html`};
 
-const user=JSON.parse(localStorage.getItem('azza_user')||'null');
-if(!user){location.href='login.html';}
+function relTime(d){const s=Math.floor((Date.now()-new Date(d))/1000);return s<60?'الآن':s<3600?Math.floor(s/60)+'د':s<86400?Math.floor(s/3600)+'س':s<604800?Math.floor(s/86400)+'ي':new Date(d).toLocaleDateString('ar');}
+function getLabel(n){return LABELS[n.type]||'إشعار جديد';}
+function getUrl(n){return n.url||(URLS[n.type]?URLS[n.type](n):'app.html');}
 
-/* تحقق من جلسة Auth */
+/* ── Init ── */
 (async()=>{
-  const {data}=await azzaDB.auth.getSession();
-  if(!data?.session){localStorage.removeItem('azza_user');location.href='login.html';}
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  await loadNotifs();
+  subscribeRealtime();
+  AZZA_NOTIF.init(db,me);
+  AZZA_NOTIF.onBadgeUpdate(n=>{
+    const b=document.getElementById('top-badge');
+    if(b){b.textContent=n;b.style.display=n>0?'':'none';}
+  });
 })();
 
-/* ── أدوات مساعدة ── */
-const ini=n=>(n||'م').trim()[0].toUpperCase();
-const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const timeAgo=iso=>{const m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return'الآن';if(m<60)return m+' دقيقة';const h=Math.floor(m/60);if(h<24)return h+' ساعة';const d=Math.floor(h/24);if(d<7)return d+' يوم';return new Date(iso).toLocaleDateString('ar');};
-function showToast(m,t='ok'){const e=document.getElementById('toast');e.textContent=m;e.style.background=t==='ok'?'#1c5b38':'#c0392b';e.style.opacity='1';clearTimeout(e._t);e._t=setTimeout(()=>e.style.opacity='0',2600);}
-
-/* ── تهيئة AzzaNotif ── */
-AzzaNotif.init(azzaDB, user, ()=>{ fetchAndRender(); });
-
-/* ── جلب الإشعارات وعرضها ── */
-let _notifs=[];
-
-async function fetchAndRender(){
-  try{
-    const {data,error}=await azzaDB.from('notifications')
-      .select('*, actor:actor_id(id,name,photo,username)')
-      .eq('recipient_id',user.id)
-      .order('created_at',{ascending:false}).limit(50);
-    if(error)throw error;
-    _notifs=(data||[]).map(row=>{
-      /* metadata قد يكون jsonb (object) أو text — نتعامل مع الحالتين */
-      let meta={};
-      try{
-        if(typeof row.metadata === 'object' && row.metadata) meta=row.metadata;
-        else if(typeof row.metadata === 'string') meta=JSON.parse(row.metadata);
-        else if(typeof row.content === 'string') meta=JSON.parse(row.content);
-      }catch{}
-      return {
-        ...row,
-        meta,
-        _db_id:    row.id,
-        from_name: row.actor?.name  || meta.from_name  || meta.actor_name  || row.message?.split(' ')[0] || 'مستخدم',
-        from_photo:row.actor?.photo || meta.from_photo || null,
-        from_id:   row.actor_id     || row.actor?.id   || meta.from_id    || null,
-        post_id:   row.entity_id    || row.related_id  || meta.post_id    || null,
-        post_text: meta.post_text   || meta.message_preview || meta.comment_text || null,
-        at:        row.created_at,
-        read:      row.is_read      || row.read         || false,
-      };
-    });
-    render();
-  }catch(e){console.error('fetchNotifs:',e.message);}
+async function loadNotifs(){
+  const {data}=await db.from('notifications').select('*').eq('recipient_id',me.id).order('created_at',{ascending:false}).limit(100);
+  ALL=data||[];
+  render();
+  updateCounts();
 }
 
-function render(){
-  const unread=_notifs.filter(n=>!n.read).length;
-  const badge=document.getElementById('unread-badge');
-  if(badge){badge.style.display=unread?'inline':'none';badge.textContent=unread;}
+function subscribeRealtime(){
+  db.channel('notif-page').on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:`recipient_id=eq.${me.id}`},()=>loadNotifs()).subscribe();
+}
 
-  const el=document.getElementById('notif-list');
-  if(!_notifs.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔔</div><b>لا إشعارات بعد</b><span>ستظهر هنا عندما يتفاعل الآخرون مع منشوراتك</span></div>`;
+/* ── Render ── */
+function render(){
+  let items=ALL;
+  if(curFilter==='unread') items=items.filter(n=>!n.is_read);
+  else if(CATS[curFilter]) items=items.filter(n=>CATS[curFilter].includes(n.type));
+  if(curSearch) items=items.filter(n=>(n.title||getLabel(n)).toLowerCase().includes(curSearch.toLowerCase())||(n.body||'').toLowerCase().includes(curSearch.toLowerCase()));
+
+  if(!items.length){
+    document.getElementById('list').innerHTML=`<div class="empty"><div class="empty-em">🔔</div><div class="empty-title">لا توجد إشعارات</div><div style="font-size:13px">ستظهر هنا عند وصول إشعارات جديدة</div></div>`;
     return;
   }
 
-  el.innerHTML=_notifs.map(n=>{
-    const t=AzzaNotif.getType(n.type);
-    const av=n.from_photo?`<img src="${esc(n.from_photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:ini(n.from_name||'م');
-    const preview=n.post_text?`
-      <div class="post-preview">
-        <div class="post-preview-stripe" style="background:${t.color}"></div>
-        <span class="post-preview-text">${esc(n.post_text)}</span>
-        <span class="post-preview-arrow">←</span>
-      </div>`:'';
-    return `<div class="notif-item${n.read?'':' unread'}" data-id="${n.id}" onclick="goNotif(${JSON.stringify(n).replace(/"/g,'&quot;')})">
-      ${!n.read?'<div class="unread-dot"></div>':'<div style="width:8px;flex-shrink:0"></div>'}
-      <div class="notif-av-wrap">
-        <div class="notif-av">${av}</div>
-        <div class="type-badge">${t.emoji}</div>
-      </div>
-      <div class="notif-content">
-        <div class="notif-text"><strong>${esc(n.from_name||'مستخدم')}</strong> <span class="action">${t.text}</span></div>
-        ${preview}
-        <div class="notif-time">${timeAgo(n.at||n.created_at)}</div>
-      </div>
-      <button class="del-btn" onclick="event.stopPropagation();deleteNotif(${n._db_id})">
-        <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>`;
-  }).join('');
+  /* تجميع حسب اليوم */
+  const groups={today:[],yesterday:[],week:[],older:[]};
+  const now=new Date(), today=now.toDateString(), yesterday=new Date(now-86400000).toDateString();
+  items.forEach(n=>{
+    const d=new Date(n.created_at), ds=d.toDateString();
+    if(ds===today) groups.today.push(n);
+    else if(ds===yesterday) groups.yesterday.push(n);
+    else if(now-d<604800000) groups.week.push(n);
+    else groups.older.push(n);
+  });
+
+  const groupLabels={today:'اليوم',yesterday:'أمس',week:'هذا الأسبوع',older:'أقدم'};
+  let html='';
+  Object.entries(groups).forEach(([key,list])=>{
+    if(!list.length) return;
+    html+=`<div class="group-hdr">${groupLabels[key]}</div>`;
+    html+=list.map(buildItem).join('');
+  });
+  document.getElementById('list').innerHTML=html;
 }
 
-/* ── إجراءات ── */
-async function goNotif(n){
-  await azzaDB.from('notifications').update({read:true}).eq('id',n._db_id);
-  const fromId  = n.from_id  || n.meta?.from_id  || n.actor_id || n.actor?.id;
-  const postId  = n.post_id  || n.meta?.post_id  || n.entity_id || n.related_id;
-  const convId  = n.meta?.conversation_id || n.entity_id;
+function buildItem(n){
+  const t=n.type, ic=ICONS[t]||'🔔', col=COLORS[t]||'#1c5b38', url=getUrl(n), label=getLabel(n), pri=n.priority||0;
+  return`<div class="notif-item${!n.is_read?' unread':''} priority-${pri}" onclick="openNotif('${n.id}','${url}')">
+    <div class="notif-icon" style="background:${col}18">${ic}</div>
+    <div class="notif-body">
+      <div class="notif-title">
+        ${!n.is_read?'<span class="notif-unread-dot"></span>':''}
+        ${esc(n.title||label)}
+        ${pri===2?'<span style="background:#ef444415;color:#ef4444;font-size:10px;padding:2px 7px;border-radius:99px">مهم</span>':''}
+      </div>
+      ${n.body?`<div class="notif-desc">${esc(n.body)}</div>`:''}
+      <div class="notif-time">${relTime(n.created_at)}</div>
+      ${buildActions(n)}
+    </div>
+  </div>`;
+}
 
-  if(n.type==='message'){
-    if(convId){
-      location.href='messages.html?conv='+convId;
-    }else{
-      /* ابحث عن المحادثة بـfromId */
-      const convs=JSON.parse(localStorage.getItem('azza_conversations')||'[]');
-      const conv=convs.find(c=>c.participants?.some(p=>p.id===fromId));
-      location.href=conv?`messages.html?conv=${conv.id}`:'messages.html';
-    }
-  }else if(n.type==='follow'){
-    location.href=fromId?'user.html?id='+fromId:'app.html';
-  }else if(postId){
-    location.href='post.html?id='+postId;
-  }else if(fromId){
-    location.href='user.html?id='+fromId;
-  }else{
-    location.href='app.html';
-  }
+function buildActions(n){
+  if(n.type==='follow_request') return`<div class="notif-actions"><button class="na-btn primary" onclick="event.stopPropagation();acceptFollow('${n.actor_id}','${n.id}')">قبول</button><button class="na-btn" onclick="event.stopPropagation();rejectFollow('${n.id}')">رفض</button></div>`;
+  if(n.type==='msg_request')    return`<div class="notif-actions"><button class="na-btn primary" onclick="event.stopPropagation();location.href='messages.html?to=${n.actor_id}'">فتح المحادثة</button></div>`;
+  if(n.type==='investment')     return`<div class="notif-actions"><button class="na-btn primary" onclick="event.stopPropagation();location.href='messages.html?to=${n.actor_id}'">تواصل معه</button><button class="na-btn" onclick="event.stopPropagation();location.href='user.html?id=${n.actor_id}'">الملف</button></div>`;
+  return'';
+}
+
+async function openNotif(id,url){
+  await db.from('notifications').update({is_read:true,is_opened:true}).eq('id',id);
+  ALL=ALL.map(n=>n.id===id?{...n,is_read:true,is_opened:true}:n);
+  render(); updateCounts();
+  if(url) location.href=url;
 }
 
 async function markAllRead(){
-  await azzaDB.from('notifications').update({is_read:true,read:true,updated_at:new Date().toISOString()}).eq('recipient_id',user.id).eq('is_read',false);
-  _notifs=_notifs.map(n=>({...n,read:true}));
-  render();showToast('تم تحديد الكل كمقروء ✅');
+  await db.from('notifications').update({is_read:true}).eq('recipient_id',me.id).eq('is_read',false);
+  ALL=ALL.map(n=>({...n,is_read:true}));
+  render(); updateCounts();
+  AZZA_NOTIF.updateBadge();
 }
 
-async function deleteNotif(dbId){
-  document.querySelector(`[data-id="${dbId}"]`)?.classList.add('removing');
-  await azzaDB.from('notifications').delete().eq('id',dbId);
-  _notifs=_notifs.filter(n=>n._db_id!==dbId);
-  setTimeout(render,220);
+async function acceptFollow(actorId,nId){
+  await db.from('follows').upsert({follower_id:actorId,following_id:me.id},{onConflict:'follower_id,following_id'});
+  await db.from('notifications').update({is_read:true}).eq('id',nId);
+  /* إرسال إشعار قبول */
+  AZZA_NOTIF.send(actorId,'follow_accept');
+  loadNotifs();
 }
 
-/* ── التشغيل ── */
-fetchAndRender();
-AzzaNotif.subscribe(); /* Realtime من AzzaNotif مباشرة */
-initSoundUI();
+async function rejectFollow(nId){
+  await db.from('notifications').update({is_read:true}).eq('id',nId);
+  loadNotifs();
+}
+
+function updateCounts(){
+  const unread=ALL.filter(n=>!n.is_read).length;
+  document.getElementById('unread-count').textContent=unread;
+  const b=document.getElementById('top-badge');
+  if(b){b.textContent=unread;b.style.display=unread>0?'':'none';}
+}
+
+function setFilter(f,el){curFilter=f;document.querySelectorAll('.ft').forEach(t=>t.classList.toggle('on',t===el));render();}
+function doSearch(q){curSearch=q;render();}
+
+/* ── Prefs ── */
+const PREFS_CONFIG=[
+  {id:'message',  icon:'💌', label:'الرسائل'},
+  {id:'comment',  icon:'💬', label:'التعليقات'},
+  {id:'like',     icon:'❤️', label:'الإعجابات'},
+  {id:'follow',   icon:'👤', label:'المتابعون'},
+  {id:'mention',  icon:'📢', label:'الإشارات'},
+  {id:'job_alert',icon:'💼', label:'تنبيهات الوظائف'},
+  {id:'investment',icon:'💰',label:'اهتمام المستثمرين'},
+  {id:'ai_rec',   icon:'🤖', label:'توصيات الذكاء الاصطناعي'},
+  {id:'system',   icon:'⚙️', label:'تحديثات النظام'},
+  {id:'security', icon:'🔐', label:'التنبيهات الأمنية'},
+];
+
+function openPrefs(){
+  const saved=JSON.parse(localStorage.getItem('azza_notif_prefs')||'{}');
+  document.getElementById('prefs-list').innerHTML=PREFS_CONFIG.map(p=>`
+    <div class="pref-row">
+      <div class="pref-ic">${p.icon}</div>
+      <div class="pref-info"><div class="pref-label">${p.label}</div></div>
+      <label class="sw"><input type="checkbox" ${saved[p.id]!==false?'checked':''} onchange="savePref('${p.id}',this.checked)"><span class="sw-sl"></span></label>
+    </div>`).join('');
+  document.getElementById('prefs-overlay').classList.add('open');
+}
+
+function savePref(id,val){
+  const prefs=JSON.parse(localStorage.getItem('azza_notif_prefs')||'{}');
+  prefs[id]=val;
+  localStorage.setItem('azza_notif_prefs',JSON.stringify(prefs));
+  db.from('notification_prefs').upsert({user_id:me.id,type_prefs:prefs},{onConflict:'user_id'}).then(()=>{});
+}
+
+function closePrefs(){document.getElementById('prefs-overlay').classList.remove('open');}
 </script>
 </body>
 </html>
