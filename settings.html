@@ -199,6 +199,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
       <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       كلمة المرور
     </button>
+    <button class="snav-item" onclick="showSection('location',this)">
+      📍 الموقع
+    </button>
     <button class="snav-item" onclick="showSection('privacy',this)">
       <svg class="ic" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
       الخصوصية
@@ -540,6 +543,39 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
             <div class="toggle-desc">يظهر الـ Trust Score لزوار ملفك</div>
           </div>
           <label class="toggle"><input type="checkbox" id="prv-trust" checked onchange="savePrivacy()"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── الموقع على الخريطة ── -->
+    <div class="settings-section" id="sec-location">
+      <div class="ss-head">
+        <div class="ss-title">📍 موقعي على الخريطة</div>
+        <div class="ss-sub">تحكم في ظهورك على خريطة AZZA التفاعلية</div>
+      </div>
+      <div class="ss-body">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">إظهار موقعي للجميع</div>
+            <div class="toggle-desc">يجعلك مرئياً على الخريطة — المستثمرون والخبراء القريبون منك يمكنهم رؤيتك</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="loc-show" onchange="toggleShowOnMap(this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div style="padding:14px 0;border-top:1px solid var(--line)">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px">🗺️ موقعك الحالي</div>
+          <div id="loc-current-status" style="font-size:13px;color:var(--sub);margin-bottom:14px;padding:10px 14px;background:var(--bg2);border-radius:10px">جاري التحقق...</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="locGPS()" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--o);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">📡 GPS تلقائي</button>
+            <button onclick="startMiniMap()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--line);background:none;color:var(--ink);font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer">✏️ تحديد يدوي</button>
+          </div>
+        </div>
+        <div id="mini-map-wrap" style="display:none;margin-top:14px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--o)">اضغط على الخريطة لتحديد موقعك</div>
+          <div id="mini-map" style="height:220px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--bg2)"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button id="mini-confirm" onclick="confirmMiniLoc()" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--o);color:#fff;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;opacity:.5" disabled>✓ تأكيد</button>
+            <button onclick="cancelMiniMap()" style="padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:13px;cursor:pointer">إلغاء</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1401,6 +1437,120 @@ function showToast(m,t='ok'){
 }
 
 init();
+
+/* ══ Location on Map ══ */
+let miniMap=null, miniMarker=null, pendingLoc=null;
+
+function initLocationSection(){
+  const me=JSON.parse(localStorage.getItem('azza_user')||'null');
+  if(!me) return;
+  const showOn=me.show_on_map||localStorage.getItem('azza_show_on_map')==='1';
+  const cb=document.getElementById('loc-show');
+  if(cb) cb.checked=!!showOn;
+  const status=document.getElementById('loc-current-status');
+  if(status){
+    if(me.lat&&me.lng){
+      status.innerHTML='✅ موقعك محدد: <strong>'+(me.city_name||me.city||'')+'</strong> ('+me.lat.toFixed(4)+', '+me.lng.toFixed(4)+')';
+      status.style.color='var(--o)';
+    }else{
+      status.innerHTML='⚠️ لم تحدد موقعك بعد — استخدم أحد الأزرار أدناه';
+    }
+  }
+}
+
+function toggleShowOnMap(val){
+  const me=JSON.parse(localStorage.getItem('azza_user')||'null');
+  if(!me) return;
+  me.show_on_map=val;
+  localStorage.setItem('azza_user',JSON.stringify(me));
+  localStorage.setItem('azza_show_on_map',val?'1':'0');
+  /* Supabase */
+  try{
+    const {createClient}=window.supabase||{};
+    if(createClient){
+      const db=createClient('https://iecniydswotsilaueogq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA');
+      db.from('users').update({show_on_map:val}).eq('id',me.id).then(()=>{});
+    }
+  }catch(e){}
+  showToast(val?'✅ أنت الآن مرئي على الخريطة':'🔒 تم إخفاؤك من الخريطة');
+}
+
+async function saveLocationToSupabase(lat,lng){
+  const me=JSON.parse(localStorage.getItem('azza_user')||'null');
+  if(!me) return;
+  me.lat=lat; me.lng=lng;
+  localStorage.setItem('azza_user',JSON.stringify(me));
+  try{
+    const {createClient}=window.supabase||{};
+    if(createClient){
+      const db=createClient('https://iecniydswotsilaueogq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA');
+      await db.from('users').update({lat,lng}).eq('id',me.id);
+    }
+  }catch(e){console.warn(e);}
+  initLocationSection();
+  showToast('✅ تم حفظ موقعك');
+}
+
+function locGPS(){
+  navigator.geolocation?.getCurrentPosition(
+    p=>saveLocationToSupabase(p.coords.latitude,p.coords.longitude),
+    ()=>showToast('تعذّر GPS — جرب التحديد اليدوي','err')
+  );
+}
+
+function startMiniMap(){
+  document.getElementById('mini-map-wrap').style.display='block';
+  if(miniMap) return;
+  /* بدّل Leaflet لأنه أبسط في صفحة الإعدادات */
+  const script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  const link=document.createElement('link');
+  link.rel='stylesheet';link.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+  document.head.appendChild(link);
+  document.head.appendChild(script);
+  script.onload=()=>{
+    const me=JSON.parse(localStorage.getItem('azza_user')||'null');
+    const lat=me?.lat||31.9, lng=me?.lng||35.2;
+    miniMap=L.map('mini-map').setView([lat,lng],10);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:18,subdomains:'abcd'}).addTo(miniMap);
+    if(me?.lat&&me?.lng){
+      miniMarker=L.marker([me.lat,me.lng],{draggable:true}).addTo(miniMap);
+      miniMarker.on('dragend',e=>{pendingLoc=e.target.getLatLng();enableConfirm();});
+      pendingLoc={lat:me.lat,lng:me.lng}; enableConfirm();
+    }
+    miniMap.on('click',e=>{
+      pendingLoc=e.latlng;
+      if(miniMarker) miniMarker.setLatLng(e.latlng);
+      else miniMarker=L.marker(e.latlng,{draggable:true}).addTo(miniMap).on('dragend',ev=>{pendingLoc=ev.target.getLatLng();});
+      enableConfirm();
+    });
+  };
+}
+
+function enableConfirm(){
+  const btn=document.getElementById('mini-confirm');
+  if(btn){btn.disabled=false;btn.style.opacity='1';}
+}
+
+function confirmMiniLoc(){
+  if(!pendingLoc) return;
+  saveLocationToSupabase(pendingLoc.lat,pendingLoc.lng);
+  cancelMiniMap();
+}
+
+function cancelMiniMap(){
+  document.getElementById('mini-map-wrap').style.display='none';
+  pendingLoc=null;
+}
+
+/* init عند فتح قسم الموقع */
+const _origShowSection=typeof showSection==='function'?showSection:null;
+if(_origShowSection){
+  window.showSection=function(id,btn){
+    _origShowSection(id,btn);
+    if(id==='location') initLocationSection();
+  };
+}
 </script>
 </body>
 </html>

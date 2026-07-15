@@ -189,25 +189,6 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 /* Toast */
 #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:9px 18px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;z-index:9999;opacity:0;transition:.3s;pointer-events:none;font-family:Tajawal;white-space:nowrap;backdrop-filter:blur(10px)}
 
-/* No Location Banner */
-.no-loc-banner{
-  position:fixed;bottom:0;right:0;left:0;z-index:900;
-  background:linear-gradient(135deg,var(--od),var(--o));
-  padding:16px 20px 28px;
-  border-radius:24px 24px 0 0;
-  box-shadow:0 -8px 32px rgba(0,0,0,.2);
-  transform:translateY(100%);
-  transition:transform .4s cubic-bezier(.34,1.06,.64,1);
-  color:#fff;
-}
-.no-loc-banner.show{transform:translateY(0)}
-.nlb-title{font-size:17px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.nlb-sub{font-size:13px;opacity:.8;margin-bottom:16px;line-height:1.6}
-.nlb-btns{display:flex;gap:10px}
-.nlb-btn{flex:1;padding:12px;border-radius:12px;border:none;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
-.nlb-primary{background:var(--g);color:var(--od)}.nlb-primary:hover{background:var(--gs)}
-.nlb-sec{background:rgba(255,255,255,.15);color:#fff}.nlb-sec:hover{background:rgba(255,255,255,.25)}
-
 /* Location Picker Mode */
 .pick-mode-bar{
   position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:900;
@@ -219,23 +200,6 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 }
 .pick-mode-bar.show{display:flex;animation:pop .2s ease}
 .pick-cancel{padding:5px 12px;border-radius:99px;border:1.5px solid rgba(255,255,255,.4);background:none;color:#fff;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer}
-
-/* Empty State */
-.empty-state{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:300;text-align:center;pointer-events:none;
-  transition:opacity .3s;
-}
-.empty-state.hidden{opacity:0}
-.es-em{font-size:52px;margin-bottom:12px}
-.es-title{font-size:16px;font-weight:900;color:var(--ink);margin-bottom:6px;
-  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  padding:8px 16px;border-radius:12px;
-}
-.es-sub{font-size:13px;color:var(--sub);
-  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  padding:6px 14px;border-radius:10px;margin-top:4px;
-}
 
 /* Mobile */
 @media(max-width:600px){
@@ -352,28 +316,10 @@ body{font-family:Tajawal,sans-serif;color:var(--ink);direction:rtl}
 
 <div id="toast"></div>
 
-<!-- No Location Banner -->
-<div class="no-loc-banner" id="no-loc-banner">
-  <div class="nlb-title">📍 أنت غير موجود على الخريطة</div>
-  <div class="nlb-sub">ثبّت موقعك لتظهر للمستثمرين والخبراء القريبين منك — خطوة واحدة فقط</div>
-  <div class="nlb-btns">
-    <button class="nlb-btn nlb-primary" onclick="useGPS()">📡 استخدم GPS</button>
-    <button class="nlb-btn nlb-sec"     onclick="startPickMode()">🗺️ حدد يدوياً</button>
-    <button class="nlb-btn nlb-sec" style="flex:.5;padding:12px 8px" onclick="dismissBanner()">✕</button>
-  </div>
-</div>
-
 <!-- Pick Mode Bar -->
 <div class="pick-mode-bar" id="pick-bar">
   📍 اضغط على الخريطة لتحديد موقعك
   <button class="pick-cancel" onclick="cancelPickMode()">إلغاء</button>
-</div>
-
-<!-- Empty State -->
-<div class="empty-state" id="empty-state">
-  <div class="es-em">🗺️</div>
-  <div class="es-title">الخريطة فارغة حالياً</div>
-  <div class="es-sub">كن أول من يظهر — ثبّت موقعك الآن</div>
 </div>
 
 <script>
@@ -758,30 +704,18 @@ async function follow(id){
 let pickMode=false, pickMarkerEl=null;
 
 function checkMyLocation(){
-  if(me?.lat&&me?.lng){
-    D('no-loc-banner').classList.remove('show');
-    D('empty-state').classList.add('hidden');
-    return;
-  }
-  /* المستخدم ما عنده lat/lng — أظهر البانر بعد ثانيتين */
-  setTimeout(()=>{
-    if(!me?.lat) D('no-loc-banner').classList.add('show');
-  },2000);
+  /* تظهر على الخريطة فقط لو show_on_map مفعّل */
+  const showOnMap=me?.show_on_map||localStorage.getItem('azza_show_on_map')==='1';
+  if(showOnMap&&me?.lat&&me?.lng) addMeMarker();
 }
 
-function dismissBanner(){
-  D('no-loc-banner').classList.remove('show');
-  localStorage.setItem('azza_loc_dismissed','1');
-}
-
-/* GPS تلقائي */
+/* GPS من الإعدادات */
 function useGPS(){
-  D('no-loc-banner').classList.remove('show');
   navigator.geolocation?.getCurrentPosition(async p=>{
     const lat=p.coords.latitude, lng=p.coords.longitude;
     await saveMyLocation(lat,lng);
-    toast('✅ تم تثبيت موقعك بنجاح');
-  },()=>toast('تعذّر GPS — حدد يدوياً','err'));
+    toast('✅ تم تثبيت موقعك');
+  },()=>toast('تعذّر GPS','err'));
 }
 
 /* وضع الاختيار اليدوي */
@@ -819,12 +753,6 @@ async function saveMyLocation(lat,lng){
   cancelPickMode();
 }
 
-/* Empty State */
-function updateEmptyState(){
-  const hasData=ALL.length>0;
-  const es=D('empty-state');
-  if(es) es.classList.toggle('hidden',hasData);
-}
 
 /* ══ Sidebar ══ */
 function buildSidebar(){
@@ -877,8 +805,7 @@ async function loadSupa(){
       if(!ALL.find(x=>x.id===u.id)){ALL.push(u);if(MAP.loaded())addMarker(u);}
     });
     buildSidebar();
-    updateEmptyState();
-  }catch(e){updateEmptyState();}
+  }catch(e){}
 }
 </script>
 </body>
