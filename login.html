@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1c5b38">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AZZA">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#1c5b38">
 <title>AZZA — تسجيل الدخول</title>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
@@ -180,6 +192,15 @@ const SB_URL='https://iecniydswotsilaueogq.supabase.co';
 const SB_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
 const sb=supabase.createClient(SB_URL,SB_ANON_KEY);
 </script>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('sw.js',{scope:'/azzaworld/'})
+          .then(r=>console.log('[AZZA PWA] SW registered'))
+          .catch(e=>console.warn('[AZZA PWA] SW failed:',e));
+      });
+    }
+  </script>
 </head>
 <body>
 
@@ -800,6 +821,46 @@ async function register(){
   /* الخطوة 1: إنشاء حساب Auth حقيقي بـSupabase — نُرفق كل بيانات الملف الشخصي
      كـuser_metadata (متاحة فوراً بدون الحاجة لـsession فعّالة)، لأنه بانتظار
      تأكيد البريد لن نقدر نكتب بجدول users مباشرة (auth.uid() غير فعّال بعد) */
+  /* ── إحداثيات المدن ── */
+  const CITY_COORDS_DB={
+    'PS':{'رام الله':{lat:31.9038,lng:35.2034,name:'رام الله',countryName:'فلسطين'},
+          'القدس':{lat:31.7683,lng:35.2137,name:'القدس',countryName:'فلسطين'},
+          'نابلس':{lat:32.2211,lng:35.2544,name:'نابلس',countryName:'فلسطين'},
+          'الخليل':{lat:31.5326,lng:35.0998,name:'الخليل',countryName:'فلسطين'},
+          'غزة':{lat:31.5017,lng:34.4668,name:'غزة',countryName:'فلسطين'},
+          'بيت لحم':{lat:31.7054,lng:35.2024,name:'بيت لحم',countryName:'فلسطين'},
+          'جنين':{lat:32.4598,lng:35.3027,name:'جنين',countryName:'فلسطين'},
+          'طولكرم':{lat:32.3100,lng:35.0300,name:'طولكرم',countryName:'فلسطين'},
+          'أريحا':{lat:31.8571,lng:35.4607,name:'أريحا',countryName:'فلسطين'},
+          'خان يونس':{lat:31.3479,lng:34.3036,name:'خان يونس',countryName:'فلسطين'},
+          'رفح':{lat:31.2968,lng:34.2434,name:'رفح',countryName:'فلسطين'},
+          'البيرة':{lat:31.9131,lng:35.2105,name:'البيرة',countryName:'فلسطين'},
+          'بيرزيت':{lat:31.9794,lng:35.1856,name:'بيرزيت',countryName:'فلسطين'},
+          'قلقيلية':{lat:32.1889,lng:34.9706,name:'قلقيلية',countryName:'فلسطين'},
+          'سلفيت':{lat:32.0800,lng:35.1800,name:'سلفيت',countryName:'فلسطين'},
+          'طوباس':{lat:32.3200,lng:35.3700,name:'طوباس',countryName:'فلسطين'}},
+    'JO':{'عمان':{lat:31.9539,lng:35.9106,name:'عمان',countryName:'الأردن'},
+          'إربد':{lat:32.5556,lng:35.8500,name:'إربد',countryName:'الأردن'},
+          'الزرقاء':{lat:32.0728,lng:36.0878,name:'الزرقاء',countryName:'الأردن'}},
+    'SA':{'الرياض':{lat:24.7136,lng:46.6753,name:'الرياض',countryName:'السعودية'},
+          'جدة':{lat:21.5433,lng:39.1728,name:'جدة',countryName:'السعودية'},
+          'مكة المكرمة':{lat:21.3891,lng:39.8579,name:'مكة',countryName:'السعودية'}},
+    'EG':{'القاهرة':{lat:30.0444,lng:31.2357,name:'القاهرة',countryName:'مصر'},
+          'الإسكندرية':{lat:31.2001,lng:29.9187,name:'الإسكندرية',countryName:'مصر'}},
+    'AE':{'دبي':{lat:25.2048,lng:55.2708,name:'دبي',countryName:'الإمارات'},
+          'أبوظبي':{lat:24.4539,lng:54.3773,name:'أبوظبي',countryName:'الإمارات'}},
+    'LB':{'بيروت':{lat:33.8938,lng:35.5018,name:'بيروت',countryName:'لبنان'}},
+    'MA':{'الرباط':{lat:34.0209,lng:-6.8416,name:'الرباط',countryName:'المغرب'},
+          'الدار البيضاء':{lat:33.5731,lng:-7.5898,name:'الدار البيضاء',countryName:'المغرب'}},
+  };
+
+  if(typeof getCityCoords==='undefined'){
+    window.getCityCoords=(country,city)=>{
+      const cc=CITY_COORDS_DB[country];
+      if(!cc) return null;
+      return cc[city]||Object.values(cc)[0]||null;
+    };
+  }
   const cityData=getCityCoords(countryKey,cityKey);
   const {data:authData,error:authError}=await sb.auth.signUp({
     email,password:pass,

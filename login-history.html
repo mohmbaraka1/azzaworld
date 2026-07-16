@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سجل الدخول والأجهزة — AZZA</title>
+<script src="supabase.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+:root{--gold:#c69749;--olive:#1c5b38;--od:#0e3622;--ol:rgba(28,91,56,.08);
+  --bg:#f5f0e8;--bg2:#ece5d4;--card:#fff;--ink:#1a1814;--sub:#7a7060;--muted:#9a9080;--line:rgba(0,0,0,.08);--r:14px}
+.dk{--bg:#111009;--bg2:#1a180f;--card:#1e1c12;--ink:#f0ead8;--sub:#9a9080;--line:rgba(255,255,255,.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Tajawal,sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+.tb-back{width:34px;height:34px;border-radius:10px;border:none;background:var(--bg2);cursor:pointer;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.tb-back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.main{max-width:720px;margin:0 auto;padding:20px 16px}
+
+/* Tabs */
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px}
+.tab{flex:1;padding:9px;border-radius:9px;border:none;font-family:Tajawal,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;background:none;color:var(--sub)}
+.tab.on{background:var(--olive);color:#fff}
+
+/* Device Card */
+.device-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;position:relative}
+.device-card.current{border-color:var(--olive)}
+.dev-ic{width:48px;height:48px;border-radius:14px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.dev-info{flex:1}
+.dev-name{font-size:15px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.dev-current{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--olive);color:#fff}
+.dev-meta{font-size:12px;color:var(--sub)}
+.dev-last{font-size:11px;color:var(--muted);margin-top:3px}
+.dev-actions{display:flex;gap:6px}
+.dev-btn{padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;color:var(--sub)}
+.dev-btn:hover{border-color:var(--olive);color:var(--olive)}
+.dev-btn.danger:hover{border-color:#ef4444;color:#ef4444}
+
+/* Login History */
+.lh-item{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.lh-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.lh-ic.ok{background:rgba(22,163,74,.1)}
+.lh-ic.fail{background:rgba(239,68,68,.1)}
+.lh-body{flex:1}
+.lh-title{font-size:13px;font-weight:700;margin-bottom:2px}
+.lh-meta{font-size:11px;color:var(--sub)}
+.lh-time{font-size:11px;color:var(--muted);text-align:left}
+.lh-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700}
+.lh-ok{background:rgba(22,163,74,.1);color:#16a34a}
+.lh-fail{background:rgba(239,68,68,.1);color:#ef4444}
+
+/* Security Events */
+.se-item{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.se-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.severity-info{background:rgba(37,99,235,.08)}
+.severity-warning{background:rgba(245,158,11,.08)}
+.severity-critical{background:rgba(239,68,68,.1)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.stat-num{font-size:24px;font-weight:900;color:var(--olive)}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* Danger Zone */
+.danger-zone{background:rgba(239,68,68,.04);border:1.5px solid rgba(239,68,68,.15);border-radius:var(--r);padding:16px;margin-top:20px}
+.dz-title{font-size:14px;font-weight:700;color:#dc2626;margin-bottom:12px}
+.dz-btn{width:100%;padding:11px;border-radius:10px;border:none;background:#ef4444;color:#fff;font-family:Tajawal,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s}
+.dz-btn:hover{background:#dc2626}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="tb-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <span style="font-size:16px;font-weight:900;flex:1">🔐 الأمان والأجهزة</span>
+  <button onclick="location.href='settings.html'" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:none;font-family:Tajawal,sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--sub)">⚙️ الإعدادات</button>
+</div>
+
+<div class="main">
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="stat-sessions">0</div><div class="stat-lbl">جهاز نشط</div></div>
+    <div class="stat"><div class="stat-num" id="stat-logins">0</div><div class="stat-lbl">دخول هذا الشهر</div></div>
+    <div class="stat"><div class="stat-num" id="stat-events">0</div><div class="stat-lbl">حدث أمني</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('devices',this)">📱 الأجهزة</button>
+    <button class="tab" onclick="showTab('history',this)">📋 سجل الدخول</button>
+    <button class="tab" onclick="showTab('events',this)">⚠️ أحداث أمنية</button>
+  </div>
+
+  <!-- Devices -->
+  <div id="tab-devices"></div>
+  <!-- History -->
+  <div id="tab-history" style="display:none"></div>
+  <!-- Events -->
+  <div id="tab-events" style="display:none"></div>
+
+  <!-- Danger Zone -->
+  <div class="danger-zone">
+    <div class="dz-title">🚨 منطقة الخطر</div>
+    <button class="dz-btn" onclick="signOutAll()">تسجيل الخروج من كل الأجهزة</button>
+  </div>
+</div>
+
+<script>
+const SB_URL  = 'https://iecniydswotsilaueogq.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllY25peWRzd290c2lsYXVlb2dxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxOTg1OTcsImV4cCI6MjA5Nzc3NDU5N30.69LfEBHUwToTHue3EPS_KYq9BvDSZJ9jcW_P1yRKReA';
+const db  = supabase.createClient(SB_URL,SB_ANON);
+const me  = JSON.parse(localStorage.getItem('azza_user')||'null');
+if(!me) location.href='login.html';
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+const DEVICE_ICONS={mobile:'📱',tablet:'📟',desktop:'💻'};
+const BROWSER_ICONS={Chrome:'🌐',Firefox:'🦊',Safari:'🧭',Edge:'🔷'};
+
+(async()=>{
+  document.documentElement.classList.toggle('dk',localStorage.getItem('azza_theme')==='dark');
+  await Promise.all([loadDevices(),loadHistory(),loadEvents()]);
+})();
+
+/* ── Devices ── */
+async function loadDevices(){
+  const {data:sessions}=await db.from('user_sessions').select('*').eq('user_id',me.id).order('last_active',{ascending:false});
+  const {data:devices}=await db.from('user_devices').select('*').eq('user_id',me.id).eq('is_active',true);
+
+  const all=[...(sessions||[])];
+  document.getElementById('stat-sessions').textContent=all.length||1;
+
+  /* الجهاز الحالي من localStorage */
+  const ua=navigator.userAgent;
+  const curBr=/Chrome/i.test(ua)?'Chrome':/Firefox/i.test(ua)?'Firefox':/Safari/i.test(ua)?'Safari':'متصفح';
+  const curOs=/Windows/i.test(ua)?'Windows':/Mac/i.test(ua)?'Mac':/Android/i.test(ua)?'Android':/iPhone/i.test(ua)?'iOS':'غير معروف';
+  const curDev=/Mobile/i.test(ua)?'mobile':'desktop';
+
+  const el=document.getElementById('tab-devices');
+  el.innerHTML=`
+    <div class="device-card current">
+      <div class="dev-ic">${DEVICE_ICONS[curDev]||'💻'}</div>
+      <div class="dev-info">
+        <div class="dev-name">${curBr} على ${curOs} <span class="dev-current">الجهاز الحالي</span></div>
+        <div class="dev-meta">آخر نشاط: الآن</div>
+      </div>
+    </div>
+    ${all.filter(s=>!s.is_current).map(s=>`
+      <div class="device-card">
+        <div class="dev-ic">${DEVICE_ICONS[s.device_type]||'💻'}</div>
+        <div class="dev-info">
+          <div class="dev-name">${esc(s.device_name||s.browser||'جهاز')} ${s.os?'/ '+esc(s.os):''}</div>
+          <div class="dev-meta">${s.city?esc(s.city)+' · ':''} ${s.browser||''}</div>
+          <div class="dev-last">آخر نشاط: ${relTime(s.last_active)}</div>
+        </div>
+        <div class="dev-actions">
+          <button class="dev-btn danger" onclick="removeSession('${s.id}')">تسجيل خروج</button>
+        </div>
+      </div>`).join('')}
+    ${all.length===0?`<div style="text-align:center;padding:32px;color:var(--muted)"><div style="font-size:36px;margin-bottom:10px">📱</div>لا توجد جلسات مسجّلة</div>`:''}`;
+}
+
+/* ── Login History ── */
+async function loadHistory(){
+  const {data}=await db.from('login_history').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(50);
+  const thisMonth=(data||[]).filter(l=>new Date(l.created_at).getMonth()===new Date().getMonth()).length;
+  document.getElementById('stat-logins').textContent=thisMonth;
+  document.getElementById('tab-history').innerHTML=(data||[]).length?
+    (data||[]).map(l=>`
+      <div class="lh-item">
+        <div class="lh-ic ${l.success?'ok':'fail'}">${l.success?'✅':'❌'}</div>
+        <div class="lh-body">
+          <div class="lh-title">${l.success?'دخول ناجح':'محاولة دخول فاشلة'} · ${esc(l.browser||'')}</div>
+          <div class="lh-meta">${l.os?esc(l.os)+' · ':''}${l.device_type==='mobile'?'📱 موبايل':l.device_type==='tablet'?'📟 تابلت':'💻 كمبيوتر'}</div>
+        </div>
+        <div class="lh-time">
+          <span class="lh-badge ${l.success?'lh-ok':'lh-fail'}">${l.success?'ناجح':'فاشل'}</span>
+          <div style="margin-top:4px">${relTime(l.created_at)}</div>
+        </div>
+      </div>`).join('')
+    :'<div style="text-align:center;padding:32px;color:var(--muted)">لا يوجد سجل دخول بعد</div>';
+}
+
+/* ── Security Events ── */
+async function loadEvents(){
+  const {data}=await db.from('security_events').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(30);
+  document.getElementById('stat-events').textContent=(data||[]).filter(e=>e.severity!=='info').length;
+  const labels={login_success:'دخول ناجح',login_fail:'محاولة دخول فاشلة',new_device:'جهاز جديد',pwd_change:'تغيير كلمة المرور',account_locked:'الحساب مقفل مؤقتاً','2fa_enabled':'تم تفعيل 2FA',suspicious_activity:'نشاط مشبوه'};
+  const icons={info:'ℹ️',warning:'⚠️',critical:'🚨'};
+  document.getElementById('tab-events').innerHTML=(data||[]).length?
+    (data||[]).map(e=>`
+      <div class="se-item">
+        <div class="se-ic severity-${e.severity}">${icons[e.severity]||'ℹ️'}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${labels[e.event_type]||esc(e.event_type)}</div>
+          <div style="font-size:11px;color:var(--muted)">${relTime(e.created_at)}</div>
+        </div>
+        <span style="font-size:10px;padding:3px 9px;border-radius:99px;font-weight:700;background:${e.severity==='critical'?'rgba(239,68,68,.1)':e.severity==='warning'?'rgba(245,158,11,.1)':'rgba(37,99,235,.08)'};color:${e.severity==='critical'?'#ef4444':e.severity==='warning'?'#b45309':'#2563eb'}">${e.severity==='critical'?'حرج':e.severity==='warning'?'تحذير':'معلومة'}</span>
+      </div>`).join('')
+    :'<div style="text-align:center;padding:32px;color:var(--muted)">لا أحداث أمنية</div>';
+}
+
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  btn?.classList.add('on');
+  ['devices','history','events'].forEach(t=>document.getElementById('tab-'+t).style.display=t===id?'block':'none');
+}
+
+async function removeSession(id){
+  if(!confirm('تسجيل الخروج من هذا الجهاز؟')) return;
+  await db.from('user_sessions').delete().eq('id',id);
+  loadDevices();
+}
+
+async function signOutAll(){
+  if(!confirm('تسجيل الخروج من كل الأجهزة؟')) return;
+  await db.from('user_sessions').delete().eq('user_id',me.id);
+  await db.auth.signOut({scope:'global'});
+  localStorage.clear();
+  location.href='login.html';
+}
+
+function relTime(d){
+  const s=Math.floor((Date.now()-new Date(d))/1000);
+  return s<60?'الآن':s<3600?Math.floor(s/60)+'د':s<86400?Math.floor(s/3600)+'س':Math.floor(s/86400)+'ي';
+}
+</script>
+</body>
+</html>

@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1c5b38">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AZZA">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#1c5b38">
 <title>عزّة — الإعدادات</title>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
@@ -157,7 +169,17 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
 }
 </style>
 <script src="supabase.js"></script>
+<script src="security.js"></script>
 <script src="notifications.js"></script>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('sw.js',{scope:'/azzaworld/'})
+          .then(r=>console.log('[AZZA PWA] SW registered'))
+          .catch(e=>console.warn('[AZZA PWA] SW failed:',e));
+      });
+    }
+  </script>
 </head>
 <body>
 
@@ -706,7 +728,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--ink);-
               <div class="danger-label">حذف الحساب نهائياً</div>
               <div class="danger-desc">يحذف حسابك وجميع بياناتك بشكل لا يمكن التراجع عنه</div>
             </div>
-            <button class="danger-btn" onclick="deleteAccount()">حذف الحساب</button>
+            <button class="danger-btn" onclick="AzzaSecurity.showDeleteAccount()">حذف الحساب</button>
           </div>
         </div>
       </div>
@@ -1550,6 +1572,18 @@ if(_origShowSection){
     _origShowSection(id,btn);
     if(id==='location') initLocationSection();
   };
+}
+
+async function loadSecLog(){
+  const me=JSON.parse(localStorage.getItem('azza_user')||'null');
+  if(!me) return;
+  const {data}=await db.from('security_logs').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(5);
+  const labels={login:'تسجيل دخول',logout:'تسجيل خروج',password_change:'تغيير كلمة المرور',account_delete_requested:'طلب حذف الحساب'};
+  const el=document.getElementById('sec-log');
+  if(el) el.innerHTML=(data||[]).map(l=>`<div style="padding:6px 0;border-bottom:.5px solid var(--line);display:flex;justify-content:space-between">
+    <span>${labels[l.event]||l.event}</span>
+    <span style="color:var(--muted)">${new Date(l.created_at).toLocaleDateString('ar')}</span>
+  </div>`).join('')||'لا يوجد نشاط مسجّل بعد';
 }
 </script>
 </body>
