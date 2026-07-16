@@ -1,0 +1,37 @@
+{
+  "name": "AZZA — منصة ريادة الأعمال العربية",
+  "short_name": "AZZA",
+  "description": "منصة تربط رواد الأعمال بالمستثمرين والخبراء في العالم العربي",
+  "start_url": "/azzaworld/app.html",
+  "scope": "/azzaworld/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0e3622",
+  "theme_color": "#1c5b38",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["business", "social", "productivity"],
+  "icons": [
+    { "src": "icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "icons/screenshot-mobile.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow", "label": "الفيد الرئيسي" },
+    { "src": "icons/screenshot-desktop.png", "sizes": "1280x720", "type": "image/png", "form_factor": "wide", "label": "لوحة التحكم" }
+  ],
+  "shortcuts": [
+    { "name": "الفيد", "url": "/azzaworld/app.html", "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}] },
+    { "name": "الخريطة", "url": "/azzaworld/explore.html", "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}] },
+    { "name": "الأكاديمية", "url": "/azzaworld/academy.html", "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}] },
+    { "name": "المساعد الذكي", "url": "/azzaworld/ai-assistant.html", "icons": [{"src": "icons/icon-96.png", "sizes": "96x96"}] }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
